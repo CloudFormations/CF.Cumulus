@@ -1,2 +1,0 @@
-type,name,path,value
-linkedService,SupportDatabase,typeProperties.connectionString.secretName,$($Env:SQLDatabase)
