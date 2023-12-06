@@ -1,0 +1,176 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pages", "Pages", "{2BB4EF83-F994-4E9E-AD4A-82BD93CCD8B8}"
+	ProjectSection(SolutionItems) = preProject
+		404.md = 404.md
+		contents.md = contents.md
+		deployprocfwk.md = deployprocfwk.md
+		index.md = index.md
+		servicetiers.md = servicetiers.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assets", "Assets", "{0261DDC1-17FF-4054-B280-711E91A30B3E}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		_config.yml = _config.yml
+		All Designs.vsdx = All Designs.vsdx
+		favicon.ico = favicon.ico
+		Gemfile = Gemfile
+		Generate Markdown for Database Procedures.sql = Generate Markdown for Database Procedures.sql
+		Generate Markdown for Database Tables.sql = Generate Markdown for Database Tables.sql
+		Generate Markdown for Database Views.sql = Generate Markdown for Database Views.sql
+		_includes\google-search.html = _includes\google-search.html
+		googlebed0a327165f6996.html = googlebed0a327165f6996.html
+		Images.pptx = Images.pptx
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Orchestrators", "Orchestrators", "{43D8C262-5EA3-48B4-BA51-EE5E13891CB3}"
+	ProjectSection(SolutionItems) = preProject
+		activities.md = activities.md
+		datafactory.md = datafactory.md
+		datasets.md = datasets.md
+		linkedservices.md = linkedservices.md
+		orchestrators.md = orchestrators.md
+		orchestratortypes.md = orchestratortypes.md
+		pipelines.md = pipelines.md
+		synapse.md = synapse.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Database", "Database", "{F9DFE9B3-0EA5-4CE9-A76F-762AC58ABD65}"
+	ProjectSection(SolutionItems) = preProject
+		database.md = database.md
+		dbfunctions.md = dbfunctions.md
+		properties.md = properties.md
+		schemas.md = schemas.md
+		storedprocedures.md = storedprocedures.md
+		synonyms.md = synonyms.md
+		tables.md = tables.md
+		views.md = views.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions", "Functions", "{9F58ED69-1325-4126-BDF2-5AC84139EFD8}"
+	ProjectSection(SolutionItems) = preProject
+		cancelpipeline.md = cancelpipeline.md
+		checkpipelinestatus.md = checkpipelinestatus.md
+		datafactoryservice.md = datafactoryservice.md
+		executepipeline.md = executepipeline.md
+		functions.md = functions.md
+		geterrordetails.md = geterrordetails.md
+		helpers.md = helpers.md
+		invalidrequestexception.md = invalidrequestexception.md
+		pipelinerequest.md = pipelinerequest.md
+		pipelinerunrequest.md = pipelinerunrequest.md
+		sendemail.md = sendemail.md
+		services.md = services.md
+		servicetype.md = servicetype.md
+		synapseservice.md = synapseservice.md
+		validatepipeline.md = validatepipeline.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Support", "Support", "{8DB1ED23-8248-4CC1-889B-87D6A8180094}"
+	ProjectSection(SolutionItems) = preProject
+		contributors.md = contributors.md
+		glossary.md = glossary.md
+		resources.md = resources.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{60C83634-3A1B-43AA-87C4-D97D3BDD3D31}"
+	ProjectSection(SolutionItems) = preProject
+		activity-secureinput.png = activity-secureinput.png
+		activitychain-checkingforrunning.png = activitychain-checkingforrunning.png
+		activitychain-child.png = activitychain-child.png
+		activitychain-cleanup.png = activitychain-cleanup.png
+		activitychain-full.png = activitychain-full.png
+		activitychain-infant.png = activitychain-infant.png
+		activitychain-parent.png = activitychain-parent.png
+		arrow-grey.png = arrow-grey.png
+		batch-chain.png = batch-chain.png
+		child.png = child.png
+		crosstenantauth.png = crosstenantauth.png
+		csharpdotnetcore.png = csharpdotnetcore.png
+		datafactory.png = datafactory.png
+		dataset.png = dataset.png
+		dbpart1.png = dbpart1.png
+		dbpart2.png = dbpart2.png
+		failhandling-chain.png = failhandling-chain.png
+		failhandling-none.png = failhandling-none.png
+		failhandling-simple.png = failhandling-simple.png
+		foreach-activity.png = foreach-activity.png
+		foreach-scaleout.png = foreach-scaleout.png
+		function.png = function.png
+		grandparent.png = grandparent.png
+		iconwithalerting.png = iconwithalerting.png
+		infant.png = infant.png
+		keyvault.png = keyvault.png
+		linkedservice-connections.png = linkedservice-connections.png
+		linkedservice.png = linkedservice.png
+		msi.png = msi.png
+		orc-adf-all.png = orc-adf-all.png
+		orc-adf-driver.png = orc-adf-driver.png
+		orc-adf-worker.png = orc-adf-worker.png
+		orc-syn-all.png = orc-syn-all.png
+		orc-syn-driver.png = orc-syn-driver.png
+		orc-syn-worker.png = orc-syn-worker.png
+		overview.png = overview.png
+		parent.png = parent.png
+		pipeline-key.png = pipeline-key.png
+		powerbi.png = powerbi.png
+		sidebar-small.png = sidebar-small.png
+		sidebar.png = sidebar.png
+		single-run-activitynosie.png = single-run-activitynosie.png
+		spn-in-database.png = spn-in-database.png
+		spn-in-keyvault.png = spn-in-keyvault.png
+		sqldb.png = sqldb.png
+		stage-chain.png = stage-chain.png
+		synapse.png = synapse.png
+		this-running.png = this-running.png
+		thumbnail.png = thumbnail.png
+		utilities.png = utilities.png
+		worker-decoupling.png = worker-decoupling.png
+		worker.png = worker.png
+		youtubeheader.png = youtubeheader.png
+		youtubeicon.png = youtubeicon.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Capabilities", "Capabilities", "{7BD21269-6F71-4ED1-8DB6-73734A01F8C2}"
+	ProjectSection(SolutionItems) = preProject
+		applytoexistingadfs.md = applytoexistingadfs.md
+		crosstenantexecution.md = crosstenantexecution.md
+		dependencychains.md = dependencychains.md
+		emailalerting.md = emailalerting.md
+		errordetails.md = errordetails.md
+		executionbatches.md = executionbatches.md
+		executionprecursor.md = executionprecursor.md
+		executionstages.md = executionstages.md
+		failurehandling.md = failurehandling.md
+		frameworkrestart.md = frameworkrestart.md
+		metadataintegritychecks.md = metadataintegritychecks.md
+		pipelinealreadyrunning.md = pipelinealreadyrunning.md
+		pipelinelineage.md = pipelinelineage.md
+		poshdeployingadfparts.md = poshdeployingadfparts.md
+		prevruncleanup.md = prevruncleanup.md
+		reporting.md = reporting.md
+		scaleoutprocessing.md = scaleoutprocessing.md
+		spnhandling.md = spnhandling.md
+		testing.md = testing.md
+		workerdecoupling.md = workerdecoupling.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{43D8C262-5EA3-48B4-BA51-EE5E13891CB3} = {2BB4EF83-F994-4E9E-AD4A-82BD93CCD8B8}
+		{F9DFE9B3-0EA5-4CE9-A76F-762AC58ABD65} = {2BB4EF83-F994-4E9E-AD4A-82BD93CCD8B8}
+		{9F58ED69-1325-4126-BDF2-5AC84139EFD8} = {2BB4EF83-F994-4E9E-AD4A-82BD93CCD8B8}
+		{8DB1ED23-8248-4CC1-889B-87D6A8180094} = {2BB4EF83-F994-4E9E-AD4A-82BD93CCD8B8}
+		{7BD21269-6F71-4ED1-8DB6-73734A01F8C2} = {2BB4EF83-F994-4E9E-AD4A-82BD93CCD8B8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B9D92735-56E9-4E65-9C0E-0111778FC7D1}
+	EndGlobalSection
+EndGlobal

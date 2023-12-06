@@ -1,0 +1,100 @@
+# Pipeline Lineage
+
+___
+[<< Contents](/procfwk/contents) 
+
+___
+
+To support and inform operational teams working with the processing framework solution pipeline lineage documentation and diagrams can be auto generated from the metadata database.
+
+This can be done using the Markdown extention Mermaid.
+
+https://mermaid-js.github.io/mermaid
+
+To generate the Mermaid markdown, within the framework metadata database the following stored procedure can be used.
+
+```sql
+EXEC [procfwkHelpers].[GetMermaidPipelineLineageMarkdown]
+	@BatchName = 'Daily' --optional
+```
+
+Within a markdown rendering service the Mermaid output can then be used to generated a pipeline lineage diagram similar to the below.
+
+[![](https://mermaid.ink/img/eyJjb2RlIjoiZ3JhcGggTFJcbnN1YmdyYXBoIERhaWx5XG5zdHlsZSBEYWlseSBmaWxsOiNERUVCRjcsc3Ryb2tlOiNERUVCRjdcbnN1YmdyYXBoIEZyYW1ld29ya0ZhY3RvcnlcbnN0eWxlIEZyYW1ld29ya0ZhY3RvcnkgZmlsbDojRTJGMEQ5LHN0cm9rZTojRTJGMEQ5XG5zdWJncmFwaCBFeHRyYWN0XG5zdHlsZSBFeHRyYWN0IGZpbGw6I0ZGRjJDQyxzdHJva2U6I0ZGRjJDQ1xucDEwKFdhaXQgMSlcbnN0eWxlIHAxMCBmaWxsOiNGMkYyRjIsc3Ryb2tlOiNGMkYyRjJcbnAyMChXYWl0IDIpXG5zdHlsZSBwMjAgZmlsbDojRjJGMkYyLHN0cm9rZTojRjJGMkYyXG5wMzAoSW50ZW50aW9uYWwgRXJyb3IpXG5zdHlsZSBwMzAgZmlsbDojRjJGMkYyLHN0cm9rZTojRjJGMkYyXG5wNDAoV2FpdCAzKVxuc3R5bGUgcDQwIGZpbGw6I0YyRjJGMixzdHJva2U6I0YyRjJGMlxuZW5kXG5zdWJncmFwaCBMb2FkXG5zdHlsZSBMb2FkIGZpbGw6I0ZGRjJDQyxzdHJva2U6I0ZGRjJDQ1xucDkwKFdhaXQgOClcbnN0eWxlIHA5MCBmaWxsOiNGMkYyRjIsc3Ryb2tlOiNGMkYyRjJcbnAxMDAoV2FpdCA5KVxuc3R5bGUgcDEwMCBmaWxsOiNGMkYyRjIsc3Ryb2tlOiNGMkYyRjJcbmVuZFxuc3ViZ3JhcGggVHJhbnNmb3JtXG5zdHlsZSBUcmFuc2Zvcm0gZmlsbDojRkZGMkNDLHN0cm9rZTojRkZGMkNDXG5wNTAoV2FpdCA0KVxuc3R5bGUgcDUwIGZpbGw6I0YyRjJGMixzdHJva2U6I0YyRjJGMlxucDYwKFdhaXQgNSlcbnN0eWxlIHA2MCBmaWxsOiNGMkYyRjIsc3Ryb2tlOiNGMkYyRjJcbnA3MChXYWl0IDYpXG5zdHlsZSBwNzAgZmlsbDojRjJGMkYyLHN0cm9rZTojRjJGMkYyXG5wODAoV2FpdCA3KVxuc3R5bGUgcDgwIGZpbGw6I0YyRjJGMixzdHJva2U6I0YyRjJGMlxuZW5kXG5lbmRcbnN1YmdyYXBoIFdvcmtlcnNGYWN0b3J5XG5zdHlsZSBXb3JrZXJzRmFjdG9yeSBmaWxsOiNFMkYwRDksc3Ryb2tlOiNFMkYwRDlcbnN1YmdyYXBoIFNlcnZlXG5zdHlsZSBTZXJ2ZSBmaWxsOiNGRkYyQ0Msc3Ryb2tlOiNGRkYyQ0NcbnAxMTAoV2FpdCAxMClcbnN0eWxlIHAxMTAgZmlsbDojRjJGMkYyLHN0cm9rZTojRjJGMkYyXG5lbmRcbmVuZFxuczEwMFtFeHRyYWN0XVxuc3R5bGUgczEwMCBmaWxsOiNGRkYyQ0Msc3Ryb2tlOiNGRkYyQ0NcbnMyMDBbVHJhbnNmb3JtXVxuc3R5bGUgczIwMCBmaWxsOiNGRkYyQ0Msc3Ryb2tlOiNGRkYyQ0NcbnMzMDBbTG9hZF1cbnN0eWxlIHMzMDAgZmlsbDojRkZGMkNDLHN0cm9rZTojRkZGMkNDXG5zNDAwW1NlcnZlXVxuc3R5bGUgczQwMCBmaWxsOiNGRkYyQ0Msc3Ryb2tlOiNGRkYyQ0NcbnMxMDAgLS0-IHAxMFxuczEwMCAtLT4gcDIwXG5zMTAwIC0tPiBwMzBcbnMxMDAgLS0-IHA0MFxuczIwMCAtLT4gcDUwXG5zMjAwIC0tPiBwNjBcbnMyMDAgLS0-IHA3MFxuczIwMCAtLT4gcDgwXG5zMzAwIC0tPiBwOTBcbnMzMDAgLS0-IHAxMDBcbnM0MDAgLS0-IHAxMTBcbnMxMDAgPT0-IHMyMDBcbnMyMDAgPT0-IHMzMDBcbnMzMDAgPT0-IHM0MDBcbnAzMCAtLi0gcDYwXG5wMzAgLS4tIHA3MFxucDcwIC0uLSBwMTAwXG5wMTAwIC0uLSBwMTEwXG5lbmQiLCJtZXJtYWlkIjp7InRoZW1lIjoiZGVmYXVsdCJ9LCJ1cGRhdGVFZGl0b3IiOmZhbHNlLCJhdXRvU3luYyI6dHJ1ZSwidXBkYXRlRGlhZ3JhbSI6ZmFsc2V9)](https://mermaid-js.github.io/mermaid-live-editor/edit#eyJjb2RlIjoiZ3JhcGggTFJcbnN1YmdyYXBoIERhaWx5XG5zdHlsZSBEYWlseSBmaWxsOiNERUVCRjcsc3Ryb2tlOiNERUVCRjdcbnN1YmdyYXBoIEZyYW1ld29ya0ZhY3RvcnlcbnN0eWxlIEZyYW1ld29ya0ZhY3RvcnkgZmlsbDojRTJGMEQ5LHN0cm9rZTojRTJGMEQ5XG5zdWJncmFwaCBFeHRyYWN0XG5zdHlsZSBFeHRyYWN0IGZpbGw6I0ZGRjJDQyxzdHJva2U6I0ZGRjJDQ1xucDEwKFdhaXQgMSlcbnN0eWxlIHAxMCBmaWxsOiNGMkYyRjIsc3Ryb2tlOiNGMkYyRjJcbnAyMChXYWl0IDIpXG5zdHlsZSBwMjAgZmlsbDojRjJGMkYyLHN0cm9rZTojRjJGMkYyXG5wMzAoSW50ZW50aW9uYWwgRXJyb3IpXG5zdHlsZSBwMzAgZmlsbDojRjJGMkYyLHN0cm9rZTojRjJGMkYyXG5wNDAoV2FpdCAzKVxuc3R5bGUgcDQwIGZpbGw6I0YyRjJGMixzdHJva2U6I0YyRjJGMlxuZW5kXG5zdWJncmFwaCBMb2FkXG5zdHlsZSBMb2FkIGZpbGw6I0ZGRjJDQyxzdHJva2U6I0ZGRjJDQ1xucDkwKFdhaXQgOClcbnN0eWxlIHA5MCBmaWxsOiNGMkYyRjIsc3Ryb2tlOiNGMkYyRjJcbnAxMDAoV2FpdCA5KVxuc3R5bGUgcDEwMCBmaWxsOiNGMkYyRjIsc3Ryb2tlOiNGMkYyRjJcbmVuZFxuc3ViZ3JhcGggVHJhbnNmb3JtXG5zdHlsZSBUcmFuc2Zvcm0gZmlsbDojRkZGMkNDLHN0cm9rZTojRkZGMkNDXG5wNTAoV2FpdCA0KVxuc3R5bGUgcDUwIGZpbGw6I0YyRjJGMixzdHJva2U6I0YyRjJGMlxucDYwKFdhaXQgNSlcbnN0eWxlIHA2MCBmaWxsOiNGMkYyRjIsc3Ryb2tlOiNGMkYyRjJcbnA3MChXYWl0IDYpXG5zdHlsZSBwNzAgZmlsbDojRjJGMkYyLHN0cm9rZTojRjJGMkYyXG5wODAoV2FpdCA3KVxuc3R5bGUgcDgwIGZpbGw6I0YyRjJGMixzdHJva2U6I0YyRjJGMlxuZW5kXG5lbmRcbnN1YmdyYXBoIFdvcmtlcnNGYWN0b3J5XG5zdHlsZSBXb3JrZXJzRmFjdG9yeSBmaWxsOiNFMkYwRDksc3Ryb2tlOiNFMkYwRDlcbnN1YmdyYXBoIFNlcnZlXG5zdHlsZSBTZXJ2ZSBmaWxsOiNGRkYyQ0Msc3Ryb2tlOiNGRkYyQ0NcbnAxMTAoV2FpdCAxMClcbnN0eWxlIHAxMTAgZmlsbDojRjJGMkYyLHN0cm9rZTojRjJGMkYyXG5lbmRcbmVuZFxuczEwMFtFeHRyYWN0XVxuc3R5bGUgczEwMCBmaWxsOiNGRkYyQ0Msc3Ryb2tlOiNGRkYyQ0NcbnMyMDBbVHJhbnNmb3JtXVxuc3R5bGUgczIwMCBmaWxsOiNGRkYyQ0Msc3Ryb2tlOiNGRkYyQ0NcbnMzMDBbTG9hZF1cbnN0eWxlIHMzMDAgZmlsbDojRkZGMkNDLHN0cm9rZTojRkZGMkNDXG5zNDAwW1NlcnZlXVxuc3R5bGUgczQwMCBmaWxsOiNGRkYyQ0Msc3Ryb2tlOiNGRkYyQ0NcbnMxMDAgLS0-IHAxMFxuczEwMCAtLT4gcDIwXG5zMTAwIC0tPiBwMzBcbnMxMDAgLS0-IHA0MFxuczIwMCAtLT4gcDUwXG5zMjAwIC0tPiBwNjBcbnMyMDAgLS0-IHA3MFxuczIwMCAtLT4gcDgwXG5zMzAwIC0tPiBwOTBcbnMzMDAgLS0-IHAxMDBcbnM0MDAgLS0-IHAxMTBcbnMxMDAgPT0-IHMyMDBcbnMyMDAgPT0-IHMzMDBcbnMzMDAgPT0-IHM0MDBcbnAzMCAtLi0gcDYwXG5wMzAgLS4tIHA3MFxucDcwIC0uLSBwMTAwXG5wMTAwIC0uLSBwMTEwXG5lbmQiLCJtZXJtYWlkIjoie1xuICBcInRoZW1lXCI6IFwiZGVmYXVsdFwiXG59IiwidXBkYXRlRWRpdG9yIjpmYWxzZSwiYXV0b1N5bmMiOnRydWUsInVwZGF0ZURpYWdyYW0iOmZhbHNlfQ)
+
+Or, as an set of code that you can copy into a different markdown rendering service, use the below example.
+
+Azure DevOps includes the Mermaid plugin as standard as part of a project Wiki page, with a code block prefixed with ::: mermaid
+
+```mermaid
+graph LR
+subgraph Daily
+style Daily fill:#DEEBF7,stroke:#DEEBF7
+subgraph FrameworkFactory
+style FrameworkFactory fill:#E2F0D9,stroke:#E2F0D9
+subgraph Extract
+style Extract fill:#FFF2CC,stroke:#FFF2CC
+p10(Wait 1)
+style p10 fill:#F2F2F2,stroke:#F2F2F2
+p20(Wait 2)
+style p20 fill:#F2F2F2,stroke:#F2F2F2
+p30(Intentional Error)
+style p30 fill:#F2F2F2,stroke:#F2F2F2
+p40(Wait 3)
+style p40 fill:#F2F2F2,stroke:#F2F2F2
+end
+subgraph Load
+style Load fill:#FFF2CC,stroke:#FFF2CC
+p90(Wait 8)
+style p90 fill:#F2F2F2,stroke:#F2F2F2
+p100(Wait 9)
+style p100 fill:#F2F2F2,stroke:#F2F2F2
+end
+subgraph Transform
+style Transform fill:#FFF2CC,stroke:#FFF2CC
+p50(Wait 4)
+style p50 fill:#F2F2F2,stroke:#F2F2F2
+p60(Wait 5)
+style p60 fill:#F2F2F2,stroke:#F2F2F2
+p70(Wait 6)
+style p70 fill:#F2F2F2,stroke:#F2F2F2
+p80(Wait 7)
+style p80 fill:#F2F2F2,stroke:#F2F2F2
+end
+end
+subgraph WorkersFactory
+style WorkersFactory fill:#E2F0D9,stroke:#E2F0D9
+subgraph Serve
+style Serve fill:#FFF2CC,stroke:#FFF2CC
+p110(Wait 10)
+style p110 fill:#F2F2F2,stroke:#F2F2F2
+end
+end
+s100[Extract]
+style s100 fill:#FFF2CC,stroke:#FFF2CC
+s200[Transform]
+style s200 fill:#FFF2CC,stroke:#FFF2CC
+s300[Load]
+style s300 fill:#FFF2CC,stroke:#FFF2CC
+s400[Serve]
+style s400 fill:#FFF2CC,stroke:#FFF2CC
+s100 --> p10
+s100 --> p20
+s100 --> p30
+s100 --> p40
+s200 --> p50
+s200 --> p60
+s200 --> p70
+s200 --> p80
+s300 --> p90
+s300 --> p100
+s400 --> p110
+s100 ==> s200
+s200 ==> s300
+s300 ==> s400
+p30 -.- p60
+p30 -.- p70
+p70 -.- p100
+p100 -.- p110
+end
+```
