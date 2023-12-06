@@ -1,0 +1,255 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Name>MetadataDB</Name>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+    <ProjectGuid>{202ebf84-a56b-4999-92a3-10f7ffe4ef25}</ProjectGuid>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+    <OutputType>Database</OutputType>
+    <RootPath>
+    </RootPath>
+    <RootNamespace>MetadataDB</RootNamespace>
+    <AssemblyName>MetadataDB</AssemblyName>
+    <ModelCollation>1033,CI</ModelCollation>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>True</DeployToDatabase>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetLanguage>CS</TargetLanguage>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <SqlServerVerification>False</SqlServerVerification>
+    <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultCollation>SQL_Latin1_General_CP1_CI_AS</DefaultCollation>
+    <DefaultFilegroup>PRIMARY</DefaultFilegroup>
+    <DefaultSchema>procfwk</DefaultSchema>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <OutputPath>bin\Release\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>bin\Debug\</OutputPath>
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
+    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
+    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
+    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  </PropertyGroup>
+  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <ItemGroup>
+    <Folder Include="Properties" />
+    <Folder Include="procfwk\" />
+    <Folder Include="procfwk\Tables\" />
+    <Folder Include="procfwk\Stored Procedures\" />
+    <Folder Include="Security\" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\Metadata" />
+    <Folder Include="procfwk\Views" />
+    <Folder Include="dbo" />
+    <Folder Include="dbo\Tables" />
+    <Folder Include="dbo\Stored Procedures" />
+    <Folder Include="procfwk\Synonyms" />
+    <Folder Include="Scripts\LogData" />
+    <Folder Include="procfwk\Functions" />
+    <Folder Include="procfwkHelpers" />
+    <Folder Include="procfwkTesting" />
+    <Folder Include="procfwkHelpers\Stored Procedures" />
+    <Folder Include="procfwkHelpers\Functions" />
+    <Folder Include="procfwkReporting" />
+    <Folder Include="procfwkReporting\Views" />
+    <Folder Include="procfwkHelpers\Views" />
+    <Folder Include="procfwkTesting\Stored Procedures" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="procfwk\Tables\Pipelines.sql" />
+    <Build Include="procfwk\Tables\PipelineParameters.sql" />
+    <Build Include="procfwk\Tables\CurrentExecution.sql" />
+    <Build Include="procfwk\Tables\ExecutionLog.sql" />
+    <Build Include="procfwk\Tables\Stages.sql" />
+    <Build Include="procfwk\Stored Procedures\GetStages.sql" />
+    <Build Include="procfwk\Stored Procedures\GetPipelinesInStage.sql" />
+    <Build Include="procfwk\Stored Procedures\GetPipelineParameters.sql" />
+    <Build Include="procfwk\Stored Procedures\CreateNewExecution.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogStagePreparing.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineRunning.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineSuccess.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineFailed.sql" />
+    <Build Include="procfwk\Stored Procedures\UpdateExecutionLog.sql" />
+    <Build Include="Security\procfwk.sql" />
+    <Build Include="procfwk\Views\CurrentProperties.sql" />
+    <Build Include="procfwk\Tables\Properties.sql" />
+    <Build Include="procfwk\Stored Procedures\GetPropertyValue.sql" />
+    <Build Include="dbo\Tables\ServicePrincipals.sql" />
+    <Build Include="procfwk\Tables\PipelineAuthLink.sql" />
+    <Build Include="Security\procfwkuser Role.sql" />
+    <Build Include="dbo\Stored Procedures\FailProcedure.sql" />
+    <Build Include="procfwk\Stored Procedures\ResetExecution.sql" />
+    <Build Include="procfwk\Stored Procedures\ExecutionWrapper.sql" />
+    <Build Include="procfwk\Stored Procedures\CheckForBlockedPipelines.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineUnknown.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogActivityFailed.sql" />
+    <Build Include="procfwk\Synonyms\PipelineProcesses.sql" />
+    <Build Include="procfwk\Synonyms\ProcessingStageDetails.sql" />
+    <Build Include="procfwk\Synonyms\DataFactoryDetails.sql" />
+    <Build Include="procfwk\Stored Procedures\CheckMetadataIntegrity.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineLastStatusCheck.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineRunId.sql" />
+    <Build Include="procfwk\Tables\ErrorLog.sql" />
+    <Build Include="procfwk\Stored Procedures\SetErrorLogDetails.sql" />
+    <Build Include="procfwk\Stored Procedures\CheckForEmailAlerts.sql" />
+    <Build Include="procfwk\Stored Procedures\GetEmailAlertParts.sql" />
+    <Build Include="procfwk\Tables\Recipients.sql" />
+    <Build Include="procfwk\Tables\PipelineAlertLink.sql" />
+    <None Include="Scripts\Metadata\Recipients.sql" />
+    <Build Include="procfwk\Tables\AlertOutcomes.sql" />
+    <Build Include="procfwk\Views\PipelineParameterDataSizes.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineChecking.sql" />
+    <Build Include="procfwk\Tables\PipelineDependencies.sql" />
+    <Build Include="procfwk\Functions\GetPropertyValueInternal.sql" />
+    <Build Include="procfwk\Stored Procedures\SetExecutionBlockDependants.sql" />
+    <None Include="Scripts\Metadata\PipelineDependencies.sql" />
+    <Build Include="Security\procfwkHelpers.sql" />
+    <Build Include="Security\procfwkTesting.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\AddPipelineDependant.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\AddProperty.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\AddRecipientPipelineAlerts.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\AddServicePrincipal.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\AddServicePrincipalUrls.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\AddServicePrincipalWrapper.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\CheckStageAndPiplineIntegrity.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\DeleteRecipientAlerts.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\DeleteServicePrincipal.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\GetExecutionDetails.sql" />
+    <Build Include="procfwkHelpers\Functions\CheckForValidURL.sql" />
+    <Build Include="procfwk\Synonyms\AddPipelineDependant.sql" />
+    <Build Include="procfwk\Synonyms\AddProperty.sql" />
+    <Build Include="procfwk\Synonyms\AddRecipientPipelineAlerts.sql" />
+    <Build Include="procfwk\Synonyms\AddServicePrincipal.sql" />
+    <Build Include="procfwk\Synonyms\AddServicePrincipalUrls.sql" />
+    <Build Include="procfwk\Synonyms\AddServicePrincipalWrapper.sql" />
+    <Build Include="procfwk\Synonyms\CheckForValidURL.sql" />
+    <Build Include="procfwk\Synonyms\CheckStageAndPiplineIntegrity.sql" />
+    <Build Include="procfwk\Synonyms\DeleteRecipientAlerts.sql" />
+    <Build Include="procfwk\Synonyms\DeleteServicePrincipal.sql" />
+    <Build Include="procfwk\Synonyms\GetExecutionDetails.sql" />
+    <None Include="Scripts\Metadata\TransferHelperObjects.sql" />
+    <Build Include="Security\procfwkReporting.sql" />
+    <Build Include="procfwk\Synonyms\AverageStageDuration.sql" />
+    <Build Include="procfwk\Synonyms\CompleteExecutionErrorLog.sql" />
+    <Build Include="procfwk\Synonyms\CompleteExecutionLog.sql" />
+    <Build Include="procfwk\Synonyms\CurrentExecutionSummary.sql" />
+    <Build Include="procfwk\Synonyms\LastExecution.sql" />
+    <Build Include="procfwk\Synonyms\LastExecutionSummary.sql" />
+    <Build Include="procfwk\Synonyms\WorkerParallelismOverTime.sql" />
+    <Build Include="procfwk\Synonyms\PipelineDependencyChains.sql" />
+    <Build Include="procfwkReporting\Views\AverageStageDuration.sql" />
+    <Build Include="procfwkReporting\Views\CompleteExecutionErrorLog.sql" />
+    <Build Include="procfwkReporting\Views\CompleteExecutionLog.sql" />
+    <Build Include="procfwkReporting\Views\CurrentExecutionSummary.sql" />
+    <Build Include="procfwkReporting\Views\LastExecution.sql" />
+    <Build Include="procfwkReporting\Views\LastExecutionSummary.sql" />
+    <Build Include="procfwkHelpers\Views\PipelineDependencyChains.sql" />
+    <Build Include="procfwkReporting\Views\WorkerParallelismOverTime.sql" />
+    <None Include="Scripts\Metadata\DropLegacyObjects.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\DeleteMetadataWithIntegrity.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\DeleteMetadataWithoutIntegrity.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultProperties.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultStages.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultOrchestrators.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultPipelines.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultPipelineParameters.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultPipelineDependants.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultAlertOutcomes.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultRecipients.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultRecipientPipelineAlerts.sql" />
+    <Build Include="procfwkTesting\Stored Procedures\CleanUpMetadata.sql" />
+    <Build Include="procfwkTesting\Stored Procedures\ResetMetadata.sql" />
+    <Build Include="procfwkTesting\Stored Procedures\Add300WorkerPipelines.sql" />
+    <Build Include="procfwk\Stored Procedures\ExecutePrecursorProcedure.sql" />
+    <Build Include="dbo\Stored Procedures\ExampleCustomExecutionPrecursor.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\AddPipelineViaPowerShell.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineCancelled.sql" />
+    <Build Include="procfwkTesting\Stored Procedures\GetRunIdWhenAvailable.sql" />
+    <Build Include="procfwk\Stored Procedures\GetWorkerAuthDetails.sql" />
+    <Build Include="procfwk\Stored Procedures\GetWorkerPipelineDetails.sql" />
+    <Build Include="procfwk\Tables\Tenants.sql" />
+    <Build Include="procfwk\Tables\Subscriptions.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultSubscription.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultTenant.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\GetServicePrincipal.sql" />
+    <Build Include="dbo\Stored Procedures\DemoModePrecursor.sql" />
+    <Build Include="procfwk\Stored Procedures\BatchWrapper.sql" />
+    <Build Include="procfwk\Tables\Batches.sql" />
+    <Build Include="procfwk\Tables\BatchExecution.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultBatches.sql" />
+    <Build Include="procfwk\Tables\BatchStageLink.sql" />
+    <Build Include="procfwkHelpers\Stored Procedures\SetDefaultBatchStageLink.sql" />
+    <Build Include="procfwk\Stored Procedures\CheckPreviousExeuction.sql" />
+    <Build Include="procfwk\Stored Procedures\SetLogPipelineValidating.sql" />
+    <Build Include="procfwkTesting\Stored Procedures\Add300WorkerPipelineBatches.sql" />
+    <Build Include="procfwkTesting\Stored Procedures\Add20BatchesFor1000Workers.sql" />
+    <Build Include="procfwk\Tables\Orchestrators.sql" />
+    <None Include="procfwk\Views\DataFactorys.sql" />
+    <Build Include="procfwk\Stored Procedures\GetWorkerDetailsWrapper.sql" />
+    <Build Include="procfwk\Stored Procedures\GetFrameworkOrchestratorDetails.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Metadata\Stages.sql" />
+    <None Include="Scripts\Metadata\Pipelines.sql" />
+    <None Include="Scripts\Metadata\PipelineParams.sql" />
+    <None Include="MetadataDB.publish.xml" />
+    <None Include="Scripts\Metadata\Orchestrators.sql" />
+    <None Include="Scripts\Metadata\Properties.sql" />
+    <None Include="Scripts\Metadata\DeleteAll.sql" />
+    <None Include="Scripts\Metadata\DropLegacyTables.sql" />
+    <None Include="Scripts\LogData\ExecutionLogBackup.sql" />
+    <None Include="Scripts\LogData\ExecutionLogRestore.sql" />
+    <None Include="Scripts\Script.SetLocalAuthenticationDetails.sql" />
+    <None Include="Scripts\LogData\ErrorLogBackup.sql" />
+    <None Include="Scripts\LogData\ErrorLogRestore.sql" />
+    <None Include="Scripts\Metadata\RecipientAlertsLink.sql" />
+    <None Include="Scripts\Metadata\AlertOutcomes.sql" />
+    <None Include="Scripts\Metadata\TransferReportingObjects.sql" />
+    <None Include="Scripts\Alter Database Scale.sql" />
+    <None Include="Scripts\Handy Selects.sql" />
+    <None Include="Scripts\Metadata\ReplaceDataFactorys.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\AzureV12\SqlSchemas\master.dacpac">
+      <HintPath>$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\AzureV12\SqlSchemas\master.dacpac</HintPath>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+      <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
+    </ArtifactReference>
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="MetadataDB.refactorlog" />
+  </ItemGroup>
+</Project>

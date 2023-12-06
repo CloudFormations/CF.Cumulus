@@ -1,0 +1,246 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29728.190
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Functions", "Functions\Functions.csproj", "{491422B7-393B-4421-BE9E-5B70E7746CC1}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "MetadataDB", "MetadataDB\MetadataDB.sqlproj", "{202EBF84-A56B-4999-92A3-10F7FFE4EF25}"
+EndProject
+Project("{151D2E53-A2C4-4D7D-83FE-D05416EBD58E}") = "DeploymentTools", "DeploymentTools\DeploymentTools.deployproj", "{3AEAD846-DBE4-45AD-97DD-37E94BE009FD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Markdown", "Markdown", "{C7297C57-3403-473B-AA2A-31012A4A9ADF}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\bug-found.md = .github\ISSUE_TEMPLATE\bug-found.md
+		CODE_OF_CONDUCT.md = CODE_OF_CONDUCT.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		.github\ISSUE_TEMPLATE\feature-request.md = .github\ISSUE_TEMPLATE\feature-request.md
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataFactory", "DataFactory", "{E081CE7B-3DE2-4AB7-8C3A-E58A075BD6F5}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataset", "dataset", "{997E1D61-E47F-48B0-8F67-09ED4AE92E0E}"
+	ProjectSection(SolutionItems) = preProject
+		DataFactory\dataset\GetSetMetadata.json = DataFactory\dataset\GetSetMetadata.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linkedService", "linkedService", "{6B27406C-2C36-4BA1-AFC8-CEFC960D8EE6}"
+	ProjectSection(SolutionItems) = preProject
+		DataFactory\linkedService\FrameworkFunctions.json = DataFactory\linkedService\FrameworkFunctions.json
+		DataFactory\linkedService\Keys.json = DataFactory\linkedService\Keys.json
+		DataFactory\linkedService\SupportDatabase.json = DataFactory\linkedService\SupportDatabase.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipeline", "pipeline", "{9CEBE9B6-F1E4-43A8-B84D-FF7D43D5CB20}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ProcFwk", "_ProcFwk", "{17586826-8BE9-4622-B12E-1683F2A20352}"
+	ProjectSection(SolutionItems) = preProject
+		DataFactory\pipeline\01-Grandparent.json = DataFactory\pipeline\01-Grandparent.json
+		DataFactory\pipeline\02-Parent.json = DataFactory\pipeline\02-Parent.json
+		DataFactory\pipeline\03-Child.json = DataFactory\pipeline\03-Child.json
+		DataFactory\pipeline\04-Infant.json = DataFactory\pipeline\04-Infant.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{04142829-7936-4C27-9891-FB086BEAE1AD}"
+	ProjectSection(SolutionItems) = preProject
+		DataFactory\pipeline\Intentional Error.json = DataFactory\pipeline\Intentional Error.json
+		DataFactory\pipeline\Wait 1.json = DataFactory\pipeline\Wait 1.json
+		DataFactory\pipeline\Wait 10.json = DataFactory\pipeline\Wait 10.json
+		DataFactory\pipeline\Wait 2.json = DataFactory\pipeline\Wait 2.json
+		DataFactory\pipeline\Wait 3.json = DataFactory\pipeline\Wait 3.json
+		DataFactory\pipeline\Wait 4.json = DataFactory\pipeline\Wait 4.json
+		DataFactory\pipeline\Wait 5.json = DataFactory\pipeline\Wait 5.json
+		DataFactory\pipeline\Wait 6.json = DataFactory\pipeline\Wait 6.json
+		DataFactory\pipeline\Wait 7.json = DataFactory\pipeline\Wait 7.json
+		DataFactory\pipeline\Wait 8.json = DataFactory\pipeline\Wait 8.json
+		DataFactory\pipeline\Wait 9.json = DataFactory\pipeline\Wait 9.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Images", "Images", "{16E32CF7-361C-4A58-B0E1-5C8C46181ADE}"
+	ProjectSection(SolutionItems) = preProject
+		Images\Activity Chain.png = Images\Activity Chain.png
+		Images\Database Diagram.png = Images\Database Diagram.png
+		Images\procfwk Designs.vsdx = Images\procfwk Designs.vsdx
+		Images\Repo Social Media Image.png = Images\Repo Social Media Image.png
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Notebooks", "Notebooks", "{19F99FD2-9170-42DA-B4FE-A52A358B5473}"
+	ProjectSection(SolutionItems) = preProject
+		Notebooks\Databricks - Throw Exception.scala = Notebooks\Databricks - Throw Exception.scala
+		Notebooks\Metadata Guide and Handy Code Snippets.ipynb = Notebooks\Metadata Guide and Handy Code Snippets.ipynb
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ARM Templates", "ARM Templates", "{CC7B607B-8C84-4E07-A6C8-326923752F92}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DataFactory", "DataFactory", "{C8F387D0-13CC-4AA5-892C-91D2F3403B55}"
+	ProjectSection(SolutionItems) = preProject
+		ARM Templates\Data Factory\v1.0 Export.json = ARM Templates\Data Factory\v1.0 Export.json
+		ARM Templates\Data Factory\v1.1 Export.json = ARM Templates\Data Factory\v1.1 Export.json
+		ARM Templates\Data Factory\v1.2 Export.json = ARM Templates\Data Factory\v1.2 Export.json
+		ARM Templates\Data Factory\v1.3 Export.json = ARM Templates\Data Factory\v1.3 Export.json
+		ARM Templates\Data Factory\v1.4 Export.json = ARM Templates\Data Factory\v1.4 Export.json
+		ARM Templates\Data Factory\v1.5 Export.json = ARM Templates\Data Factory\v1.5 Export.json
+		ARM Templates\Data Factory\v1.6 Export.json = ARM Templates\Data Factory\v1.6 Export.json
+		ARM Templates\Data Factory\v1.7 Export.json = ARM Templates\Data Factory\v1.7 Export.json
+		ARM Templates\Data Factory\v1.8 Export.json = ARM Templates\Data Factory\v1.8 Export.json
+		ARM Templates\Data Factory\v1.8.3 Export.json = ARM Templates\Data Factory\v1.8.3 Export.json
+		ARM Templates\Data Factory\v1.8.5 Export.json = ARM Templates\Data Factory\v1.8.5 Export.json
+		ARM Templates\Data Factory\v1.8.6 Export.json = ARM Templates\Data Factory\v1.8.6 Export.json
+		ARM Templates\Data Factory\v1.9 Export.json = ARM Templates\Data Factory\v1.9 Export.json
+		ARM Templates\Data Factory\v1.9.1 Export.json = ARM Templates\Data Factory\v1.9.1 Export.json
+		ARM Templates\Data Factory\v1.9.2 Export.json = ARM Templates\Data Factory\v1.9.2 Export.json
+		ARM Templates\Data Factory\v2.0 Export.json = ARM Templates\Data Factory\v2.0 Export.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trigger", "trigger", "{FC7877EF-110F-4AD7-B203-EEECE6F08A86}"
+	ProjectSection(SolutionItems) = preProject
+		DataFactory\trigger\FunctionalTestingTrigger.json = DataFactory\trigger\FunctionalTestingTrigger.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reporting", "Reporting", "{5A56A63A-351D-467D-A2DA-FDB3C9CBD252}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PowerBI", "PowerBI", "{EBC230DF-D45D-43E4-A74E-32ADA3DDAE7A}"
+	ProjectSection(SolutionItems) = preProject
+		Reporting\PowerBI\Executions Overview.pbit = Reporting\PowerBI\Executions Overview.pbit
+		Reporting\PowerBI\Executions Overview.pbix = Reporting\PowerBI\Executions Overview.pbix
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SQL Database", "SQL Database", "{20313ECA-118E-408D-BB42-8094A7A9CD20}"
+	ProjectSection(SolutionItems) = preProject
+		ARM Templates\SQL Database\v1.6 Export.json = ARM Templates\SQL Database\v1.6 Export.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Functions App", "Functions App", "{463330CD-189F-42B4-984A-8D3C1385645B}"
+	ProjectSection(SolutionItems) = preProject
+		ARM Templates\Functions App\v1.6 Export.json = ARM Templates\Functions App\v1.6 Export.json
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FactoryTesting", "FactoryTesting\FactoryTesting.csproj", "{777BB424-9D89-49E5-BE29-E73E0A0E159A}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "MetadataDBTests", "MetadataDBTests\MetadataDBTests.sqlproj", "{32D54B90-932D-44A3-911D-007C4B90BC55}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ProcFwkUtils", "_ProcFwkUtils", "{6809EDBD-125D-440E-8486-9CFAB9BB5B7D}"
+	ProjectSection(SolutionItems) = preProject
+		DataFactory\pipeline\Check For Running Pipeline.json = DataFactory\pipeline\Check For Running Pipeline.json
+		DataFactory\pipeline\Email Sender.json = DataFactory\pipeline\Email Sender.json
+		DataFactory\pipeline\Intentional Error.json = DataFactory\pipeline\Intentional Error.json
+		DataFactory\pipeline\Throw Exception.json = DataFactory\pipeline\Throw Exception.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Synapse", "Synapse", "{6B8CC8C2-C4AA-4BC4-85EC-719348FC3B07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipeline", "pipeline", "{398CB5BE-3687-4F95-8EAA-54EE0DAC4E6C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ProcFwk", "_ProcFwk", "{2181D7DA-8237-418F-8CD9-CD1BF9843524}"
+	ProjectSection(SolutionItems) = preProject
+		Synapse\pipeline\01-Grandparent.json = Synapse\pipeline\01-Grandparent.json
+		Synapse\pipeline\02-Parent.json = Synapse\pipeline\02-Parent.json
+		Synapse\pipeline\03-Child.json = Synapse\pipeline\03-Child.json
+		Synapse\pipeline\04-Infant.json = Synapse\pipeline\04-Infant.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_ProcFwkUtils", "_ProcFwkUtils", "{6E660431-66E0-4B1A-BCFC-8FCBF1C646F2}"
+	ProjectSection(SolutionItems) = preProject
+		Synapse\pipeline\Check For Running Pipeline.json = Synapse\pipeline\Check For Running Pipeline.json
+		Synapse\pipeline\Email Sender.json = Synapse\pipeline\Email Sender.json
+		Synapse\pipeline\Throw Exception.json = Synapse\pipeline\Throw Exception.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Workers", "Workers", "{21058901-FBEE-4D40-83E0-21B05636417B}"
+	ProjectSection(SolutionItems) = preProject
+		Synapse\pipeline\Intentional Error.json = Synapse\pipeline\Intentional Error.json
+		Synapse\pipeline\Wait 1.json = Synapse\pipeline\Wait 1.json
+		Synapse\pipeline\Wait 10.json = Synapse\pipeline\Wait 10.json
+		Synapse\pipeline\Wait 2.json = Synapse\pipeline\Wait 2.json
+		Synapse\pipeline\Wait 3.json = Synapse\pipeline\Wait 3.json
+		Synapse\pipeline\Wait 4.json = Synapse\pipeline\Wait 4.json
+		Synapse\pipeline\Wait 5.json = Synapse\pipeline\Wait 5.json
+		Synapse\pipeline\Wait 6.json = Synapse\pipeline\Wait 6.json
+		Synapse\pipeline\Wait 7.json = Synapse\pipeline\Wait 7.json
+		Synapse\pipeline\Wait 8.json = Synapse\pipeline\Wait 8.json
+		Synapse\pipeline\Wait 9.json = Synapse\pipeline\Wait 9.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataset", "dataset", "{7F17593A-2CEF-4741-A4B7-C1CC79F12EB7}"
+	ProjectSection(SolutionItems) = preProject
+		Synapse\dataset\GetSetMetadata.json = Synapse\dataset\GetSetMetadata.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linkedservice", "linkedservice", "{F495E5FB-B908-4F76-B8BB-6C83CC5D2337}"
+	ProjectSection(SolutionItems) = preProject
+		Synapse\linkedService\FrameworkFunctions.json = Synapse\linkedService\FrameworkFunctions.json
+		Synapse\linkedService\Keys.json = Synapse\linkedService\Keys.json
+		Synapse\linkedService\SupportDatabase.json = Synapse\linkedService\SupportDatabase.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trigger", "trigger", "{29DBE5FC-D1FE-4C49-9DA2-4115C7F830B4}"
+	ProjectSection(SolutionItems) = preProject
+		Synapse\trigger\FunctionalTestingTrigger.json = Synapse\trigger\FunctionalTestingTrigger.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Synapse", "Synapse", "{4A3176F1-B8E0-4D2B-861B-9A1655EB322E}"
+	ProjectSection(SolutionItems) = preProject
+		ARM Templates\Synapse\v2.0 Export.json = ARM Templates\Synapse\v2.0 Export.json
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{491422B7-393B-4421-BE9E-5B70E7746CC1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{491422B7-393B-4421-BE9E-5B70E7746CC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{491422B7-393B-4421-BE9E-5B70E7746CC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{491422B7-393B-4421-BE9E-5B70E7746CC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{202EBF84-A56B-4999-92A3-10F7FFE4EF25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{202EBF84-A56B-4999-92A3-10F7FFE4EF25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{202EBF84-A56B-4999-92A3-10F7FFE4EF25}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{202EBF84-A56B-4999-92A3-10F7FFE4EF25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{202EBF84-A56B-4999-92A3-10F7FFE4EF25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{202EBF84-A56B-4999-92A3-10F7FFE4EF25}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{3AEAD846-DBE4-45AD-97DD-37E94BE009FD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3AEAD846-DBE4-45AD-97DD-37E94BE009FD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3AEAD846-DBE4-45AD-97DD-37E94BE009FD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3AEAD846-DBE4-45AD-97DD-37E94BE009FD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{777BB424-9D89-49E5-BE29-E73E0A0E159A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{777BB424-9D89-49E5-BE29-E73E0A0E159A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{777BB424-9D89-49E5-BE29-E73E0A0E159A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{777BB424-9D89-49E5-BE29-E73E0A0E159A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32D54B90-932D-44A3-911D-007C4B90BC55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{32D54B90-932D-44A3-911D-007C4B90BC55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{32D54B90-932D-44A3-911D-007C4B90BC55}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{32D54B90-932D-44A3-911D-007C4B90BC55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{32D54B90-932D-44A3-911D-007C4B90BC55}.Release|Any CPU.Build.0 = Release|Any CPU
+		{32D54B90-932D-44A3-911D-007C4B90BC55}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{997E1D61-E47F-48B0-8F67-09ED4AE92E0E} = {E081CE7B-3DE2-4AB7-8C3A-E58A075BD6F5}
+		{6B27406C-2C36-4BA1-AFC8-CEFC960D8EE6} = {E081CE7B-3DE2-4AB7-8C3A-E58A075BD6F5}
+		{9CEBE9B6-F1E4-43A8-B84D-FF7D43D5CB20} = {E081CE7B-3DE2-4AB7-8C3A-E58A075BD6F5}
+		{17586826-8BE9-4622-B12E-1683F2A20352} = {9CEBE9B6-F1E4-43A8-B84D-FF7D43D5CB20}
+		{04142829-7936-4C27-9891-FB086BEAE1AD} = {9CEBE9B6-F1E4-43A8-B84D-FF7D43D5CB20}
+		{C8F387D0-13CC-4AA5-892C-91D2F3403B55} = {CC7B607B-8C84-4E07-A6C8-326923752F92}
+		{FC7877EF-110F-4AD7-B203-EEECE6F08A86} = {E081CE7B-3DE2-4AB7-8C3A-E58A075BD6F5}
+		{EBC230DF-D45D-43E4-A74E-32ADA3DDAE7A} = {5A56A63A-351D-467D-A2DA-FDB3C9CBD252}
+		{20313ECA-118E-408D-BB42-8094A7A9CD20} = {CC7B607B-8C84-4E07-A6C8-326923752F92}
+		{463330CD-189F-42B4-984A-8D3C1385645B} = {CC7B607B-8C84-4E07-A6C8-326923752F92}
+		{6809EDBD-125D-440E-8486-9CFAB9BB5B7D} = {17586826-8BE9-4622-B12E-1683F2A20352}
+		{398CB5BE-3687-4F95-8EAA-54EE0DAC4E6C} = {6B8CC8C2-C4AA-4BC4-85EC-719348FC3B07}
+		{2181D7DA-8237-418F-8CD9-CD1BF9843524} = {398CB5BE-3687-4F95-8EAA-54EE0DAC4E6C}
+		{6E660431-66E0-4B1A-BCFC-8FCBF1C646F2} = {2181D7DA-8237-418F-8CD9-CD1BF9843524}
+		{21058901-FBEE-4D40-83E0-21B05636417B} = {398CB5BE-3687-4F95-8EAA-54EE0DAC4E6C}
+		{7F17593A-2CEF-4741-A4B7-C1CC79F12EB7} = {6B8CC8C2-C4AA-4BC4-85EC-719348FC3B07}
+		{F495E5FB-B908-4F76-B8BB-6C83CC5D2337} = {6B8CC8C2-C4AA-4BC4-85EC-719348FC3B07}
+		{29DBE5FC-D1FE-4C49-9DA2-4115C7F830B4} = {6B8CC8C2-C4AA-4BC4-85EC-719348FC3B07}
+		{4A3176F1-B8E0-4D2B-861B-9A1655EB322E} = {CC7B607B-8C84-4E07-A6C8-326923752F92}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {170F5302-BB9C-4569-8F43-D859C7678EF0}
+	EndGlobalSection
+EndGlobal
