@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.Management.DataFactory.Models;
+﻿using Azure.ResourceManager.DataFactory.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

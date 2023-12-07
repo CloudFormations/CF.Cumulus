@@ -1,18 +1,36 @@
 ﻿using System;
 using System.Threading;
 using Newtonsoft.Json;
-using Microsoft.Rest;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Azure.Management.DataFactory;
-using Microsoft.Azure.Management.DataFactory.Models;
+using Azure.ResourceManager.DataFactory;
 using cloudformations.cumulus.helpers;
+
+using Azure.Core;
+using Azure.Identity;
+using Azure.ResourceManager;
+using Azure.ResourceManager.Compute;
+using Azure.ResourceManager.Resources;
+using Azure.ResourceManager.DataFactory.Models;
+using System.Text;
+using Azure;
+using Microsoft.Rest.Azure;
+using Azure.Analytics.Synapse.Artifacts.Models;
+using System.Linq;
+using System.Diagnostics;
+
+//https://github.com/Azure/azure-sdk-for-net/blob/Azure.ResourceManager.DataFactory_1.0.0-beta.5/sdk/datafactory/Azure.ResourceManager.DataFactory/README.md
+//https://github.com/Azure/azure-sdk-for-net/blob/Azure.ResourceManager.DataFactory_1.0.0-beta.5/sdk/datafactory/Azure.ResourceManager.DataFactory/samples/Generated/Samples/Sample_DataFactoryPipelineResource.cs#L256
+
 
 namespace cloudformations.cumulus.services
 {
     public class AzureDataFactoryService : PipelineService
     {
-        private readonly DataFactoryManagementClient _adfManagementClient;
+        private ArmClient client = new ArmClient(new DefaultAzureCredential());
+        private ResourceIdentifier resourceId;
+        private DataFactoryResource dataFactory;
+        private DataFactoryPipelineResource dataFactoryPipeline;
+        
         private readonly ILogger _logger;
 
         public AzureDataFactoryService(PipelineRequest request, ILogger logger)
@@ -20,17 +38,15 @@ namespace cloudformations.cumulus.services
             _logger = logger;
             _logger.LogInformation("Creating ADF connectivity clients.");
 
-            //Auth details
-            var context = new AuthenticationContext("https://login.windows.net/" + request.TenantId);
-            var cc = new ClientCredential(request.ApplicationId, request.AuthenticationKey);
-            var result = context.AcquireTokenAsync("https://management.azure.com/", cc).Result;
-            var cred = new TokenCredentials(result.AccessToken);
+            resourceId = DataFactoryResource.CreateResourceIdentifier
+                (
+                request.SubscriptionId, 
+                request.ResourceGroupName, 
+                request.OrchestratorName
+                );
 
-            //Management Client
-            _adfManagementClient = new DataFactoryManagementClient(cred)
-            {
-                SubscriptionId = request.SubscriptionId
-            };
+            dataFactory = client.GetDataFactoryResource(resourceId);
+            dataFactoryPipeline = client.GetDataFactoryPipelineResource(resourceId);
         }
 
         public override PipelineDescription ValidatePipeline(PipelineRequest request)
@@ -39,25 +55,30 @@ namespace cloudformations.cumulus.services
 
             try
             {
-                var pipelineResource = _adfManagementClient.Pipelines.Get
-                    (
-                    request.ResourceGroupName, 
-                    request.OrchestratorName, 
-                    request.PipelineName
-                    );
-                
-                _logger.LogInformation(pipelineResource.Id.ToString());
+                DataFactoryPipelineCollection collection = dataFactory.GetDataFactoryPipelines();
 
-                return new PipelineDescription()
+                NullableResponse<DataFactoryPipelineResource> response = collection.GetIfExists(request.PipelineName);
+                DataFactoryPipelineResource result = response.HasValue ? response.Value : null;
+
+                if (result == null)
                 {
-                    PipelineExists = "True",
-                    PipelineName = pipelineResource.Name,
-                    PipelineId = pipelineResource.Id,
-                    PipelineType = pipelineResource.Type,
-                    ActivityCount = pipelineResource.Activities.Count
-                };
+                    throw new InvalidRequestException("Failed to validate pipeline. ");
+                }
+                else
+                {
+                    _logger.LogInformation("Validated ADF pipeline.");
+
+                    return new PipelineDescription()
+                    {
+                        PipelineExists = "True",
+                        PipelineName = response.Value.Data.Name,
+                        PipelineId = response.Value.Data.Id,
+                        PipelineType = response.Value.Data.ResourceType,
+                        ActivityCount = response.Value.Data.Activities.Count
+                    };
+                }
             }
-            catch (Microsoft.Rest.Azure.CloudException) //expected exception when pipeline doesnt exist
+            catch (CloudException) //expected exception when pipeline doesnt exist
             {
                 return new PipelineDescription()
                 {
@@ -83,31 +104,24 @@ namespace cloudformations.cumulus.services
             else
                 _logger.LogInformation("Calling pipeline with parameters.");
 
-            var runResponse = _adfManagementClient.Pipelines.CreateRunWithHttpMessagesAsync
-                (
-                request.ResourceGroupName, 
-                request.OrchestratorName, 
-                request.PipelineName, 
-                parameters: request.ParametersAsObjects
-                ).Result.Body;
+            string runId = null;
+            PipelineCreateRunResult pipelineRunResult;
 
-            _logger.LogInformation("Pipeline run ID: " + runResponse.RunId);
+            pipelineRunResult = dataFactoryPipeline.CreateRun(referencePipelineRunId: runId);
+             
+            _logger.LogInformation("Pipeline run ID: " + runId);
+
+            DataFactoryPipelineRunInfo runInfo;
 
             //Wait and check for pipeline to start...
-            PipelineRun pipelineRun;
             _logger.LogInformation("Checking ADF pipeline status.");
             while (true)
             {
-                pipelineRun = _adfManagementClient.PipelineRuns.Get
-                    (
-                    request.ResourceGroupName, 
-                    request.OrchestratorName,
-                    runResponse.RunId
-                    );
+                runInfo = dataFactory.GetPipelineRun(runId);         
 
-                _logger.LogInformation("Waiting for pipeline to start, current status: " + pipelineRun.Status);
+                _logger.LogInformation("Waiting for pipeline to start, current status: " + runInfo.Status);
 
-                if (pipelineRun.Status != "Queued")
+                if (runInfo.Status != "Queued")
                     break;
                 Thread.Sleep(internalWaitDuration);
             }
@@ -115,8 +129,8 @@ namespace cloudformations.cumulus.services
             return new PipelineRunStatus()
             {
                 PipelineName = request.PipelineName,
-                RunId = runResponse.RunId,
-                ActualStatus = pipelineRun.Status
+                RunId = runId,
+                ActualStatus = runInfo.Status
             };
         }
 
@@ -184,95 +198,82 @@ namespace cloudformations.cumulus.services
             _logger.LogInformation("Checking ADF pipeline status.");
 
             //Get pipeline status with provided run id
-            PipelineRun pipelineRun;
-            pipelineRun = _adfManagementClient.PipelineRuns.Get
-                (
-                request.ResourceGroupName, 
-                request.OrchestratorName, 
-                request.RunId
-                );
+            DataFactoryPipelineRunInfo runInfo;
+            runInfo = dataFactory.GetPipelineRun(request.RunId);
 
             //Defensive check
-            PipelineNameCheck(request.PipelineName, pipelineRun.PipelineName);
+            PipelineNameCheck(request.PipelineName, runInfo.PipelineName);
 
-            _logger.LogInformation("ADF pipeline status: " + pipelineRun.Status);
-
-            //Defensive check
-            PipelineNameCheck(request.PipelineName, pipelineRun.PipelineName);
+            _logger.LogInformation("ADF pipeline status: " + runInfo.Status);
 
             //Final return detail
             return new PipelineRunStatus()
             {
                 PipelineName = request.PipelineName,
-                RunId = pipelineRun.RunId,
-                ActualStatus = pipelineRun.Status.Replace("Canceling", "Cancelling") //microsoft typo
+                RunId = request.RunId,
+                ActualStatus = runInfo.Status.Replace("Canceling", "Cancelling") //microsoft typo
             };
         }
 
         public override PipelineErrorDetail GetPipelineRunActivityErrors(PipelineRunRequest request)
         {
-            PipelineRun pipelineRun = _adfManagementClient.PipelineRuns.Get
-                (
-                request.ResourceGroupName, 
-                request.OrchestratorName, 
-                request.RunId
-                );
+            //Get pipeline status with provided run id
+            DataFactoryPipelineRunInfo runInfo;
+            runInfo = dataFactory.GetPipelineRun(request.RunId);
 
+            _logger.LogInformation("ADF pipeline status: " + runInfo.Status);
+            
             //Defensive check
-            PipelineNameCheck(request.PipelineName, pipelineRun.PipelineName);
+            PipelineNameCheck(request.PipelineName, runInfo.PipelineName);
 
             _logger.LogInformation("Create pipeline Activity Runs query filters.");
-            RunFilterParameters filterParams = new RunFilterParameters
+
+
+
+            RunFilterContent filterParams = new RunFilterContent
                 (
                 request.ActivityQueryStart, 
                 request.ActivityQueryEnd
                 );
 
-            _logger.LogInformation("Querying ADF pipeline for Activity Runs.");
-            ActivityRunsQueryResponse queryResponse = _adfManagementClient.ActivityRuns.QueryByPipelineRun
-                (
-                request.ResourceGroupName, 
-                request.OrchestratorName, 
-                request.RunId, 
-                filterParams
-                );
+            //PipelineActivityRunInformation queryResponse;
+            Pageable<PipelineActivityRunInformation> queryResponses = dataFactory.GetActivityRun(request.RunId, filterParams);
 
             //Create initial output content
             PipelineErrorDetail output = new PipelineErrorDetail()
             {
                 PipelineName = request.PipelineName,
-                ActualStatus = pipelineRun.Status,
+                ActualStatus = runInfo.Status,
                 RunId = request.RunId,
-                ResponseCount = queryResponse.Value.Count
+                ResponseCount = queryResponses.Count()
             };
 
-            _logger.LogInformation("Pipeline status: " + pipelineRun.Status);
-            _logger.LogInformation("Activities found in pipeline response: " + queryResponse.Value.Count.ToString());
+            _logger.LogInformation("Pipeline status: " + runInfo.Status);
+            _logger.LogInformation("Activities found in pipeline response: " + queryResponses.Count().ToString());
 
-            //Loop over activities in pipeline run
-            foreach (ActivityRun activity in queryResponse.Value)
+            foreach (PipelineActivityRunInformation queryResponse in queryResponses)
             {
-                if (activity.Error == null)
+                if (queryResponse.Error == null)
                 {
                     continue; //only want errors
                 }
 
                 //Parse error output to customise output
-                dynamic outputBlockInner = JsonConvert.DeserializeObject(activity.Error.ToString());
+                dynamic outputBlockInner = BinaryData.FromObjectAsJson(queryResponse.Error);
                 string errorCode = outputBlockInner?.errorCode;
                 string errorType = outputBlockInner?.failureType;
                 string errorMessage = outputBlockInner?.message;
 
-                _logger.LogInformation("Activity run id: " + activity.ActivityRunId);
-                _logger.LogInformation("Activity name: " + activity.ActivityName);
-                _logger.LogInformation("Activity type: " + activity.ActivityType);
+                _logger.LogInformation("Activity run id: " + queryResponse.ActivityRunId.ToString());
+                _logger.LogInformation("Activity name: " + queryResponse.ActivityName);
+                _logger.LogInformation("Activity type: " + queryResponse.ActivityType);
                 _logger.LogInformation("Error message: " + errorMessage);
 
                 output.Errors.Add(new FailedActivity()
                 {
-                    ActivityRunId = activity.ActivityRunId,
-                    ActivityName = activity.ActivityName,
-                    ActivityType = activity.ActivityType,
+                    ActivityRunId = queryResponse.ActivityRunId.ToString(),
+                    ActivityName = queryResponse.ActivityName,
+                    ActivityType = queryResponse.ActivityType,
                     ErrorCode = errorCode,
                     ErrorType = errorType,
                     ErrorMessage = errorMessage
@@ -283,7 +284,7 @@ namespace cloudformations.cumulus.services
 
         public override void Dispose()
         {
-            _adfManagementClient?.Dispose();
+            //nothing to dispose, handling by Microsoft
         }
     }
 }

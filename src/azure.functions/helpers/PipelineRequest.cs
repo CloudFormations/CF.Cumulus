@@ -7,8 +7,6 @@ namespace cloudformations.cumulus.helpers
     public class PipelineRequest
     {
         public string TenantId { get; set; }
-        public string ApplicationId { get; set; }
-        public string AuthenticationKey { get; set; }
         public string SubscriptionId { get; set; }
         public string ResourceGroupName { get; set; }
         public string OrchestratorName { get; set; }
@@ -21,9 +19,7 @@ namespace cloudformations.cumulus.helpers
         {
             // ensure properties not null
             if (
-              TenantId == null ||
-              ApplicationId == null ||
-              AuthenticationKey == null ||
+              //TenantId == null || //future feature support
               SubscriptionId == null ||
               ResourceGroupName == null ||
               OrchestratorType == null ||
@@ -33,21 +29,9 @@ namespace cloudformations.cumulus.helpers
                 ReportInvalidBody(logger);
 
             //other validation
-            if (!CheckGuid(TenantId)) ReportInvalidBody(logger, "Expected Tenant Id to be a GUID.");
+            //if (!CheckGuid(TenantId)) ReportInvalidBody(logger, "Expected Tenant Id to be a GUID."); //future feature support
+            if (TenantId != null) ReportInvalidBody(logger, "The use of an explicit Tenant Id is not currently supported.");
             if (!CheckGuid(SubscriptionId)) ReportInvalidBody(logger, "Expected Subscription Id to be a GUID.");
-
-            // resolve key vault values
-            if (!CheckGuid(ApplicationId) && CheckUri(ApplicationId))
-            {
-                logger.LogInformation("Getting applicationId from Key Vault");
-                ApplicationId = KeyVaultClient.GetSecretFromUri(ApplicationId);
-            }
-
-            if (CheckUri(AuthenticationKey))
-            {
-                logger.LogInformation("Getting authenticationKey from Key Vault");
-                AuthenticationKey = KeyVaultClient.GetSecretFromUri(AuthenticationKey);
-            }
         }
 
         private bool CheckUri(string uriValue)
