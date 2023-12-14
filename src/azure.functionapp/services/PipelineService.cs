@@ -12,22 +12,25 @@ namespace cloudformations.cumulus.services
         {
             if (pr.OrchestratorType == PipelineServiceType.ADF)
                 return new AzureDataFactoryService(pr, logger);
-
+            
             if (pr.OrchestratorType == PipelineServiceType.SYN)
                 return new AzureSynapseService(pr, logger);
+            
+            if (pr.OrchestratorType == PipelineServiceType.FAB)
+                return new MicrosoftFabricService(pr, logger);
 
             throw new InvalidRequestException ("Unsupported orchestrator type: " + (pr.OrchestratorType?.ToString() ?? "<null>"));
         }
 
-        public abstract PipelineDescription ValidatePipeline(PipelineRequest request);
+        public abstract PipelineDescription PipelineValidate(PipelineRequest request);
 
-        public abstract PipelineRunStatus ExecutePipeline(PipelineRequest request);
+        public abstract PipelineRunStatus PipelineExecute(PipelineRequest request);
 
-        public abstract PipelineRunStatus CancelPipeline(PipelineRunRequest request);
+        public abstract PipelineRunStatus PipelineCancel(PipelineRunRequest request);
 
-        public abstract PipelineRunStatus GetPipelineRunStatus(PipelineRunRequest request);
+        public abstract PipelineRunStatus PipelineGetStatus(PipelineRunRequest request);
 
-        public abstract PipelineErrorDetail GetPipelineRunActivityErrors(PipelineRunRequest request);
+        public abstract PipelineErrorDetail PipelineGetErrorDetails(PipelineRunRequest request);
 
         protected void PipelineNameCheck(string requestName, string foundName)
         {

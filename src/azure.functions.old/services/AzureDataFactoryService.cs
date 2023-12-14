@@ -20,6 +20,7 @@ using System.Diagnostics;
 
 //https://github.com/Azure/azure-sdk-for-net/blob/Azure.ResourceManager.DataFactory_1.0.0-beta.5/sdk/datafactory/Azure.ResourceManager.DataFactory/README.md
 //https://github.com/Azure/azure-sdk-for-net/blob/Azure.ResourceManager.DataFactory_1.0.0-beta.5/sdk/datafactory/Azure.ResourceManager.DataFactory/samples/Generated/Samples/Sample_DataFactoryPipelineResource.cs#L256
+//https://learn.microsoft.com/en-us/dotnet/api/azure.resourcemanager.datafactory.datafactoryextensions.getdatafactorypipelineresource?view=azure-dotnet-preview
 
 
 namespace cloudformations.cumulus.services
@@ -138,18 +139,20 @@ namespace cloudformations.cumulus.services
         {
             _logger.LogInformation("Getting ADF pipeline current status.");
 
-            PipelineRun pipelineRun;
-            pipelineRun = _adfManagementClient.PipelineRuns.Get
-                (
-                request.ResourceGroupName,
-                request.OrchestratorName,
-                request.RunId
-                );
+            //Get pipeline status with provided run id
+            DataFactoryPipelineRunInfo runInfo;
+            runInfo = dataFactory.GetPipelineRun(request.RunId);
 
             //Defensive check
-            PipelineNameCheck(request.PipelineName, pipelineRun.PipelineName);
+            PipelineNameCheck(request.PipelineName, runInfo.PipelineName);
 
-            if (pipelineRun.Status == "InProgress" || pipelineRun.Status == "Queued")
+            _logger.LogInformation("ADF pipeline status: " + runInfo.Status);
+
+            throw new InvalidRequestException("Pipeline cancellation not currently supported.");
+            /*
+            
+
+            if (runInfo.Status == "InProgress" || runInfo.Status == "Queued")
             {
                 _logger.LogInformation("Attempting to cancel ADF pipeline.");
                 _adfManagementClient.PipelineRuns.Cancel
@@ -183,7 +186,7 @@ namespace cloudformations.cumulus.services
                     break;
                 Thread.Sleep(internalWaitDuration);
             }
-
+           
             //Final return detail
             return new PipelineRunStatus()
             {
@@ -191,6 +194,7 @@ namespace cloudformations.cumulus.services
                 RunId = request.RunId,
                 ActualStatus = pipelineRun.Status.Replace("Canceling", "Cancelling") //microsoft typo
             };
+             */
         }
 
         public override PipelineRunStatus GetPipelineRunStatus(PipelineRunRequest request)

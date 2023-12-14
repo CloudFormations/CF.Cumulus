@@ -4,19 +4,27 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Microsoft.Rest;
 using Microsoft.Extensions.Logging;
-using Microsoft.IdentityModel.Clients.ActiveDirectory;
-using Microsoft.Azure.Management.Synapse;
+
 using Azure.Core;
 using Azure.Identity;
 using Azure.Analytics.Synapse.Artifacts;
 using Azure.Analytics.Synapse.Artifacts.Models;
 using cloudformations.cumulus.helpers;
+using Azure.ResourceManager;
+using Azure.ResourceManager.Synapse;
+
 
 namespace cloudformations.cumulus.services
 {
     public class AzureSynapseService : PipelineService
     {
-        private readonly SynapseManagementClient _synManagementClient;
+        private ArmClient client = new ArmClient(new DefaultAzureCredential());
+        private ResourceIdentifier workspaceResourceId;
+        private ResourceIdentifier integrationResourceId;
+
+        private SynapseWorkspaceResource synapseWorkspace;
+        private SynapseIntegrationRuntimeResource synapseWorkspaceIntegration;
+
         private readonly PipelineClient _pipelineClient;
         private readonly PipelineRunClient _pipelineRunClient;
         private readonly ILogger _logger;
@@ -26,27 +34,39 @@ namespace cloudformations.cumulus.services
             _logger = logger;
             _logger.LogInformation("Creating SYN connectivity clients.");
 
-            //Auth details
-            var context = new AuthenticationContext("https://login.windows.net/" + request.TenantId);
-            var cc = new ClientCredential(request.ApplicationId, request.AuthenticationKey);
-            var result = context.AcquireTokenAsync("https://management.azure.com/", cc).Result;
-            var cred = new TokenCredentials(result.AccessToken);
+            // workspaceResourceId = SynapseAadOnlyAuthenticationResource.CreateResourceIdentifier
+            //     (
+            //     request.SubscriptionId,
+            //     request.ResourceGroupName,
+            //     request.OrchestratorName,
+            //     request.OrchestratorName //not sure if this is right
+            //     );
+            //
+            // integrationResourceId = SynapseIntegrationRuntimeResource.CreateResourceIdentifier
+            //     (
+            //     request.SubscriptionId,
+            //     request.ResourceGroupName,
+            //     request.OrchestratorName,
+            //     request.OrchestratorName //not sure if this is right
+            //     );
+            //
+            // synapseWorkspace = client.GetSynapseWorkspaceResource(workspaceResourceId);
+            // synapseWorkspaceIntegration = client.GetSynapseIntegrationRuntimeResource(integrationResourceId);
 
-            //Management Client
-            _synManagementClient = new SynapseManagementClient(cred)
-            {
-                SubscriptionId = request.SubscriptionId
-            };
+            //Bit of a hack for now!
+            string tenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
+            string clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
+            string clientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET");
 
             //Pipeline Clients
             Uri synapseDevEndpoint = new Uri("https://" + request.OrchestratorName.ToLower() + ".dev.azuresynapse.net");
             TokenCredential token = new ClientSecretCredential
                 (
-                request.TenantId,
-                request.ApplicationId,
-                request.AuthenticationKey
+                tenantId,
+                clientId,
+                clientSecret
                 );
-
+            
             _pipelineClient = new PipelineClient(synapseDevEndpoint, token);
             _pipelineRunClient = new PipelineRunClient(synapseDevEndpoint, token);
         }
@@ -293,9 +313,7 @@ namespace cloudformations.cumulus.services
 
         public override void Dispose()
         {
-            _synManagementClient?.Dispose();
-            //_pipelineClient?.Dispose(); not yet supported
-            //_pipelineRunClient?.Dispose(); not yet supported
+
         }
     }
 }
