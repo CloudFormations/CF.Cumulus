@@ -8,7 +8,6 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.DataFactory;
 using Azure.ResourceManager.DataFactory.Models;
 
-using Microsoft.Rest.Azure;
 using Microsoft.Extensions.Logging;
 
 using cloudformations.cumulus.helpers;
@@ -54,33 +53,15 @@ namespace cloudformations.cumulus.services
         {
             _logger.LogInformation("Validating ADF pipeline.");
 
-            try
+            DataFactoryPipelineCollection collection = dataFactory.GetDataFactoryPipelines();
+
+            NullableResponse<DataFactoryPipelineResource> response = collection.GetIfExists(request.PipelineName);
+            DataFactoryPipelineResource? result = response.HasValue ? response.Value : null;
+
+            if (result == null)
             {
-                DataFactoryPipelineCollection collection = dataFactory.GetDataFactoryPipelines();
+                _logger.LogInformation("Validated ADF pipeline does not exist.");
 
-                NullableResponse<DataFactoryPipelineResource> response = collection.GetIfExists(request.PipelineName);
-                DataFactoryPipelineResource? result = response.HasValue ? response.Value : null;
-
-                if (result == null)
-                {
-                    throw new InvalidRequestException("Failed to validate pipeline. ");
-                }
-                else
-                {
-                    _logger.LogInformation("Validated ADF pipeline.");
-
-                    return new PipelineDescription()
-                    {
-                        PipelineExists = "True",
-                        PipelineName = response.Value.Data.Name,
-                        PipelineId = response.Value.Data.Id,
-                        PipelineType = response.Value.Data.ResourceType,
-                        ActivityCount = response.Value.Data.Activities.Count
-                    };
-                }
-            }
-            catch (CloudException) //expected exception when pipeline doesnt exist
-            {
                 return new PipelineDescription()
                 {
                     PipelineExists = "False",
@@ -90,11 +71,18 @@ namespace cloudformations.cumulus.services
                     ActivityCount = 0
                 };
             }
-            catch (Exception ex) //other unknown issue
+            else
             {
-                _logger.LogInformation(ex.Message);
-                _logger.LogInformation(ex.GetType().ToString());
-                throw new InvalidRequestException("Failed to validate pipeline. ", ex);
+                _logger.LogInformation("Validated ADF pipeline exists.");
+
+                return new PipelineDescription()
+                {
+                    PipelineExists = "True",
+                    PipelineName = response.Value.Data.Name,
+                    PipelineId = response.Value.Data.Id,
+                    PipelineType = response.Value.Data.ResourceType,
+                    ActivityCount = response.Value.Data.Activities.Count
+                };
             }
         }
 
