@@ -1,4 +1,4 @@
-﻿namespace cloudformations.cumulus
+﻿namespace cloudformations.cumulus.services
 {
     public enum PipelineServiceType
     {

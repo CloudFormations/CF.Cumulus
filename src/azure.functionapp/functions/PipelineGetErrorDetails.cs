@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using cloudformations.cumulus.helpers;
 using cloudformations.cumulus.services;
 using Newtonsoft.Json;
+using cloudformations.cumulus.returns;
 
 namespace cloudformations.cumulus.functions
 {
@@ -22,8 +23,10 @@ namespace cloudformations.cumulus.functions
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData requestData)
         {
             logger.LogInformation("Pipeline Get Error Details Function triggered by HTTP request.");
-
             logger.LogInformation("Parsing body from request.");
+
+            ArgumentNullException.ThrowIfNull(requestData);
+
             PipelineRunRequest request = await new BodyReader(requestData).GetRunRequestBodyAsync();
             request.Validate(logger);
 
@@ -33,7 +36,7 @@ namespace cloudformations.cumulus.functions
 
                 var response = requestData.CreateResponse(HttpStatusCode.OK);
                 response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-                response.WriteString(JsonConvert.SerializeObject(result));
+                await response.WriteStringAsync(JsonConvert.SerializeObject(result));
 
                 logger.LogInformation("Pipeline Get Error Details Function complete.");
 

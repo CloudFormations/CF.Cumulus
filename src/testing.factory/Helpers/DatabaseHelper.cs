@@ -2,7 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 
-namespace FactoryTesting.Helpers
+namespace framework.testing.Helpers
 {
     public class DatabaseHelper<T> : PipelineRunHelper<T> where T : DatabaseHelper<T>
     {

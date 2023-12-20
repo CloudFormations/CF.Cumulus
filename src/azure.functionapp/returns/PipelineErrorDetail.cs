@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace cloudformations.cumulus.services
+namespace cloudformations.cumulus.returns
 {
     public class PipelineErrorDetail : PipelineRunStatus
     {

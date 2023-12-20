@@ -4,12 +4,12 @@ using NUnit.Framework.Internal;
 using System.Threading.Tasks;
 using FactoryTesting.Helpers;
 
-namespace FactoryTesting.Pipelines.Utilities
+namespace framework.testing.Pipelines.Utilities
 {
     public class GivenCheckForRunningPipeline
     {
         private UtilitiesHelper _helper;
-      
+
         [OneTimeSetUp]
         public async Task WhenPipelineRun()
         {

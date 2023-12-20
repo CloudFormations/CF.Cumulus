@@ -1,17 +1,18 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using cloudformations.cumulus.services;
+using Microsoft.Extensions.Logging;
 
 namespace cloudformations.cumulus.helpers
 {
     public class PipelineRequest
     {
-        public string TenantId { get; set; }
-        public string SubscriptionId { get; set; }
-        public string ResourceGroupName { get; set; }
-        public string OrchestratorName { get; set; }
-        public string PipelineName { get; set; }
+        public string? TenantId { get; set; }
+        public string? SubscriptionId { get; set; }
+        public string? ResourceGroupName { get; set; }
+        public string? OrchestratorName { get; set; }
+        public string? PipelineName { get; set; }
         public PipelineServiceType? OrchestratorType { get; set; }
 
-        public Dictionary<string, string> PipelineParameters;
+        public Dictionary<string, string>? PipelineParameters;
 
         public virtual void Validate(ILogger logger)
         {
@@ -28,15 +29,18 @@ namespace cloudformations.cumulus.helpers
                 ReportInvalidBody(logger);
             };
 
-            //other validation
-            //if (!CheckGuid(TenantId)) ReportInvalidBody(logger, "Expected Tenant Id to be a GUID."); //future feature support
+            //future feature support
+            //ArgumentNullException.ThrowIfNull(TenantId);
+            //if (!CheckGuid(TenantId)) ReportInvalidBody(logger, "Expected Tenant Id to be a GUID.");
             if (TenantId != null) ReportInvalidBody(logger, "The use of an explicit Tenant Id is not currently supported.");
+
+            ArgumentNullException.ThrowIfNull(SubscriptionId); //a little overkill and shouldn't ever happen
             if (!CheckGuid(SubscriptionId)) ReportInvalidBody(logger, "Expected Subscription Id to be a GUID.");
         }
 
         private bool CheckUri(string uriValue)
         {
-            bool result = Uri.TryCreate(uriValue, UriKind.Absolute, out Uri uriResult)
+            bool result = Uri.TryCreate(uriValue, UriKind.Absolute, out var uriResult)
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
 
             return result;
@@ -63,7 +67,7 @@ namespace cloudformations.cumulus.helpers
             throw new InvalidRequestException(msg);
         }
 
-        public Dictionary<string, object> ParametersAsObjects
+        public Dictionary<string, object>? ParametersAsObjects
         {
             get
             {

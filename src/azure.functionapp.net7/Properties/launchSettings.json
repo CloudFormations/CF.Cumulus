@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "azure.functionapp": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7176",
+      "launchBrowser": false
+    }
+  }
+}

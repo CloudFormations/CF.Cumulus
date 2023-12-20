@@ -5,7 +5,7 @@ namespace cloudformations.cumulus.helpers
 {
     public class PipelineRunRequest : PipelineRequest
     {
-        public string RunId { get; set; }
+        public string? RunId { get; set; }
 
         public bool RecursivePipelineCancel = true; //might provide this as part of the request later
 
@@ -21,6 +21,7 @@ namespace cloudformations.cumulus.helpers
                 ReportInvalidBody(logger);
 
             //other validation
+            ArgumentNullException.ThrowIfNull(RunId); //a little overkill and shouldn't ever happen
             if (!CheckGuid(RunId)) ReportInvalidBody(logger, "Expected Run Id to be a GUID.");
         }
     }

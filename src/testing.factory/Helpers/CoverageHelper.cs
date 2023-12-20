@@ -1,11 +1,11 @@
-﻿using FactoryTesting.Helpers;
+﻿using framework.testing.Helpers;
 using Microsoft.Azure.Management.DataFactory.Models;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FactoryTesting.Helpers
+namespace framework.testing.Helpers
 {
     public class CoverageHelper<T> : DatabaseHelper<T> where T : CoverageHelper<T>
     {

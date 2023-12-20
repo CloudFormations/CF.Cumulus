@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FactoryTesting.Helpers
+namespace framework.testing.Helpers
 {
     public class PipelineRunHelper<T> : DataFactoryHelper<T> where T : PipelineRunHelper<T>
     {

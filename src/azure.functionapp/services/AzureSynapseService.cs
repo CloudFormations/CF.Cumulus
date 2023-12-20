@@ -10,17 +10,18 @@ using Azure.ResourceManager;
 using Azure.ResourceManager.Synapse;
 
 using cloudformations.cumulus.helpers;
+using cloudformations.cumulus.returns;
 
 namespace cloudformations.cumulus.services
 {
     public class AzureSynapseService : PipelineService
     {
         private ArmClient client = new ArmClient(new DefaultAzureCredential());
-        private ResourceIdentifier workspaceResourceId;
-        private ResourceIdentifier integrationResourceId;
+        //private ResourceIdentifier workspaceResourceId;
+        //private ResourceIdentifier integrationResourceId;
 
-        private SynapseWorkspaceResource synapseWorkspace;
-        private SynapseIntegrationRuntimeResource synapseWorkspaceIntegration;
+        //private SynapseWorkspaceResource synapseWorkspace;
+        //private SynapseIntegrationRuntimeResource synapseWorkspaceIntegration;
 
         private readonly PipelineClient _pipelineClient;
         private readonly PipelineRunClient _pipelineRunClient;
@@ -51,11 +52,12 @@ namespace cloudformations.cumulus.services
             // synapseWorkspaceIntegration = client.GetSynapseIntegrationRuntimeResource(integrationResourceId);
 
             //Bit of a hack for now!
-            string tenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
-            string clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
-            string clientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET");
+            string? tenantId = Environment.GetEnvironmentVariable("AZURE_TENANT_ID");
+            string? clientId = Environment.GetEnvironmentVariable("AZURE_CLIENT_ID");
+            string? clientSecret = Environment.GetEnvironmentVariable("AZURE_CLIENT_SECRET");
 
             //Pipeline Clients
+            ArgumentNullException.ThrowIfNull(request.OrchestratorName);
             Uri synapseDevEndpoint = new Uri("https://" + request.OrchestratorName.ToLower() + ".dev.azuresynapse.net");
             TokenCredential token = new ClientSecretCredential
                 (
@@ -73,6 +75,7 @@ namespace cloudformations.cumulus.services
             _logger.LogInformation("Validating SYN pipeline.");
 
             PipelineResource pipelineResource;
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
 
             try
             {
@@ -155,6 +158,7 @@ namespace cloudformations.cumulus.services
                 Thread.Sleep(internalWaitDuration);
             }
 
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
             return new PipelineRunStatus()
             {
                 PipelineName = request.PipelineName,
@@ -172,6 +176,7 @@ namespace cloudformations.cumulus.services
                 (
                 request.RunId
                 );
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
 
             //Defensive check
             PipelineNameCheck(request.PipelineName, pipelineRun.PipelineName);
@@ -228,6 +233,7 @@ namespace cloudformations.cumulus.services
                 );
 
             //Defensive check
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
             PipelineNameCheck(request.PipelineName, pipelineRun.PipelineName);
 
             _logger.LogInformation("SYN pipeline status: " + pipelineRun.Status);
@@ -249,6 +255,7 @@ namespace cloudformations.cumulus.services
                 );
 
             //Defensive check
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
             PipelineNameCheck(request.PipelineName, pipelineRun.PipelineName);
 
             _logger.LogInformation("Create pipeline Activity Runs query filters.");

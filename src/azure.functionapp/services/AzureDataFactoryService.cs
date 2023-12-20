@@ -11,6 +11,7 @@ using Azure.ResourceManager.DataFactory.Models;
 using Microsoft.Extensions.Logging;
 
 using cloudformations.cumulus.helpers;
+using cloudformations.cumulus.returns;
 
 namespace cloudformations.cumulus.services
 {
@@ -58,6 +59,8 @@ namespace cloudformations.cumulus.services
             NullableResponse<DataFactoryPipelineResource> response = collection.GetIfExists(request.PipelineName);
             DataFactoryPipelineResource? result = response.HasValue ? response.Value : null;
 
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
+
             if (result == null)
             {
                 _logger.LogInformation("Validated ADF pipeline does not exist.");
@@ -99,6 +102,7 @@ namespace cloudformations.cumulus.services
             _logger.LogInformation("Pipeline run ID: " + runId);
 
             DataFactoryPipelineRunInfo runInfo;
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
 
             //Wait and check for pipeline to start...
             _logger.LogInformation("Checking ADF pipeline status.");
@@ -135,6 +139,8 @@ namespace cloudformations.cumulus.services
             runInfo = dataFactory.GetPipelineRun(request.RunId);
 
             //Defensive check
+            ArgumentNullException.ThrowIfNull(request.RunId);
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
             PipelineNameCheck(request.PipelineName, runInfo.PipelineName);
 
             _logger.LogInformation("ADF pipeline status: " + runInfo.Status);
@@ -155,8 +161,10 @@ namespace cloudformations.cumulus.services
             runInfo = dataFactory.GetPipelineRun(request.RunId);
 
             _logger.LogInformation("ADF pipeline status: " + runInfo.Status);
-            
+
             //Defensive check
+            ArgumentNullException.ThrowIfNull(request.RunId);
+            ArgumentNullException.ThrowIfNull(request.PipelineName);
             PipelineNameCheck(request.PipelineName, runInfo.PipelineName);
 
             _logger.LogInformation("Create pipeline Activity Runs query filters.");
@@ -202,12 +210,17 @@ namespace cloudformations.cumulus.services
                     continue; //only want to return errors
                 }
 
+                Guid runId = (Guid)queryResponse.ActivityRunId;
+
                 _logger.LogInformation("Errored activity found in result. Capturing details.");
-                _logger.LogInformation("Errored activity run id: " + queryResponse.ActivityRunId.ToString());
+                _logger.LogInformation("Errored activity run id: " + runId.ToString());
+
+                ArgumentNullException.ThrowIfNull(errorType);
+                ArgumentNullException.ThrowIfNull(errorMessage);
 
                 output.Errors.Add(new FailedActivity()
                 {
-                    ActivityRunId = queryResponse.ActivityRunId.ToString(),
+                    ActivityRunId = runId.ToString(),
                     ActivityName = queryResponse.ActivityName,
                     ActivityType = queryResponse.ActivityType,
                     ErrorCode = errorCode,

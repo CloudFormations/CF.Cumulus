@@ -3,7 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System.Threading.Tasks;
 
-namespace FactoryTesting.Pipelines.Utilities
+namespace framework.testing.Pipelines.Utilities
 {
     public class GivenThrowException
     {
@@ -13,8 +13,8 @@ namespace FactoryTesting.Pipelines.Utilities
         public async Task WhenPipelineRun()
         {
             _helper = new UtilitiesHelper()
-                .WithParameter("Message","NUnit Test");
-            
+                .WithParameter("Message", "NUnit Test");
+
             await _helper.RunPipeline("Throw Exception");
         }
 

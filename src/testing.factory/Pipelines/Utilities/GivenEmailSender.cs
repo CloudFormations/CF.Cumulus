@@ -3,7 +3,7 @@ using NUnit.Framework;
 using NUnit.Framework.Internal;
 using System.Threading.Tasks;
 
-namespace FactoryTesting.Pipelines.Utilities
+namespace framework.testing.Pipelines.Utilities
 {
     public class GivenEmailSender
     {

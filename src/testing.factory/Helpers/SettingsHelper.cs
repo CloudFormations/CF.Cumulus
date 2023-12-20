@@ -3,7 +3,7 @@ using Azure.Security.KeyVault.Secrets;
 using NUnit.Framework;
 using System;
 
-namespace FactoryTesting.Helpers
+namespace framework.testing.Helpers
 {
     public class SettingsHelper<T>
     {

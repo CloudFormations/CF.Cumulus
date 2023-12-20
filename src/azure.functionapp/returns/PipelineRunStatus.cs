@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace cloudformations.cumulus.services
+namespace cloudformations.cumulus.returns
 {
     public class PipelineRunStatus
     {
@@ -11,7 +11,7 @@ namespace cloudformations.cumulus.services
         public string RunId { get; set; }
         public string ActualStatus { get; set; }
 
-        public string SimpleStatus 
+        public string SimpleStatus
         {
             get
             {

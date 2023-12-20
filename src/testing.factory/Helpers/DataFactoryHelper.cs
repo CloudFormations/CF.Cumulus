@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace FactoryTesting.Helpers
+namespace framework.testing.Helpers
 {
     public class DataFactoryHelper<T> : SettingsHelper<T> where T : DataFactoryHelper<T>
     {
