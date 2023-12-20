@@ -4,7 +4,7 @@
 		"description": "Used just so the procfwk has something to call during development.",
 		"activities": [
 			{
-				"name": "Wait01",
+				"name": "Wait1",
 				"description": "Framework development worker simulator.",
 				"type": "Wait",
 				"dependsOn": [],

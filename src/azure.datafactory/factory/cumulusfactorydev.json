@@ -1,0 +1,9 @@
+{
+	"name": "cumulusfactorydev",
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "b96a7cc7-3bb9-4638-8376-437176e6da25",
+		"tenantId": "d562890e-82fc-42c7-8033-b62200df3d96"
+	}
+}
