@@ -10,9 +10,16 @@ using Newtonsoft.Json;
 namespace cloudformations.cumulus.functions
 {
     public class PipelineValidate
-    {      
+    {
+        private readonly ILogger logger;
+
+        public PipelineValidate(ILoggerFactory loggerFactory)
+        {
+            logger = loggerFactory.CreateLogger<PipelineValidate>();
+        }
+
         [Function("PipelineValidate")]
-        public static async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData requestData, ILogger logger)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData requestData)
         {
             logger.LogInformation("Pipeline Validate Function triggered by HTTP request.");
 

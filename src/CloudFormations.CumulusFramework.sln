@@ -13,7 +13,7 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "metadata.ingest", "metadata
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "metadata.transform", "metadata.transform\metadata.transform.sqlproj", "{7248F9C8-F270-48FF-9BBE-7BD82C3D7280}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "azure.functionapp", "azure.functionapp\azure.functionapp.csproj", "{9F82FD86-629E-405F-A344-52AE8466A260}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "azure.functionapp", "azure.functionapp\azure.functionapp.csproj", "{9F82FD86-629E-405F-A344-52AE8466A260}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "azure.functions.old", "azure.functions.old\azure.functions.old.csproj", "{53AAF0A2-A6C2-4AE9-A360-B72CE681489F}"
 EndProject

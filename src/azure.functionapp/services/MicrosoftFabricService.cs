@@ -21,11 +21,6 @@ namespace cloudformations.cumulus.services
             _logger.LogInformation("Creating FAB connectivity clients.");
         }
 
-        public override void Dispose()
-        {
-            throw new NotImplementedException();
-        }
-
         public override PipelineRunStatus PipelineCancel(PipelineRunRequest request)
         {
             throw new NotImplementedException();
@@ -49,6 +44,10 @@ namespace cloudformations.cumulus.services
         public override PipelineDescription PipelineValidate(PipelineRequest request)
         {
             throw new NotImplementedException();
+        }
+        public override void Dispose()
+        {
+            GC.SuppressFinalize(this);
         }
     }
 }

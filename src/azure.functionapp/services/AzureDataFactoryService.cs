@@ -1,41 +1,53 @@
 ﻿using System;
-using Microsoft.Extensions.Logging;
-using Azure.ResourceManager.DataFactory;
+using Newtonsoft.Json;
 
 using Azure;
 using Azure.Core;
 using Azure.Identity;
 using Azure.ResourceManager;
+using Azure.ResourceManager.DataFactory;
 using Azure.ResourceManager.DataFactory.Models;
 
-using cloudformations.cumulus.helpers;
 using Microsoft.Rest.Azure;
+using Microsoft.Extensions.Logging;
+
+using cloudformations.cumulus.helpers;
 
 namespace cloudformations.cumulus.services
 {
     public class AzureDataFactoryService : PipelineService
     {
-        private ArmClient client = new ArmClient(new DefaultAzureCredential());
-        private ResourceIdentifier resourceId;
+        private ArmClient client;
+        private ResourceIdentifier factoryResourceId;
+        private ResourceIdentifier pipelineResourceId;
         private DataFactoryResource dataFactory;
         private DataFactoryPipelineResource dataFactoryPipeline;
-        
-        private readonly ILogger _logger;
+        private ILogger _logger;
 
         public AzureDataFactoryService(PipelineRequest request, ILogger logger)
         {
             _logger = logger;
             _logger.LogInformation("Creating ADF connectivity clients.");
 
-            resourceId = DataFactoryResource.CreateResourceIdentifier
+            client = new ArmClient(new DefaultAzureCredential());
+
+            factoryResourceId = DataFactoryResource.CreateResourceIdentifier
                 (
-                request.SubscriptionId, 
-                request.ResourceGroupName, 
+                request.SubscriptionId,
+                request.ResourceGroupName,
                 request.OrchestratorName
                 );
 
-            dataFactory = client.GetDataFactoryResource(resourceId);
-            dataFactoryPipeline = client.GetDataFactoryPipelineResource(resourceId);
+            pipelineResourceId = DataFactoryPipelineResource.CreateResourceIdentifier
+                (
+                request.SubscriptionId,
+                request.ResourceGroupName,
+                request.OrchestratorName,
+                request.PipelineName
+                );
+
+            dataFactory = client.GetDataFactoryResource(factoryResourceId);
+            dataFactoryPipeline = client.GetDataFactoryPipelineResource(pipelineResourceId);
         }
 
         public override PipelineDescription PipelineValidate(PipelineRequest request)
@@ -93,11 +105,9 @@ namespace cloudformations.cumulus.services
             else
                 _logger.LogInformation("Calling pipeline with parameters.");
 
-            string runId = null;
-            PipelineCreateRunResult pipelineRunResult;
+            PipelineCreateRunResult pipelineRunResult = dataFactoryPipeline.CreateRun();
+            string runId = pipelineRunResult.RunId.ToString();
 
-            pipelineRunResult = dataFactoryPipeline.CreateRun(referencePipelineRunId: runId);
-             
             _logger.LogInformation("Pipeline run ID: " + runId);
 
             DataFactoryPipelineRunInfo runInfo;
@@ -172,35 +182,40 @@ namespace cloudformations.cumulus.services
             //PipelineActivityRunInformation queryResponse;
             Pageable<PipelineActivityRunInformation> queryResponses = dataFactory.GetActivityRun(request.RunId, filterParams);
 
+            int responseCount = queryResponses.Count();
+            int responsePage = 0;
+
             //Create initial output content
             PipelineErrorDetail output = new PipelineErrorDetail()
             {
                 PipelineName = request.PipelineName,
                 ActualStatus = runInfo.Status,
                 RunId = request.RunId,
-                ResponseCount = queryResponses.Count()
+                ResponseCount = responseCount
             };
 
             _logger.LogInformation("Pipeline status: " + runInfo.Status);
-            _logger.LogInformation("Activities found in pipeline response: " + queryResponses.Count().ToString());
+            _logger.LogInformation("Activities found in pipeline response: " + responseCount.ToString());
 
             foreach (PipelineActivityRunInformation queryResponse in queryResponses)
             {
-                if (queryResponse.Error == null)
+                responsePage = responsePage + 1;
+                //Parse output to customise error content
+                _logger.LogInformation($"Parsing activity response page {responsePage} of {responseCount} information.");
+
+                dynamic? outputBlockInner = JsonConvert.DeserializeObject(queryResponse.Error.ToString());
+                string? errorCode = outputBlockInner?.errorCode;
+                string? errorType = outputBlockInner?.failureType;
+                string? errorMessage = outputBlockInner?.message;
+
+                if (String.IsNullOrWhiteSpace(errorCode))
                 {
-                    continue; //only want errors
+                    _logger.LogInformation($"Skipping activity information for '{queryResponse.ActivityName}' as not errored.");
+                    continue; //only want to return errors
                 }
 
-                //Parse error output to customise output
-                dynamic outputBlockInner = BinaryData.FromObjectAsJson(queryResponse.Error);
-                string errorCode = outputBlockInner?.errorCode;
-                string errorType = outputBlockInner?.failureType;
-                string errorMessage = outputBlockInner?.message;
-
-                _logger.LogInformation("Activity run id: " + queryResponse.ActivityRunId.ToString());
-                _logger.LogInformation("Activity name: " + queryResponse.ActivityName);
-                _logger.LogInformation("Activity type: " + queryResponse.ActivityType);
-                _logger.LogInformation("Error message: " + errorMessage);
+                _logger.LogInformation("Errored activity found in result. Capturing details.");
+                _logger.LogInformation("Errored activity run id: " + queryResponse.ActivityRunId.ToString());
 
                 output.Errors.Add(new FailedActivity()
                 {
@@ -217,7 +232,7 @@ namespace cloudformations.cumulus.services
 
         public override void Dispose()
         {
-            //nothing to dispose, handled by Microsoft
+            GC.SuppressFinalize(this);
         }
     }
 }

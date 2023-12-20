@@ -9,10 +9,17 @@ using Newtonsoft.Json;
 
 namespace cloudformations.cumulus.functions
 {
-    public static class PipelineGetErrorDetails
+    public class PipelineGetErrorDetails
     {
+        private readonly ILogger logger;
+
+        public PipelineGetErrorDetails(ILoggerFactory loggerFactory)
+        {
+            logger = loggerFactory.CreateLogger<PipelineGetErrorDetails>();
+        }
+
         [Function("PipelineGetErrorDetails")]
-        public static async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData requestData, ILogger logger)
+        public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData requestData)
         {
             logger.LogInformation("Pipeline Get Error Details Function triggered by HTTP request.");
 

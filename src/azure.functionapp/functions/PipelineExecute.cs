@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using cloudformations.cumulus.helpers;
 using cloudformations.cumulus.services;
 using Newtonsoft.Json;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace cloudformations.cumulus.functions
 {

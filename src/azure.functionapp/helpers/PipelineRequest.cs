@@ -1,6 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
 
 namespace cloudformations.cumulus.helpers
 {
@@ -19,14 +17,16 @@ namespace cloudformations.cumulus.helpers
         {
             // ensure properties not null
             if (
-              //TenantId == null || //future feature support
-              SubscriptionId == null ||
-              ResourceGroupName == null ||
-              OrchestratorType == null ||
-              OrchestratorName == null ||
-              PipelineName == null
-            )
+                //TenantId == null || //future feature support
+                SubscriptionId == null ||
+                ResourceGroupName == null ||
+                OrchestratorType == null ||
+                OrchestratorName == null ||
+                PipelineName == null
+                )
+            {
                 ReportInvalidBody(logger);
+            };
 
             //other validation
             //if (!CheckGuid(TenantId)) ReportInvalidBody(logger, "Expected Tenant Id to be a GUID."); //future feature support

@@ -310,7 +310,7 @@ namespace cloudformations.cumulus.services
 
         public override void Dispose()
         {
-
+            GC.SuppressFinalize(this);
         }
     }
 }

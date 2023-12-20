@@ -9,19 +9,19 @@ using Newtonsoft.Json;
 
 namespace cloudformations.cumulus.functions
 {
-    public class PipelineGetStatus
+    public class PipelineCancel
     {
         private readonly ILogger logger;
 
-        public PipelineGetStatus(ILoggerFactory loggerFactory)
+        public PipelineCancel(ILoggerFactory loggerFactory)
         {
-            logger = loggerFactory.CreateLogger<PipelineGetStatus>();
+            logger = loggerFactory.CreateLogger<PipelineCancel>();
         }
 
-        [Function("PipelineGetStatus")]
+        [Function("PipelineCancel")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData requestData)
         {
-            logger.LogInformation("Pipeline Get Status Function triggered by HTTP request.");
+            logger.LogInformation("Pipeline Cancel Function triggered by HTTP request.");
 
             logger.LogInformation("Parsing body from request.");
             PipelineRunRequest request = await new BodyReader(requestData).GetRunRequestBodyAsync();
@@ -29,7 +29,7 @@ namespace cloudformations.cumulus.functions
 
             using (var service = PipelineService.GetServiceForRequest(request, logger))
             {
-                PipelineRunStatus result = service.PipelineGetStatus(request);
+                PipelineRunStatus result = service.PipelineCancel(request);
 
                 var response = requestData.CreateResponse(HttpStatusCode.OK);
                 response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
