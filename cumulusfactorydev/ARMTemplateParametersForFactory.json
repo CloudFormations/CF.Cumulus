@@ -1,0 +1,18 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "cumulusfactorydev"
+		},
+		"FrameworkFunctions_properties_typeProperties_functionAppUrl": {
+			"value": "https://frameworksupportfunctions.azurewebsites.net"
+		},
+		"Keys_properties_typeProperties_baseUrl": {
+			"value": "https://FrameworkKeys.vault.azure.net/"
+		},
+		"SupportDatabase_properties_typeProperties_connectionString_secretName": {
+			"value": "FrameworkMetadataDev"
+		}
+	}
+}

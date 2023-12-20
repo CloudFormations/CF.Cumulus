@@ -1,0 +1,83 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "cumulusfactorydev"
+		},
+		"FrameworkFunctions_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://frameworksupportfunctions.azurewebsites.net"
+		},
+		"Keys_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://FrameworkKeys.vault.azure.net/"
+		},
+		"SupportDatabase_properties_typeProperties_connectionString_secretName": {
+			"type": "string",
+			"defaultValue": "FrameworkMetadataDev"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "cumulusfactorydev_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Keys_properties_typeProperties_baseUrl": {
+						"value": "[parameters('Keys_properties_typeProperties_baseUrl')]"
+					},
+					"FrameworkFunctions_properties_typeProperties_functionAppUrl": {
+						"value": "[parameters('FrameworkFunctions_properties_typeProperties_functionAppUrl')]"
+					},
+					"SupportDatabase_properties_typeProperties_connectionString_secretName": {
+						"value": "[parameters('SupportDatabase_properties_typeProperties_connectionString_secretName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "cumulusfactorydev_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'cumulusfactorydev_ArmTemplate_0')]"
+			]
+		}
+	]
+}
