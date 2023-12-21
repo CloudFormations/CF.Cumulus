@@ -127,17 +127,34 @@ namespace cloudformations.cumulus.services
 
         public override PipelineRunStatus PipelineExecute(PipelineRequest request)
         {
+            CreateRunResponse runResponse;
+            Dictionary<string, object> synParameters;
+
             if (request.PipelineParameters == null)
+            {
                 _logger.LogInformation("Calling pipeline without parameters.");
+
+                runResponse = _pipelineClient.CreatePipelineRun
+                    (
+                    request.PipelineName
+                    );
+            }
             else
+            {
                 _logger.LogInformation("Calling pipeline with parameters.");
 
-            CreateRunResponse runResponse;
-            runResponse = _pipelineClient.CreatePipelineRun
-                (
-                request.PipelineName,
-                parameters: request.ParametersAsObjects
-                );
+                synParameters = [];
+                foreach (var key in request.PipelineParameters.Keys)
+                {
+                    synParameters.Add(key, request.PipelineParameters[key]);
+                }
+
+                runResponse = _pipelineClient.CreatePipelineRun
+                    (
+                    request.PipelineName,
+                    parameters: synParameters
+                    );
+            }
 
             _logger.LogInformation("Pipeline run ID: " + runResponse.RunId);
 

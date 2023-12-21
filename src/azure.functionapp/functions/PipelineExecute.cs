@@ -23,7 +23,6 @@ namespace cloudformations.cumulus.functions
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData requestData)
         {
             logger.LogInformation("Pipeline Execute Function triggered by HTTP request.");
-
             logger.LogInformation("Parsing body from request.");
 
             ArgumentNullException.ThrowIfNull(requestData);

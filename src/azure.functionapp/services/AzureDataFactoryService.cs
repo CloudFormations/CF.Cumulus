@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 
 using cloudformations.cumulus.helpers;
 using cloudformations.cumulus.returns;
+using System.Web;
 
 namespace cloudformations.cumulus.services
 {
@@ -91,13 +92,35 @@ namespace cloudformations.cumulus.services
 
         public override PipelineRunStatus PipelineExecute(PipelineRequest request)
         {
-            if (request.PipelineParameters == null)
-                _logger.LogInformation("Calling pipeline without parameters.");
-            else
-                _logger.LogInformation("Calling pipeline with parameters.");
+            PipelineCreateRunResult pipelineRunResult;
+            Dictionary<string, BinaryData> adfParameters;
+            string? runId;
 
-            PipelineCreateRunResult pipelineRunResult = dataFactoryPipeline.CreateRun();
-            string runId = pipelineRunResult.RunId.ToString();
+            if (request.PipelineParameters == null)
+            {
+                _logger.LogInformation("Calling pipeline without parameters.");
+                pipelineRunResult = dataFactoryPipeline.CreateRun();
+                
+                runId = pipelineRunResult.RunId.ToString();
+            }
+            else
+            {
+                _logger.LogInformation("Calling pipeline with parameters.");
+                
+                adfParameters = [];
+                foreach (var key in request.PipelineParameters.Keys)
+                {
+                    if (String.IsNullOrEmpty(request.PipelineParameters[key])) continue;
+
+                    _logger.LogInformation($"Adding parameter key: {key} value: {request.PipelineParameters[key]} to pipeline call.");
+
+                    adfParameters.Add(key, BinaryData.FromString('"' + request.PipelineParameters[key] + '"')); //adding " marks feels like a hack, but because parameters are passed from JSON call to a JSON call via a dictionary seems to be needed in Binary Data convert!
+                }
+                
+                pipelineRunResult = dataFactoryPipeline.CreateRun(parameterValueSpecification: adfParameters);
+                
+                runId = pipelineRunResult.RunId.ToString();
+            }
 
             _logger.LogInformation("Pipeline run ID: " + runId);
 

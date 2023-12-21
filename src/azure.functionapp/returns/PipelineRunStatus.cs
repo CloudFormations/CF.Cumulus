@@ -7,19 +7,19 @@ namespace cloudformations.cumulus.returns
         private const string Running = "Running";
         private const string Complete = "Complete";
 
-        public string PipelineName { get; set; }
-        public string RunId { get; set; }
-        public string ActualStatus { get; set; }
+        public string? PipelineName { get; set; }
+        public string? RunId { get; set; }
+        public string? ActualStatus { get; set; }
 
         public string SimpleStatus
         {
             get
             {
-                return ConvertPipelineStatus(ActualStatus);
+                return (ActualStatus == null)? "Uknown" : ConvertPipelineStatus(ActualStatus);
             }
         }
 
-        private string ConvertPipelineStatus(string actualStatus)
+        private static string ConvertPipelineStatus(string actualStatus)
         {
             string simpleStatus = actualStatus switch
             {

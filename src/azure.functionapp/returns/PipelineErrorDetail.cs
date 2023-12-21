@@ -21,11 +21,11 @@ namespace cloudformations.cumulus.returns
 
     public class FailedActivity
     {
-        public string ActivityRunId { get; internal set; }
-        public string ActivityName { get; internal set; }
-        public string ActivityType { get; internal set; }
-        public string ErrorCode { get; internal set; }
-        public string ErrorType { get; internal set; }
-        public string ErrorMessage { get; internal set; }
+        public string? ActivityRunId { get; internal set; }
+        public string? ActivityName { get; internal set; }
+        public string? ActivityType { get; internal set; }
+        public string? ErrorCode { get; internal set; }
+        public string? ErrorType { get; internal set; }
+        public string? ErrorMessage { get; internal set; }
     }
 }

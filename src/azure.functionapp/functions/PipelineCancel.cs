@@ -38,7 +38,7 @@ namespace cloudformations.cumulus.functions
                 response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
                 await response.WriteStringAsync(JsonConvert.SerializeObject(result));
 
-                logger.LogInformation("Pipeline Get Status Function complete.");
+                logger.LogInformation("Pipeline Cancel Function complete.");
 
                 return response;
             }

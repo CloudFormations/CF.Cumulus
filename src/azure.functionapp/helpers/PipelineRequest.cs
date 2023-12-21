@@ -1,5 +1,8 @@
 ﻿using cloudformations.cumulus.services;
 using Microsoft.Extensions.Logging;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
 
 namespace cloudformations.cumulus.helpers
 {
@@ -12,8 +15,8 @@ namespace cloudformations.cumulus.helpers
         public string? PipelineName { get; set; }
         public PipelineServiceType? OrchestratorType { get; set; }
 
-        public Dictionary<string, string>? PipelineParameters;
-
+        public IDictionary<string, string>? PipelineParameters; //using string, string limits pipeline param options, but makes handling calls downstream easier
+        
         public virtual void Validate(ILogger logger)
         {
             // ensure properties not null
@@ -65,19 +68,6 @@ namespace cloudformations.cumulus.helpers
             var msg = "Invalid body. " + additions;
             logger.LogError(msg);
             throw new InvalidRequestException(msg);
-        }
-
-        public Dictionary<string, object>? ParametersAsObjects
-        {
-            get
-            {
-                if (PipelineParameters == null)
-                    return null;
-                var dictionary = new Dictionary<string, object>();
-                foreach (var key in PipelineParameters.Keys)
-                    dictionary.Add(key, PipelineParameters[key]);
-                return dictionary;
-            }
-        }
+        }        
     }
 }
