@@ -127,6 +127,9 @@
 					"WaitTime": {
 						"type": "int",
 						"defaultValue": 5
+					},
+					"Test": {
+						"type": "string"
 					}
 				},
 				"folder": {
