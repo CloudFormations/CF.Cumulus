@@ -1,12 +1,13 @@
 {
 	"name": "cumulusfunctions",
 	"properties": {
+		"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level.",
 		"annotations": [
 			"procfwk"
 		],
 		"type": "AzureFunction",
 		"typeProperties": {
-			"functionAppUrl": "https://frameworksupportfunctions.azurewebsites.net",
+			"functionAppUrl": "https://cumulusfunctionappdev.azurewebsites.net",
 			"functionKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
@@ -14,8 +15,9 @@
 					"type": "LinkedServiceReference"
 				},
 				"secretName": "cumulusfunctionsKey"
-			}
-		},
-		"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level."
+			},
+			"authentication": "MSI",
+			"resourceId": "/subscriptions/1b2b1db2-3735-4a51-86a5-18fa41b8bb49/resourceGroups/CumulusFrameworkDev/providers/Microsoft.Web/sites/cumulusfunctionappdev"
+		}
 	}
 }
