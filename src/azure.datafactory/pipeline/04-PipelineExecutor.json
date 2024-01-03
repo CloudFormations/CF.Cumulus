@@ -30,7 +30,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"functionName": "ExecutePipeline",
+					"functionName": "PipelineExecute",
 					"method": "POST",
 					"body": {
 						"value": "@concat('\n{\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\"',activity('Get Pipeline Params').output.firstRow.Params,'\n}')",
@@ -440,7 +440,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"functionName": "CheckPipelineStatus",
+								"functionName": "PipelineGetStatus",
 								"method": "POST",
 								"body": {
 									"value": "@concat('\n{\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\",\n    \"runId\": \"',variables('WorkerRunId'),'\"\n}')",
@@ -758,7 +758,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"functionName": "GetActivityErrors",
+										"functionName": "PipelineGetErrorDetails",
 										"method": "POST",
 										"body": {
 											"value": "@concat('\n{\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\",\n    \"runId\": \"',variables('WorkerRunId'),'\"\n}')",
@@ -998,7 +998,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"functionName": "ValidatePipeline",
+					"functionName": "PipelineValidate",
 					"method": "POST",
 					"body": {
 						"value": "@concat('\n{\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\"\n}')",
