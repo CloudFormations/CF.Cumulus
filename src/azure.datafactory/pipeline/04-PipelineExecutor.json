@@ -245,6 +245,8 @@
 				"name": "Check For Alerts",
 				"description": "Checks the properties tables and if any recipients in the database require alerts sending for the current pipeline ID.",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Update Run Id",
@@ -294,6 +296,8 @@
 				"name": "Send Alerts",
 				"description": "True = alerts need sending.\nFalse = do nothing.",
 				"type": "IfCondition",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Check For Alerts",
