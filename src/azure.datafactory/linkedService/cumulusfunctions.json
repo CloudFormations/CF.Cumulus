@@ -16,8 +16,7 @@
 				},
 				"secretName": "cumulusfunctionsKey"
 			},
-			"authentication": "MSI",
-			"resourceId": "/subscriptions/1b2b1db2-3735-4a51-86a5-18fa41b8bb49/resourceGroups/CumulusFrameworkDev/providers/Microsoft.Web/sites/cumulusfunctionappdev"
+			"authentication": "Anonymous"
 		}
 	}
 }
