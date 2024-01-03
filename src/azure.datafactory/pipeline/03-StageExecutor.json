@@ -1,5 +1,5 @@
 {
-	"name": "03-Child",
+	"name": "03-StageExecutor",
 	"properties": {
 		"description": "procfwk child pipeline used to execute Worker pipelines within a given execution stage. This pipeline will be called once for each stage, then execute all Workers in parallel.",
 		"activities": [
@@ -108,7 +108,7 @@
 			}
 		},
 		"folder": {
-			"name": "_ProcFwk"
+			"name": "Cumulus.Control"
 		},
 		"annotations": [
 			"procfwk",

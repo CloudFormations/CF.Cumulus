@@ -1,5 +1,5 @@
 {
-	"name": "FrameworkFunctions",
+	"name": "cumulusfunctions",
 	"properties": {
 		"annotations": [
 			"procfwk"
@@ -10,10 +10,10 @@
 			"functionKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
-					"referenceName": "Keys",
+					"referenceName": "cumuluskeys",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "FrameworkFunctionsKey"
+				"secretName": "cumulusfunctionsKey"
 			}
 		},
 		"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level."

@@ -1,5 +1,5 @@
 {
-	"name": "SupportDatabase",
+	"name": "cumulusdatabase",
 	"properties": {
 		"description": "Connection between ADF and processing framework metadata SQLDB.",
 		"annotations": [
@@ -10,7 +10,7 @@
 			"connectionString": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
-					"referenceName": "Keys",
+					"referenceName": "cumuluskeys",
 					"type": "LinkedServiceReference"
 				},
 				"secretName": "FrameworkMetadataDev"

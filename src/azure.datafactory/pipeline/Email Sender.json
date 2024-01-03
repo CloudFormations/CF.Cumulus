@@ -25,7 +25,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "FrameworkFunctions",
+					"referenceName": "cumulusfunctions",
 					"type": "LinkedServiceReference"
 				}
 			}

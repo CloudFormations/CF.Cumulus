@@ -1,5 +1,5 @@
 {
-	"name": "04-Infant",
+	"name": "04-PipelineExecutor",
 	"properties": {
 		"description": "procfwk infant pipeline used to check when the processing pipeline called by the Child completes and passes the resulting status back to the metadata database.",
 		"activities": [
@@ -38,7 +38,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "FrameworkFunctions",
+					"referenceName": "cumulusfunctions",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -124,7 +124,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -179,7 +179,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -237,7 +237,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -448,7 +448,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "FrameworkFunctions",
+								"referenceName": "cumulusfunctions",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -534,7 +534,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SupportDatabase",
+								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -589,7 +589,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SupportDatabase",
+								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -680,7 +680,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -736,7 +736,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -762,7 +762,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "FrameworkFunctions",
+										"referenceName": "cumulusfunctions",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -806,7 +806,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -855,7 +855,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -903,7 +903,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SupportDatabase",
+								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						}
@@ -998,7 +998,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "FrameworkFunctions",
+					"referenceName": "cumulusfunctions",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -1085,7 +1085,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SupportDatabase",
+								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						}
@@ -1143,7 +1143,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -1187,7 +1187,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -1285,7 +1285,7 @@
 			}
 		},
 		"folder": {
-			"name": "_ProcFwk"
+			"name": "Cumulus.Control"
 		},
 		"annotations": [
 			"procfwk",

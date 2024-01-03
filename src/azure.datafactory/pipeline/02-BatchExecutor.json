@@ -1,5 +1,5 @@
 {
-	"name": "02-Parent",
+	"name": "02-BatchExecutor",
 	"properties": {
 		"description": "ADF.procfwk parent pipeline used to bootstrap the orchestration framework in perform the first level ForEach calls in sequence for the metadata stages.",
 		"activities": [
@@ -137,7 +137,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SupportDatabase",
+								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -174,7 +174,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SupportDatabase",
+								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						}
@@ -270,7 +270,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -431,7 +431,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SupportDatabase",
+								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -469,7 +469,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "FrameworkFunctions",
+								"referenceName": "cumulusfunctions",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -539,7 +539,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": "SupportDatabase",
+													"referenceName": "cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -588,7 +588,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": "SupportDatabase",
+													"referenceName": "cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -637,7 +637,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": "SupportDatabase",
+													"referenceName": "cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -686,7 +686,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": "SupportDatabase",
+													"referenceName": "cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -742,7 +742,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": "SupportDatabase",
+													"referenceName": "cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -797,7 +797,7 @@
 											}
 										},
 										"linkedServiceName": {
-											"referenceName": "SupportDatabase",
+											"referenceName": "cumulusdatabase",
 											"type": "LinkedServiceReference"
 										}
 									}
@@ -851,7 +851,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "SupportDatabase",
+								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						}
@@ -882,7 +882,7 @@
 					"storedProcedureName": "[procfwk].[ExecutePrecursorProcedure]"
 				},
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -975,7 +975,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			}
@@ -992,7 +992,7 @@
 			}
 		},
 		"folder": {
-			"name": "_ProcFwk"
+			"name": "Cumulus.Control"
 		},
 		"annotations": [
 			"procfwk",

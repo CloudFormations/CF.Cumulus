@@ -1,5 +1,5 @@
 {
-	"name": "01-Grandparent",
+	"name": "01-SolutionExecutor",
 	"properties": {
 		"description": "procfwk grandparent pipeline used optionally to bootstrap any wider processes in your Data Factory that then calls the processing framework.",
 		"activities": [
@@ -31,7 +31,7 @@
 			}
 		},
 		"folder": {
-			"name": "_ProcFwk"
+			"name": "Cumulus.Control"
 		},
 		"annotations": [
 			"procfwk",
