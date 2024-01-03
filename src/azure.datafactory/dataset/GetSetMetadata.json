@@ -7,7 +7,7 @@
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "_ProcFwk"
+			"name": "Cumulus"
 		},
 		"annotations": [
 			"procfwk"
