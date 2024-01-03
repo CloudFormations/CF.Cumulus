@@ -1,13 +1,13 @@
 {
 	"name": "cumuluskeys",
 	"properties": {
+		"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
 		"annotations": [
 			"procfwk"
 		],
 		"type": "AzureKeyVault",
 		"typeProperties": {
-			"baseUrl": "https://FrameworkKeys.vault.azure.net/"
-		},
-		"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework."
+			"baseUrl": "https://cumuluskeysdev.vault.azure.net/"
+		}
 	}
 }
