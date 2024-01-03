@@ -14,12 +14,12 @@ IF EXISTS
 	)
 	BEGIN
 		--drop just to avoid constraints
-		IF OBJECT_ID(N'[cumulus.control].[PipelineParameters]') IS NOT NULL DROP TABLE [cumulus.control].[PipelineParameters];
-		IF OBJECT_ID(N'[cumulus.control].[PipelineAuthLink]') IS NOT NULL DROP TABLE [cumulus.control].[PipelineAuthLink];
+		IF OBJECT_ID(N'[control].[PipelineParameters]') IS NOT NULL DROP TABLE [control].[PipelineParameters];
+		IF OBJECT_ID(N'[control].[PipelineAuthLink]') IS NOT NULL DROP TABLE [control].[PipelineAuthLink];
 
-		SELECT * INTO [dbo].[zz_PipelineProcesses] FROM [cumulus.control].[PipelineProcesses];
+		SELECT * INTO [dbo].[zz_PipelineProcesses] FROM [control].[PipelineProcesses];
 
-		DROP TABLE [cumulus.control].[PipelineProcesses];
+		DROP TABLE [control].[PipelineProcesses];
 	END
 
 --ProcessingStageDetails
@@ -37,9 +37,9 @@ IF EXISTS
 		AND o.[type] = 'U' --Check for tables as created synonyms to support backwards compatability
 	)
 	BEGIN
-		SELECT * INTO [dbo].[zz_ProcessingStageDetails] FROM [cumulus.control].[ProcessingStageDetails];
+		SELECT * INTO [dbo].[zz_ProcessingStageDetails] FROM [control].[ProcessingStageDetails];
 		
-		DROP TABLE [cumulus.control].[ProcessingStageDetails];
+		DROP TABLE [control].[ProcessingStageDetails];
 	END;
 
 --DataFactoryDetails
@@ -57,9 +57,9 @@ IF EXISTS
 		AND o.[type] = 'U' --Check for tables as created synonyms to support backwards compatability
 	)
 	BEGIN
-		SELECT * INTO [dbo].[zz_DataFactoryDetails] FROM [cumulus.control].[DataFactoryDetails];
+		SELECT * INTO [dbo].[zz_DataFactoryDetails] FROM [control].[DataFactoryDetails];
 		
-		DROP TABLE [cumulus.control].[DataFactoryDetails];
+		DROP TABLE [control].[DataFactoryDetails];
 	END;
 
 --DataFactorys
@@ -77,5 +77,5 @@ IF EXISTS
 		AND o.[type] = 'U' --Check for tables as created synonyms to support backwards compatability
 	)
 	BEGIN
-		SELECT * INTO [dbo].[zz_DataFactorys] FROM [cumulus.control].[DataFactorys];
+		SELECT * INTO [dbo].[zz_DataFactorys] FROM [control].[DataFactorys];
 	END;

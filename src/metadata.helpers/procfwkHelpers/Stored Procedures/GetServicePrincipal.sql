@@ -11,7 +11,7 @@ BEGIN
 	DECLARE @Id NVARCHAR(MAX)
 	DECLARE @Secret NVARCHAR(MAX)
 
-	IF ([cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInDatabase'
+	IF ([control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInDatabase'
 		BEGIN
 			--get auth details regardless of being pipeline specific and regardless of a pipeline param being passed
 			;WITH cte AS
@@ -21,11 +21,11 @@ BEGIN
 					CAST(DECRYPTBYPASSPHRASE(CONCAT(@OrchestratorName, @PipelineName), S.[PrincipalSecret]) AS NVARCHAR(MAX)) AS [Secret]
 				FROM
 					[dbo].[ServicePrincipals] S
-					INNER JOIN  [cumulus.control].[PipelineAuthLink] L
+					INNER JOIN  [control].[PipelineAuthLink] L
 						ON S.[CredentialId] = L.[CredentialId]
-					INNER JOIN [cumulus.control].[Pipelines] P
+					INNER JOIN [control].[Pipelines] P
 						ON L.[PipelineId] = P.[PipelineId]
-					INNER JOIN [cumulus.control].[Orchestrators] D
+					INNER JOIN [control].[Orchestrators] D
 						ON P.[OrchestratorId] = D.[OrchestratorId]
 							AND L.[OrchestratorId] = D.[OrchestratorId]
 				WHERE
@@ -40,9 +40,9 @@ BEGIN
 					CAST(DECRYPTBYPASSPHRASE(@OrchestratorName, S.[PrincipalSecret]) AS NVARCHAR(MAX)) AS [Secret]
 				FROM
 					[dbo].[ServicePrincipals] S
-					INNER JOIN  [cumulus.control].[PipelineAuthLink] L
+					INNER JOIN  [control].[PipelineAuthLink] L
 						ON S.[CredentialId] = L.[CredentialId]
-					INNER JOIN [cumulus.control].[Orchestrators] D
+					INNER JOIN [control].[Orchestrators] D
 						ON L.[OrchestratorId] = D.[OrchestratorId]
 				WHERE
 					D.[OrchestratorName] = @OrchestratorName
@@ -56,7 +56,7 @@ BEGIN
 			WHERE
 				[Secret] IS NOT NULL
 		END
-	ELSE IF ([cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInKeyVault'
+	ELSE IF ([control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInKeyVault'
 		BEGIN
 			--get auth details regardless of being pipeline specific and regardless of a pipeline param being passed
 			;WITH cte AS
@@ -66,11 +66,11 @@ BEGIN
 					S.[PrincipalSecretUrl] AS [Secret]
 				FROM
 					[dbo].[ServicePrincipals] S
-					INNER JOIN  [cumulus.control].[PipelineAuthLink] L
+					INNER JOIN  [control].[PipelineAuthLink] L
 						ON S.[CredentialId] = L.[CredentialId]
-					INNER JOIN [cumulus.control].[Pipelines] P
+					INNER JOIN [control].[Pipelines] P
 						ON L.[PipelineId] = P.[PipelineId]
-					INNER JOIN [cumulus.control].[Orchestrators] D
+					INNER JOIN [control].[Orchestrators] D
 						ON P.[OrchestratorId] = D.[OrchestratorId]
 							AND L.[OrchestratorId] = D.[OrchestratorId]
 				WHERE
@@ -85,9 +85,9 @@ BEGIN
 					S.[PrincipalSecretUrl] AS [Secret]
 				FROM
 					[dbo].[ServicePrincipals] S
-					INNER JOIN  [cumulus.control].[PipelineAuthLink] L
+					INNER JOIN  [control].[PipelineAuthLink] L
 						ON S.[CredentialId] = L.[CredentialId]
-					INNER JOIN [cumulus.control].[Orchestrators] D
+					INNER JOIN [control].[Orchestrators] D
 						ON L.[OrchestratorId] = D.[OrchestratorId]
 				WHERE
 					D.[OrchestratorName] = @OrchestratorName

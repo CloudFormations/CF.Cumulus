@@ -13,12 +13,12 @@ BEGIN
 			SELECT
 				MAX([LogId]) AS MaxLogId
 			FROM
-				[cumulus.control].[ExecutionLog]
+				[control].[ExecutionLog]
 			)
 		SELECT
 			@LocalExecutionId = el1.[LocalExecutionId]
 		FROM
-			[cumulus.control].[ExecutionLog] el1
+			[control].[ExecutionLog] el1
 			INNER JOIN maxLog
 				ON maxLog.[MaxLogId] = el1.[LogId];
 	END;
@@ -29,8 +29,8 @@ BEGIN
 		COUNT(0) AS RecordCount,
 		DATEDIFF(MINUTE, MIN(el2.[StartDateTime]), MAX(el2.[EndDateTime])) DurationMinutes
 	FROM
-		[cumulus.control].[ExecutionLog] el2
-		INNER JOIN [cumulus.control].[Stages] stgs
+		[control].[ExecutionLog] el2
+		INNER JOIN [control].[Stages] stgs
 			ON el2.[StageId] = stgs.[StageId]
 	WHERE
 		el2.[LocalExecutionId] = @LocalExecutionId
@@ -62,11 +62,11 @@ BEGIN
 		errLog.[ErrorType],
 		errLog.[ErrorMessage]
 	FROM 
-		[cumulus.control].[ExecutionLog] el3
-		LEFT OUTER JOIN [cumulus.control].[ErrorLog] errLog
+		[control].[ExecutionLog] el3
+		LEFT OUTER JOIN [control].[ErrorLog] errLog
 			ON el3.[LocalExecutionId] = errLog.[LocalExecutionId]
 				AND el3.[PipelineRunId] = errLog.[PipelineRunId]
-		INNER JOIN [cumulus.control].[Stages] stgs
+		INNER JOIN [control].[Stages] stgs
 			ON el3.[StageId] = stgs.[StageId]
 	WHERE
 		el3.[LocalExecutionId] = @LocalExecutionId

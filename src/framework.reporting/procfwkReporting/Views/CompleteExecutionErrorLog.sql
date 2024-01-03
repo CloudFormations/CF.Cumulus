@@ -18,10 +18,10 @@ SELECT
 	errLog.[ErrorType],
 	errLog.[ErrorMessage]
 FROM
-	[cumulus.control].[ExecutionLog] exeLog
-	INNER JOIN [cumulus.control].[ErrorLog] errLog
+	[control].[ExecutionLog] exeLog
+	INNER JOIN [control].[ErrorLog] errLog
 		ON exeLog.[LocalExecutionId] = errLog.[LocalExecutionId]
 			AND exeLog.[PipelineRunId] = errLog.[PipelineRunId]
-	INNER JOIN [cumulus.control].[Stages] stgs
+	INNER JOIN [control].[Stages] stgs
 		ON exeLog.[StageId] = stgs.[StageId]
 ;

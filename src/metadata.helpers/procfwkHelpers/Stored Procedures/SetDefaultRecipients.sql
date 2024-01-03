@@ -21,7 +21,7 @@ BEGIN
 		('Test User 2','test.user2@adfprocfwk.com', 'CC', 1),
 		('Test User 3','test.user3@adfprocfwk.com', 'BCC', 1);
 
-	MERGE INTO [cumulus.control].[Recipients] AS tgt
+	MERGE INTO [control].[Recipients] AS tgt
 	USING 
 		@Recipients AS src
 			ON tgt.[Name] = src.[Name]

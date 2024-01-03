@@ -17,7 +17,7 @@ BEGIN
 	VALUES
 		('12345678-1234-1234-1234-012345678910', 'Default', 'Example value for development environment.');
 
-	MERGE INTO [cumulus.control].[Tenants] AS tgt
+	MERGE INTO [control].[Tenants] AS tgt
 	USING 
 		@Tenants AS src
 			ON tgt.[TenantId] = src.[TenantId]

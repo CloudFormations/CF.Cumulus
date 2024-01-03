@@ -22,7 +22,7 @@ BEGIN
 		SELECT
 			SUM([BitValue]) AS ''TotalBitValue''
 		FROM
-			[cumulus.control].[AlertOutcomes]
+			[control].[AlertOutcomes]
 		WHERE
 			[PipelineOutcomeStatus] IN (' + @AlertForStatus + ')
 		'
@@ -34,7 +34,7 @@ BEGIN
 	IF @PipelineName IS NOT NULL
 		BEGIN
 			--add alert for specific pipeline if doesn't exist
-			INSERT INTO [cumulus.control].[PipelineAlertLink]
+			INSERT INTO [control].[PipelineAlertLink]
 				(
 				[PipelineId],
 				[RecipientId],
@@ -45,10 +45,10 @@ BEGIN
 				r.[RecipientId],
 				@ActualBitValue
 			FROM
-				[cumulus.control].[Pipelines] p
-				INNER JOIN [cumulus.control].[Recipients] r
+				[control].[Pipelines] p
+				INNER JOIN [control].[Recipients] r
 					ON r.[Name] = @RecipientName
-				LEFT OUTER JOIN [cumulus.control].[PipelineAlertLink] al
+				LEFT OUTER JOIN [control].[PipelineAlertLink] al
 					ON p.[PipelineId] = al.[PipelineId]
 						AND r.[RecipientId] = al.[RecipientId]
 			WHERE
@@ -62,13 +62,13 @@ BEGIN
 			DELETE 
 				al
 			FROM 
-				[cumulus.control].[PipelineAlertLink] al
-				INNER JOIN [cumulus.control].[Recipients] r
+				[control].[PipelineAlertLink] al
+				INNER JOIN [control].[Recipients] r
 					ON al.[RecipientId] = r.[RecipientId]
 			WHERE
 				r.[Name] = @RecipientName;
 						
-			INSERT INTO [cumulus.control].[PipelineAlertLink]
+			INSERT INTO [control].[PipelineAlertLink]
 				(
 				[PipelineId],
 				[RecipientId],
@@ -79,8 +79,8 @@ BEGIN
 				r.[RecipientId],
 				@ActualBitValue
 			FROM
-				[cumulus.control].[Recipients] r
-				CROSS JOIN [cumulus.control].[Pipelines] p
+				[control].[Recipients] r
+				CROSS JOIN [control].[Pipelines] p
 			WHERE
 				r.[Name] = @RecipientName;
 		END;

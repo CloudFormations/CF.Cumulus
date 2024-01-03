@@ -60,80 +60,82 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="cumulus.control" />
-    <Folder Include="cumulus.control\Tables" />
-    <Folder Include="cumulus.control\Stored Procedures" />
+    <Folder Include="control" />
+    <Folder Include="control\Tables" />
+    <Folder Include="control\Stored Procedures" />
     <Folder Include="Security\" />
     <Folder Include="Scripts" />
-    <Folder Include="cumulus.control\Views" />
+    <Folder Include="control\Views" />
     <Folder Include="dbo" />
     <Folder Include="dbo\Tables" />
-    <Folder Include="cumulus.control\Functions" />
+    <Folder Include="control\Functions" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="cumulus.control\Tables\Pipelines.sql" />
-    <Build Include="cumulus.control\Tables\PipelineParameters.sql" />
-    <Build Include="cumulus.control\Tables\CurrentExecution.sql" />
-    <Build Include="cumulus.control\Tables\ExecutionLog.sql" />
-    <Build Include="cumulus.control\Tables\Stages.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetStages.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetPipelinesInStage.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetPipelineParameters.sql" />
-    <Build Include="cumulus.control\Stored Procedures\CreateNewExecution.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogStagePreparing.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineRunning.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineSuccess.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineFailed.sql" />
-    <Build Include="cumulus.control\Stored Procedures\UpdateExecutionLog.sql" />
-    <Build Include="Security\cumulus.control.sql" />
-    <Build Include="cumulus.control\Views\CurrentProperties.sql" />
-    <Build Include="cumulus.control\Tables\Properties.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetPropertyValue.sql" />
+    <Build Include="control\Tables\Pipelines.sql" />
+    <Build Include="control\Tables\PipelineParameters.sql" />
+    <Build Include="control\Tables\CurrentExecution.sql" />
+    <Build Include="control\Tables\ExecutionLog.sql" />
+    <Build Include="control\Tables\Stages.sql" />
+    <Build Include="control\Stored Procedures\GetStages.sql" />
+    <Build Include="control\Stored Procedures\GetPipelinesInStage.sql" />
+    <Build Include="control\Stored Procedures\GetPipelineParameters.sql" />
+    <Build Include="control\Stored Procedures\CreateNewExecution.sql" />
+    <Build Include="control\Stored Procedures\SetLogStagePreparing.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineRunning.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineSuccess.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineFailed.sql" />
+    <Build Include="control\Stored Procedures\UpdateExecutionLog.sql" />
+    <Build Include="Security\control.sql" />
+    <Build Include="control\Views\CurrentProperties.sql" />
+    <Build Include="control\Tables\Properties.sql" />
+    <Build Include="control\Stored Procedures\GetPropertyValue.sql" />
     <Build Include="dbo\Tables\ServicePrincipals.sql" />
-    <Build Include="cumulus.control\Tables\PipelineAuthLink.sql" />
-    <Build Include="cumulus.control\Stored Procedures\ResetExecution.sql" />
-    <Build Include="cumulus.control\Stored Procedures\ExecutionWrapper.sql" />
-    <Build Include="cumulus.control\Stored Procedures\CheckForBlockedPipelines.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineUnknown.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogActivityFailed.sql" />
-    <Build Include="cumulus.control\Stored Procedures\CheckMetadataIntegrity.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineLastStatusCheck.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineRunId.sql" />
-    <Build Include="cumulus.control\Tables\ErrorLog.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetErrorLogDetails.sql" />
-    <Build Include="cumulus.control\Stored Procedures\CheckForEmailAlerts.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetEmailAlertParts.sql" />
-    <Build Include="cumulus.control\Tables\Recipients.sql" />
-    <Build Include="cumulus.control\Tables\PipelineAlertLink.sql" />
-    <Build Include="cumulus.control\Tables\AlertOutcomes.sql" />
-    <Build Include="cumulus.control\Views\PipelineParameterDataSizes.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineChecking.sql" />
-    <Build Include="cumulus.control\Tables\PipelineDependencies.sql" />
-    <Build Include="cumulus.control\Functions\GetPropertyValueInternal.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetExecutionBlockDependants.sql" />
-    <Build Include="cumulus.control\Stored Procedures\ExecutePrecursorProcedure.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineCancelled.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetWorkerAuthDetails.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetWorkerPipelineDetails.sql" />
-    <Build Include="cumulus.control\Tables\Tenants.sql" />
-    <Build Include="cumulus.control\Tables\Subscriptions.sql" />
-    <Build Include="cumulus.control\Stored Procedures\BatchWrapper.sql" />
-    <Build Include="cumulus.control\Tables\Batches.sql" />
-    <Build Include="cumulus.control\Tables\BatchExecution.sql" />
-    <Build Include="cumulus.control\Tables\BatchStageLink.sql" />
-    <Build Include="cumulus.control\Stored Procedures\CheckPreviousExeuction.sql" />
-    <Build Include="cumulus.control\Stored Procedures\SetLogPipelineValidating.sql" />
-    <Build Include="cumulus.control\Tables\Orchestrators.sql" />
-    <None Include="cumulus.control\Views\DataFactorys.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetWorkerDetailsWrapper.sql" />
-    <Build Include="cumulus.control\Stored Procedures\GetFrameworkOrchestratorDetails.sql" />
+    <Build Include="control\Tables\PipelineAuthLink.sql" />
+    <Build Include="control\Stored Procedures\ResetExecution.sql" />
+    <Build Include="control\Stored Procedures\ExecutionWrapper.sql" />
+    <Build Include="control\Stored Procedures\CheckForBlockedPipelines.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineUnknown.sql" />
+    <Build Include="control\Stored Procedures\SetLogActivityFailed.sql" />
+    <Build Include="control\Stored Procedures\CheckMetadataIntegrity.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineLastStatusCheck.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineRunId.sql" />
+    <Build Include="control\Tables\ErrorLog.sql" />
+    <Build Include="control\Stored Procedures\SetErrorLogDetails.sql" />
+    <Build Include="control\Stored Procedures\CheckForEmailAlerts.sql" />
+    <Build Include="control\Stored Procedures\GetEmailAlertParts.sql" />
+    <Build Include="control\Tables\Recipients.sql" />
+    <Build Include="control\Tables\PipelineAlertLink.sql" />
+    <Build Include="control\Tables\AlertOutcomes.sql" />
+    <Build Include="control\Views\PipelineParameterDataSizes.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineChecking.sql" />
+    <Build Include="control\Tables\PipelineDependencies.sql" />
+    <Build Include="control\Functions\GetPropertyValueInternal.sql" />
+    <Build Include="control\Stored Procedures\SetExecutionBlockDependants.sql" />
+    <Build Include="control\Stored Procedures\ExecutePrecursorProcedure.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineCancelled.sql" />
+    <Build Include="control\Stored Procedures\GetWorkerAuthDetails.sql" />
+    <Build Include="control\Stored Procedures\GetWorkerPipelineDetails.sql" />
+    <Build Include="control\Tables\Tenants.sql" />
+    <Build Include="control\Tables\Subscriptions.sql" />
+    <Build Include="control\Stored Procedures\BatchWrapper.sql" />
+    <Build Include="control\Tables\Batches.sql" />
+    <Build Include="control\Tables\BatchExecution.sql" />
+    <Build Include="control\Tables\BatchStageLink.sql" />
+    <Build Include="control\Stored Procedures\CheckPreviousExeuction.sql" />
+    <Build Include="control\Stored Procedures\SetLogPipelineValidating.sql" />
+    <Build Include="control\Tables\Orchestrators.sql" />
+    <Build Include="control\Stored Procedures\GetWorkerDetailsWrapper.sql" />
+    <Build Include="control\Stored Procedures\GetFrameworkOrchestratorDetails.sql" />
+    <Build Include="control\Stored Procedures\AddProperty.sql" />
+    <Build Include="control\Stored Procedures\GetWorkerPipelineDetailsv2.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="MetadataDB.publish.xml" />
     <None Include="metadata.control.publish.xml" />
+    <None Include="Scripts\DefaultProperties.sql" />
+    <None Include="Security\db_cumulususer.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
@@ -144,8 +146,5 @@
       <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
       <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
     </ArtifactReference>
-  </ItemGroup>
-  <ItemGroup>
-    <RefactorLog Include="MetadataDB.refactorlog" />
   </ItemGroup>
 </Project>

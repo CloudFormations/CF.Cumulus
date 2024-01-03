@@ -43,7 +43,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[cumulus.control].[GetFrameworkOrchestratorDetails]",
+						"sqlReaderStoredProcedureName": "[control].[GetFrameworkOrchestratorDetails]",
 						"storedProcedureParameters": {
 							"CallingOrchestratorName": {
 								"type": "String",
@@ -78,7 +78,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[cumulus.control].[GetPropertyValue]",
+						"sqlReaderStoredProcedureName": "[control].[GetPropertyValue]",
 						"storedProcedureParameters": {
 							"PropertyName": {
 								"type": "String",
@@ -152,7 +152,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[cumulus.control].[GetPropertyValue]",
+						"sqlReaderStoredProcedureName": "[control].[GetPropertyValue]",
 						"storedProcedureParameters": {
 							"PropertyName": {
 								"type": "String",

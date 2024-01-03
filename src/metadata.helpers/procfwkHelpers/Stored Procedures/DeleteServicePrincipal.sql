@@ -13,7 +13,7 @@ BEGIN
 	DECLARE @CredentialId INT
 
 	--resolve principal Id or Url to credential Id
-	IF ([cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInDatabase'
+	IF ([control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInDatabase'
 		BEGIN
 			--defensive checks
 			BEGIN TRY
@@ -36,7 +36,7 @@ BEGIN
 			WHERE
 				[PrincipalId] = @PrincipalIdValue
 		END
-	ELSE IF ([cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInKeyVault'
+	ELSE IF ([control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInKeyVault'
 		BEGIN
 			--get cred id using principal id url
 			SELECT
@@ -55,7 +55,7 @@ BEGIN
 	--secondary defensive checks
 	IF NOT EXISTS
 		(
-		SELECT [OrchestratorName] FROM [cumulus.control].[Orchestrators] WHERE [OrchestratorName] = @OrchestratorName AND [OrchestratorType] = @OrchestratorType
+		SELECT [OrchestratorName] FROM [control].[Orchestrators] WHERE [OrchestratorName] = @OrchestratorName AND [OrchestratorType] = @OrchestratorType
 		)
 		BEGIN
 			SET @ErrorDetails = 'Invalid Orchestrator name. Please ensure the Orchestrator metadata exists.'
@@ -75,7 +75,7 @@ BEGIN
 		BEGIN
 			IF NOT EXISTS
 				( 
-				SELECT [PipelineName] FROM [cumulus.control].[Pipelines] WHERE [PipelineName] = @SpecificPipelineName
+				SELECT [PipelineName] FROM [control].[Pipelines] WHERE [PipelineName] = @SpecificPipelineName
 				)
 				BEGIN
 					SET @ErrorDetails = 'Invalid Pipeline name. Please ensure the Pipeline metadata exists.'
@@ -87,10 +87,10 @@ BEGIN
 			DELETE
 				L
 			FROM
-				[cumulus.control].[PipelineAuthLink] L
-				INNER JOIN [cumulus.control].[Pipelines] P
+				[control].[PipelineAuthLink] L
+				INNER JOIN [control].[Pipelines] P
 					ON L.[PipelineId] = P.[PipelineId]
-				INNER JOIN [cumulus.control].[Orchestrators] D
+				INNER JOIN [control].[Orchestrators] D
 					ON P.[OrchestratorId] = D.[OrchestratorId]
 						AND L.[OrchestratorId] = D.[OrchestratorId]
 				INNER JOIN [dbo].[ServicePrincipals] S
@@ -107,8 +107,8 @@ BEGIN
 			DELETE
 				L
 			FROM
-				[cumulus.control].[PipelineAuthLink] L
-				INNER JOIN [cumulus.control].[Orchestrators] D
+				[control].[PipelineAuthLink] L
+				INNER JOIN [control].[Orchestrators] D
 					ON L.[OrchestratorId] = D.[OrchestratorId]
 				INNER JOIN [dbo].[ServicePrincipals] S
 					ON L.[CredentialId] = S.[CredentialId]
@@ -123,7 +123,7 @@ BEGIN
 		SP
 	FROM 
 		[dbo].[ServicePrincipals] SP
-		LEFT OUTER JOIN [cumulus.control].[PipelineAuthLink] AL
+		LEFT OUTER JOIN [control].[PipelineAuthLink] AL
 			ON SP.[CredentialId] = AL.[CredentialId]
 	WHERE 
 		SP.[CredentialId] = @CredentialId

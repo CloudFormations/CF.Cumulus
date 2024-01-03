@@ -1,9 +1,9 @@
 ﻿CREATE PROCEDURE [procfwkHelpers].[SetDefaultAlertOutcomes]
 AS
 BEGIN
-	TRUNCATE TABLE [cumulus.control].[AlertOutcomes];
+	TRUNCATE TABLE [control].[AlertOutcomes];
 
-	INSERT INTO [cumulus.control].[AlertOutcomes] 
+	INSERT INTO [control].[AlertOutcomes] 
 		(
 		[PipelineOutcomeStatus]
 		)

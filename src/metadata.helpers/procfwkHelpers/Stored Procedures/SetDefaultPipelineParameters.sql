@@ -27,7 +27,7 @@ BEGIN
 		(9, 'WaitTime', '7'),
 		(11, 'WaitTime', '10');
 
-	MERGE INTO [cumulus.control].[PipelineParameters]  AS tgt
+	MERGE INTO [control].[PipelineParameters]  AS tgt
 	USING 
 		@PipelineParameters AS src
 			ON tgt.[PipelineId] = src.[PipelineId]

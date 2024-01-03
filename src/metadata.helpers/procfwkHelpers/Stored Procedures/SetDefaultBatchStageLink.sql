@@ -1,9 +1,9 @@
 ﻿CREATE PROCEDURE [procfwkHelpers].[SetDefaultBatchStageLink]
 AS
 BEGIN
-	TRUNCATE TABLE [cumulus.control].[BatchStageLink]
+	TRUNCATE TABLE [control].[BatchStageLink]
 
-	INSERT INTO [cumulus.control].[BatchStageLink]
+	INSERT INTO [control].[BatchStageLink]
 		(
 		[BatchId],
 		[StageId]
@@ -12,8 +12,8 @@ BEGIN
 		b.[BatchId],
 		s.[StageId]
 	FROM
-		[cumulus.control].[Batches] b
-		INNER JOIN [cumulus.control].[Stages] s
+		[control].[Batches] b
+		INNER JOIN [control].[Stages] s
 			ON s.[StageName] <> 'Speed'
 	WHERE
 		b.[BatchName] = 'Daily'
@@ -24,8 +24,8 @@ BEGIN
 		b.[BatchId],
 		s.[StageId]
 	FROM
-		[cumulus.control].[Batches] b
-		INNER JOIN [cumulus.control].[Stages] s
+		[control].[Batches] b
+		INNER JOIN [control].[Stages] s
 			ON s.[StageName] = 'Speed'
 	WHERE
 		b.[BatchName] = 'Hourly'

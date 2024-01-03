@@ -19,7 +19,7 @@ BEGIN
 	VALUES
 		('12345678-1234-1234-1234-012345678910', 'Default', 'Example value for development environment.', '12345678-1234-1234-1234-012345678910');
 
-	MERGE INTO [cumulus.control].[Subscriptions] AS tgt
+	MERGE INTO [control].[Subscriptions] AS tgt
 	USING 
 		@Subscriptions AS src
 			ON tgt.[SubscriptionId] = src.[SubscriptionId]

@@ -12,9 +12,9 @@
 		AND o.[type] = 'U' --Check for tables as created synonyms to support backwards compatability
 	)
 	BEGIN
-		DROP TABLE [cumulus.control].[DataFactorys];
+		DROP TABLE [control].[DataFactorys];
 
-		EXEC('CREATE VIEW [cumulus.control].[DataFactorys]
+		EXEC('CREATE VIEW [control].[DataFactorys]
 AS
 SELECT
 	[OrchestratorId] AS DataFactoryId,
@@ -23,7 +23,7 @@ SELECT
 	[SubscriptionId],
 	[Description]
 FROM
-	[cumulus.control].[Orchestrators]
+	[control].[Orchestrators]
 WHERE
 	[OrchestratorType] = ''ADF'';')
 	END;

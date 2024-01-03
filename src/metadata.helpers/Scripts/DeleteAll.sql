@@ -1,71 +1,71 @@
 ﻿	--BatchExecution
-	IF OBJECT_ID(N'[cumulus.control].[BatchExecution]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[BatchExecution]') IS NOT NULL 
 		BEGIN
-			TRUNCATE TABLE [cumulus.control].[BatchExecution];
+			TRUNCATE TABLE [control].[BatchExecution];
 		END;
 
 	--CurrentExecution
-	IF OBJECT_ID(N'[cumulus.control].[CurrentExecution]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[CurrentExecution]') IS NOT NULL 
 		BEGIN
-			TRUNCATE TABLE [cumulus.control].[CurrentExecution];
+			TRUNCATE TABLE [control].[CurrentExecution];
 		END;
 
 	--ExecutionLog
-	IF OBJECT_ID(N'[cumulus.control].[ExecutionLog]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[ExecutionLog]') IS NOT NULL 
 		BEGIN
-			TRUNCATE TABLE [cumulus.control].[ExecutionLog];
+			TRUNCATE TABLE [control].[ExecutionLog];
 		END
 
 	--ErrorLog
-	IF OBJECT_ID(N'[cumulus.control].[ExecutionLog]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[ExecutionLog]') IS NOT NULL 
 		BEGIN
-			TRUNCATE TABLE [cumulus.control].[ErrorLog];
+			TRUNCATE TABLE [control].[ErrorLog];
 		END
 
 	--BatchStageLink
-	IF OBJECT_ID(N'[cumulus.control].[BatchStageLink]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[BatchStageLink]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[BatchStageLink];
+			DELETE FROM [control].[BatchStageLink];
 		END;
 
 	--Batches
-	IF OBJECT_ID(N'[cumulus.control].[Batches]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[Batches]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[Batches];
+			DELETE FROM [control].[Batches];
 		END;
 
 	--PipelineDependencies
-	IF OBJECT_ID(N'[cumulus.control].[PipelineDependencies]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[PipelineDependencies]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[PipelineDependencies];
-			DBCC CHECKIDENT ('[cumulus.control].[PipelineDependencies]', RESEED, 0);
+			DELETE FROM [control].[PipelineDependencies];
+			DBCC CHECKIDENT ('[control].[PipelineDependencies]', RESEED, 0);
 		END;
 
 	--PipelineAlertLink
-	IF OBJECT_ID(N'[cumulus.control].[PipelineAlertLink]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[PipelineAlertLink]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[PipelineAlertLink];
-			DBCC CHECKIDENT ('[cumulus.control].[PipelineAlertLink]', RESEED, 0);
+			DELETE FROM [control].[PipelineAlertLink];
+			DBCC CHECKIDENT ('[control].[PipelineAlertLink]', RESEED, 0);
 		END;
 
 	--Recipients
-	IF OBJECT_ID(N'[cumulus.control].[Recipients]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[Recipients]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[Recipients];
-			DBCC CHECKIDENT ('[cumulus.control].[Recipients]', RESEED, 0);
+			DELETE FROM [control].[Recipients];
+			DBCC CHECKIDENT ('[control].[Recipients]', RESEED, 0);
 		END;
 
 	--AlertOutcomes
-	IF OBJECT_ID(N'[cumulus.control].[AlertOutcomes]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[AlertOutcomes]') IS NOT NULL 
 		BEGIN
-			TRUNCATE TABLE [cumulus.control].[AlertOutcomes];
+			TRUNCATE TABLE [control].[AlertOutcomes];
 		END;
 
 	--PipelineAuthLink
-	IF OBJECT_ID(N'[cumulus.control].[PipelineAuthLink]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[PipelineAuthLink]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[PipelineAuthLink];
-			DBCC CHECKIDENT ('[cumulus.control].[PipelineAuthLink]', RESEED, 0);
+			DELETE FROM [control].[PipelineAuthLink];
+			DBCC CHECKIDENT ('[control].[PipelineAuthLink]', RESEED, 0);
 		END;
 
 	--ServicePrincipals
@@ -76,24 +76,24 @@
 		END;
 
 	--Properties
-	IF OBJECT_ID(N'[cumulus.control].[Properties]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[Properties]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[Properties];
-			DBCC CHECKIDENT ('[cumulus.control].[Properties]', RESEED, 0);
+			DELETE FROM [control].[Properties];
+			DBCC CHECKIDENT ('[control].[Properties]', RESEED, 0);
 		END;
 
 	--PipelineParameters
-	IF OBJECT_ID(N'[cumulus.control].[PipelineParameters]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[PipelineParameters]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[PipelineParameters];
-			DBCC CHECKIDENT ('[cumulus.control].[PipelineParameters]', RESEED, 0);
+			DELETE FROM [control].[PipelineParameters];
+			DBCC CHECKIDENT ('[control].[PipelineParameters]', RESEED, 0);
 		END;
 
 	--Pipelines
-	IF OBJECT_ID(N'[cumulus.control].[Pipelines]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[Pipelines]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[Pipelines];
-			DBCC CHECKIDENT ('[cumulus.control].[Pipelines]', RESEED, 0);
+			DELETE FROM [control].[Pipelines];
+			DBCC CHECKIDENT ('[control].[Pipelines]', RESEED, 0);
 		END;
 
 	--Orchestrators
@@ -111,30 +111,30 @@
 			AND o.[type] = 'U' --Check for tables as created synonyms to support backwards compatability
 		)
 		BEGIN
-			DELETE FROM [cumulus.control].[DataFactorys];
+			DELETE FROM [control].[DataFactorys];
 		END;
 
-	IF OBJECT_ID(N'[cumulus.control].[Orchestrators]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[Orchestrators]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[Orchestrators];
-			DBCC CHECKIDENT ('[cumulus.control].[Orchestrators]', RESEED, 0);
+			DELETE FROM [control].[Orchestrators];
+			DBCC CHECKIDENT ('[control].[Orchestrators]', RESEED, 0);
 		END;
 
 	--Stages
-	IF OBJECT_ID(N'[cumulus.control].[Stages]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[Stages]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[Stages];
-			DBCC CHECKIDENT ('[cumulus.control].[Stages]', RESEED, 0);
+			DELETE FROM [control].[Stages];
+			DBCC CHECKIDENT ('[control].[Stages]', RESEED, 0);
 		END;
 
 	--Subscriptions
-	IF OBJECT_ID(N'[cumulus.control].[Subscriptions]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[Subscriptions]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[Subscriptions];
+			DELETE FROM [control].[Subscriptions];
 		END;
 	
 	--Tenants
-	IF OBJECT_ID(N'[cumulus.control].[Tenants]') IS NOT NULL 
+	IF OBJECT_ID(N'[control].[Tenants]') IS NOT NULL 
 		BEGIN
-			DELETE FROM [cumulus.control].[Tenants];
+			DELETE FROM [control].[Tenants];
 		END;

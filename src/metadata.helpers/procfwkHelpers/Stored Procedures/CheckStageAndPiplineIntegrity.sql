@@ -25,7 +25,7 @@ BEGIN
 		SELECT
 			MIN([StageId]) AS firstStageId
 		FROM
-			[cumulus.control].[Stages]
+			[control].[Stages]
 		)
 	--query metadata
 	INSERT INTO @TempCheckStageAndPiplineIntegrity
@@ -51,15 +51,15 @@ BEGIN
 		END AS Information
 	FROM 
 		--get base pipeline details
-		[cumulus.control].[Pipelines] base
-		INNER JOIN [cumulus.control].[Orchestrators] adf
+		[control].[Pipelines] base
+		INNER JOIN [control].[Orchestrators] adf
 			ON base.[OrchestratorId] = adf.[OrchestratorId]
-		INNER JOIN [cumulus.control].[Stages] baseStage
+		INNER JOIN [control].[Stages] baseStage
 			ON base.[StageId] = baseStage.[StageId]	
 		--get successor details
-		LEFT OUTER JOIN [cumulus.control].[Pipelines] preds
+		LEFT OUTER JOIN [control].[Pipelines] preds
 			ON base.[PipelineId] = preds.[LogicalPredecessorId]
-		LEFT OUTER JOIN [cumulus.control].[Stages] predsStage
+		LEFT OUTER JOIN [control].[Stages] predsStage
 			ON preds.[StageId] = predsStage.[StageId]
 		--other details for checking
 		CROSS JOIN firstStage

@@ -31,7 +31,7 @@ BEGIN
 								WHEN 'FN' THEN 'FUNCTION'
 							END;
 
-			EXEC('DROP ' + @DDLType + ' [cumulus.control].[' + @ObjectName + '];')
+			EXEC('DROP ' + @DDLType + ' [control].[' + @ObjectName + '];')
 		END;
 END;
 GO

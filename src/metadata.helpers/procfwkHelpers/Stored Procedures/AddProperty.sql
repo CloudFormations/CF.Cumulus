@@ -12,11 +12,11 @@ BEGIN
 	--defensive check
 	IF EXISTS
 		(
-		SELECT * FROM [cumulus.control].[Properties] WHERE [PropertyName] = @PropertyName AND [ValidTo] IS NOT NULL
+		SELECT * FROM [control].[Properties] WHERE [PropertyName] = @PropertyName AND [ValidTo] IS NOT NULL
 		)
 		AND NOT EXISTS
 		(
-		SELECT * FROM [cumulus.control].[Properties] WHERE [PropertyName] = @PropertyName AND [ValidTo] IS NULL
+		SELECT * FROM [control].[Properties] WHERE [PropertyName] = @PropertyName AND [ValidTo] IS NULL
 		)
 		BEGIN
 			WITH lastValue AS
@@ -25,7 +25,7 @@ BEGIN
 					[PropertyId],
 					ROW_NUMBER() OVER (PARTITION BY [PropertyName] ORDER BY [ValidTo] ASC) AS Rn
 				FROM
-					[cumulus.control].[Properties]
+					[control].[Properties]
 				WHERE
 					[PropertyName] = @PropertyName
 				)
@@ -35,7 +35,7 @@ BEGIN
 			SET
 				[ValidTo] = NULL
 			FROM
-				[cumulus.control].[Properties] prop
+				[control].[Properties] prop
 				INNER JOIN lastValue
 					ON prop.[PropertyId] = lastValue.[PropertyId]
 			WHERE
@@ -53,7 +53,7 @@ BEGIN
 			GETUTCDATE() AS StartEndDate
 		)
 	--insert new version of existing property from MERGE OUTPUT
-	INSERT INTO [cumulus.control].[Properties]
+	INSERT INTO [control].[Properties]
 		(
 		[PropertyName],
 		[PropertyValue],
@@ -68,7 +68,7 @@ BEGIN
 	FROM
 		(
 		MERGE INTO
-			[cumulus.control].[Properties] targetTable
+			[control].[Properties] targetTable
 		USING
 			sourceTable
 				ON sourceTable.[PropertyName] = targetTable.[PropertyName]	

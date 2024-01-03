@@ -41,7 +41,7 @@ BEGIN
 		(5,1	,'Wait 3'				,NULL		,1),
 		(5,1	,'Wait 4'				,NULL		,1);
 
-	MERGE INTO [cumulus.control].[Pipelines] AS tgt
+	MERGE INTO [control].[Pipelines] AS tgt
 	USING 
 		@Pipelines AS src
 			ON tgt.[OrchestratorId] = src.[OrchestratorId]

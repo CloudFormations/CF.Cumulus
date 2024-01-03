@@ -66,14 +66,14 @@ namespace framework.testing.Helpers
             if (string.IsNullOrEmpty(tenantId)) tenantId = GetSetting("AZURE_TENANT_ID");
             if (string.IsNullOrEmpty(subscriptionId)) subscriptionId = GetSetting("AZURE_SUBSCRIPTION_ID");
 
-            ExecuteNonQuery($"INSERT INTO[cumulus.control].[Tenants] ([TenantId],[Name],[Description]) VALUES ('{tenantId}', 'mrpaulandrew.com', NULL);");
-            ExecuteNonQuery($"INSERT INTO [cumulus.control].[Subscriptions] ([SubscriptionId],[Name],[Description],[TenantId]) VALUES ('{subscriptionId}', 'Microsoft Sponsored Subscription', NULL, '{tenantId}');");
-            ExecuteNonQuery($"UPDATE [cumulus.control].[Orchestrators] SET [SubscriptionId] = '{subscriptionId}';");
+            ExecuteNonQuery($"INSERT INTO[control].[Tenants] ([TenantId],[Name],[Description]) VALUES ('{tenantId}', 'mrpaulandrew.com', NULL);");
+            ExecuteNonQuery($"INSERT INTO [control].[Subscriptions] ([SubscriptionId],[Name],[Description],[TenantId]) VALUES ('{subscriptionId}', 'Microsoft Sponsored Subscription', NULL, '{tenantId}');");
+            ExecuteNonQuery($"UPDATE [control].[Orchestrators] SET [SubscriptionId] = '{subscriptionId}';");
         }
 
         public void AddWorkerSPNStoredInDatabase(string workerFactoryName, string orchestratorType = "ADF")
         {
-            ExecuteNonQuery("UPDATE [cumulus.control].[Properties] SET [PropertyValue] = 'StoreInDatabase' WHERE [PropertyName] = 'SPNHandlingMethod';");
+            ExecuteNonQuery("UPDATE [control].[Properties] SET [PropertyValue] = 'StoreInDatabase' WHERE [PropertyName] = 'SPNHandlingMethod';");
 
             var parameters = new Dictionary<string, object>
             {
@@ -89,7 +89,7 @@ namespace framework.testing.Helpers
 
         public void AddWorkerSPNStoredInKeyVault(string workerFactoryName, string orchestratorType = "ADF")
         {
-            ExecuteNonQuery("UPDATE [cumulus.control].[Properties] SET [PropertyValue] = 'StoreInKeyVault' WHERE [PropertyName] = 'SPNHandlingMethod';");
+            ExecuteNonQuery("UPDATE [control].[Properties] SET [PropertyValue] = 'StoreInKeyVault' WHERE [PropertyName] = 'SPNHandlingMethod';");
 
             var parameters = new Dictionary<string, object>
             {
@@ -106,8 +106,8 @@ namespace framework.testing.Helpers
         public void AddBasicMetadata()
         {
             ExecuteStoredProcedure("[procfwkTesting].[ResetMetadata]", null);
-            ExecuteNonQuery("UPDATE [cumulus.control].[Orchestrators] SET [IsFrameworkOrchestrator] = '0';");
-            ExecuteNonQuery($"UPDATE [cumulus.control].[Orchestrators] SET [IsFrameworkOrchestrator] = '1' WHERE [OrchestratorName] = '{GetSetting("DataFactoryName")}';");
+            ExecuteNonQuery("UPDATE [control].[Orchestrators] SET [IsFrameworkOrchestrator] = '0';");
+            ExecuteNonQuery($"UPDATE [control].[Orchestrators] SET [IsFrameworkOrchestrator] = '1' WHERE [OrchestratorName] = '{GetSetting("DataFactoryName")}';");
         }
 
         public override void TearDown()

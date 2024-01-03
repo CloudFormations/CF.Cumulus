@@ -1,25 +1,25 @@
-﻿SELECT * FROM [cumulus.control].[BatchExecution]
+﻿SELECT * FROM [control].[BatchExecution]
 
-SELECT * FROM [cumulus.control].[CurrentExecution]
+SELECT * FROM [control].[CurrentExecution]
 
 SELECT * FROM [procfwkReporting].[CurrentExecutionSummary]
 
-SELECT * FROM [cumulus.control].[CurrentProperties]
+SELECT * FROM [control].[CurrentProperties]
 
-SELECT * FROM [cumulus.control].[Batches]
+SELECT * FROM [control].[Batches]
 
-SELECT * FROM [cumulus.control].[BatchStageLink]
+SELECT * FROM [control].[BatchStageLink]
 
-SELECT * FROM [cumulus.control].[Orchestrators]
+SELECT * FROM [control].[Orchestrators]
 
-SELECT * FROM [cumulus.control].[Stages]
+SELECT * FROM [control].[Stages]
 
-SELECT * FROM [cumulus.control].[Pipelines]
+SELECT * FROM [control].[Pipelines]
 
---SELECT * FROM [cumulus.control].[PipelineParameters]
+--SELECT * FROM [control].[PipelineParameters]
 
-SELECT * FROM [cumulus.control].[ExecutionLog]
+SELECT * FROM [control].[ExecutionLog]
 
-SELECT * FROM [cumulus.control].[ErrorLog]
+SELECT * FROM [control].[ErrorLog]
 
 --SELECT * FROM [dbo].[ServicePrincipals]

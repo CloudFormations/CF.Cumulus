@@ -71,7 +71,7 @@ IF EXISTS
 
 		SET @SQL = 
 		'
-		INSERT INTO [cumulus.control].[ExecutionLog]
+		INSERT INTO [control].[ExecutionLog]
 		(
 		' + @Columns + '
 		)
@@ -85,7 +85,7 @@ IF EXISTS
 		EXEC(@SQL);
 
 		DECLARE @Before INT = (SELECT COUNT(0) FROM [dbo].[ExecutionLogBackup]);
-		DECLARE @After INT = (SELECT COUNT(0) FROM [cumulus.control].[ExecutionLog]);
+		DECLARE @After INT = (SELECT COUNT(0) FROM [control].[ExecutionLog]);
 
 		IF (@Before = @After)
 		BEGIN

@@ -16,4 +16,4 @@ SELECT
 	[EndDateTime],
 	DATEDIFF(MINUTE, [StartDateTime], [EndDateTime]) 'RunDurationMinutes'
 FROM 
-	[cumulus.control].[ExecutionLog]
+	[control].[ExecutionLog]

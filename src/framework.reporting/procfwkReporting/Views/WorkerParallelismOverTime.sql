@@ -16,7 +16,7 @@ WITH numbers AS
 		CAST(CONVERT(VARCHAR(16), MIN([StartDateTime]), 120) AS DATETIME)  AS 'ExecutionStart',
 		CAST(CONVERT(VARCHAR(16), MAX([EndDateTime]), 120) AS DATETIME) AS 'ExecutionEnd'
 	FROM
-		[cumulus.control].[ExecutionLog]
+		[control].[ExecutionLog]
 	--WHERE
 	--	[LocalExecutionId] = '2BB02783-2A2C-4970-9BEA-0543013BFD5E'
 	GROUP BY
@@ -34,11 +34,11 @@ WITH numbers AS
 	FROM
 		executionBoundaries eB
 		CROSS JOIN numbers n
-		INNER JOIN [cumulus.control].[ExecutionLog] eL
+		INNER JOIN [control].[ExecutionLog] eL
 			ON eB.[LocalExecutionId] = eL.[LocalExecutionId]
 				AND DATEADD(MINUTE, n.[Number], eB.[ExecutionStart]) 
 					BETWEEN eL.[StartDateTime] AND eL.[EndDateTime]
-		INNER JOIN [cumulus.control].[Stages] s
+		INNER JOIN [control].[Stages] s
 			ON eL.[StageId] = s.[StageId]
 	)
 

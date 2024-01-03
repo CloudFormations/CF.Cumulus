@@ -18,7 +18,7 @@ BEGIN
 		('Daily', N'Daily Worker Pipelines.', 1),
 		('Hourly', N'Hourly Worker Pipelines.', 1);	
 
-	MERGE INTO [cumulus.control].[Batches] AS tgt
+	MERGE INTO [control].[Batches] AS tgt
 	USING 
 		@Batches AS src
 			ON tgt.[BatchName] = src.[BatchName]

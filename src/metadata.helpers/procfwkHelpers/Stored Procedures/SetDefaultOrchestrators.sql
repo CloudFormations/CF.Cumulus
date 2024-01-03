@@ -27,7 +27,7 @@ BEGIN
 		('WorkersFactory','ADF',0,'Example Data Factory used to house worker pipelines.','ADF.procfwk','12345678-1234-1234-1234-012345678910'),
 		('procfwkforsynapse','SYN',0,'Example Synapse instance used to house all pipelines.','ADF.procfwk','12345678-1234-1234-1234-012345678910');
 
-	MERGE INTO [cumulus.control].[Orchestrators] AS tgt
+	MERGE INTO [control].[Orchestrators] AS tgt
 	USING 
 		@Orchestrators AS src
 			ON tgt.[OrchestratorName] = src.[OrchestratorName]

@@ -71,7 +71,7 @@ IF EXISTS
 
 		SET @ErrSQL = 
 		'
-		INSERT INTO [cumulus.control].[ErrorLog]
+		INSERT INTO [control].[ErrorLog]
 		(
 		' + @ErrColumns + '
 		)
@@ -85,7 +85,7 @@ IF EXISTS
 		EXEC(@ErrSQL);
 
 		DECLARE @ErrBefore INT = (SELECT COUNT(0) FROM [dbo].[ErrorLogBackup]);
-		DECLARE @ErrAfter INT = (SELECT COUNT(0) FROM [cumulus.control].[ErrorLog]);
+		DECLARE @ErrAfter INT = (SELECT COUNT(0) FROM [control].[ErrorLog]);
 
 		IF (@ErrBefore = @ErrAfter)
 		BEGIN

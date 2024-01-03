@@ -6,7 +6,7 @@ PRINT 'TenantId: ' + '$(AZURE_TENANT_ID)'
 PRINT 'SubscriptionId: ' + '$(AZURE_SUBSCRIPTION_ID)'
 
 --add my tenant
-INSERT INTO [cumulus.control].[Tenants]
+INSERT INTO [control].[Tenants]
 	(
 	[TenantId],
 	[Name],
@@ -16,7 +16,7 @@ VALUES
 	('$(AZURE_TENANT_ID)', 'mrpaulandrew.com', NULL);
 
 --add my subscription
-INSERT INTO [cumulus.control].[Subscriptions]
+INSERT INTO [control].[Subscriptions]
 	(
 	[SubscriptionId],
 	[Name],
@@ -28,13 +28,13 @@ VALUES
 
 --update Orchestrator with new subscription
 UPDATE
-	[cumulus.control].[Orchestrators]
+	[control].[Orchestrators]
 SET
 	[SubscriptionId] = '$(AZURE_SUBSCRIPTION_ID)';
 
 --remove default values
-DELETE FROM [cumulus.control].[Subscriptions] WHERE [SubscriptionId] = '12345678-1234-1234-1234-012345678910';
-DELETE FROM [cumulus.control].[Tenants] WHERE [TenantId] = '12345678-1234-1234-1234-012345678910';
+DELETE FROM [control].[Subscriptions] WHERE [SubscriptionId] = '12345678-1234-1234-1234-012345678910';
+DELETE FROM [control].[Tenants] WHERE [TenantId] = '12345678-1234-1234-1234-012345678910';
 
 /*
 EXEC [procfwkHelpers].[AddProperty]
@@ -43,7 +43,7 @@ EXEC [procfwkHelpers].[AddProperty]
 	@Description = N'Accepted values: StoreInDatabase, StoreInKeyVault. See v1.8.2 release notes for full details.';
 */
 
-IF (SELECT [cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInDatabase'
+IF (SELECT [control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInDatabase'
 	BEGIN
 		--Add SPN for execution of all worker pipelines using database to store SPN values
 		EXEC [procfwkHelpers].[AddServicePrincipalWrapper]
@@ -77,7 +77,7 @@ IF (SELECT [cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 
 			@SpecificPipelineName = N'Wait 1';
 		*/
 	END
-ELSE IF (SELECT [cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInKeyVault'
+ELSE IF (SELECT [control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInKeyVault'
 	BEGIN
 		--Add SPN for execution of all worker pipelines using database to store key vault URLs
 		EXEC [procfwkHelpers].[AddServicePrincipalWrapper]

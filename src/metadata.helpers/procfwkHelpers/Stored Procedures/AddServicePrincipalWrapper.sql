@@ -10,9 +10,9 @@
 AS
 BEGIN
 	
-	IF ([cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInDatabase'
+	IF ([control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInDatabase'
 		BEGIN
-			EXEC [cumulus.control].[AddServicePrincipal]
+			EXEC [control].[AddServicePrincipal]
 				@OrchestratorName = @OrchestratorName,
 				@OrchestratorType = @OrchestratorType,
 				@PrincipalId = @PrincipalIdValue,
@@ -20,9 +20,9 @@ BEGIN
 				@PrincipalName = @PrincipalName,
 				@SpecificPipelineName = @SpecificPipelineName			
 		END
-	ELSE IF ([cumulus.control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInKeyVault'
+	ELSE IF ([control].[GetPropertyValueInternal]('SPNHandlingMethod')) = 'StoreInKeyVault'
 		BEGIN
-			EXEC [cumulus.control].[AddServicePrincipalUrls]
+			EXEC [control].[AddServicePrincipalUrls]
 				@OrchestratorName = @OrchestratorName,
 				@OrchestratorType = @OrchestratorType,
 				@PrincipalIdUrl = @PrincipalIdValue,

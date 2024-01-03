@@ -21,7 +21,7 @@ BEGIN
 		('Serve', N'Load transformed data into semantic layer.', 1),
 		('Speed', N'Regular loading of frequently used data.', 0);
 
-	MERGE INTO [cumulus.control].[Stages] AS tgt
+	MERGE INTO [control].[Stages] AS tgt
 	USING 
 		@Stages AS src
 			ON tgt.[StageName] = src.[StageName]

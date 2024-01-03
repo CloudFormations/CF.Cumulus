@@ -3,7 +3,7 @@ AS
 BEGIN
 
 	--quick win
-	IF ([cumulus.control].[GetPropertyValueInternal]('ExecutionPrecursorProc')) <> '[dbo].[DemoModePrecursor]'
+	IF ([control].[GetPropertyValueInternal]('ExecutionPrecursorProc')) <> '[dbo].[DemoModePrecursor]'
 	BEGIN
 		EXEC [procfwkHelpers].[AddProperty]
 			@PropertyName = N'ExecutionPrecursorProc',
@@ -17,17 +17,17 @@ BEGIN
 			[PipelineId],
 			LEFT(ABS(CAST(CAST(NEWID() AS VARBINARY(192)) AS INT)),1) AS NewValue
 		FROM 
-			[cumulus.control].[PipelineParameters]
+			[control].[PipelineParameters]
 		)
 	UPDATE
 		pp
 	SET
 		pp.[ParameterValue] = cte.[NewValue]
 	FROM
-		[cumulus.control].[PipelineParameters] pp
+		[control].[PipelineParameters] pp
 		INNER JOIN cte
 			ON pp.[PipelineId] = cte.[PipelineId]
-		INNER JOIN [cumulus.control].[Pipelines] p
+		INNER JOIN [control].[Pipelines] p
 			ON pp.[PipelineId] = p.[PipelineId]
 	WHERE
 		pp.[ParameterName] LIKE 'Wait%'
@@ -37,7 +37,7 @@ BEGIN
 	--for intentional error
 	IF NOT EXISTS
 		(
-		SELECT * FROM [cumulus.control].[CurrentExecution]
+		SELECT * FROM [control].[CurrentExecution]
 		)
 		BEGIN
 			UPDATE
@@ -45,8 +45,8 @@ BEGIN
 			SET
 				pp.[ParameterValue] = 'true'
 			FROM
-				[cumulus.control].[PipelineParameters] pp
-				INNER JOIN [cumulus.control].[Pipelines] p
+				[control].[PipelineParameters] pp
+				INNER JOIN [control].[Pipelines] p
 					ON pp.[PipelineId] = p.[PipelineId]
 			WHERE
 				p.[PipelineName] = 'Intentional Error'
@@ -59,8 +59,8 @@ BEGIN
 			SET
 				pp.[ParameterValue] = 'false'
 			FROM
-				[cumulus.control].[PipelineParameters] pp
-				INNER JOIN [cumulus.control].[Pipelines] p
+				[control].[PipelineParameters] pp
+				INNER JOIN [control].[Pipelines] p
 					ON pp.[PipelineId] = p.[PipelineId]
 			WHERE
 				p.[PipelineName] = 'Intentional Error'
@@ -68,7 +68,7 @@ BEGIN
 		END;
 
 	--dependency chain failure handling
-	IF ([cumulus.control].[GetPropertyValueInternal]('FailureHandling')) <> 'DependencyChain'
+	IF ([control].[GetPropertyValueInternal]('FailureHandling')) <> 'DependencyChain'
 	BEGIN
 		EXEC [procfwkHelpers].[AddProperty]
 			@PropertyName = N'FailureHandling',
@@ -77,7 +77,7 @@ BEGIN
 
 
 	--short infant iterations
-	IF ([cumulus.control].[GetPropertyValueInternal]('PipelineStatusCheckDuration')) <> '5'
+	IF ([control].[GetPropertyValueInternal]('PipelineStatusCheckDuration')) <> '5'
 	BEGIN
 		EXEC [procfwkHelpers].[AddProperty]
 			@PropertyName = N'PipelineStatusCheckDuration',

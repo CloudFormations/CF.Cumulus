@@ -9,17 +9,17 @@ BEGIN
 			[PipelineId],
 			LEFT(ABS(CAST(CAST(NEWID() AS VARBINARY(192)) AS INT)),2) AS NewValue
 		FROM 
-			[cumulus.control].[PipelineParameters]
+			[control].[PipelineParameters]
 		)
 	UPDATE
 		pp
 	SET
 		pp.[ParameterValue] = cte.[NewValue]
 	FROM
-		[cumulus.control].[PipelineParameters] pp
+		[control].[PipelineParameters] pp
 		INNER JOIN cte
 			ON pp.[PipelineId] = cte.[PipelineId]
-		INNER JOIN [cumulus.control].[Pipelines] p
+		INNER JOIN [control].[Pipelines] p
 			ON pp.[PipelineId] = p.[PipelineId]
 	WHERE
 		pp.[ParameterName] LIKE 'Wait%'

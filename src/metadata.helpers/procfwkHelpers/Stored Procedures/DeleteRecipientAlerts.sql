@@ -10,10 +10,10 @@ BEGIN
 	--defensive check
 	IF NOT EXISTS
 		(
-		SELECT [RecipientId] FROM [cumulus.control].[Recipients] WHERE [EmailAddress] = @EmailAddress
+		SELECT [RecipientId] FROM [control].[Recipients] WHERE [EmailAddress] = @EmailAddress
 		)
 		BEGIN
-			RAISERROR('Recipient email address does not exists in [cumulus.control].[Recipients] table.',16,1);
+			RAISERROR('Recipient email address does not exists in [control].[Recipients] table.',16,1);
 			RETURN 0;
 		END;
 
@@ -26,15 +26,15 @@ BEGIN
 			SET
 				al.[Enabled] = 0
 			FROM
-				[cumulus.control].[PipelineAlertLink] al
-				INNER JOIN [cumulus.control].[Recipients] r
+				[control].[PipelineAlertLink] al
+				INNER JOIN [control].[Recipients] r
 					ON al.[RecipientId] = r.[RecipientId]
 			WHERE
 				r.[EmailAddress] = @EmailAddress;
 	
 			--disable recipient(s)
 			UPDATE
-				[cumulus.control].[Recipients]
+				[control].[Recipients]
 			SET
 				[Enabled] = 0
 			WHERE
@@ -47,15 +47,15 @@ BEGIN
 			DELETE		
 				al
 			FROM
-				[cumulus.control].[PipelineAlertLink] al
-				INNER JOIN [cumulus.control].[Recipients] r
+				[control].[PipelineAlertLink] al
+				INNER JOIN [control].[Recipients] r
 					ON al.[RecipientId] = r.[RecipientId]
 			WHERE
 				r.[EmailAddress] = @EmailAddress;
 
 			--delete recipient(s)
 			DELETE FROM
-				[cumulus.control].[Recipients]
+				[control].[Recipients]
 			WHERE
 				[EmailAddress] = @EmailAddress;
 		END;

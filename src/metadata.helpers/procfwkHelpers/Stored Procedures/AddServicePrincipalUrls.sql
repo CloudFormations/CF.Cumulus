@@ -18,7 +18,7 @@ BEGIN
 	--defensive checks
 	IF NOT EXISTS
 		(
-		SELECT [OrchestratorName] FROM [cumulus.control].[Orchestrators] WHERE [OrchestratorName] = @OrchestratorName AND [OrchestratorType] = @OrchestratorType
+		SELECT [OrchestratorName] FROM [control].[Orchestrators] WHERE [OrchestratorName] = @OrchestratorName AND [OrchestratorType] = @OrchestratorType
 		)
 		BEGIN
 			SET @ErrorDetails = 'Invalid Orchestrator name. Please ensure the Orchestrator metadata exists before trying to add authentication for it.'
@@ -31,10 +31,10 @@ BEGIN
 		SELECT
 			*
 		FROM
-			[cumulus.control].[PipelineAuthLink] AL
-			INNER JOIN [cumulus.control].[Orchestrators] DF
+			[control].[PipelineAuthLink] AL
+			INNER JOIN [control].[Orchestrators] DF
 				ON AL.[OrchestratorId] = DF.[OrchestratorId]
-			INNER JOIN [cumulus.control].[Pipelines] PP
+			INNER JOIN [control].[Pipelines] PP
 				ON AL.[PipelineId] = PP.[PipelineId]
 		WHERE
 			DF.[OrchestratorName] = @OrchestratorName
@@ -42,7 +42,7 @@ BEGIN
 			AND PP.[PipelineName] = @SpecificPipelineName
 		)
 		BEGIN
-			SET @ErrorDetails = 'The provided Pipeline or Orchestrator combination already have a Service Principal. Delete the existing record using the procedure [cumulus.control].[DeleteServicePrincipal].'
+			SET @ErrorDetails = 'The provided Pipeline or Orchestrator combination already have a Service Principal. Delete the existing record using the procedure [control].[DeleteServicePrincipal].'
 			RAISERROR(@ErrorDetails, 16, 1);
 			RETURN 0;
 		END
@@ -65,7 +65,7 @@ BEGIN
 			--secondary defensive check for pipeline optional param
 			IF NOT EXISTS
 				( 
-				SELECT [PipelineName] FROM [cumulus.control].[Pipelines] WHERE [PipelineName] = @SpecificPipelineName
+				SELECT [PipelineName] FROM [control].[Pipelines] WHERE [PipelineName] = @SpecificPipelineName
 				)
 				BEGIN
 					SET @ErrorDetails = 'Invalid Pipeline name. Please ensure the Pipeline metadata exists before trying to add authentication for it.'
@@ -99,7 +99,7 @@ BEGIN
 				END
 
 			--add single pipeline to SPN link
-			INSERT INTO [cumulus.control].[PipelineAuthLink]
+			INSERT INTO [control].[PipelineAuthLink]
 				(
 				[PipelineId],
 				[OrchestratorId],
@@ -110,8 +110,8 @@ BEGIN
 				D.[OrchestratorId],
 				@CredentialId
 			FROM
-				[cumulus.control].[Pipelines] P
-				INNER JOIN [cumulus.control].[Orchestrators] D
+				[control].[Pipelines] P
+				INNER JOIN [control].[Orchestrators] D
 					ON P.[OrchestratorId] = D.[OrchestratorId]
 			WHERE
 				P.[PipelineName] = @SpecificPipelineName
@@ -136,7 +136,7 @@ BEGIN
 			SET @CredentialId = SCOPE_IDENTITY()
 
 			--add link
-			INSERT INTO [cumulus.control].[PipelineAuthLink]
+			INSERT INTO [control].[PipelineAuthLink]
 				(
 				[PipelineId],
 				[OrchestratorId],
@@ -147,10 +147,10 @@ BEGIN
 				D.[OrchestratorId],
 				@CredentialId
 			FROM
-				[cumulus.control].[Pipelines] P
-				INNER JOIN [cumulus.control].[Orchestrators] D
+				[control].[Pipelines] P
+				INNER JOIN [control].[Orchestrators] D
 					ON P.[OrchestratorId] = D.[OrchestratorId]
-				LEFT OUTER JOIN [cumulus.control].[PipelineAuthLink] L
+				LEFT OUTER JOIN [control].[PipelineAuthLink] L
 					ON P.[PipelineId] = L.[PipelineId]
 			WHERE
 				D.[OrchestratorName] = @OrchestratorName

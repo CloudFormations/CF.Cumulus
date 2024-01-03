@@ -14,14 +14,14 @@ BEGIN
 	SELECT
 		@PipelineId = [PipelineId]
 	FROM
-		[cumulus.control].[Pipelines]
+		[control].[Pipelines]
 	WHERE
 		[PipelineName] = @PipelineName;
 
 	SELECT
 		@DependantPipelineId = [PipelineId]
 	FROM
-		[cumulus.control].[Pipelines]
+		[control].[Pipelines]
 	WHERE
 		[PipelineName] = @DependantPipelineName;
 
@@ -49,8 +49,8 @@ BEGIN
 		SELECT 
 			*
 		FROM 
-			[cumulus.control].[Pipelines] pp
-			INNER JOIN [cumulus.control].[Pipelines] dp
+			[control].[Pipelines] pp
+			INNER JOIN [control].[Pipelines] dp
 				ON dp.[PipelineId] = @DependantPipelineId
 		WHERE
 			pp.[PipelineId] = @PipelineId
@@ -67,7 +67,7 @@ BEGIN
 		SELECT 
 			* 
 		FROM 
-			[cumulus.control].[PipelineDependencies] 
+			[control].[PipelineDependencies] 
 		WHERE
 			[PipelineId] = @PipelineId
 			AND [DependantPipelineId] = @DependantPipelineId
@@ -78,7 +78,7 @@ BEGIN
 		END
 	ELSE
 		BEGIN
-			INSERT INTO [cumulus.control].[PipelineDependencies]
+			INSERT INTO [control].[PipelineDependencies]
 				(
 				[PipelineId],
 				[DependantPipelineId]

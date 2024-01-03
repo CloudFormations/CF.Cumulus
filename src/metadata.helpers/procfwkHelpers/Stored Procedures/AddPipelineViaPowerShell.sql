@@ -16,14 +16,14 @@ BEGIN
 	--get/set orchestrator
 	IF EXISTS
 		(
-		SELECT * FROM [cumulus.control].[Orchestrators] WHERE [OrchestratorName] = @OrchestratorName AND [ResourceGroupName] = @ResourceGroup AND [OrchestratorType] = @OrchestratorType
+		SELECT * FROM [control].[Orchestrators] WHERE [OrchestratorName] = @OrchestratorName AND [ResourceGroupName] = @ResourceGroup AND [OrchestratorType] = @OrchestratorType
 		)
 		BEGIN
-			SELECT @OrchestratorId = [OrchestratorId] FROM [cumulus.control].[Orchestrators] WHERE [OrchestratorName] = @OrchestratorName AND [ResourceGroupName] = @ResourceGroup AND [OrchestratorType] = @OrchestratorType;
+			SELECT @OrchestratorId = [OrchestratorId] FROM [control].[Orchestrators] WHERE [OrchestratorName] = @OrchestratorName AND [ResourceGroupName] = @ResourceGroup AND [OrchestratorType] = @OrchestratorType;
 		END
 	ELSE
 		BEGIN
-			INSERT INTO [cumulus.control].[Orchestrators]
+			INSERT INTO [control].[Orchestrators]
 				(
 				[OrchestratorName],
 				[OrchestratorType],
@@ -47,14 +47,14 @@ BEGIN
 	--get/set stage
 	IF EXISTS
 		(
-		SELECT * FROM [cumulus.control].[Stages] WHERE [StageName] = @StageName
+		SELECT * FROM [control].[Stages] WHERE [StageName] = @StageName
 		)
 		BEGIN
-			SELECT @StageId = [StageId] FROM [cumulus.control].[Stages] WHERE [StageName] = @StageName;
+			SELECT @StageId = [StageId] FROM [control].[Stages] WHERE [StageName] = @StageName;
 		END;
 	ELSE
 		BEGIN
-			INSERT INTO [cumulus.control].[Stages]
+			INSERT INTO [control].[Stages]
 				(
 				[StageName],
 				[StageDescription],
@@ -81,7 +81,7 @@ BEGIN
 			NULL AS LogicalPredecessorId,
 			1 AS [Enabled]
 		)
-	MERGE INTO [cumulus.control].[Pipelines] AS tgt
+	MERGE INTO [control].[Pipelines] AS tgt
 	USING 
 		sourceData AS src
 			ON tgt.[OrchestratorId] = src.[OrchestratorId]

@@ -23,7 +23,7 @@ BEGIN
 		)
 		BEGIN
 			PRINT 'Transferring: ' + @ObjectName;
-			EXEC('ALTER SCHEMA [procfwkHelpers] TRANSFER [cumulus.control].[' + @ObjectName + '];')
+			EXEC('ALTER SCHEMA [procfwkHelpers] TRANSFER [control].[' + @ObjectName + '];')
 		END;
 END;
 GO

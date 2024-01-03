@@ -6,14 +6,14 @@ WITH maxLog AS
 	SELECT
 		MAX([LogId]) AS 'MaxLogId'
 	FROM
-		[cumulus.control].[ExecutionLog]
+		[control].[ExecutionLog]
 	),
 	lastExecutionId AS
 	(
 	SELECT
 		[LocalExecutionId]
 	FROM
-		[cumulus.control].[ExecutionLog] el1
+		[control].[ExecutionLog] el1
 		INNER JOIN maxLog
 			ON maxLog.[MaxLogId] = el1.[LogId]
 	)
@@ -27,7 +27,7 @@ SELECT
 	el2.[EndDateTime],
 	DATEDIFF(MINUTE, el2.[StartDateTime], el2.[EndDateTime]) AS RunDurationMinutes
 FROM 
-	[cumulus.control].[ExecutionLog] el2
+	[control].[ExecutionLog] el2
 	INNER JOIN lastExecutionId
 		ON el2.[LocalExecutionId] = lastExecutionId.[LocalExecutionId]
 WHERE

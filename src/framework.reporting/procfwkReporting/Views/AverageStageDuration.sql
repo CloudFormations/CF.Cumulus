@@ -9,7 +9,7 @@ WITH stageStartEnd AS
 		MIN([StartDateTime]) AS 'StageStart',
 		MAX([EndDateTime]) AS 'StageEnd'
 	FROM
-		[cumulus.control].[ExecutionLog]
+		[control].[ExecutionLog]
 	GROUP BY
 		[LocalExecutionId],
 		[StageId]
@@ -22,7 +22,7 @@ SELECT
 	AVG(DATEDIFF(MINUTE, stageStartEnd.[StageStart], stageStartEnd.[StageEnd])) 'AvgStageRunDurationMinutes'
 FROM
 	stageStartEnd
-	INNER JOIN [cumulus.control].[Stages] s
+	INNER JOIN [control].[Stages] s
 		ON stageStartEnd.[StageId] = s.[StageId]
 GROUP BY
 	s.[StageId],
