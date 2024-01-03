@@ -114,7 +114,7 @@ namespace cloudformations.cumulus.services
 
                     _logger.LogInformation($"Adding parameter key: {key} value: {request.PipelineParameters[key]} to pipeline call.");
 
-                    adfParameters.Add(key, BinaryData.FromString('"' + request.PipelineParameters[key] + '"')); //adding " marks feels like a hack, but because parameters are passed from JSON call to a JSON call via a dictionary seems to be needed in Binary Data convert!
+                    adfParameters.Add(key, BinaryData.FromString('"' + request.PipelineParameters[key] + '"')); //adding " marks feels like a hack, but because parameters are passed from JSON call to a JSON call via a dictionary seems to be needed in BinaryData.FromString conversion!
                 }
                 
                 pipelineRunResult = dataFactoryPipeline.CreateRun(parameterValueSpecification: adfParameters);
