@@ -58,7 +58,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[procfwk].[GetPipelineParameters]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[GetPipelineParameters]",
 						"storedProcedureParameters": {
 							"PipelineId": {
 								"type": "Int32",
@@ -98,7 +98,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[procfwk].[SetLogPipelineRunning]",
+					"storedProcedureName": "[cumulus.control].[SetLogPipelineRunning]",
 					"storedProcedureParameters": {
 						"ExecutionId": {
 							"value": {
@@ -149,7 +149,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[procfwk].[SetLogActivityFailed]",
+					"storedProcedureName": "[cumulus.control].[SetLogActivityFailed]",
 					"storedProcedureParameters": {
 						"ExecutionId": {
 							"value": {
@@ -204,7 +204,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[procfwk].[SetLogPipelineRunId]",
+					"storedProcedureName": "[cumulus.control].[SetLogPipelineRunId]",
 					"storedProcedureParameters": {
 						"ExecutionId": {
 							"value": {
@@ -270,7 +270,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[procfwk].[CheckForEmailAlerts]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[CheckForEmailAlerts]",
 						"storedProcedureParameters": {
 							"PipelineId": {
 								"type": "Int32",
@@ -325,7 +325,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderStoredProcedureName": "[procfwk].[GetEmailAlertParts]",
+									"sqlReaderStoredProcedureName": "[cumulus.control].[GetEmailAlertParts]",
 									"storedProcedureParameters": {
 										"PipelineId": {
 											"type": "Int32",
@@ -508,7 +508,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[procfwk].[SetLogPipelineLastStatusCheck]",
+								"storedProcedureName": "[cumulus.control].[SetLogPipelineLastStatusCheck]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"value": {
@@ -559,7 +559,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[procfwk].[SetLogActivityFailed]",
+								"storedProcedureName": "[cumulus.control].[SetLogActivityFailed]",
 								"storedProcedureParameters": {
 									"CallingActivity": {
 										"value": "GetWorkerPipelineStatus",
@@ -654,7 +654,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[procfwk].[SetLogPipelineSuccess]",
+										"storedProcedureName": "[cumulus.control].[SetLogPipelineSuccess]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -703,7 +703,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[procfwk].[SetLogPipelineFailed]",
+										"storedProcedureName": "[cumulus.control].[SetLogPipelineFailed]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -787,7 +787,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[procfwk].[SetErrorLogDetails]",
+										"storedProcedureName": "[cumulus.control].[SetErrorLogDetails]",
 										"storedProcedureParameters": {
 											"JsonErrorDetails": {
 												"value": {
@@ -829,7 +829,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[procfwk].[SetLogPipelineCancelled]",
+										"storedProcedureName": "[cumulus.control].[SetLogPipelineCancelled]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -877,7 +877,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[procfwk].[SetLogPipelineUnknown]",
+								"storedProcedureName": "[cumulus.control].[SetLogPipelineUnknown]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"value": {
@@ -926,7 +926,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[procfwk].[GetPropertyValue]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[GetPropertyValue]",
 						"storedProcedureParameters": {
 							"PropertyName": {
 								"type": "String",
@@ -1055,7 +1055,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[procfwk].[SetLogActivityFailed]",
+								"storedProcedureName": "[cumulus.control].[SetLogActivityFailed]",
 								"storedProcedureParameters": {
 									"CallingActivity": {
 										"value": "InvalidPipelineName",
@@ -1113,7 +1113,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[procfwk].[SetLogActivityFailed]",
+					"storedProcedureName": "[cumulus.control].[SetLogActivityFailed]",
 					"storedProcedureParameters": {
 						"ExecutionId": {
 							"value": {
@@ -1161,7 +1161,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[procfwk].[SetLogPipelineValidating]",
+					"storedProcedureName": "[cumulus.control].[SetLogPipelineValidating]",
 					"storedProcedureParameters": {
 						"ExecutionId": {
 							"value": {
@@ -1207,7 +1207,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[procfwk].[GetWorkerDetailsWrapper]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[GetWorkerDetailsWrapper]",
 						"storedProcedureParameters": {
 							"ExecutionId": {
 								"type": "Guid",

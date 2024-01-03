@@ -10,23 +10,23 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 --load default metadata
-:r .\Metadata\Properties.sql
-:r .\Metadata\Orchestrators.sql
-:r .\Metadata\Stages.sql
-:r .\Metadata\Pipelines.sql
-:r .\Metadata\PipelineParams.sql
-:r .\Metadata\PipelineDependencies.sql
-:r .\Metadata\Recipients.sql
-:r .\Metadata\AlertOutcomes.sql
-:r .\Metadata\RecipientAlertsLink.sql
-
---restore log data
-:r .\LogData\ExecutionLogRestore.sql
-:r .\LogData\ErrorLogRestore.sql
-
---object transfers
-:r .\Metadata\TransferHelperObjects.sql
-:r .\Metadata\TransferReportingObjects.sql
-
---replace old objects
-:r .\Metadata\ReplaceDataFactorys.sql
+--:r .\Metadata\Properties.sql
+--:r .\Metadata\Orchestrators.sql
+--:r .\Metadata\Stages.sql
+--:r .\Metadata\Pipelines.sql
+--:r .\Metadata\PipelineParams.sql
+--:r .\Metadata\PipelineDependencies.sql
+--:r .\Metadata\Recipients.sql
+--:r .\Metadata\AlertOutcomes.sql
+--:r .\Metadata\RecipientAlertsLink.sql
+--
+----restore log data
+--:r .\LogData\ExecutionLogRestore.sql
+--:r .\LogData\ErrorLogRestore.sql
+--
+----object transfers
+--:r .\Metadata\TransferHelperObjects.sql
+--:r .\Metadata\TransferReportingObjects.sql
+--
+----replace old objects
+--:r .\Metadata\ReplaceDataFactorys.sql

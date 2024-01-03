@@ -19,7 +19,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[procfwk].[GetPipelinesInStage]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[GetPipelinesInStage]",
 						"storedProcedureParameters": {
 							"ExecutionId": {
 								"type": "Guid",

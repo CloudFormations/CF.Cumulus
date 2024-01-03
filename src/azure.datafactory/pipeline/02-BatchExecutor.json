@@ -26,7 +26,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[procfwk].[GetStages]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[GetStages]",
 						"storedProcedureParameters": {
 							"ExecutionId": {
 								"type": "Guid",
@@ -114,7 +114,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[procfwk].[SetLogStagePreparing]",
+								"storedProcedureName": "[cumulus.control].[SetLogStagePreparing]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"value": {
@@ -151,7 +151,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[procfwk].[CheckForBlockedPipelines]",
+								"storedProcedureName": "[cumulus.control].[CheckForBlockedPipelines]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"value": {
@@ -200,7 +200,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[procfwk].[ExecutionWrapper]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[ExecutionWrapper]",
 						"storedProcedureParameters": {
 							"CallingOrchestratorName": {
 								"type": "String",
@@ -247,7 +247,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[procfwk].[UpdateExecutionLog]",
+					"storedProcedureName": "[cumulus.control].[UpdateExecutionLog]",
 					"storedProcedureParameters": {
 						"PerformErrorCheck": {
 							"value": {
@@ -293,7 +293,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[procfwk].[CheckPreviousExeuction]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[CheckPreviousExeuction]",
 						"storedProcedureParameters": {
 							"BatchName": {
 								"type": "String",
@@ -355,7 +355,7 @@
 							"typeProperties": {
 								"source": {
 									"type": "AzureSqlSource",
-									"sqlReaderStoredProcedureName": "[procfwk].[GetWorkerAuthDetails]",
+									"sqlReaderStoredProcedureName": "[cumulus.control].[GetWorkerAuthDetails]",
 									"storedProcedureParameters": {
 										"ExecutionId": {
 											"type": "Guid",
@@ -401,7 +401,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[procfwk].[SetLogPipelineChecking]",
+								"storedProcedureName": "[cumulus.control].[SetLogPipelineChecking]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"value": {
@@ -505,7 +505,7 @@
 												},
 												"userProperties": [],
 												"typeProperties": {
-													"storedProcedureName": "[procfwk].[SetLogPipelineFailed]",
+													"storedProcedureName": "[cumulus.control].[SetLogPipelineFailed]",
 													"storedProcedureParameters": {
 														"ExecutionId": {
 															"value": {
@@ -558,7 +558,7 @@
 												},
 												"userProperties": [],
 												"typeProperties": {
-													"storedProcedureName": "[procfwk].[SetLogPipelineSuccess]",
+													"storedProcedureName": "[cumulus.control].[SetLogPipelineSuccess]",
 													"storedProcedureParameters": {
 														"ExecutionId": {
 															"value": {
@@ -607,7 +607,7 @@
 												},
 												"userProperties": [],
 												"typeProperties": {
-													"storedProcedureName": "[procfwk].[SetLogPipelineRunning]",
+													"storedProcedureName": "[cumulus.control].[SetLogPipelineRunning]",
 													"storedProcedureParameters": {
 														"ExecutionId": {
 															"value": {
@@ -656,7 +656,7 @@
 												},
 												"userProperties": [],
 												"typeProperties": {
-													"storedProcedureName": "[procfwk].[SetLogPipelineRunning]",
+													"storedProcedureName": "[cumulus.control].[SetLogPipelineRunning]",
 													"storedProcedureParameters": {
 														"ExecutionId": {
 															"value": {
@@ -705,7 +705,7 @@
 												},
 												"userProperties": [],
 												"typeProperties": {
-													"storedProcedureName": "[procfwk].[SetLogPipelineCancelled]",
+													"storedProcedureName": "[cumulus.control].[SetLogPipelineCancelled]",
 													"storedProcedureParameters": {
 														"ExecutionId": {
 															"value": {
@@ -760,7 +760,7 @@
 										},
 										"userProperties": [],
 										"typeProperties": {
-											"storedProcedureName": "[procfwk].[SetLogPipelineUnknown]",
+											"storedProcedureName": "[cumulus.control].[SetLogPipelineUnknown]",
 											"storedProcedureParameters": {
 												"ExecutionId": {
 													"value": {
@@ -821,7 +821,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"storedProcedureName": "[procfwk].[SetLogPipelineLastStatusCheck]",
+								"storedProcedureName": "[cumulus.control].[SetLogPipelineLastStatusCheck]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"value": {
@@ -875,7 +875,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[procfwk].[ExecutePrecursorProcedure]"
+					"storedProcedureName": "[cumulus.control].[ExecutePrecursorProcedure]"
 				},
 				"linkedServiceName": {
 					"referenceName": "cumulusdatabase",
@@ -956,7 +956,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[procfwk].[CheckMetadataIntegrity]",
+					"storedProcedureName": "[cumulus.control].[CheckMetadataIntegrity]",
 					"storedProcedureParameters": {
 						"BatchName": {
 							"value": {
