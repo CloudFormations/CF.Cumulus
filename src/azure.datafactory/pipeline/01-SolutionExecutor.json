@@ -4,23 +4,13 @@
 		"description": "procfwk grandparent pipeline used optionally to bootstrap any wider processes in your Data Factory that then calls the processing framework.",
 		"activities": [
 			{
-				"name": "procfwk",
-				"description": "Call procfwk",
+				"name": "Cumulus Default Batch",
+				"description": "Call Cumulus.Control",
 				"type": "ExecutePipeline",
 				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
-					"pipeline": {
-						"referenceName": "02-Parent",
-						"type": "PipelineReference"
-					},
-					"waitOnCompletion": true,
-					"parameters": {
-						"BatchName": {
-							"value": "@pipeline().parameters.BatchName",
-							"type": "Expression"
-						}
-					}
+					"waitOnCompletion": true
 				}
 			}
 		],
