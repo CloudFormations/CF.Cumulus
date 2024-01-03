@@ -1,9 +1,0 @@
-{
-	"name": "FrameworkFactory",
-	"properties": {
-		"globalConfigurations": {
-			"PipelineBillingEnabled": "true"
-		}
-	},
-	"location": "uksouth"
-}
