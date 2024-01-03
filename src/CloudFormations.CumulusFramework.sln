@@ -48,22 +48,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linkedService", "linkedServ
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{D3E5B580-301B-4B04-BDA3-7A17FB0B494C}"
-	ProjectSection(SolutionItems) = preProject
-		azure.datafactory\pipeline\Check For Running Pipeline.json = azure.datafactory\pipeline\Check For Running Pipeline.json
-		azure.datafactory\pipeline\Email Sender.json = azure.datafactory\pipeline\Email Sender.json
-		azure.datafactory\pipeline\Intentional Error.json = azure.datafactory\pipeline\Intentional Error.json
-		azure.datafactory\pipeline\Throw Exception.json = azure.datafactory\pipeline\Throw Exception.json
-		azure.datafactory\pipeline\Wait 1.json = azure.datafactory\pipeline\Wait 1.json
-		azure.datafactory\pipeline\Wait 10.json = azure.datafactory\pipeline\Wait 10.json
-		azure.datafactory\pipeline\Wait 2.json = azure.datafactory\pipeline\Wait 2.json
-		azure.datafactory\pipeline\Wait 3.json = azure.datafactory\pipeline\Wait 3.json
-		azure.datafactory\pipeline\Wait 4.json = azure.datafactory\pipeline\Wait 4.json
-		azure.datafactory\pipeline\Wait 5.json = azure.datafactory\pipeline\Wait 5.json
-		azure.datafactory\pipeline\Wait 6.json = azure.datafactory\pipeline\Wait 6.json
-		azure.datafactory\pipeline\Wait 7.json = azure.datafactory\pipeline\Wait 7.json
-		azure.datafactory\pipeline\Wait 8.json = azure.datafactory\pipeline\Wait 8.json
-		azure.datafactory\pipeline\Wait 9.json = azure.datafactory\pipeline\Wait 9.json
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trigger", "trigger", "{B59F2304-062E-47C1-8D06-A23A8A384897}"
 	ProjectSection(SolutionItems) = preProject
@@ -76,6 +60,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cumulus.Control", "Cumulus.
 		azure.datafactory\pipeline\02-BatchExecutor.json = azure.datafactory\pipeline\02-BatchExecutor.json
 		azure.datafactory\pipeline\03-StageExecutor.json = azure.datafactory\pipeline\03-StageExecutor.json
 		azure.datafactory\pipeline\04-PipelineExecutor.json = azure.datafactory\pipeline\04-PipelineExecutor.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cumulus.Utils", "Cumulus.Utils", "{85858FFB-41A3-46ED-B6A6-EAD44EBE1486}"
+	ProjectSection(SolutionItems) = preProject
+		azure.datafactory\pipeline\Check For Running Pipeline.json = azure.datafactory\pipeline\Check For Running Pipeline.json
+		azure.datafactory\pipeline\Email Sender.json = azure.datafactory\pipeline\Email Sender.json
+		azure.datafactory\pipeline\Throw Exception.json = azure.datafactory\pipeline\Throw Exception.json
 	EndProjectSection
 EndProject
 Global
@@ -128,6 +119,7 @@ Global
 		{D3E5B580-301B-4B04-BDA3-7A17FB0B494C} = {07BC36F2-627C-406B-B222-9D9F22454D4E}
 		{B59F2304-062E-47C1-8D06-A23A8A384897} = {07BC36F2-627C-406B-B222-9D9F22454D4E}
 		{2E511592-037A-4117-8039-1ECA7F662A0E} = {D3E5B580-301B-4B04-BDA3-7A17FB0B494C}
+		{85858FFB-41A3-46ED-B6A6-EAD44EBE1486} = {D3E5B580-301B-4B04-BDA3-7A17FB0B494C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DE134F06-80BF-4EA6-97EE-083FA3BDAA86}
