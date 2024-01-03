@@ -51,7 +51,7 @@
 			}
 		},
 		"folder": {
-			"name": "_ProcFwk/_ProcFwkUtils"
+			"name": "Cumulus.Utils"
 		},
 		"annotations": [
 			"procfwk",
