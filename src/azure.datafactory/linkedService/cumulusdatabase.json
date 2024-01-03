@@ -7,14 +7,7 @@
 		],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": {
-				"type": "AzureKeyVaultSecret",
-				"store": {
-					"referenceName": "cumuluskeys",
-					"type": "LinkedServiceReference"
-				},
-				"secretName": "FrameworkMetadataDev"
-			}
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
 		}
 	}
 }
