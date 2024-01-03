@@ -605,6 +605,10 @@
 									]
 								}
 							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
 								"variableName": "WorkerPipelineState",
@@ -648,7 +652,7 @@
 									"policy": {
 										"timeout": "0.00:01:00",
 										"retry": 2,
-										"retryIntervalInSeconds": 5,
+										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
 										"secureInput": false
 									},
@@ -697,7 +701,7 @@
 									"policy": {
 										"timeout": "0.00:01:00",
 										"retry": 2,
-										"retryIntervalInSeconds": 5,
+										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
 										"secureInput": false
 									},
@@ -781,7 +785,7 @@
 									"policy": {
 										"timeout": "0.00:01:00",
 										"retry": 2,
-										"retryIntervalInSeconds": 5,
+										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
 										"secureInput": false
 									},
@@ -823,7 +827,7 @@
 									"policy": {
 										"timeout": "0.00:01:00",
 										"retry": 2,
-										"retryIntervalInSeconds": 5,
+										"retryIntervalInSeconds": 30,
 										"secureOutput": false,
 										"secureInput": false
 									},
@@ -871,7 +875,7 @@
 							"policy": {
 								"timeout": "0.00:01:00",
 								"retry": 2,
-								"retryIntervalInSeconds": 5,
+								"retryIntervalInSeconds": 30,
 								"secureOutput": false,
 								"secureInput": false
 							},
@@ -954,6 +958,10 @@
 						]
 					}
 				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkerRunId",
@@ -1207,7 +1215,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[cumulus.control].[GetWorkerDetailsWrapper]",
+						"sqlReaderStoredProcedureName": "[cumulus.control].[GetWorkerPipelineDetailsv2]",
 						"storedProcedureParameters": {
 							"ExecutionId": {
 								"type": "Guid",
@@ -1252,6 +1260,10 @@
 						]
 					}
 				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
 					"variableName": "WorkerCoreDetails",
