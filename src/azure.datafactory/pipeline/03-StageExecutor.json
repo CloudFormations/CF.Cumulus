@@ -75,7 +75,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "04-Infant",
+									"referenceName": "04-PipelineExecutor",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
