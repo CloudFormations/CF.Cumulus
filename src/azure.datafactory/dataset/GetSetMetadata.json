@@ -3,11 +3,11 @@
 	"properties": {
 		"description": "Single generic dataset used to get and set all database metadata.",
 		"linkedServiceName": {
-			"referenceName": "SupportDatabase",
+			"referenceName": "cumulusdatabase",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
-			"name": "_ProcFwk"
+			"name": "Cumulus"
 		},
 		"annotations": [
 			"procfwk"

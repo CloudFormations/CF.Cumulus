@@ -11,10 +11,10 @@
 */
 
 --data
-:r .\LogData\ExecutionLogBackup.sql
-:r .\LogData\ErrorLogBackup.sql
+--:r .\LogData\ExecutionLogBackup.sql
+--:r .\LogData\ErrorLogBackup.sql
 
 --delete all
-:r .\Metadata\DropLegacyTables.sql
-:r .\Metadata\DropLegacyObjects.sql
-:r .\Metadata\DeleteAll.sql
+--:r .\Metadata\DropLegacyTables.sql
+--:r .\Metadata\DropLegacyObjects.sql
+--:r .\Metadata\DeleteAll.sql

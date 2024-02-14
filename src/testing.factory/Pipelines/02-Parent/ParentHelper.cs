@@ -127,7 +127,7 @@ namespace FactoryTesting.Pipelines.Parent
 
         public ParentHelper WithBatchExecutionHandling()
         {
-            ExecuteNonQuery(@$"UPDATE [procfwk].[Properties] 
+            ExecuteNonQuery(@$"UPDATE [control].[Properties] 
 SET [PropertyValue] = '1' 
 WHERE [PropertyName] = 'UseExecutionBatches'");
             return this;
@@ -135,7 +135,7 @@ WHERE [PropertyName] = 'UseExecutionBatches'");
 
         public ParentHelper WithoutBatchExecutionHandling()
         {
-            ExecuteNonQuery(@$"UPDATE [procfwk].[Properties] 
+            ExecuteNonQuery(@$"UPDATE [control].[Properties] 
 SET [PropertyValue] = '0' 
 WHERE [PropertyName] = 'UseExecutionBatches'");
             return this;
@@ -143,7 +143,7 @@ WHERE [PropertyName] = 'UseExecutionBatches'");
 
         public ParentHelper WithFailureHandling(string mode)
         {
-            ExecuteNonQuery(@$"UPDATE [procfwk].[Properties] 
+            ExecuteNonQuery(@$"UPDATE [control].[Properties] 
 SET [PropertyValue] = '{mode}' 
 WHERE [PropertyName] = 'FailureHandling'");
             return this;
@@ -152,7 +152,7 @@ WHERE [PropertyName] = 'FailureHandling'");
         public ParentHelper WithCancelledWorkersBlock(bool mode)
         {
             string modeString = mode ? "1" : "0";
-            ExecuteNonQuery(@$"UPDATE [procfwk].[Properties] 
+            ExecuteNonQuery(@$"UPDATE [control].[Properties] 
 SET [PropertyValue] = '{modeString}' 
 WHERE [PropertyName] = 'CancelledWorkerResultBlocks'");
             return this;
@@ -160,7 +160,7 @@ WHERE [PropertyName] = 'CancelledWorkerResultBlocks'");
         public ParentHelper WithOverideRestart(bool mode)
         {
             string modeString = mode ? "1" : "0";
-            ExecuteNonQuery(@$"UPDATE [procfwk].[Properties] 
+            ExecuteNonQuery(@$"UPDATE [control].[Properties] 
 SET [PropertyValue] = '{modeString}' 
 WHERE [PropertyName] = 'OverideRestart'");
             return this;
@@ -168,7 +168,7 @@ WHERE [PropertyName] = 'OverideRestart'");
 
         public ParentHelper WithoutPrecursorObject()
         {
-            ExecuteNonQuery(@$"UPDATE [procfwk].[Properties] 
+            ExecuteNonQuery(@$"UPDATE [control].[Properties] 
 SET [PropertyValue] = '[dbo].[none]' 
 WHERE [PropertyName] = 'ExecutionPrecursorProc'");
             return this;
@@ -176,14 +176,14 @@ WHERE [PropertyName] = 'ExecutionPrecursorProc'");
 
         public ParentHelper WithPrecursorObject()
         {
-            ExecuteNonQuery(@$"UPDATE [procfwk].[Properties] 
+            ExecuteNonQuery(@$"UPDATE [control].[Properties] 
 SET [PropertyValue] = '[dbo].[ExampleCustomExecutionPrecursor]' 
 WHERE [PropertyName] = 'ExecutionPrecursorProc'");
             return this;
         }
         public ParentHelper WithSingleExecutionStage()
         {
-            ExecuteNonQuery("UPDATE [procfwk].[Pipelines] SET [StageId] = 1");
+            ExecuteNonQuery("UPDATE [control].[Pipelines] SET [StageId] = 1");
             return this;
         }
 
@@ -195,7 +195,7 @@ WHERE [PropertyName] = 'ExecutionPrecursorProc'");
         }
         private ParentHelper SetFalsePipelineStatus(string falseStatus, string where, string equals)
         {
-            ExecuteNonQuery($"UPDATE [procfwk].[CurrentExecution] SET [PipelineStatus] = '{falseStatus}' WHERE {where} = '{equals.Replace("'", "''")}'");
+            ExecuteNonQuery($"UPDATE [control].[CurrentExecution] SET [PipelineStatus] = '{falseStatus}' WHERE {where} = '{equals.Replace("'", "''")}'");
             return this;
         }
 
@@ -220,17 +220,17 @@ WHERE [PropertyName] = 'ExecutionPrecursorProc'");
         private void EnableDisableMetadata(string table, bool state)
         {
             string paramValue = state ? "true" : "false";
-            ExecuteNonQuery(@$"UPDATE [procfwk].[{table}] SET [Enabled] = '{paramValue}'");
+            ExecuteNonQuery(@$"UPDATE [control].[{table}] SET [Enabled] = '{paramValue}'");
         }
 
         private void EnableDisableMetadata(string table, bool state, string where, string equals)
         {
             string paramValue = state ? "true" : "false";
-            ExecuteNonQuery(@$"UPDATE [procfwk].[{table}] SET [Enabled] = '{paramValue}' WHERE {where} = '{equals.Replace("'", "''")}'");
+            ExecuteNonQuery(@$"UPDATE [control].[{table}] SET [Enabled] = '{paramValue}' WHERE {where} = '{equals.Replace("'", "''")}'");
         }
         private void SetParameterValue(string value, string where, string equals)
         {
-            string sqlStatement = @$"UPDATE [procfwk].[PipelineParameters] SET [ParameterValue] = '{value.Replace("'", "''")}' WHERE {where} = '{equals.Replace("'", "''")}'";
+            string sqlStatement = @$"UPDATE [control].[PipelineParameters] SET [ParameterValue] = '{value.Replace("'", "''")}' WHERE {where} = '{equals.Replace("'", "''")}'";
             ExecuteNonQuery(sqlStatement);
         }
 
@@ -239,8 +239,8 @@ WHERE [PropertyName] = 'ExecutionPrecursorProc'");
             string paramValue = simulate ? "true" : "false";
             ExecuteNonQuery(@$"UPDATE pp 
 SET [ParameterValue] = '{paramValue}' 
-FROM [procfwk].[PipelineParameters] pp 
-  INNER JOIN  [procfwk].[Pipelines] p ON pp.[PipelineId] = p.[PipelineId] 
+FROM [control].[PipelineParameters] pp 
+  INNER JOIN  [control].[Pipelines] p ON pp.[PipelineId] = p.[PipelineId] 
 WHERE p.[PipelineName] = 'Intentional Error' AND pp.[ParameterName] = 'RaiseErrors'");
         }
 
