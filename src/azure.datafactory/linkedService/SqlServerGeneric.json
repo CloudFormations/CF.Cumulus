@@ -1,0 +1,32 @@
+{
+	"name": "SqlServerGeneric",
+	"properties": {
+		"parameters": {
+			"ServerName": {
+				"type": "string"
+			},
+			"DatabaseName": {
+				"type": "string"
+			},
+			"UserName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Data Source=@{linkedService().ServerName};Initial Catalog=@{linkedService().DatabaseName};User ID=@{linkedService().UserName}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().ServerName",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
