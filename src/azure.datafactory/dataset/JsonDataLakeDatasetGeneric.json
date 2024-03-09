@@ -1,5 +1,5 @@
 {
-	"name": "BinaryDataLakeDatasetGeneric",
+	"name": "JsonDataLakeDatasetGeneric",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorageGeneric",
@@ -29,7 +29,7 @@
 			"name": "Ingest"
 		},
 		"annotations": [],
-		"type": "Binary",
+		"type": "Json",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
@@ -46,6 +46,7 @@
 					"type": "Expression"
 				}
 			}
-		}
+		},
+		"schema": {}
 	}
 }

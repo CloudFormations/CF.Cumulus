@@ -1,5 +1,5 @@
 {
-	"name": "BinaryDataLakeDatasetGeneric",
+	"name": "ParquetDataLakeDatasetGeneric",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "AzureDataLakeStorageGeneric",
@@ -29,7 +29,7 @@
 			"name": "Ingest"
 		},
 		"annotations": [],
-		"type": "Binary",
+		"type": "Parquet",
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
@@ -45,7 +45,9 @@
 					"value": "@dataset().FileSystem",
 					"type": "Expression"
 				}
-			}
-		}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
 	}
 }
