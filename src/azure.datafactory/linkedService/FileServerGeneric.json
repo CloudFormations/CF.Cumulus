@@ -1,0 +1,30 @@
+{
+	"name": "FileServerGeneric",
+	"properties": {
+		"parameters": {
+			"Host": {
+				"type": "string"
+			},
+			"UserName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "FileServer",
+		"typeProperties": {
+			"host": "@{linkedService().Host}",
+			"userId": "@{linkedService().UserName}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().UserName",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
