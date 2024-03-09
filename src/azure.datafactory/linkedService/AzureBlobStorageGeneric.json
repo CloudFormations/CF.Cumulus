@@ -1,0 +1,15 @@
+{
+	"name": "AzureBlobStorageGeneric",
+	"properties": {
+		"parameters": {
+			"AccountName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "@{concat('https://',linkedService().AccountName,'.dfs.core.windows.net/')}"
+		}
+	}
+}
