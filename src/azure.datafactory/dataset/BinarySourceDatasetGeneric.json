@@ -1,5 +1,5 @@
 {
-	"name": "BinaryDatasetGeneric",
+	"name": "BinarySourceDatasetGeneric",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "FileServerGeneric",

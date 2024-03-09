@@ -1,5 +1,5 @@
 {
-	"name": "JsonDatasetGeneric",
+	"name": "JsonSourceDatasetGeneric",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "FileServerGeneric",

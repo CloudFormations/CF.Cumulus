@@ -1,5 +1,5 @@
 {
-	"name": "ParquetDatasetGeneric",
+	"name": "ParquetSourceDatasetGeneric",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "FileServerGeneric",
