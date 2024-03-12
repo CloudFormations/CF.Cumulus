@@ -8,8 +8,15 @@
 				"description": "Call Cumulus.Control",
 				"type": "ExecutePipeline",
 				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
+					"pipeline": {
+						"referenceName": "02-BatchExecutor",
+						"type": "PipelineReference"
+					},
 					"waitOnCompletion": true
 				}
 			}
