@@ -3,10 +3,12 @@
 	"properties": {
 		"parameters": {
 			"Host": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "C:\\SourceData\\"
 			},
 			"UserName": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": "azure_vm_admin"
 			}
 		},
 		"annotations": [],
@@ -25,6 +27,10 @@
 					"type": "Expression"
 				}
 			}
+		},
+		"connectVia": {
+			"referenceName": "datasourceVM02",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
