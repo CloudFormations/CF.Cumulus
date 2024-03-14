@@ -9,6 +9,10 @@
 			"UserName": {
 				"type": "string",
 				"defaultValue": "azure_vm_admin"
+			},
+			"Password": {
+				"type": "string",
+				"defaultValue": "vmadminpassword"
 			}
 		},
 		"annotations": [],
@@ -23,7 +27,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"secretName": {
-					"value": "@linkedService().UserName",
+					"value": "@linkedService().Password",
 					"type": "Expression"
 				}
 			}
