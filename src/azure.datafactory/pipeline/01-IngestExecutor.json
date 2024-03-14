@@ -85,11 +85,11 @@
 							"Host": "C:",
 							"UserName": "azure_vm_admin",
 							"Directory": {
-								"value": "@activity('Get Ingest Payload').output['CompleteSource']",
+								"value": "@activity('Get Ingest Payload').output.CompleteSource",
 								"type": "Expression"
 							},
 							"FileName": {
-								"value": "@activity('Get Ingest Payload').output['SourceName']",
+								"value": "@activity('Get Ingest Payload').output.SourceName",
 								"type": "Expression"
 							},
 							"Password": "vmadminpassword"
@@ -103,11 +103,11 @@
 						"parameters": {
 							"FileSystem": "raw",
 							"Directory": {
-								"value": "@activity('Get Ingest Payload').output['CompleteSource']",
+								"value": "@activity('Get Ingest Payload').output.CompleteSource",
 								"type": "Expression"
 							},
 							"FileName": {
-								"value": "@activity('Get Ingest Payload').output['SourceName']",
+								"value": "@activity('Get Ingest Payload').output.SourceName",
 								"type": "Expression"
 							},
 							"AccountName": "cumulusframeworkdev"
