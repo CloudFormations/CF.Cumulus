@@ -256,7 +256,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@bool(equals(pipeline().parameters.runDate,''))",
+						"value": "@bool(equals(pipeline().parameters.runDateTime,' '))",
 						"type": "Expression"
 					},
 					"ifTrueActivities": [
@@ -282,8 +282,9 @@
 			}
 		],
 		"parameters": {
-			"runDate": {
-				"type": "string"
+			"runDateTime": {
+				"type": "string",
+				"defaultValue": " "
 			}
 		},
 		"variables": {
