@@ -39,11 +39,17 @@
 				}
 			},
 			{
-				"name": "Copy Binary VM02_copy1",
+				"name": "Copy Binary VM02",
 				"type": "Copy",
 				"dependsOn": [
 					{
-						"activity": "Get Ingest Payload",
+						"activity": "Set Folder DateTime Hierarchy",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "If FileServer",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -82,14 +88,17 @@
 						"referenceName": "BinarySourceDatasetGeneric",
 						"type": "DatasetReference",
 						"parameters": {
-							"Host": "C:",
+							"Host": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+								"type": "Expression"
+							},
 							"UserName": "azure_vm_admin",
 							"Directory": {
-								"value": "@activity('Get Ingest Payload').output.CompleteSource",
+								"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
 								"type": "Expression"
 							},
 							"FileName": {
-								"value": "@activity('Get Ingest Payload').output.SourceName",
+								"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
 								"type": "Expression"
 							},
 							"Password": "vmadminpassword"
@@ -103,19 +112,61 @@
 						"parameters": {
 							"FileSystem": "raw",
 							"Directory": {
-								"value": "@activity('Get Ingest Payload').output.CompleteSource",
+								"value": "@concat(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'/',activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'/Version=',activity('Get Ingest Payload').output.firstRow.VersionNumber,'/',variables('DateTimeHierarchy'))",
 								"type": "Expression"
 							},
 							"FileName": {
-								"value": "@activity('Get Ingest Payload').output.SourceName",
+								"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
 								"type": "Expression"
 							},
 							"AccountName": "cumulusframeworkdev"
 						}
 					}
 				]
+			},
+			{
+				"name": "Set Folder DateTime Hierarchy",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DateTimeHierarchy",
+					"value": {
+						"value": "@formatDateTime(pipeline().TriggerTime, 'YEAR=yyyy/\\MONT\\H=MM/DAY=dd')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "If FileServer",
+				"description": "True if LS = FileServer",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@bool(equals(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'DataSourcesVM02'))",
+						"type": "Expression"
+					}
+				}
 			}
 		],
+		"variables": {
+			"DateTimeHierarchy": {
+				"type": "String"
+			}
+		},
 		"folder": {
 			"name": "Cumulus.Ingest"
 		},
