@@ -5,6 +5,8 @@
 			{
 				"name": "Get Ingest Payload",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -39,26 +41,11 @@
 				}
 			},
 			{
-				"name": "Set Folder DateTime Hierarchy",
-				"type": "SetVariable",
-				"dependsOn": [],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "DateTimeHierarchy",
-					"value": {
-						"value": "@formatDateTime(pipeline().TriggerTime, 'YEAR=yyyy/\\MONT\\H=MM/DAY=dd')",
-						"type": "Expression"
-					}
-				}
-			},
-			{
 				"name": "If FileServer",
 				"description": "True if LS = FileServer",
 				"type": "IfCondition",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Get Ingest Payload",
@@ -78,6 +65,8 @@
 			{
 				"name": "Switch dataset types for DataSourceVM02",
 				"type": "Switch",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "If FileServer",
@@ -259,8 +248,44 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "If runDate Specified",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@bool(equals(pipeline().parameters.runDate,''))",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Set Folder DateTime Hierarchy_copy1",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "DateTimeHierarchy",
+								"value": {
+									"value": "@formatDateTime(pipeline().TriggerTime, '\\ye\\ar=yyyy/\\mon\\t\\h=MM/\\d\\a\\y=dd')",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
 			}
 		],
+		"parameters": {
+			"runDate": {
+				"type": "string"
+			}
+		},
 		"variables": {
 			"DateTimeHierarchy": {
 				"type": "String"
