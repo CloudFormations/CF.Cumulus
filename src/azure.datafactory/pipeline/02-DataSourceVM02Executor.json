@@ -1,0 +1,197 @@
+{
+	"name": "02-DataSourceVM02Executor",
+	"properties": {
+		"activities": [
+			{
+				"name": "Switch dataset types for DataSourceVM02",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@pipeline().parameters.Payload.ExtensionType",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "binary",
+							"activities": [
+								{
+									"name": "Copy Binary VM02",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "FileServerReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "BinarySourceDatasetGeneric",
+											"type": "DatasetReference",
+											"parameters": {
+												"Host": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+													"type": "Expression"
+												},
+												"UserName": "azure_vm_admin",
+												"Directory": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+													"type": "Expression"
+												},
+												"FileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+													"type": "Expression"
+												},
+												"Password": "vmadminpassword"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "BinaryDataLakeDatasetGeneric",
+											"type": "DatasetReference",
+											"parameters": {
+												"FileSystem": "raw",
+												"Directory": {
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'/',activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'/Version=',activity('Get Ingest Payload').output.firstRow.VersionNumber,'/',variables('DateTimeHierarchy'))",
+													"type": "Expression"
+												},
+												"FileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+													"type": "Expression"
+												},
+												"AccountName": "cumulusframeworkdev"
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"value": "parquet",
+							"activities": [
+								{
+									"name": "Copy Parquet VM02",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "ParquetSource",
+											"storeSettings": {
+												"type": "FileServerReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											},
+											"formatSettings": {
+												"type": "ParquetReadSettings"
+											}
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "ParquetSourceDatasetGeneric",
+											"type": "DatasetReference",
+											"parameters": {
+												"Host": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+													"type": "Expression"
+												},
+												"UserName": "azure_vm_admin",
+												"Directory": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+													"type": "Expression"
+												},
+												"FileName": "vmadminpassword"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ParquetDataLakeDatasetGeneric",
+											"type": "DatasetReference",
+											"parameters": {
+												"FileSystem": "raw",
+												"Directory": {
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'/',activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'/Version=',activity('Get Ingest Payload').output.firstRow.VersionNumber,'/',variables('DateTimeHierarchy'))",
+													"type": "Expression"
+												},
+												"FileName": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+												"AccountName": "cumulusframeworkdev"
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"value": "json"
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"DateTimeHierarchy": {
+				"type": "string"
+			},
+			"Payload": {
+				"type": "object"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Ingest"
+		},
+		"annotations": []
+	}
+}
