@@ -58,12 +58,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@activity('Get Ingest Payload').output.firstRow.IntegrationRuntimeName",
+						"value": "@activity('Get Ingest Payload').output.firstRow.LinkedServiceName",
 						"type": "Expression"
 					},
 					"cases": [
 						{
-							"value": "FileServerGeneric",
+							"value": "DataSourcesVM02",
 							"activities": [
 								{
 									"name": "DataSourcesVM02 Executor",
