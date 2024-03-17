@@ -58,7 +58,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@activity('Get Ingest Payload').output.firstRow.LinkedServiceName",
+						"value": "@activity('Get Ingest Payload').output.firstRow.IntegrationRuntimeName",
 						"type": "Expression"
 					},
 					"cases": [
