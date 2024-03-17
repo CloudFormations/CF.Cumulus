@@ -21,11 +21,17 @@
 						"storedProcedureParameters": {
 							"DatasetId": {
 								"type": "Int16",
-								"value": "5"
+								"value": {
+									"value": "@pipeline().parameters.datasetId",
+									"type": "Expression"
+								}
 							},
 							"Incremental": {
 								"type": "Int16",
-								"value": "0"
+								"value": {
+									"value": "@pipeline().parameters.incrementalLoad",
+									"type": "Expression"
+								}
 							}
 						},
 						"queryTimeout": "02:00:00",
@@ -128,6 +134,14 @@
 			"runDateTime": {
 				"type": "string",
 				"defaultValue": " "
+			},
+			"datasetId": {
+				"type": "int",
+				"defaultValue": 4
+			},
+			"incrementalLoad": {
+				"type": "bool",
+				"defaultValue": "0"
 			}
 		},
 		"variables": {
