@@ -54,10 +54,13 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"Host": {
-													"value": "@pipeline().parameters.Payload.CompleteSource",
+													"value": "@pipeline().parameters.Payload.SourceLocation",
 													"type": "Expression"
 												},
-												"UserName": "azure_vm_admin",
+												"UserName": {
+													"value": "@pipeline().parameters.Payload.AkvUserName",
+													"type": "Expression"
+												},
 												"Directory": {
 													"value": "@pipeline().parameters.Payload.CompleteSource",
 													"type": "Expression"
@@ -66,7 +69,10 @@
 													"value": "@pipeline().parameters.Payload.SourceName",
 													"type": "Expression"
 												},
-												"Password": "vmadminpassword"
+												"Password": {
+													"value": "@pipeline().parameters.Payload.AkvPasswordName",
+													"type": "Expression"
+												}
 											}
 										}
 									],
