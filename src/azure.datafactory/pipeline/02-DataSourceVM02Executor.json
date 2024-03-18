@@ -54,7 +54,7 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"Host": {
-													"value": "@pipeline().parameters.Payload.SourceLocation",
+													"value": "@pipeline().parameters.Payload.CompleteSource",
 													"type": "Expression"
 												},
 												"UserName": {
