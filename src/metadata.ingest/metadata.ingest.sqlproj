@@ -58,8 +58,19 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Security" />
+    <Folder Include="ingest" />
+    <Folder Include="ingest\Tables" />
+    <Folder Include="ingest\Views" />
+    <Folder Include="ingest\Stored Procedures" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Security\ingest.sql" />
+    <Build Include="ingest\Tables\Attributes.sql" />
+    <Build Include="ingest\Tables\Connections.sql" />
+    <Build Include="ingest\Tables\ConnectionTypes.sql" />
+    <Build Include="ingest\Tables\Datasets.sql" />
+    <Build Include="ingest\Views\DatasetsLatestVersion.sql" />
+    <Build Include="ingest\Views\Payload.sql" />
+    <Build Include="ingest\Stored Procedures\PayloadProcedure.sql" />
   </ItemGroup>
 </Project>
