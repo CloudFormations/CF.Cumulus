@@ -3,23 +3,23 @@
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
-			"Location": {
+			"LSHostName": {
 				"type": "string"
 			},
-			"DatabaseName": {
+			"LSDatabaseName": {
 				"type": "string"
 			},
-			"Username": {
+			"LSUsername": {
 				"type": "string"
 			},
-			"Password": {
+			"LSPassword": {
 				"type": "string"
 			}
 		},
 		"annotations": [],
 		"type": "SqlServer",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Data Source=@{linkedService().Location};Initial Catalog=@{linkedService().DatabaseName};User ID=@{linkedService().Username};Password=@{linkedService().Password}"
+			"connectionString": "Integrated Security=False;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
 		}
 	}
 }
