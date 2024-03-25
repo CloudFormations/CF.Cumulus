@@ -2,17 +2,17 @@
 	"name": "Ingest_LS_SQLDB_MIAuth",
 	"properties": {
 		"parameters": {
-			"Location": {
+			"LSHostName": {
 				"type": "string"
 			},
-			"DatabaseName": {
+			"LSDatabaseName": {
 				"type": "string"
 			}
 		},
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().Location};Initial Catalog=@{linkedService().DatabaseName}"
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
 		}
 	}
 }
