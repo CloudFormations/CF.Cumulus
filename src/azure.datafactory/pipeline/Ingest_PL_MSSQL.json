@@ -362,8 +362,7 @@
 		],
 		"parameters": {
 			"DatasetId": {
-				"type": "int",
-				"defaultValue": 10
+				"type": "int"
 			},
 			"RunDateTime": {
 				"type": "string",
