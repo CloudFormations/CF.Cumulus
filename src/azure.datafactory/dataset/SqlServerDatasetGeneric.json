@@ -16,6 +16,10 @@
 				"UserName": {
 					"value": "@dataset().UserName",
 					"type": "Expression"
+				},
+				"Password": {
+					"value": "@dataset().Password",
+					"type": "Expression"
 				}
 			}
 		},
@@ -28,6 +32,15 @@
 			},
 			"UserName": {
 				"type": "string"
+			},
+			"Password": {
+				"type": "string"
+			},
+			"SchemaName": {
+				"type": "string"
+			},
+			"TableName": {
+				"type": "string"
 			}
 		},
 		"folder": {
@@ -35,6 +48,16 @@
 		},
 		"annotations": [],
 		"type": "SqlServerTable",
-		"schema": []
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@dataset().SchemaName",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@dataset().TableName",
+				"type": "Expression"
+			}
+		}
 	}
 }
