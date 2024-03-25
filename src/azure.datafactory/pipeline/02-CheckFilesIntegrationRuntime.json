@@ -1,70 +1,15 @@
 {
-	"name": "01-IngestExecutor",
+	"name": "02-CheckFilesIntegrationRuntime",
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Ingest Payload",
-				"type": "Lookup",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[ingest].[PayloadProcedure]",
-						"storedProcedureParameters": {
-							"DatasetId": {
-								"type": "Int16",
-								"value": {
-									"value": "@pipeline().parameters.datasetId",
-									"type": "Expression"
-								}
-							},
-							"Incremental": {
-								"type": "Int16",
-								"value": {
-									"value": "@pipeline().parameters.incrementalLoad",
-									"type": "Expression"
-								}
-							}
-						},
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"dataset": {
-						"referenceName": "GetSetMetadata",
-						"type": "DatasetReference"
-					},
-					"firstRowOnly": true
-				}
-			},
-			{
 				"name": "Switch Integration Runtimes",
 				"type": "Switch",
-				"dependsOn": [
-					{
-						"activity": "If runDate Specified",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Get Ingest Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@activity('Get Ingest Payload').output.firstRow.IntegrationRuntimeName",
+						"value": "@pipeline().parameters.Payload.IntegrationRuntimeName",
 						"type": "Expression"
 					},
 					"cases": [
@@ -81,7 +26,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "02-DataSourceVM02Executor",
+											"referenceName": "03-FilesExecutor-DataSourceVM02",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -91,7 +36,7 @@
 												"type": "Expression"
 											},
 											"Payload": {
-												"value": "@activity('Get Ingest Payload').output.firstRow",
+												"value": "@pipeline().parameters.Payload",
 												"type": "Expression"
 											}
 										}
@@ -101,51 +46,14 @@
 						}
 					]
 				}
-			},
-			{
-				"name": "If runDate Specified",
-				"type": "IfCondition",
-				"dependsOn": [],
-				"userProperties": [],
-				"typeProperties": {
-					"expression": {
-						"value": "@bool(equals(pipeline().parameters.runDateTime,' '))",
-						"type": "Expression"
-					},
-					"ifTrueActivities": [
-						{
-							"name": "Set Folder DateTime Hierarchy_copy1",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "DateTimeHierarchy",
-								"value": {
-									"value": "@formatDateTime(pipeline().TriggerTime, '\\ye\\ar=yyyy/\\mon\\t\\h=MM/\\d\\a\\y=dd')",
-									"type": "Expression"
-								}
-							}
-						}
-					]
-				}
 			}
 		],
 		"parameters": {
-			"runDateTime": {
-				"type": "string",
-				"defaultValue": " "
+			"Payload": {
+				"type": "object"
 			},
-			"datasetId": {
-				"type": "int",
-				"defaultValue": 1
-			},
-			"incrementalLoad": {
-				"type": "int",
-				"defaultValue": 0
+			"IncrementalLoad": {
+				"type": "int"
 			}
 		},
 		"variables": {

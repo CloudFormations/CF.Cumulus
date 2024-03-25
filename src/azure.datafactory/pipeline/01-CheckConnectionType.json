@@ -1,0 +1,223 @@
+{
+	"name": "01-CheckConnectionType",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Ingest Payload",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[ingest].[PayloadProcedure]",
+						"storedProcedureParameters": {
+							"DatasetId": {
+								"type": "Int16",
+								"value": {
+									"value": "@pipeline().parameters.datasetId",
+									"type": "Expression"
+								}
+							},
+							"Incremental": {
+								"type": "Int16",
+								"value": {
+									"value": "@pipeline().parameters.incrementalLoad",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "GetSetMetadata",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "If runDate Specified",
+				"type": "IfCondition",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@bool(equals(pipeline().parameters.runDateTime,' '))",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Set Folder DateTime Hierarchy",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "DateTimeHierarchy",
+								"value": {
+									"value": "@formatDateTime(pipeline().TriggerTime, '\\ye\\ar=yyyy/\\mon\\t\\h=MM/\\d\\a\\y=dd')",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Switch Connection Types",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "If runDate Specified",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionTypeDisplayName",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "SQL Server",
+							"activities": [
+								{
+									"name": "Execute SQL Server Pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "02-SqlServerExecutor",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Payload": {
+												"value": "@activity('Get Ingest Payload').output.firstRow",
+												"type": "Expression"
+											},
+											"DateTimeHierarchy": {
+												"value": "@pipeline().parameters.runDateTime",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "Oracle",
+							"activities": [
+								{
+									"name": "Execute Oracle Pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "02-OracleExecutor",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Payload": {
+												"value": "@activity('Get Ingest Payload').output.firstRow",
+												"type": "Expression"
+											},
+											"DateTimeHierarchy": {
+												"value": "@pipeline().parameters.runDateTime",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "Files",
+							"activities": [
+								{
+									"name": "Execute Files Pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "02-CheckFilesIntegrationRuntime",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Payload": {
+												"value": "@activity('Get Ingest Payload').output.firstRow",
+												"type": "Expression"
+											},
+											"IncrementalLoad": {
+												"value": "@pipeline().parameters.runDateTime",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"runDateTime": {
+				"type": "string",
+				"defaultValue": " "
+			},
+			"datasetId": {
+				"type": "int",
+				"defaultValue": 1
+			},
+			"incrementalLoad": {
+				"type": "int",
+				"defaultValue": 0
+			}
+		},
+		"variables": {
+			"DateTimeHierarchy": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Ingest"
+		},
+		"annotations": []
+	}
+}
