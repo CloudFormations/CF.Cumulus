@@ -52,8 +52,8 @@
 			"Payload": {
 				"type": "object"
 			},
-			"IncrementalLoad": {
-				"type": "int"
+			"DateTimeHierarchy": {
+				"type": "string"
 			}
 		},
 		"variables": {

@@ -122,7 +122,11 @@
 												"type": "Expression"
 											},
 											"DateTimeHierarchy": {
-												"value": "@pipeline().parameters.runDateTime",
+												"value": "@variables('DateTimeHierarchy')",
+												"type": "Expression"
+											},
+											"IncrementalLoad": {
+												"value": "@pipeline().parameters.incrementalLoad",
 												"type": "Expression"
 											}
 										}
@@ -153,7 +157,11 @@
 												"type": "Expression"
 											},
 											"DateTimeHierarchy": {
-												"value": "@pipeline().parameters.runDateTime",
+												"value": "@variables('DateTimeHierarchy')",
+												"type": "Expression"
+											},
+											"IncrementalLoad": {
+												"value": "@pipeline().parameters.incrementalLoad",
 												"type": "Expression"
 											}
 										}
@@ -183,8 +191,8 @@
 												"value": "@activity('Get Ingest Payload').output.firstRow",
 												"type": "Expression"
 											},
-											"IncrementalLoad": {
-												"value": "@pipeline().parameters.runDateTime",
+											"DateTimeHierarchy": {
+												"value": "@variables('DateTimeHierarchy')",
 												"type": "Expression"
 											}
 										}

@@ -101,6 +101,9 @@
 			},
 			"DateTimeHierarchy": {
 				"type": "string"
+			},
+			"IncrementalLoad": {
+				"type": "int"
 			}
 		},
 		"folder": {
