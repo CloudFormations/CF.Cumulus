@@ -32,7 +32,7 @@
 										"waitOnCompletion": true,
 										"parameters": {
 											"DateTimeHierarchy": {
-												"value": "@variables('DateTimeHierarchy')",
+												"value": "@pipeline().parameters.DateTimeHierarchy",
 												"type": "Expression"
 											},
 											"Payload": {
