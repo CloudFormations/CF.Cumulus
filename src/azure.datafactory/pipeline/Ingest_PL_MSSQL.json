@@ -296,7 +296,7 @@
 									"typeProperties": {
 										"method": "GET",
 										"url": {
-											"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
 											"type": "Expression"
 										},
 										"authentication": {
