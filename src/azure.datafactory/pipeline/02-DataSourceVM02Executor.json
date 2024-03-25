@@ -192,6 +192,94 @@
 									]
 								}
 							]
+						},
+						{
+							"value": "oraclesql",
+							"activities": [
+								{
+									"name": "Copy Oracle Data VM02",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "OracleSource",
+											"partitionOption": "None",
+											"queryTimeout": "02:00:00"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "OracleSourceDatasetGeneric",
+											"type": "DatasetReference",
+											"parameters": {
+												"SchemaName": {
+													"value": "@pipeline().parameters.Payload.sourcePath",
+													"type": "Expression"
+												},
+												"TableName": {
+													"value": "@pipeline().parameters.Payload.sourceName",
+													"type": "Expression"
+												},
+												"Host": "10.0.0.5",
+												"Port": "1521",
+												"SID": "oratest1",
+												"UserName": {
+													"value": "@pipeline().parameters.Payload.AkvUserName",
+													"type": "Expression"
+												},
+												"Password": {
+													"value": "@pipeline().parameters.Payload.AkvPasswordName",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "ParquetDataLakeDatasetGeneric",
+											"type": "DatasetReference",
+											"parameters": {
+												"FileSystem": "raw",
+												"Directory": {
+													"value": "@concat(pipeline().parameters.Payload.LinkedServiceName,'/',pipeline().parameters.Payload.DatasetDisplayName,'/Version=',pipeline().parameters.Payload.VersionNumber,'/',pipeline().parameters.DateTimeHierarchy)",
+													"type": "Expression"
+												},
+												"FileName": {
+													"value": "@pipeline().parameters.Payload.SourceName",
+													"type": "Expression"
+												},
+												"AccountName": "cumulusframeworkdev"
+											}
+										}
+									]
+								}
+							]
 						}
 					]
 				}
