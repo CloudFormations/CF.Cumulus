@@ -56,11 +56,6 @@
 				"type": "string"
 			}
 		},
-		"variables": {
-			"DateTimeHierarchy": {
-				"type": "String"
-			}
-		},
 		"folder": {
 			"name": "Cumulus.Ingest"
 		},
