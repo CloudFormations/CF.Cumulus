@@ -176,7 +176,7 @@
 													"type": "Expression"
 												},
 												"DSDirectoryName": {
-													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
+													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
 													"type": "Expression"
 												},
 												"DSFileName": {
