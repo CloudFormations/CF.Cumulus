@@ -6,7 +6,7 @@
 			"type": "LinkedServiceReference",
 			"parameters": {
 				"StorageName": {
-					"value": "@dataset().DataLakeName",
+					"value": "@dataset().DSStorageName",
 					"type": "Expression"
 				}
 			}
@@ -31,15 +31,15 @@
 			"location": {
 				"type": "AzureBlobFSLocation",
 				"fileName": {
-					"value": "@dataset().FileName",
+					"value": "@dataset().DSFileName",
 					"type": "Expression"
 				},
 				"folderPath": {
-					"value": "@dataset().DirectoryName",
+					"value": "@dataset().DSDirectoryName",
 					"type": "Expression"
 				},
 				"fileSystem": {
-					"value": "@dataset().ContainerName",
+					"value": "@dataset().DSContainerName",
 					"type": "Expression"
 				}
 			},
