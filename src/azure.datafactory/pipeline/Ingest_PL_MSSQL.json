@@ -121,7 +121,7 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderQuery": {
-												"value": "@activity('Get Ingest Payload').output.firstRow.TargetQuery",
+												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 												"type": "Expression"
 											},
 											"queryTimeout": "02:00:00",
