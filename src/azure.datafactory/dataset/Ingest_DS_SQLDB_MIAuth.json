@@ -3,7 +3,25 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "Ingest_LS_SQLDB_MIAuth",
-			"type": "LinkedServiceReference"
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Location": {
+					"value": "@dataset().Hostname",
+					"type": "Expression"
+				},
+				"Name": {
+					"value": "@dataset().DatabaseName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"Hostname": {
+				"type": "string"
+			},
+			"DatabaseName": {
+				"type": "string"
+			}
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
