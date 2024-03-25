@@ -3,109 +3,6 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Copy SQL Server Data VM02",
-				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "Get Ingest Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Set Target Path",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "SqlServerSource",
-						"queryTimeout": "02:00:00",
-						"partitionOption": "None"
-					},
-					"sink": {
-						"type": "ParquetSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "ParquetWriteSettings"
-						}
-					},
-					"enableStaging": false,
-					"translator": {
-						"type": "TabularTranslator",
-						"typeConversion": true,
-						"typeConversionSettings": {
-							"allowDataTruncation": true,
-							"treatBooleanAsNumber": false
-						}
-					}
-				},
-				"inputs": [
-					{
-						"referenceName": "SqlServerDatasetGeneric",
-						"type": "DatasetReference",
-						"parameters": {
-							"ServerName": {
-								"value": "@pipeline().parameters.Payload.ConnectionLocation",
-								"type": "Expression"
-							},
-							"DatabaseName": {
-								"value": "@pipeline().parameters.Payload.SourceLocation",
-								"type": "Expression"
-							},
-							"UserName": {
-								"value": "@pipeline().parameters.Payload.AkvUserName",
-								"type": "Expression"
-							},
-							"Password": {
-								"value": "@pipeline().parameters.Payload.AkvPasswordName",
-								"type": "Expression"
-							},
-							"SchemaName": {
-								"value": "@pipeline().parameters.Payload.SourcePath",
-								"type": "Expression"
-							},
-							"TableName": {
-								"value": "@pipeline().parameters.Payload.SourceName",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "ParquetDataLakeDatasetGeneric",
-						"type": "DatasetReference",
-						"parameters": {
-							"FileSystem": "raw",
-							"Directory": {
-								"value": "@concat(pipeline().parameters.Payload.ConnectionDisplayName,'/',pipeline().parameters.Payload.DatasetDisplayName,'/Version=',pipeline().parameters.Payload.VersionNumber,'/',pipeline().parameters.DateTimeHierarchy)",
-								"type": "Expression"
-							},
-							"FileName": {
-								"value": "@pipeline().parameters.Payload.SourceName",
-								"type": "Expression"
-							},
-							"AccountName": "cumulusframeworkdev"
-						}
-					}
-				]
-			},
-			{
 				"name": "Get Ingest Payload",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -190,6 +87,12 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
+					},
+					{
+						"activity": "Set Target Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
 				"userProperties": [],
@@ -217,15 +120,70 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('Get Ingest Payload').output.firstRow.TargetQuery",
+												"type": "Expression"
+											},
 											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},
-										"enableStaging": false
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
 									},
 									"inputs": [
 										{
 											"referenceName": "Ingest_DS_SQLDB_MIAuth",
-											"type": "DatasetReference"
+											"type": "DatasetReference",
+											"parameters": {
+												"Hostname": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"type": "Expression"
+												},
+												"DatabaseName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"DataLakeName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"ContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DirectoryName": {
+													"value": "@variables('TargetPath')",
+													"type": "Expression"
+												},
+												"FileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
+												}
+											}
 										}
 									]
 								}
