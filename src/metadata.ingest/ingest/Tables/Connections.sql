@@ -2,6 +2,8 @@ CREATE TABLE [ingest].[Connections](
 	[ConnectionId] [int] IDENTITY(1,1) NOT NULL,
 	[ConnectionTypeFK] [int] NOT NULL,
 	[ConnectionDisplayName] [nvarchar](50) NOT NULL,
+	[ConnectionLocation] [nvarchar](50) NULL,
+	[ConnectionPort] [nvarchar](50) NULL,
 	[SourceLocation] [nvarchar](100) NOT NULL,
 	[LinkedServiceName] [nvarchar](200) NOT NULL,
 	[IntegrationRuntimeName] [nvarchar](200) NOT NULL,

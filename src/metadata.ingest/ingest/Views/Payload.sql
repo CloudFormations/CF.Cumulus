@@ -1,4 +1,3 @@
-/****** Object:  View [ingest].[Payload]    Script Date: 3/19/2024 1:26:16 PM ******/
 CREATE VIEW [ingest].[Payload] AS 
 SELECT 
     CASE 
@@ -7,6 +6,9 @@ SELECT
         ELSE NULL
     END AS CompleteSource
     , c.SourceLocation
+    , c.ConnectionLocation
+    , c.ConnectionPort
+    , d.SourcePath
     , d.SourceName
     , ct.ConnectionTypeDisplayName
     , c.ConnectionDisplayName
@@ -36,4 +38,3 @@ AND
         OR d.VersionValidTo IS NULL
     )
 GO
-
