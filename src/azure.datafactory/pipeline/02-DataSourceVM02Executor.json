@@ -83,7 +83,7 @@
 											"parameters": {
 												"FileSystem": "raw",
 												"Directory": {
-													"value": "@concat(pipeline().parameters.Payload.LinkedServiceName,'/',pipeline().parameters.Payload.DatasetDisplayName,'/Version=',pipeline().parameters.Payload.VersionNumber,'/',pipeline().parameters.DateTimeHierarchy)",
+													"value": "@concat(pipeline().parameters.Payload.ConnectionDisplayName,'/',pipeline().parameters.Payload.DatasetDisplayName,'/Version=',pipeline().parameters.Payload.VersionNumber,'/',pipeline().parameters.DateTimeHierarchy)",
 													"type": "Expression"
 												},
 												"FileName": {
