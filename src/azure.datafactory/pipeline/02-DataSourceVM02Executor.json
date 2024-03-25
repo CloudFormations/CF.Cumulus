@@ -246,9 +246,18 @@
 													"value": "@pipeline().parameters.Payload.sourceName",
 													"type": "Expression"
 												},
-												"Host": "10.0.0.5",
-												"Port": "1521",
-												"SID": "oratest1",
+												"Host": {
+													"value": "@pipeline().parameters.Payload.ConnectionLocation",
+													"type": "Expression"
+												},
+												"Port": {
+													"value": "@pipeline().parameters.Payload.ConnectionPort",
+													"type": "Expression"
+												},
+												"SID": {
+													"value": "@pipeline().parameters.Payload.SourceLocation",
+													"type": "Expression"
+												},
 												"UserName": {
 													"value": "@pipeline().parameters.Payload.AkvUserName",
 													"type": "Expression"
@@ -326,7 +335,10 @@
 											"referenceName": "SqlServerDatasetGeneric",
 											"type": "DatasetReference",
 											"parameters": {
-												"ServerName": "cumulusDataSour",
+												"ServerName": {
+													"value": "@pipeline().parameters.Payload.ConnectionLocation",
+													"type": "Expression"
+												},
 												"DatabaseName": {
 													"value": "@pipeline().parameters.Payload.SourceLocation",
 													"type": "Expression"
