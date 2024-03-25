@@ -151,11 +151,11 @@
 											"referenceName": "Ingest_DS_SQLDB_MIAuth",
 											"type": "DatasetReference",
 											"parameters": {
-												"Hostname": {
+												"DSHostname": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 													"type": "Expression"
 												},
-												"DatabaseName": {
+												"DSDatabaseName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
 													"type": "Expression"
 												}
@@ -167,19 +167,19 @@
 											"referenceName": "Ingest_DS_DataLake_Parquet",
 											"type": "DatasetReference",
 											"parameters": {
-												"DataLakeName": {
+												"DSStorageName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
 													"type": "Expression"
 												},
-												"ContainerName": {
+												"DSContainerName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
 													"type": "Expression"
 												},
-												"DirectoryName": {
+												"DSDirectoryName": {
 													"value": "@variables('TargetPath')",
 													"type": "Expression"
 												},
-												"FileName": {
+												"DSFileName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
 													"type": "Expression"
 												}
