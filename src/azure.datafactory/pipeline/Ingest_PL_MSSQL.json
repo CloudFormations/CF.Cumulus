@@ -106,7 +106,7 @@
 							"value": "SQLDB_MIAuth",
 							"activities": [
 								{
-									"name": "SQLDB MI Copy",
+									"name": "SQLDB MIAuth Copy",
 									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
@@ -186,6 +186,116 @@
 											}
 										}
 									]
+								}
+							]
+						},
+						{
+							"value": "SQLDB_SQLAuth",
+							"activities": [
+								{
+									"name": "SQLDB SQLAuth Copy",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Fetch SQL Auth Password",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_SQLDB_SQLAuth",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSHostName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"type": "Expression"
+												},
+												"DSDatabaseName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+													"type": "Expression"
+												},
+												"DSUsername": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSStorageName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Fetch SQL Auth Password",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
 								}
 							]
 						}
