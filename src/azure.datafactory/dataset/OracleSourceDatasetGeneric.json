@@ -5,9 +5,18 @@
 			"referenceName": "OracleGeneric",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"Host": "10.0.0.5",
-				"Port": "1521",
-				"SID": "oratest1",
+				"Host": {
+					"value": "@dataset().Host",
+					"type": "Expression"
+				},
+				"Port": {
+					"value": "@dataset().Port",
+					"type": "Expression"
+				},
+				"SID": {
+					"value": "@dataset().SID",
+					"type": "Expression"
+				},
 				"UserName": {
 					"value": "@dataset().UserName",
 					"type": "Expression"
