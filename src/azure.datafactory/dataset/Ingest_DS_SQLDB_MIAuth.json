@@ -1,0 +1,12 @@
+{
+	"name": "Ingest_DS_SQLDB_MIAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_SQLDB_MIAuth",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}
