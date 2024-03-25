@@ -1,0 +1,61 @@
+{
+	"name": "OracleSourceDatasetGeneric",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "OracleGeneric",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"Host": "10.0.0.5",
+				"Port": "1521",
+				"SID": "oratest1",
+				"UserName": {
+					"value": "@dataset().UserName",
+					"type": "Expression"
+				},
+				"Password": {
+					"value": "@dataset().Password",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"SchemaName": {
+				"type": "string"
+			},
+			"TableName": {
+				"type": "string"
+			},
+			"Host": {
+				"type": "string"
+			},
+			"Port": {
+				"type": "string"
+			},
+			"SID": {
+				"type": "string"
+			},
+			"UserName": {
+				"type": "string"
+			},
+			"Password": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": {
+				"value": "@toUpper(dataset().SchemaName)",
+				"type": "Expression"
+			},
+			"table": {
+				"value": "@toUpper(dataset().TableName)",
+				"type": "Expression"
+			}
+		}
+	}
+}
