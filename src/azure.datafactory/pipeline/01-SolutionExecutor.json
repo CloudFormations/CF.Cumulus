@@ -17,7 +17,13 @@
 						"referenceName": "02-BatchExecutor",
 						"type": "PipelineReference"
 					},
-					"waitOnCompletion": true
+					"waitOnCompletion": true,
+					"parameters": {
+						"BatchName": {
+							"value": "@pipeline().parameters.BatchName",
+							"type": "Expression"
+						}
+					}
 				}
 			}
 		],
