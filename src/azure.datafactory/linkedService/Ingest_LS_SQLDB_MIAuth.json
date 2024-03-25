@@ -5,14 +5,14 @@
 			"Location": {
 				"type": "string"
 			},
-			"Name": {
+			"DatabaseName": {
 				"type": "string"
 			}
 		},
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().Location};Initial Catalog=@{linkedService().Name}"
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().Location};Initial Catalog=@{linkedService().DatabaseName}"
 		}
 	}
 }
