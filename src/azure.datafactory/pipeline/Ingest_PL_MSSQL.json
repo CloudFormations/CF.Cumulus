@@ -128,13 +128,6 @@
 									"value": "@pipeline().parameters.DatasetId",
 									"type": "Expression"
 								}
-							},
-							"PipelineName": {
-								"type": "String",
-								"value": {
-									"value": "@pipeline().Pipeline",
-									"type": "Expression"
-								}
 							}
 						},
 						"queryTimeout": "02:00:00",
