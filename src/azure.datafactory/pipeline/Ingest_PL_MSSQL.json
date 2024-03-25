@@ -214,6 +214,10 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzureSqlSource",
+											"sqlReaderQuery": {
+												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
 											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},
@@ -243,6 +247,10 @@
 												},
 												"DSUsername": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"type": "Expression"
+												},
+												"DSPassword": {
+													"value": "@activity('Fetch SQL Auth Password').output.value",
 													"type": "Expression"
 												}
 											}
