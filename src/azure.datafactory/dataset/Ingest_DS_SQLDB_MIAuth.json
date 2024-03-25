@@ -3,23 +3,13 @@
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "Ingest_LS_SQLDB_MIAuth",
-			"type": "LinkedServiceReference",
-			"parameters": {
-				"Location": {
-					"value": "@dataset().Hostname",
-					"type": "Expression"
-				},
-				"Name": {
-					"value": "@dataset().DatabaseName",
-					"type": "Expression"
-				}
-			}
+			"type": "LinkedServiceReference"
 		},
 		"parameters": {
-			"Hostname": {
+			"DSHostname": {
 				"type": "string"
 			},
-			"DatabaseName": {
+			"DSDatabaseName": {
 				"type": "string"
 			}
 		},
