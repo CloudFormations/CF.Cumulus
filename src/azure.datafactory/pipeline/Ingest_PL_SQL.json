@@ -1,5 +1,5 @@
 {
-	"name": "02-SqlServerExecutor_copy1",
+	"name": "Ingest_PL_SQL",
 	"properties": {
 		"activities": [
 			{
