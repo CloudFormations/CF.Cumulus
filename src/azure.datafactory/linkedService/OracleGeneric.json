@@ -1,0 +1,47 @@
+{
+	"name": "OracleGeneric",
+	"properties": {
+		"parameters": {
+			"Host": {
+				"type": "string",
+				"defaultValue": "10.0.0.5"
+			},
+			"Port": {
+				"type": "string",
+				"defaultValue": "1521"
+			},
+			"SID": {
+				"type": "string",
+				"defaultValue": "oratest1"
+			},
+			"UserName": {
+				"type": "string",
+				"defaultValue": "C##myusernew"
+			},
+			"Password": {
+				"type": "string",
+				"defaultValue": "oracleuserpassword"
+			}
+		},
+		"annotations": [],
+		"type": "Oracle",
+		"typeProperties": {
+			"connectionString": "host=@{linkedService().Host};port=@{linkedService().Port};sid=@{linkedService().SID};user id=@{linkedService().UserName}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().Password",
+					"type": "Expression"
+				}
+			}
+		},
+		"connectVia": {
+			"referenceName": "datasourceVM02",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
