@@ -1,0 +1,10 @@
+{
+	"name": "Ingest_LS_SQLDB",
+	"properties": {
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
+		}
+	}
+}
