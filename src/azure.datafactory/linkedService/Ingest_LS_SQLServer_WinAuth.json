@@ -19,7 +19,9 @@
 		"annotations": [],
 		"type": "SqlServer",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Data Source=@{linkedService().Location};Initial Catalog=@{linkedService().DatabaseName};User ID=@{linkedService().Username};Password=@{linkedService().Password}"
+			"connectionString": "Integrated Security=True;Data Source=@{linkedService().Location};Initial Catalog=@{linkedService().DatabaseName}",
+			"userName": "@{linkedService().Username}",
+			"password": "@{linkedService().Password}"
 		}
 	}
 }
