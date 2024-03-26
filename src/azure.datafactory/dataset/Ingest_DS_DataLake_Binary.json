@@ -18,9 +18,6 @@
 			"DSFileName": {
 				"type": "string"
 			},
-			"DSHostName": {
-				"type": "string"
-			},
 			"DSStorageName": {
 				"type": "string"
 			},
