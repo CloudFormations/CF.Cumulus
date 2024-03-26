@@ -918,8 +918,6 @@
 				"name": "Is Parent Already Running",
 				"description": "Establish before anything else if the parent pipeline is already running. Batch execution aware.",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
 				"policy": {
 					"secureInput": false
