@@ -143,10 +143,6 @@
 													}
 												}
 											],
-											"oracleReaderQuery": {
-												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
-												"type": "Expression"
-											},
 											"partitionOption": "None",
 											"convertDecimalToInteger": false,
 											"queryTimeout": "02:00:00"
