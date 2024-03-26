@@ -248,6 +248,22 @@
 									"typeProperties": {
 										"source": {
 											"type": "ParquetSource",
+											"additionalColumns": [
+												{
+													"name": "PipelineRunId",
+													"value": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "PipelineExecutionDateTime",
+													"value": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													}
+												}
+											],
 											"storeSettings": {
 												"type": "FileServerReadSettings",
 												"recursive": true
