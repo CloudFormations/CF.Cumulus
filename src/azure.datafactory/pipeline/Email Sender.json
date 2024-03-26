@@ -54,8 +54,10 @@
 			"name": "Cumulus.Utils"
 		},
 		"annotations": [
-			"procfwk",
-			"Utils"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control",
+			"Send Alerts"
 		]
 	}
 }
