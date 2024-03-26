@@ -3,7 +3,9 @@
 	"properties": {
 		"description": "Connection between ADF and processing framework metadata SQLDB.",
 		"annotations": [
-			"procfwk"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control"
 		],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
