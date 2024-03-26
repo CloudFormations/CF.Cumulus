@@ -3,7 +3,9 @@
 	"properties": {
 		"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
 		"annotations": [
-			"procfwk"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control"
 		],
 		"type": "AzureKeyVault",
 		"typeProperties": {
