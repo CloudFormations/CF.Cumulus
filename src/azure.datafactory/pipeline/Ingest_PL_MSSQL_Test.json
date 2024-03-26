@@ -568,7 +568,7 @@
 													"type": "Expression"
 												},
 												"DSPassword": {
-													"value": "@activity('Fetch SQL Auth Password').output.value",
+													"value": "@activity('Fetch SQL Login Auth Password').output.value",
 													"type": "Expression"
 												}
 											}
