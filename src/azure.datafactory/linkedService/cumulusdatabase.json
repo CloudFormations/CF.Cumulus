@@ -4,7 +4,7 @@
 		"description": "Connection between ADF and processing framework metadata SQLDB.",
 		"annotations": [
 			"Cloud Formations",
-			"Cumulus",
+			"CF.Cumulus",
 			"Control"
 		],
 		"type": "AzureSqlDatabase",
