@@ -1,0 +1,385 @@
+{
+	"name": "Ingest_PL_Files",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Ingest Payload",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[ingest].[GetDatasetPayload]",
+						"storedProcedureParameters": {
+							"DatasetId": {
+								"type": "Int16",
+								"value": {
+									"value": "@pipeline().parameters.DatasetId",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "GetSetMetadata",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "Set Run DateTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "LocalRunDateTime",
+					"value": {
+						"value": "@if(equals(pipeline().parameters.RunDateTime,' '),string(utcnow()),pipeline().parameters.RunDateTime)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Target Path",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Run DateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "TargetPath",
+					"value": {
+						"value": "@formatDateTime(variables('LocalRunDateTime'), '\\ye\\ar=yyyy/\\mon\\t\\h=MM/\\d\\a\\y=dd')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "File Type",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set Target Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@replace(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'Ingest_LS_','')",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "SQLDB_MIAuth",
+							"activities": [
+								{
+									"name": "SQLDB MIAuth Copy",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"additionalColumns": [
+												{
+													"name": "PipelineRunId",
+													"value": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "PipelineExecutionDateTime",
+													"value": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													}
+												}
+											],
+											"sqlReaderQuery": {
+												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"isolationLevel": "ReadCommitted",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_SQLDB_MIAuth",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSHostname": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"type": "Expression"
+												},
+												"DSDatabaseName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSStorageName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"value": "SQLDB_SQLAuth",
+							"activities": [
+								{
+									"name": "SQLDB SQLAuth Copy",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Fetch SQL Auth Password",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"additionalColumns": [
+												{
+													"name": "PipelineRunId",
+													"value": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "PipelineExecutionDateTime",
+													"value": {
+														"value": "@utcnow()",
+														"type": "Expression"
+													}
+												}
+											],
+											"sqlReaderQuery": {
+												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"queryTimeout": "02:00:00",
+											"isolationLevel": "ReadCommitted",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_SQLDB_SQLAuth",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSHostName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"type": "Expression"
+												},
+												"DSDatabaseName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+													"type": "Expression"
+												},
+												"DSUsername": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"type": "Expression"
+												},
+												"DSPassword": {
+													"value": "@activity('Fetch SQL Auth Password').output.value",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSStorageName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Fetch SQL Auth Password",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Supported Linked Service Type",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('The Linked Service type and authentication combination is not currently supported.')",
+									"type": "Expression"
+								},
+								"errorCode": "16"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"DatasetId": {
+				"type": "int"
+			},
+			"RunDateTime": {
+				"type": "string",
+				"defaultValue": " "
+			}
+		},
+		"variables": {
+			"LocalRunDateTime": {
+				"type": "String"
+			},
+			"TargetPath": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Ingest"
+		},
+		"annotations": []
+	}
+}
