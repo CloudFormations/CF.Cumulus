@@ -103,118 +103,14 @@
 					},
 					"cases": [
 						{
-							"value": "SQLDB_MIAuth",
+							"value": "Files_Binary",
 							"activities": [
 								{
-									"name": "SQLDB MIAuth Copy",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "AzureSqlSource",
-											"additionalColumns": [
-												{
-													"name": "PipelineRunId",
-													"value": {
-														"value": "@pipeline().RunId",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "PipelineExecutionDateTime",
-													"value": {
-														"value": "@utcnow()",
-														"type": "Expression"
-													}
-												}
-											],
-											"sqlReaderQuery": {
-												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"isolationLevel": "ReadCommitted",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "ParquetSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
-											},
-											"formatSettings": {
-												"type": "ParquetWriteSettings"
-											}
-										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
-									},
-									"inputs": [
-										{
-											"referenceName": "Ingest_DS_SQLDB_MIAuth",
-											"type": "DatasetReference",
-											"parameters": {
-												"DSHostname": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
-													"type": "Expression"
-												},
-												"DSDatabaseName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Ingest_DS_DataLake_Parquet",
-											"type": "DatasetReference",
-											"parameters": {
-												"DSStorageName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
-													"type": "Expression"
-												},
-												"DSContainerName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
-													"type": "Expression"
-												},
-												"DSDirectoryName": {
-													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
-													"type": "Expression"
-												},
-												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						},
-						{
-							"value": "SQLDB_SQLAuth",
-							"activities": [
-								{
-									"name": "SQLDB SQLAuth Copy",
+									"name": "Binary Files VM02 Copy",
 									"type": "Copy",
 									"dependsOn": [
 										{
-											"activity": "Fetch SQL Auth Password",
+											"activity": "Fetch Binary Files Auth Password",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -230,61 +126,47 @@
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "AzureSqlSource",
-											"additionalColumns": [
-												{
-													"name": "PipelineRunId",
-													"value": {
-														"value": "@pipeline().RunId",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "PipelineExecutionDateTime",
-													"value": {
-														"value": "@utcnow()",
-														"type": "Expression"
-													}
-												}
-											],
-											"sqlReaderQuery": {
-												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
-												"type": "Expression"
-											},
-											"queryTimeout": "02:00:00",
-											"isolationLevel": "ReadCommitted",
-											"partitionOption": "None"
-										},
-										"sink": {
-											"type": "ParquetSink",
+											"type": "BinarySource",
 											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
+												"type": "FileServerReadSettings",
+												"recursive": true
 											},
 											"formatSettings": {
-												"type": "ParquetWriteSettings"
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
 											}
 										},
 										"enableStaging": false
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_SQLDB_SQLAuth",
+											"referenceName": "Ingest_DS_Files_Binary",
 											"type": "DatasetReference",
 											"parameters": {
+												"DSDirectory": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+													"type": "Expression"
+												},
 												"DSHostName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 													"type": "Expression"
 												},
-												"DSDatabaseName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
-													"type": "Expression"
-												},
-												"DSUsername": {
+												"DSUserName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
 													"type": "Expression"
 												},
 												"DSPassword": {
-													"value": "@activity('Fetch SQL Auth Password').output.value",
+													"value": "@activity('Fetch Binary Files Auth Password').output.value",
 													"type": "Expression"
 												}
 											}
@@ -292,9 +174,17 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "Ingest_DS_DataLake_Parquet",
+											"referenceName": "Ingest_DS_DataLake_Binary",
 											"type": "DatasetReference",
 											"parameters": {
+												"DSDirectory": {
+													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
+												},
 												"DSStorageName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
 													"type": "Expression"
@@ -302,13 +192,126 @@
 												"DSContainerName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
 													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "Fetch Binary Files Auth Password",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "Files_parquet",
+							"activities": [
+								{
+									"name": "Parquet Files VM02 Copy",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Fetch Parquet Files Auth Password",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "ParquetSource",
+											"storeSettings": {
+												"type": "FileServerReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "ParquetReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_Files_Parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSHostName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"type": "Expression"
 												},
-												"DSDirectoryName": {
+												"DSUserName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"type": "Expression"
+												},
+												"DSDirectory": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+													"type": "Expression"
+												},
+												"DSPassword": {
+													"value": "@activity('Fetch Parquet Files Auth Password').output.value",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Binary",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSDirectory": {
 													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
 													"type": "Expression"
 												},
 												"DSFileName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
+												},
+												"DSStorageName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
 													"type": "Expression"
 												}
 											}
@@ -316,7 +319,7 @@
 									]
 								},
 								{
-									"name": "Fetch SQL Auth Password",
+									"name": "Fetch Parquet Files Auth Password",
 									"type": "WebActivity",
 									"dependsOn": [],
 									"policy": {
