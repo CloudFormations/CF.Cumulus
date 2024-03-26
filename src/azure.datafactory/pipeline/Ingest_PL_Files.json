@@ -224,7 +224,7 @@
 							]
 						},
 						{
-							"value": "Files_parquet",
+							"value": "Files_Parquet",
 							"activities": [
 								{
 									"name": "Parquet Files VM02 Copy",
