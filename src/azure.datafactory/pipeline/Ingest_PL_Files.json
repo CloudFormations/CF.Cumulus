@@ -150,7 +150,7 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"DSDirectory": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 													"type": "Expression"
 												},
 												"DSFileName": {
@@ -158,7 +158,7 @@
 													"type": "Expression"
 												},
 												"DSHostName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 													"type": "Expression"
 												},
 												"DSUserName": {
@@ -282,7 +282,7 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"DSHostName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 													"type": "Expression"
 												},
 												"DSUserName": {
@@ -290,7 +290,7 @@
 													"type": "Expression"
 												},
 												"DSDirectory": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.CompleteSource",
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 													"type": "Expression"
 												},
 												"DSFileName": {
