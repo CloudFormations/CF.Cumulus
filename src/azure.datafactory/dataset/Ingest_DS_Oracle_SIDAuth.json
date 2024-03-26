@@ -44,6 +44,9 @@
 				"type": "string"
 			}
 		},
+		"folder": {
+			"name": "Ingest"
+		},
 		"annotations": [],
 		"type": "OracleTable",
 		"schema": []

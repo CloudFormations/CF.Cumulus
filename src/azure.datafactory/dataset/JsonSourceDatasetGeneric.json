@@ -30,7 +30,7 @@
 			}
 		},
 		"folder": {
-			"name": "Ingest"
+			"name": "IngestOld"
 		},
 		"annotations": [],
 		"type": "Json",

@@ -37,6 +37,9 @@
 				"type": "string"
 			}
 		},
+		"folder": {
+			"name": "Ingest"
+		},
 		"annotations": [],
 		"type": "SqlServerTable",
 		"schema": []
