@@ -1,7 +1,7 @@
 {
 	"name": "01-SolutionExecutor",
 	"properties": {
-		"description": "procfwk grandparent pipeline used optionally to bootstrap any wider processes in your Data Factory that then calls the processing framework.",
+		"description": "CF.Cumulus pipeline used optionally to bootstrap any wider processes in your Data Factory that then calls the processing framework.",
 		"activities": [
 			{
 				"name": "Cumulus Default Batch",
@@ -37,8 +37,10 @@
 			"name": "Cumulus.Control"
 		},
 		"annotations": [
-			"procfwk",
-			"Grandparent"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control",
+			"Solution Executor"
 		]
 	}
 }
