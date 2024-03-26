@@ -257,13 +257,24 @@
 											}
 										},
 										"sink": {
-											"type": "BinarySink",
+											"type": "ParquetSink",
 											"storeSettings": {
 												"type": "AzureBlobFSWriteSettings",
 												"copyBehavior": "PreserveHierarchy"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
 											}
 										},
-										"enableStaging": false
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
 									},
 									"inputs": [
 										{
@@ -295,23 +306,23 @@
 									],
 									"outputs": [
 										{
-											"referenceName": "Ingest_DS_DataLake_Binary",
+											"referenceName": "Ingest_DS_DataLake_Parquet",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSDirectory": {
-													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
-													"type": "Expression"
-												},
-												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
-													"type": "Expression"
-												},
 												"DSStorageName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
 													"type": "Expression"
 												},
 												"DSContainerName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('TargetPath')\n    )",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
 													"type": "Expression"
 												}
 											}
