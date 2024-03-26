@@ -1,5 +1,5 @@
 {
-	"name": "Ingest_PL_MSSQL_Test",
+	"name": "Ingest_PL_MSSQL",
 	"properties": {
 		"activities": [
 			{
