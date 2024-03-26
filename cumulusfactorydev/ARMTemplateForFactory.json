@@ -7,17 +7,18 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "cumulusfactorydev"
 		},
-		"FrameworkFunctions_properties_typeProperties_functionAppUrl": {
-			"type": "string",
-			"defaultValue": "https://frameworksupportfunctions.azurewebsites.net"
+		"cumulusdatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'cumulusdatabase'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
 		},
-		"Keys_properties_typeProperties_baseUrl": {
+		"cumulusfunctions_properties_typeProperties_functionAppUrl": {
 			"type": "string",
-			"defaultValue": "https://FrameworkKeys.vault.azure.net/"
+			"defaultValue": "https://cumulusfunctionappdev.azurewebsites.net"
 		},
-		"SupportDatabase_properties_typeProperties_connectionString_secretName": {
+		"cumuluskeys_properties_typeProperties_baseUrl": {
 			"type": "string",
-			"defaultValue": "FrameworkMetadataDev"
+			"defaultValue": "https://cumuluskeysdev.vault.azure.net/"
 		}
 	},
 	"variables": {
@@ -25,21 +26,24 @@
 	},
 	"resources": [
 		{
-			"name": "[concat(parameters('factoryName'), '/01-Grandparent')]",
+			"name": "[concat(parameters('factoryName'), '/01-SolutionExecutor')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "procfwk grandparent pipeline used optionally to bootstrap any wider processes in your Data Factory that then calls the processing framework.",
+				"description": "CF.Cumulus pipeline used optionally to bootstrap any wider processes in your Data Factory that then calls the processing framework.",
 				"activities": [
 					{
-						"name": "procfwk",
-						"description": "Call procfwk",
+						"name": "Cumulus Default Batch",
+						"description": "Call Cumulus.Control",
 						"type": "ExecutePipeline",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
-								"referenceName": "02-Parent",
+								"referenceName": "02-BatchExecutor",
 								"type": "PipelineReference"
 							},
 							"waitOnCompletion": true,
@@ -62,23 +66,25 @@
 					}
 				},
 				"folder": {
-					"name": "_ProcFwk"
+					"name": "Cumulus.Control"
 				},
 				"annotations": [
-					"procfwk",
-					"Grandparent"
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control",
+					"Solution Executor"
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/02-Parent')]"
+				"[concat(variables('factoryId'), '/pipelines/02-BatchExecutor')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/02-Parent')]",
+			"name": "[concat(parameters('factoryName'), '/02-BatchExecutor')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "ADF.procfwk parent pipeline used to bootstrap the orchestration framework in perform the first level ForEach calls in sequence for the metadata stages.",
+				"description": "CF.Cumulus pipeline used to bootstrap the orchestration framework in perform the first level ForEach calls in sequence for the metadata stages.",
 				"activities": [
 					{
 						"name": "Get Stages",
@@ -103,7 +109,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[GetStages]",
+								"sqlReaderStoredProcedureName": "[[control].[GetStages]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"type": "Guid",
@@ -156,10 +162,13 @@
 											]
 										}
 									],
+									"policy": {
+										"secureInput": false
+									},
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "03-Child",
+											"referenceName": "03-StageExecutor",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -196,7 +205,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[procfwk].[SetLogStagePreparing]",
+										"storedProcedureName": "[[control].[SetLogStagePreparing]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -215,7 +224,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -233,7 +242,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[procfwk].[CheckForBlockedPipelines]",
+										"storedProcedureName": "[[control].[CheckForBlockedPipelines]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -252,7 +261,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -282,7 +291,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[ExecutionWrapper]",
+								"sqlReaderStoredProcedureName": "[[control].[ExecutionWrapper]",
 								"storedProcedureParameters": {
 									"CallingOrchestratorName": {
 										"type": "String",
@@ -330,7 +339,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[procfwk].[UpdateExecutionLog]",
+							"storedProcedureName": "[[control].[UpdateExecutionLog]",
 							"storedProcedureParameters": {
 								"PerformErrorCheck": {
 									"value": {
@@ -349,7 +358,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "SupportDatabase",
+							"referenceName": "cumulusdatabase",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -376,7 +385,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[CheckPreviousExeuction]",
+								"sqlReaderStoredProcedureName": "[[control].[CheckPreviousExeuction]",
 								"storedProcedureParameters": {
 									"BatchName": {
 										"type": "String",
@@ -439,7 +448,7 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzureSqlSource",
-											"sqlReaderStoredProcedureName": "[[procfwk].[GetWorkerAuthDetails]",
+											"sqlReaderStoredProcedureName": "[[control].[GetWorkerAuthDetails]",
 											"storedProcedureParameters": {
 												"ExecutionId": {
 													"type": "Guid",
@@ -486,7 +495,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[procfwk].[SetLogPipelineChecking]",
+										"storedProcedureName": "[[control].[SetLogPipelineChecking]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -512,7 +521,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -551,7 +560,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "FrameworkFunctions",
+										"referenceName": "cumulusfunctions",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -591,7 +600,7 @@
 														},
 														"userProperties": [],
 														"typeProperties": {
-															"storedProcedureName": "[[procfwk].[SetLogPipelineFailed]",
+															"storedProcedureName": "[[control].[SetLogPipelineFailed]",
 															"storedProcedureParameters": {
 																"ExecutionId": {
 																	"value": {
@@ -621,7 +630,7 @@
 															}
 														},
 														"linkedServiceName": {
-															"referenceName": "SupportDatabase",
+															"referenceName": "cumulusdatabase",
 															"type": "LinkedServiceReference"
 														}
 													}
@@ -644,7 +653,7 @@
 														},
 														"userProperties": [],
 														"typeProperties": {
-															"storedProcedureName": "[[procfwk].[SetLogPipelineSuccess]",
+															"storedProcedureName": "[[control].[SetLogPipelineSuccess]",
 															"storedProcedureParameters": {
 																"ExecutionId": {
 																	"value": {
@@ -670,7 +679,7 @@
 															}
 														},
 														"linkedServiceName": {
-															"referenceName": "SupportDatabase",
+															"referenceName": "cumulusdatabase",
 															"type": "LinkedServiceReference"
 														}
 													}
@@ -693,7 +702,7 @@
 														},
 														"userProperties": [],
 														"typeProperties": {
-															"storedProcedureName": "[[procfwk].[SetLogPipelineRunning]",
+															"storedProcedureName": "[[control].[SetLogPipelineRunning]",
 															"storedProcedureParameters": {
 																"ExecutionId": {
 																	"value": {
@@ -719,7 +728,7 @@
 															}
 														},
 														"linkedServiceName": {
-															"referenceName": "SupportDatabase",
+															"referenceName": "cumulusdatabase",
 															"type": "LinkedServiceReference"
 														}
 													}
@@ -742,7 +751,7 @@
 														},
 														"userProperties": [],
 														"typeProperties": {
-															"storedProcedureName": "[[procfwk].[SetLogPipelineRunning]",
+															"storedProcedureName": "[[control].[SetLogPipelineRunning]",
 															"storedProcedureParameters": {
 																"ExecutionId": {
 																	"value": {
@@ -768,7 +777,7 @@
 															}
 														},
 														"linkedServiceName": {
-															"referenceName": "SupportDatabase",
+															"referenceName": "cumulusdatabase",
 															"type": "LinkedServiceReference"
 														}
 													}
@@ -791,7 +800,7 @@
 														},
 														"userProperties": [],
 														"typeProperties": {
-															"storedProcedureName": "[[procfwk].[SetLogPipelineCancelled]",
+															"storedProcedureName": "[[control].[SetLogPipelineCancelled]",
 															"storedProcedureParameters": {
 																"ExecutionId": {
 																	"value": {
@@ -824,7 +833,7 @@
 															}
 														},
 														"linkedServiceName": {
-															"referenceName": "SupportDatabase",
+															"referenceName": "cumulusdatabase",
 															"type": "LinkedServiceReference"
 														}
 													}
@@ -846,7 +855,7 @@
 												},
 												"userProperties": [],
 												"typeProperties": {
-													"storedProcedureName": "[[procfwk].[SetLogPipelineUnknown]",
+													"storedProcedureName": "[[control].[SetLogPipelineUnknown]",
 													"storedProcedureParameters": {
 														"ExecutionId": {
 															"value": {
@@ -879,7 +888,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": "SupportDatabase",
+													"referenceName": "cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -907,7 +916,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[procfwk].[SetLogPipelineLastStatusCheck]",
+										"storedProcedureName": "[[control].[SetLogPipelineLastStatusCheck]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -933,7 +942,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -961,10 +970,10 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[procfwk].[ExecutePrecursorProcedure]"
+							"storedProcedureName": "[[control].[ExecutePrecursorProcedure]"
 						},
 						"linkedServiceName": {
-							"referenceName": "SupportDatabase",
+							"referenceName": "cumulusdatabase",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -997,7 +1006,12 @@
 						"name": "Is Parent Already Running",
 						"description": "Establish before anything else if the parent pipeline is already running. Batch execution aware.",
 						"type": "ExecutePipeline",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [],
+						"policy": {
+							"secureInput": false
+						},
 						"userProperties": [],
 						"typeProperties": {
 							"pipeline": {
@@ -1042,7 +1056,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[procfwk].[CheckMetadataIntegrity]",
+							"storedProcedureName": "[[control].[CheckMetadataIntegrity]",
 							"storedProcedureParameters": {
 								"BatchName": {
 									"value": {
@@ -1061,7 +1075,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "SupportDatabase",
+							"referenceName": "cumulusdatabase",
 							"type": "LinkedServiceReference"
 						}
 					}
@@ -1081,27 +1095,29 @@
 					}
 				},
 				"folder": {
-					"name": "_ProcFwk"
+					"name": "Cumulus.Control"
 				},
 				"annotations": [
-					"procfwk",
-					"Parent"
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control",
+					"Batch Executor"
 				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/GetSetMetadata')]",
-				"[concat(variables('factoryId'), '/linkedServices/SupportDatabase')]",
+				"[concat(variables('factoryId'), '/linkedServices/cumulusdatabase')]",
 				"[concat(variables('factoryId'), '/pipelines/Check For Running Pipeline')]",
-				"[concat(variables('factoryId'), '/pipelines/03-Child')]",
-				"[concat(variables('factoryId'), '/linkedServices/FrameworkFunctions')]"
+				"[concat(variables('factoryId'), '/pipelines/03-StageExecutor')]",
+				"[concat(variables('factoryId'), '/linkedServices/cumulusfunctions')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/03-Child')]",
+			"name": "[concat(parameters('factoryName'), '/03-StageExecutor')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "procfwk child pipeline used to execute Worker pipelines within a given execution stage. This pipeline will be called once for each stage, then execute all Workers in parallel.",
+				"description": "CF.Cumulus pipeline used to execute Worker pipelines within a given execution stage. This pipeline will be called once for each stage, then execute all Workers in parallel.",
 				"activities": [
 					{
 						"name": "Get Pipelines",
@@ -1119,7 +1135,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[GetPipelinesInStage]",
+								"sqlReaderStoredProcedureName": "[[control].[GetPipelinesInStage]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"type": "Guid",
@@ -1173,10 +1189,13 @@
 									"description": "Run the required worker pipeline and wait for its completion. Update metadata once done.",
 									"type": "ExecutePipeline",
 									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "04-Infant",
+											"referenceName": "04-PipelineExecutor",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -1212,24 +1231,26 @@
 					}
 				},
 				"folder": {
-					"name": "_ProcFwk"
+					"name": "Cumulus.Control"
 				},
 				"annotations": [
-					"procfwk",
-					"Child"
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control",
+					"Stage Executor"
 				]
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/GetSetMetadata')]",
-				"[concat(variables('factoryId'), '/pipelines/04-Infant')]"
+				"[concat(variables('factoryId'), '/pipelines/04-PipelineExecutor')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/04-Infant')]",
+			"name": "[concat(parameters('factoryName'), '/04-PipelineExecutor')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
 			"properties": {
-				"description": "procfwk infant pipeline used to check when the processing pipeline called by the Child completes and passes the resulting status back to the metadata database.",
+				"description": "CF.Cumulus pipeline used to check when the processing pipeline called by the Child completes and passes the resulting status back to the metadata database.",
 				"activities": [
 					{
 						"name": "Execute Worker Pipeline",
@@ -1258,16 +1279,16 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"functionName": "ExecutePipeline",
+							"functionName": "PipelineExecute",
 							"method": "POST",
 							"headers": {},
 							"body": {
-								"value": "@concat('\n{\n    \"tenantId\": \"',variables('WorkerCoreDetails')[0].tenantId,'\",\n    \"applicationId\": \"',variables('WorkerCoreDetails')[0].applicationId,'\",\n    \"authenticationKey\": \"',variables('WorkerCoreDetails')[0].authenticationKey,'\",\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\"',activity('Get Pipeline Params').output.firstRow.Params,'\n}')",
+								"value": "@concat('\n{\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\"',activity('Get Pipeline Params').output.firstRow.Params,'\n}')",
 								"type": "Expression"
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "FrameworkFunctions",
+							"referenceName": "cumulusfunctions",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -1287,7 +1308,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[GetPipelineParameters]",
+								"sqlReaderStoredProcedureName": "[[control].[GetPipelineParameters]",
 								"storedProcedureParameters": {
 									"PipelineId": {
 										"type": "Int32",
@@ -1328,7 +1349,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[procfwk].[SetLogPipelineRunning]",
+							"storedProcedureName": "[[control].[SetLogPipelineRunning]",
 							"storedProcedureParameters": {
 								"ExecutionId": {
 									"value": {
@@ -1354,7 +1375,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "SupportDatabase",
+							"referenceName": "cumulusdatabase",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -1379,7 +1400,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[procfwk].[SetLogActivityFailed]",
+							"storedProcedureName": "[[control].[SetLogActivityFailed]",
 							"storedProcedureParameters": {
 								"ExecutionId": {
 									"value": {
@@ -1409,7 +1430,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "SupportDatabase",
+							"referenceName": "cumulusdatabase",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -1434,7 +1455,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[procfwk].[SetLogPipelineRunId]",
+							"storedProcedureName": "[[control].[SetLogPipelineRunId]",
 							"storedProcedureParameters": {
 								"ExecutionId": {
 									"value": {
@@ -1467,7 +1488,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "SupportDatabase",
+							"referenceName": "cumulusdatabase",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -1475,6 +1496,8 @@
 						"name": "Check For Alerts",
 						"description": "Checks the properties tables and if any recipients in the database require alerts sending for the current pipeline ID.",
 						"type": "Lookup",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Update Run Id",
@@ -1500,7 +1523,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[CheckForEmailAlerts]",
+								"sqlReaderStoredProcedureName": "[[control].[CheckForEmailAlerts]",
 								"storedProcedureParameters": {
 									"PipelineId": {
 										"type": "Int32",
@@ -1525,6 +1548,8 @@
 						"name": "Send Alerts",
 						"description": "True = alerts need sending.\nFalse = do nothing.",
 						"type": "IfCondition",
+						"state": "Inactive",
+						"onInactiveMarkAs": "Succeeded",
 						"dependsOn": [
 							{
 								"activity": "Check For Alerts",
@@ -1556,7 +1581,7 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzureSqlSource",
-											"sqlReaderStoredProcedureName": "[[procfwk].[GetEmailAlertParts]",
+											"sqlReaderStoredProcedureName": "[[control].[GetEmailAlertParts]",
 											"storedProcedureParameters": {
 												"PipelineId": {
 													"type": "Int32",
@@ -1589,6 +1614,9 @@
 											]
 										}
 									],
+									"policy": {
+										"secureInput": false
+									},
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
@@ -1672,16 +1700,16 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"functionName": "CheckPipelineStatus",
+										"functionName": "PipelineGetStatus",
 										"method": "POST",
 										"headers": {},
 										"body": {
-											"value": "@concat('\n{\n    \"tenantId\": \"',variables('WorkerCoreDetails')[0].tenantId,'\",\n    \"applicationId\": \"',variables('WorkerCoreDetails')[0].applicationId,'\",\n    \"authenticationKey\": \"',variables('WorkerCoreDetails')[0].authenticationKey,'\",\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\",\n    \"runId\": \"',variables('WorkerRunId'),'\"\n}')",
+											"value": "@concat('\n{\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\",\n    \"runId\": \"',variables('WorkerRunId'),'\"\n}')",
 											"type": "Expression"
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "FrameworkFunctions",
+										"referenceName": "cumulusfunctions",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -1741,7 +1769,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[procfwk].[SetLogPipelineLastStatusCheck]",
+										"storedProcedureName": "[[control].[SetLogPipelineLastStatusCheck]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -1767,7 +1795,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -1792,7 +1820,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[procfwk].[SetLogActivityFailed]",
+										"storedProcedureName": "[[control].[SetLogActivityFailed]",
 										"storedProcedureParameters": {
 											"CallingActivity": {
 												"value": "GetWorkerPipelineStatus",
@@ -1822,7 +1850,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -1891,7 +1919,7 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
-												"storedProcedureName": "[[procfwk].[SetLogPipelineSuccess]",
+												"storedProcedureName": "[[control].[SetLogPipelineSuccess]",
 												"storedProcedureParameters": {
 													"ExecutionId": {
 														"value": {
@@ -1917,7 +1945,7 @@
 												}
 											},
 											"linkedServiceName": {
-												"referenceName": "SupportDatabase",
+												"referenceName": "cumulusdatabase",
 												"type": "LinkedServiceReference"
 											}
 										}
@@ -1940,7 +1968,7 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
-												"storedProcedureName": "[[procfwk].[SetLogPipelineFailed]",
+												"storedProcedureName": "[[control].[SetLogPipelineFailed]",
 												"storedProcedureParameters": {
 													"ExecutionId": {
 														"value": {
@@ -1973,7 +2001,7 @@
 												}
 											},
 											"linkedServiceName": {
-												"referenceName": "SupportDatabase",
+												"referenceName": "cumulusdatabase",
 												"type": "LinkedServiceReference"
 											}
 										},
@@ -1991,16 +2019,16 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
-												"functionName": "GetActivityErrors",
+												"functionName": "PipelineGetErrorDetails",
 												"method": "POST",
 												"headers": {},
 												"body": {
-													"value": "@concat('\n{\n    \"tenantId\": \"',variables('WorkerCoreDetails')[0].tenantId,'\",\n    \"applicationId\": \"',variables('WorkerCoreDetails')[0].applicationId,'\",\n    \"authenticationKey\": \"',variables('WorkerCoreDetails')[0].authenticationKey,'\",\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\",\n    \"runId\": \"',variables('WorkerRunId'),'\"\n}')",
+													"value": "@concat('\n{\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\",\n    \"runId\": \"',variables('WorkerRunId'),'\"\n}')",
 													"type": "Expression"
 												}
 											},
 											"linkedServiceName": {
-												"referenceName": "FrameworkFunctions",
+												"referenceName": "cumulusfunctions",
 												"type": "LinkedServiceReference"
 											}
 										},
@@ -2025,7 +2053,7 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
-												"storedProcedureName": "[[procfwk].[SetErrorLogDetails]",
+												"storedProcedureName": "[[control].[SetErrorLogDetails]",
 												"storedProcedureParameters": {
 													"JsonErrorDetails": {
 														"value": {
@@ -2044,7 +2072,7 @@
 												}
 											},
 											"linkedServiceName": {
-												"referenceName": "SupportDatabase",
+												"referenceName": "cumulusdatabase",
 												"type": "LinkedServiceReference"
 											}
 										}
@@ -2067,7 +2095,7 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
-												"storedProcedureName": "[[procfwk].[SetLogPipelineCancelled]",
+												"storedProcedureName": "[[control].[SetLogPipelineCancelled]",
 												"storedProcedureParameters": {
 													"ExecutionId": {
 														"value": {
@@ -2093,7 +2121,7 @@
 												}
 											},
 											"linkedServiceName": {
-												"referenceName": "SupportDatabase",
+												"referenceName": "cumulusdatabase",
 												"type": "LinkedServiceReference"
 											}
 										}
@@ -2115,7 +2143,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[procfwk].[SetLogPipelineUnknown]",
+										"storedProcedureName": "[[control].[SetLogPipelineUnknown]",
 										"storedProcedureParameters": {
 											"ExecutionId": {
 												"value": {
@@ -2141,7 +2169,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
 									}
 								}
@@ -2164,7 +2192,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[GetPropertyValue]",
+								"sqlReaderStoredProcedureName": "[[control].[GetPropertyValue]",
 								"storedProcedureParameters": {
 									"PropertyName": {
 										"type": "String",
@@ -2233,16 +2261,16 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"functionName": "ValidatePipeline",
+							"functionName": "PipelineValidate",
 							"method": "POST",
 							"headers": {},
 							"body": {
-								"value": "@concat('\n{\n    \"tenantId\": \"',variables('WorkerCoreDetails')[0].tenantId,'\",\n    \"applicationId\": \"',variables('WorkerCoreDetails')[0].applicationId,'\",\n    \"authenticationKey\": \"',variables('WorkerCoreDetails')[0].authenticationKey,'\",\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\"\n}')",
+								"value": "@concat('\n{\n    \"subscriptionId\": \"',variables('WorkerCoreDetails')[0].subscriptionId,'\",\n    \"resourceGroupName\": \"',variables('WorkerCoreDetails')[0].resourceGroupName,'\",\n\t\"orchestratorName\": \"',variables('WorkerCoreDetails')[0].orchestratorName,'\",\n    \"orchestratorType\": \"',variables('WorkerCoreDetails')[0].orchestratorType,'\",\n    \"pipelineName\": \"',variables('WorkerCoreDetails')[0].pipelineName,'\"\n}')",
 								"type": "Expression"
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "FrameworkFunctions",
+							"referenceName": "cumulusfunctions",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2266,26 +2294,6 @@
 							},
 							"ifFalseActivities": [
 								{
-									"name": "Throw Exception - Invalid Infant",
-									"description": "Throw an exception with details about the invalid worker pipeline name.",
-									"type": "ExecutePipeline",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"pipeline": {
-											"referenceName": "Throw Exception",
-											"type": "PipelineReference"
-										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"Message": {
-												"value": "@concat('Worker pipeline [',variables('WorkerCoreDetails')[0].pipelineName,'] is not valid in target Orchestrator [',variables('WorkerCoreDetails')[0].orchestratorName,']')",
-												"type": "Expression"
-											}
-										}
-									}
-								},
-								{
 									"name": "Update Execution With Invalid Worker",
 									"description": "Update the current execution table with an informed status for the worker pipeline that couldn't be executed.",
 									"type": "SqlServerStoredProcedure",
@@ -2299,7 +2307,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"storedProcedureName": "[[procfwk].[SetLogActivityFailed]",
+										"storedProcedureName": "[[control].[SetLogActivityFailed]",
 										"storedProcedureParameters": {
 											"CallingActivity": {
 												"value": "InvalidPipelineName",
@@ -2329,8 +2337,22 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "SupportDatabase",
+										"referenceName": "cumulusdatabase",
 										"type": "LinkedServiceReference"
+									}
+								},
+								{
+									"name": "Throw Exception - Invalid Worker",
+									"description": "Throw an exception with details about the invalid worker pipeline name.",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": {
+											"value": "@concat('Worker pipeline [',variables('WorkerCoreDetails')[0].pipelineName,'] is not valid in target Orchestrator [',variables('WorkerCoreDetails')[0].orchestratorName,']')",
+											"type": "Expression"
+										},
+										"errorCode": "16"
 									}
 								}
 							]
@@ -2357,7 +2379,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[procfwk].[SetLogActivityFailed]",
+							"storedProcedureName": "[[control].[SetLogActivityFailed]",
 							"storedProcedureParameters": {
 								"ExecutionId": {
 									"value": {
@@ -2387,7 +2409,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "SupportDatabase",
+							"referenceName": "cumulusdatabase",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2405,7 +2427,7 @@
 						},
 						"userProperties": [],
 						"typeProperties": {
-							"storedProcedureName": "[[procfwk].[SetLogPipelineValidating]",
+							"storedProcedureName": "[[control].[SetLogPipelineValidating]",
 							"storedProcedureParameters": {
 								"ExecutionId": {
 									"value": {
@@ -2431,7 +2453,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "SupportDatabase",
+							"referenceName": "cumulusdatabase",
 							"type": "LinkedServiceReference"
 						}
 					},
@@ -2451,7 +2473,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[GetWorkerDetailsWrapper]",
+								"sqlReaderStoredProcedureName": "[[control].[GetWorkerPipelineDetailsv2]",
 								"storedProcedureParameters": {
 									"ExecutionId": {
 										"type": "Guid",
@@ -2537,19 +2559,20 @@
 					}
 				},
 				"folder": {
-					"name": "_ProcFwk"
+					"name": "Cumulus.Control"
 				},
 				"annotations": [
-					"procfwk",
-					"Infant"
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control",
+					"Pipeline Executor"
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/FrameworkFunctions')]",
+				"[concat(variables('factoryId'), '/linkedServices/cumulusfunctions')]",
 				"[concat(variables('factoryId'), '/datasets/GetSetMetadata')]",
-				"[concat(variables('factoryId'), '/linkedServices/SupportDatabase')]",
-				"[concat(variables('factoryId'), '/pipelines/Email Sender')]",
-				"[concat(variables('factoryId'), '/pipelines/Throw Exception')]"
+				"[concat(variables('factoryId'), '/linkedServices/cumulusdatabase')]",
+				"[concat(variables('factoryId'), '/pipelines/Email Sender')]"
 			]
 		},
 		{
@@ -2599,7 +2622,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[GetFrameworkOrchestratorDetails]",
+								"sqlReaderStoredProcedureName": "[[control].[GetFrameworkOrchestratorDetails]",
 								"storedProcedureParameters": {
 									"CallingOrchestratorName": {
 										"type": "String",
@@ -2635,7 +2658,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[GetPropertyValue]",
+								"sqlReaderStoredProcedureName": "[[control].[GetPropertyValue]",
 								"storedProcedureParameters": {
 									"PropertyName": {
 										"type": "String",
@@ -2672,23 +2695,17 @@
 							},
 							"ifTrueActivities": [
 								{
-									"name": "Throw Exception - Pipeline Running",
-									"description": "Using the utils pipeline raise an exception to stop the new trigger while a run is already in progress.",
-									"type": "ExecutePipeline",
+									"name": "Throw Exception - Pipeline Already Running",
+									"description": "Raise an exception to stop the new trigger while a run is already in progress.",
+									"type": "Fail",
 									"dependsOn": [],
 									"userProperties": [],
 									"typeProperties": {
-										"pipeline": {
-											"referenceName": "Throw Exception",
-											"type": "PipelineReference"
+										"message": {
+											"value": "@concat('Provided pipeline name (',pipeline().parameters.PipelineName,') still has a run in progress or queued given the query range parameters set in the properties table.')",
+											"type": "Expression"
 										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"Message": {
-												"value": "@concat('Provided pipeline name (',pipeline().parameters.PipelineName,') still has a run in progress or queued given the query range parameters set in the properties table.')",
-												"type": "Expression"
-											}
-										}
+										"errorCode": "16"
 									}
 								}
 							]
@@ -2710,7 +2727,7 @@
 						"typeProperties": {
 							"source": {
 								"type": "AzureSqlSource",
-								"sqlReaderStoredProcedureName": "[[procfwk].[GetPropertyValue]",
+								"sqlReaderStoredProcedureName": "[[control].[GetPropertyValue]",
 								"storedProcedureParameters": {
 									"PropertyName": {
 										"type": "String",
@@ -2946,12 +2963,12 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
+												"method": "GET",
+												"headers": {},
 												"url": {
 													"value": "https://management.azure.com/subscriptions/@{variables('SubscriptionId')}/resourceGroups/@{variables('ResourceGroupName')}/providers/Microsoft.DataFactory/factories/@{pipeline().DataFactory}/pipelines/@{pipeline().parameters.PipelineName}?api-version=2018-06-01",
 													"type": "Expression"
 												},
-												"method": "GET",
-												"headers": {},
 												"authentication": {
 													"type": "MSI",
 													"resource": "https://management.core.windows.net/"
@@ -2979,12 +2996,12 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
+												"method": "POST",
+												"headers": {},
 												"url": {
 													"value": "https://management.azure.com/subscriptions/@{variables('SubscriptionId')}/resourceGroups/@{variables('ResourceGroupName')}/providers/Microsoft.DataFactory/factories/@{pipeline().DataFactory}/queryPipelineRuns?api-version=2018-06-01",
 													"type": "Expression"
 												},
-												"method": "POST",
-												"headers": {},
 												"body": {
 													"value": "{\n  \"lastUpdatedAfter\": \"@{adddays(utcnow(),int(variables('QueryRunDays')))}\",\n  \"lastUpdatedBefore\": \"@{utcnow()}\",\n  \"filters\": [\n    {\n      \"operand\": \"PipelineName\",\n      \"operator\": \"Equals\",\n      \"values\": [\n        \"@{pipeline().parameters.PipelineName}\"\n      ]\n    }\n  ]\n}",
 													"type": "Expression"
@@ -3039,12 +3056,12 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
+												"method": "GET",
+												"headers": {},
 												"url": {
 													"value": "https://@{pipeline().DataFactory}.dev.azuresynapse.net/pipelines/@{pipeline().parameters.PipelineName}?api-version=2019-06-01-preview",
 													"type": "Expression"
 												},
-												"method": "GET",
-												"headers": {},
 												"authentication": {
 													"type": "MSI",
 													"resource": "https://management.core.windows.net/"
@@ -3072,12 +3089,12 @@
 											},
 											"userProperties": [],
 											"typeProperties": {
+												"method": "POST",
+												"headers": {},
 												"url": {
 													"value": "https://@{pipeline().DataFactory}.dev.azuresynapse.net/queryPipelineRuns?api-version=2019-06-01-preview",
 													"type": "Expression"
 												},
-												"method": "POST",
-												"headers": {},
 												"body": {
 													"value": "{\n  \"lastUpdatedAfter\": \"@{adddays(utcnow(),int(variables('QueryRunDays')))}\",\n  \"lastUpdatedBefore\": \"@{utcnow()}\",\n  \"filters\": [\n    {\n      \"operand\": \"PipelineName\",\n      \"operator\": \"Equals\",\n      \"values\": [\n        \"@{pipeline().parameters.PipelineName}\"\n      ]\n    }\n  ]\n}",
 													"type": "Expression"
@@ -3118,20 +3135,17 @@
 							],
 							"defaultActivities": [
 								{
-									"name": "Throw Exception Invalid Orchestrator Type",
+									"name": "Throw Exception - Invalid Orchestrator Type",
 									"description": "Throw exception if switch cases are not met.",
-									"type": "ExecutePipeline",
+									"type": "Fail",
 									"dependsOn": [],
 									"userProperties": [],
 									"typeProperties": {
-										"pipeline": {
-											"referenceName": "Throw Exception",
-											"type": "PipelineReference"
+										"message": {
+											"value": "@concat('Invalid orchestrator type provided. Unable to check pipeline running state.')",
+											"type": "Expression"
 										},
-										"waitOnCompletion": true,
-										"parameters": {
-											"Message": "Invalid orchestrator type provided. Unable to check pipeline running state."
-										}
+										"errorCode": "16"
 									}
 								}
 							]
@@ -3199,16 +3213,17 @@
 					}
 				},
 				"folder": {
-					"name": "_ProcFwk/_ProcFwkUtils"
+					"name": "Cumulus.Utils"
 				},
 				"annotations": [
-					"procfwk",
-					"Utils"
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control",
+					"Running Pipeline Check"
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/GetSetMetadata')]",
-				"[concat(variables('factoryId'), '/pipelines/Throw Exception')]"
+				"[concat(variables('factoryId'), '/datasets/GetSetMetadata')]"
 			]
 		},
 		{
@@ -3241,7 +3256,7 @@
 							}
 						},
 						"linkedServiceName": {
-							"referenceName": "FrameworkFunctions",
+							"referenceName": "cumulusfunctions",
 							"type": "LinkedServiceReference"
 						}
 					}
@@ -3270,564 +3285,18 @@
 					}
 				},
 				"folder": {
-					"name": "_ProcFwk/_ProcFwkUtils"
+					"name": "Cumulus.Utils"
 				},
 				"annotations": [
-					"procfwk",
-					"Utils"
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control",
+					"Send Alerts"
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/FrameworkFunctions')]"
+				"[concat(variables('factoryId'), '/linkedServices/cumulusfunctions')]"
 			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Intentional Error')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait1",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					},
-					{
-						"name": "Raise Errors or Not",
-						"description": "Framework development worker simulator.",
-						"type": "IfCondition",
-						"dependsOn": [
-							{
-								"activity": "Wait1",
-								"dependencyConditions": [
-									"Succeeded"
-								]
-							}
-						],
-						"userProperties": [],
-						"typeProperties": {
-							"expression": {
-								"value": "@equals(pipeline().parameters.RaiseErrors,'true')",
-								"type": "Expression"
-							},
-							"ifTrueActivities": [
-								{
-									"name": "Call Fail",
-									"type": "Fail",
-									"dependsOn": [],
-									"userProperties": [],
-									"typeProperties": {
-										"message": "Intentional Error",
-										"errorCode": "9000"
-									}
-								}
-							]
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"RaiseErrors": {
-						"type": "string",
-						"defaultValue": "false"
-					},
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Throw Exception')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Provide a simple way of throwing an exception within Data Factory using TSQL error handling.",
-				"activities": [
-					{
-						"name": "Raise Error Backup",
-						"description": "Using a SQL database to raise an error/exception but wrapped up as a data factory pipeline. Error message information exposed as a pipeline parameter.",
-						"type": "Lookup",
-						"dependsOn": [
-							{
-								"activity": "Raise Error",
-								"dependencyConditions": [
-									"Failed"
-								]
-							}
-						],
-						"policy": {
-							"timeout": "0.00:10:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"source": {
-								"type": "AzureSqlSource",
-								"sqlReaderQuery": {
-									"value": "RAISERROR('@{pipeline().parameters.Message}',16,1);",
-									"type": "Expression"
-								},
-								"queryTimeout": "02:00:00",
-								"partitionOption": "None"
-							},
-							"dataset": {
-								"referenceName": "GetSetMetadata",
-								"type": "DatasetReference",
-								"parameters": {}
-							},
-							"firstRowOnly": false
-						}
-					},
-					{
-						"name": "Raise Error",
-						"description": "Using newer native activity raise an error/exception but wrapped up as a data factory pipeline. Error message information exposed as a pipeline parameter.",
-						"type": "Fail",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"message": {
-								"value": "@pipeline().parameters.Message",
-								"type": "Expression"
-							},
-							"errorCode": "16"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"Message": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "_ProcFwk/_ProcFwkUtils"
-				},
-				"annotations": [
-					"procfwk",
-					"Utils"
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/GetSetMetadata')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 1')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait1",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					},
-					"Test": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 10')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait10",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 2')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait2",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 3')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait3",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 4')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait4",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 5')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait5",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 6')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait6",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 7')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait7",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 8')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait8",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 5
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Wait 9')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Used just so the procfwk has something to call during development.",
-				"activities": [
-					{
-						"name": "Wait9",
-						"description": "Framework development worker simulator.",
-						"type": "Wait",
-						"dependsOn": [],
-						"userProperties": [],
-						"typeProperties": {
-							"waitTimeInSeconds": {
-								"value": "@pipeline().parameters.WaitTime",
-								"type": "Expression"
-							}
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"WaitTime": {
-						"type": "int",
-						"defaultValue": 15
-					}
-				},
-				"folder": {
-					"name": "_Workers"
-				},
-				"annotations": [
-					"_ProcFwkWorker"
-				]
-			},
-			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/GetSetMetadata')]",
@@ -3836,90 +3305,89 @@
 			"properties": {
 				"description": "Single generic dataset used to get and set all database metadata.",
 				"linkedServiceName": {
-					"referenceName": "SupportDatabase",
+					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
-					"name": "_ProcFwk"
+					"name": "Cumulus"
 				},
 				"annotations": [
-					"procfwk"
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control"
 				],
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/SupportDatabase')]"
+				"[concat(variables('factoryId'), '/linkedServices/cumulusdatabase')]"
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/FrameworkFunctions')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level.",
-				"annotations": [
-					"procfwk"
-				],
-				"type": "AzureFunction",
-				"typeProperties": {
-					"functionAppUrl": "[parameters('FrameworkFunctions_properties_typeProperties_functionAppUrl')]",
-					"functionKey": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "Keys",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "FrameworkFunctionsKey"
-					},
-					"authentication": "Anonymous"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Keys')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Keys')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
-				"annotations": [
-					"procfwk"
-				],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('Keys_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SupportDatabase')]",
+			"name": "[concat(parameters('factoryName'), '/cumulusdatabase')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"description": "Connection between ADF and processing framework metadata SQLDB.",
 				"annotations": [
-					"procfwk"
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control"
 				],
 				"type": "AzureSqlDatabase",
 				"typeProperties": {
-					"connectionString": {
+					"connectionString": "[parameters('cumulusdatabase_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/cumulusfunctions')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level.",
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control"
+				],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('cumulusfunctions_properties_typeProperties_functionAppUrl')]",
+					"functionKey": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
-							"referenceName": "Keys",
+							"referenceName": "cumuluskeys",
 							"type": "LinkedServiceReference"
 						},
-						"secretName": "[parameters('SupportDatabase_properties_typeProperties_connectionString_secretName')]"
-					}
+						"secretName": "cumulusfunctionsKey"
+					},
+					"authentication": "Anonymous"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Keys')]"
+				"[concat(variables('factoryId'), '/linkedServices/cumuluskeys')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/cumuluskeys')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control"
+				],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('cumuluskeys_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/FunctionalTestingTrigger')]",
@@ -3931,15 +3399,7 @@
 					"procfwk"
 				],
 				"runtimeState": "Stopped",
-				"pipelines": [
-					{
-						"pipelineReference": {
-							"referenceName": "01-Grandparent",
-							"type": "PipelineReference"
-						},
-						"parameters": {}
-					}
-				],
+				"pipelines": [],
 				"type": "ScheduleTrigger",
 				"typeProperties": {
 					"recurrence": {
@@ -3947,28 +3407,6 @@
 						"interval": 2,
 						"startTime": "2020-04-06T15:00:00Z",
 						"timeZone": "UTC"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/pipelines/01-Grandparent')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AzureIR-UKSouth')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "Managed",
-				"typeProperties": {
-					"computeProperties": {
-						"location": "UK South",
-						"dataFlowProperties": {
-							"computeType": "General",
-							"coreCount": 8,
-							"timeToLive": 10,
-							"cleanup": false
-						}
 					}
 				}
 			},

@@ -5,14 +5,14 @@
 		"factoryName": {
 			"value": "cumulusfactorydev"
 		},
-		"FrameworkFunctions_properties_typeProperties_functionAppUrl": {
-			"value": "https://frameworksupportfunctions.azurewebsites.net"
+		"cumulusdatabase_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
 		},
-		"Keys_properties_typeProperties_baseUrl": {
-			"value": "https://FrameworkKeys.vault.azure.net/"
+		"cumulusfunctions_properties_typeProperties_functionAppUrl": {
+			"value": "https://cumulusfunctionappdev.azurewebsites.net"
 		},
-		"SupportDatabase_properties_typeProperties_connectionString_secretName": {
-			"value": "FrameworkMetadataDev"
+		"cumuluskeys_properties_typeProperties_baseUrl": {
+			"value": "https://cumuluskeysdev.vault.azure.net/"
 		}
 	}
 }
