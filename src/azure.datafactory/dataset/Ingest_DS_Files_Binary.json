@@ -1,0 +1,58 @@
+{
+	"name": "Ingest_DS_Files_Binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_FileServer_VM02",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSHostName": {
+					"value": "@dataset().DSHostName",
+					"type": "Expression"
+				},
+				"LSUserName": {
+					"value": "@dataset().DSUserName",
+					"type": "Expression"
+				},
+				"LSPassword": {
+					"value": "@dataset().DSPassword",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSDirectory": {
+				"type": "string"
+			},
+			"DSFileName": {
+				"type": "string"
+			},
+			"DSHostName": {
+				"type": "string"
+			},
+			"DSUserName": {
+				"type": "string"
+			},
+			"DSPassword": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": {
+					"value": "@dataset().DSFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().DSDirectory",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
