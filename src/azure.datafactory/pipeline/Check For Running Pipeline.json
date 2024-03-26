@@ -549,23 +549,17 @@
 					],
 					"defaultActivities": [
 						{
-							"name": "Throw Exception Invalid Orchestrator Type",
+							"name": "Throw Exception - Invalid Orchestrator Type",
 							"description": "Throw exception if switch cases are not met.",
-							"type": "ExecutePipeline",
+							"type": "Fail",
 							"dependsOn": [],
-							"policy": {
-								"secureInput": false
-							},
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "Throw Exception",
-									"type": "PipelineReference"
+								"message": {
+									"value": "@concat('Invalid orchestrator type provided. Unable to check pipeline running state.')",
+									"type": "Expression"
 								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"Message": "Invalid orchestrator type provided. Unable to check pipeline running state."
-								}
+								"errorCode": "16"
 							}
 						}
 					]
