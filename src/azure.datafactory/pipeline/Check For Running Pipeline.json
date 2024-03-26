@@ -114,26 +114,17 @@
 					},
 					"ifTrueActivities": [
 						{
-							"name": "Throw Exception - Pipeline Running",
-							"description": "Using the utils pipeline raise an exception to stop the new trigger while a run is already in progress.",
-							"type": "ExecutePipeline",
+							"name": "Throw Exception - Pipeline Already Running",
+							"description": "Raise an exception to stop the new trigger while a run is already in progress.",
+							"type": "Fail",
 							"dependsOn": [],
-							"policy": {
-								"secureInput": false
-							},
 							"userProperties": [],
 							"typeProperties": {
-								"pipeline": {
-									"referenceName": "Throw Exception",
-									"type": "PipelineReference"
+								"message": {
+									"value": "@concat('Provided pipeline name (',pipeline().parameters.PipelineName,') still has a run in progress or queued given the query range parameters set in the properties table.')",
+									"type": "Expression"
 								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"Message": {
-										"value": "@concat('Provided pipeline name (',pipeline().parameters.PipelineName,') still has a run in progress or queued given the query range parameters set in the properties table.')",
-										"type": "Expression"
-									}
-								}
+								"errorCode": "16"
 							}
 						}
 					]
