@@ -22,6 +22,10 @@
 			"connectionString": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}",
 			"userName": "@{linkedService().LSUsername}",
 			"password": "@{linkedService().LSPassword}"
+		},
+		"connectVia": {
+			"referenceName": "datasourceVM02",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
