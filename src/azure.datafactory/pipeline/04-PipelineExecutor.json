@@ -1,7 +1,7 @@
 {
 	"name": "04-PipelineExecutor",
 	"properties": {
-		"description": "procfwk infant pipeline used to check when the processing pipeline called by the Child completes and passes the resulting status back to the metadata database.",
+		"description": "CF.Cumulus pipeline used to check when the processing pipeline called by the Child completes and passes the resulting status back to the metadata database.",
 		"activities": [
 			{
 				"name": "Execute Worker Pipeline",
@@ -361,6 +361,9 @@
 									]
 								}
 							],
+							"policy": {
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
@@ -1038,6 +1041,9 @@
 							"description": "Throw an exception with details about the invalid worker pipeline name.",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
@@ -1304,8 +1310,10 @@
 			"name": "Cumulus.Control"
 		},
 		"annotations": [
-			"procfwk",
-			"Infant"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control",
+			"Pipeline Executor"
 		]
 	}
 }
