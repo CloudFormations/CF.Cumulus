@@ -126,7 +126,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "AzureSqlSource",
+											"type": "OracleSource",
 											"additionalColumns": [
 												{
 													"name": "PipelineRunId",
@@ -143,13 +143,13 @@
 													}
 												}
 											],
-											"sqlReaderQuery": {
+											"oracleReaderQuery": {
 												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 												"type": "Expression"
 											},
-											"queryTimeout": "02:00:00",
-											"isolationLevel": "ReadCommitted",
-											"partitionOption": "None"
+											"partitionOption": "None",
+											"convertDecimalToInteger": false,
+											"queryTimeout": "02:00:00"
 										},
 										"sink": {
 											"type": "ParquetSink",
@@ -160,23 +160,35 @@
 												"type": "ParquetWriteSettings"
 											}
 										},
-										"enableStaging": false
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_SQLDB_SQLAuth",
+											"referenceName": "Ingest_DS_Oracle_SIDAuth",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSHostName": {
+												"DSHostname": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
-													"type": "Expression"
-												},
-												"DSDatabaseName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
 													"type": "Expression"
 												},
 												"DSUsername": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"type": "Expression"
+												},
+												"DSOracleSid": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+													"type": "Expression"
+												},
+												"DSPortNumber": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
 													"type": "Expression"
 												},
 												"DSPassword": {
