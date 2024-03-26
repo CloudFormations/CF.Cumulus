@@ -1,7 +1,7 @@
 {
 	"name": "03-StageExecutor",
 	"properties": {
-		"description": "procfwk child pipeline used to execute Worker pipelines within a given execution stage. This pipeline will be called once for each stage, then execute all Workers in parallel.",
+		"description": "CF.Cumulus pipeline used to execute Worker pipelines within a given execution stage. This pipeline will be called once for each stage, then execute all Workers in parallel.",
 		"activities": [
 			{
 				"name": "Get Pipelines",
@@ -72,6 +72,9 @@
 							"description": "Run the required worker pipeline and wait for its completion. Update metadata once done.",
 							"type": "ExecutePipeline",
 							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
@@ -111,8 +114,10 @@
 			"name": "Cumulus.Control"
 		},
 		"annotations": [
-			"procfwk",
-			"Child"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control",
+			"Stage Executor"
 		]
 	}
 }
