@@ -71,10 +71,9 @@
     <Build Include="ingest\Tables\ConnectionTypes.sql" />
     <Build Include="ingest\Tables\Datasets.sql" />
     <Build Include="ingest\Views\DatasetsLatestVersion.sql" />
-    <Build Include="ingest\Views\Payload.sql" />
-    <Build Include="ingest\Stored Procedures\PayloadProcedure.sql" />
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <Build Include="ingest\Stored Procedures\AddConnectionType.sql" />
+    <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />

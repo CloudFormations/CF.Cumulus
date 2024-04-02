@@ -1,6 +1,8 @@
+
 CREATE PROCEDURE [ingest].[AddConnectionType]
 	(
 	@ConnectionTypeDisplayName NVARCHAR(128),
+    @SourceLanguageType NVARCHAR(5),
 	@Enabled BIT
 	)
 AS
@@ -9,21 +11,27 @@ BEGIN
 		USING 
 			(SELECT
 				@ConnectionTypeDisplayName AS ConnectionTypeDisplayName
+				, @SourceLanguageType AS SourceLanguageType
 				, @Enabled AS Enabled
-			) AS source (ConnectionTypeDisplayName, Enabled)
+			) AS source (ConnectionTypeDisplayName, SourceLanguageType, Enabled)
 		ON ( target.ConnectionTypeDisplayName = source.ConnectionTypeDisplayName )
 		WHEN MATCHED
 			THEN UPDATE
-				SET Enabled = source.Enabled
+				SET 
+                    SourceLanguageType = source.SourceLanguageType
+                    , Enabled = source.Enabled
 		WHEN NOT MATCHED
 			THEN INSERT
 				(
-					ConnectionTypeDisplayName
+					SourceLanguageType
+                    , ConnectionTypeDisplayName
 					, Enabled
 				)
 			VALUES
-				(
-					source.ConnectionTypeDisplayName
+				(   
+                    source.SourceLanguageType
+					, source.ConnectionTypeDisplayName
 					, source.Enabled
 				);
 END;
+GO

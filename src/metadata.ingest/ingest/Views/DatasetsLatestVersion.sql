@@ -14,4 +14,3 @@ INNER JOIN ingest.Datasets AS d
     ON CTE.DatasetDisplayName = d.DatasetDisplayName 
     AND CTE.VersionNumber = d.VersionNumber
 GO
-
