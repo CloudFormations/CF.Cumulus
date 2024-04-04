@@ -1,12 +1,27 @@
 CREATE PROCEDURE [ingest].[GetDatasetPayload]
 	(
 	@DatasetId INT
+	
 	)
 AS
 BEGIN
 	
-    -- Set Source Language Type
 
+    -- Set LoadType conditions
+	DECLARE @LoadType CHAR(2)
+	DECLARE @FirstLoad INT
+    DECLARE @LoadAction VARCHAR(12)
+	
+	SELECT
+		@LoadType = [LoadType],
+		@FirstLoad = [FirstLoad]
+	FROM
+		[ingest].[Datasets]
+	WHERE
+		[DatasetId] = @DatasetId
+
+
+    -- Set Source Language Type
     DECLARE @SourceLanguageType VARCHAR(5)
 
     SELECT 
@@ -39,10 +54,9 @@ BEGIN
         FROM 
             [ingest].[Datasets] AS ds
         WHERE
-            ds.DatasetId = @DatasetId
-
-
+            ds.DatasetId = @DatasetId 
 	END
+
 	ELSE IF @SourceLanguageType = 'PSQL'
 	BEGIN
 		SELECT
@@ -63,13 +77,13 @@ BEGIN
             [ingest].[Datasets] AS ds
         WHERE
             ds.DatasetId = @DatasetId
-
-
 	END
+
     ELSE IF @SourceLanguageType = 'SQL'
     BEGIN
-        SELECT @SourceQuery = @SourceQuery
+        SET @SourceQuery = @SourceQuery
     END
+
     ELSE IF @SourceLanguageType = 'NA'
     BEGIN
         SELECT 
@@ -82,8 +96,35 @@ BEGIN
             ds.DatasetId = @DatasetId
     END
 	ELSE
-		RAISERROR('Not supported',1,16)
+		RAISERROR('Language Type not supported.',16,1)
 
+    -- 
+    IF (@LoadType = 'F')
+		BEGIN
+			SET @SourceQuery = @SourceQuery
+            SET @LoadAction = 'full'
+		END
+	ELSE IF (@LoadType = 'I' AND @FirstLoad = 1)
+		BEGIN
+			SET @SourceQuery = @SourceQuery
+            SET @LoadAction = 'full'
+		END
+	ELSE IF (@LoadType = 'I' AND @FirstLoad = 0)
+		BEGIN
+			SELECT 
+                @SourceQuery = @SourceQuery + ' ' + ds.[CDCWhereClause]
+            FROM 
+                [ingest].[Datasets] AS ds
+            WHERE
+                ds.DatasetId = @DatasetId
+            SET @LoadAction = 'incremental'
+		END
+	--ELSE IF @LoadType = 'FW'
+	--ELSE IF @LoadType = 'H'
+	ELSE
+		BEGIN
+			RAISERROR('Load type condition not yet supported.',16,1);
+		END
 
 
 	SELECT
@@ -95,7 +136,8 @@ BEGIN
 		cn2.[SourceLocation] AS 'TargetStorageContainer',
 		cn3.[ConnectionLocation] AS 'KeyVaultBaseURL',
 		
-		@SourceQuery AS 'SourceQuery'
+		@SourceQuery AS 'SourceQuery',
+        @LoadAction AS LoadAction
 		--'SELECT * FROM ' + QUOTENAME(ds.[SourcePath]) + '.' + QUOTENAME(ds.[SourceName]) AS 'SourceQuery'
 	FROM
 		[ingest].[Datasets] ds
@@ -110,5 +152,4 @@ BEGIN
 
 END
 GO
-
 

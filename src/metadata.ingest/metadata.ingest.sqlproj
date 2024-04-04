@@ -74,6 +74,7 @@
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <Build Include="ingest\Stored Procedures\AddConnectionType.sql" />
     <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
+    <Build Include="ingest\Stored Procedures\SetDatasetFirstLoadMetadata.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
