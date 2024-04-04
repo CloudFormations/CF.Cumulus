@@ -1,5 +1,5 @@
 {
-	"name": "Ingest_PL_MSSQL_Incremental",
+	"name": "Ingest_PL_MSSQL",
 	"properties": {
 		"description": "Testing",
 		"activities": [
@@ -18,7 +18,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[ingest].[GetDatasetPayload3]",
+						"sqlReaderStoredProcedureName": "[ingest].[GetDatasetPayload]",
 						"storedProcedureParameters": {
 							"DatasetId": {
 								"type": "Int16",
@@ -707,7 +707,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"expression": {
-						"value": "@equals(variables('LoadType'),'full')",
+						"value": "@equals(activity('Get Ingest Payload').output.firstRow.LoadAction,'full')",
 						"type": "Expression"
 					},
 					"ifTrueActivities": [
