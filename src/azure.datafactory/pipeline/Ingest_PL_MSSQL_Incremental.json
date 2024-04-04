@@ -21,10 +21,18 @@
 						"sqlReaderStoredProcedureName": "[ingest].[GetDatasetPayload2]",
 						"storedProcedureParameters": {
 							"DatasetId": {
-								"type": "Int32"
+								"type": "Int16",
+								"value": {
+									"value": "@pipeline().parameters.DatasetId",
+									"type": "Expression"
+								}
 							},
 							"IncrementalLoad": {
-								"type": "Boolean"
+								"type": "Int16",
+								"value": {
+									"value": "@pipeline().parameters.IncrementalLoad",
+									"type": "Expression"
+								}
 							}
 						},
 						"queryTimeout": "02:00:00",
@@ -639,6 +647,7 @@
 			},
 			{
 				"name": "Set LoadType",
+				"description": "Set the Data Load type:\nIncremental Load = 1\nFull Load = 0",
 				"type": "SetVariable",
 				"dependsOn": [],
 				"policy": {
@@ -649,7 +658,7 @@
 				"typeProperties": {
 					"variableName": "LoadType",
 					"value": {
-						"value": "@if(equals(pipeline().parameters.IncrementalLoad,0),'Full','Incremental')",
+						"value": "@if(equals(pipeline().parameters.IncrementalLoad,0),'full','incremental')",
 						"type": "Expression"
 					}
 				}
