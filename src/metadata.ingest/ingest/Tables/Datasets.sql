@@ -21,15 +21,8 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
 
-ALTER TABLE [ingest].[Datasets] ADD  DEFAULT ((0)) FOR [FirstLoad]
-GO
-
-ALTER TABLE [ingest].[Datasets] ADD  DEFAULT ('F') FOR [LoadType]
-GO
-
 ALTER TABLE [ingest].[Datasets]  WITH CHECK ADD  CONSTRAINT [chkDatasetDisplayNameNoSpaces] CHECK  ((NOT [DatasetDisplayName] like '% %'))
 GO
 
 ALTER TABLE [ingest].[Datasets] CHECK CONSTRAINT [chkDatasetDisplayNameNoSpaces]
 GO
-

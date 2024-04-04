@@ -1,7 +1,6 @@
 CREATE PROCEDURE [ingest].[GetDatasetPayload]
 	(
 	@DatasetId INT
-	
 	)
 AS
 BEGIN
@@ -152,4 +151,5 @@ BEGIN
 
 END
 GO
+
 
