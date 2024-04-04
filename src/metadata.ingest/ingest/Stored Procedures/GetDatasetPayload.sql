@@ -69,7 +69,7 @@ BEGIN
 
 
 		SELECT 
-            @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + UPPER(ds.[SourcePath]) + '.' + UPPER(ds.[SourceName]) + ';'
+            @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + UPPER(ds.[SourcePath]) + '.' + UPPER(ds.[SourceName])
 
 
         FROM 
@@ -100,18 +100,18 @@ BEGIN
     -- 
     IF (@LoadType = 'F')
 		BEGIN
-			SET @SourceQuery = @SourceQuery
+			SET @SourceQuery = @SourceQuery + ';'
             SET @LoadAction = 'full'
 		END
 	ELSE IF (@LoadType = 'I' AND @FirstLoad = 1)
 		BEGIN
-			SET @SourceQuery = @SourceQuery
+			SET @SourceQuery = @SourceQuery + ';'
             SET @LoadAction = 'full'
 		END
 	ELSE IF (@LoadType = 'I' AND @FirstLoad = 0)
 		BEGIN
 			SELECT 
-                @SourceQuery = @SourceQuery + ' ' + ds.[CDCWhereClause]
+                @SourceQuery = @SourceQuery + ' ' + ds.[CDCWhereClause] + ';'
             FROM 
                 [ingest].[Datasets] AS ds
             WHERE
