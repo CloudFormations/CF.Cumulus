@@ -319,8 +319,6 @@
 			{
 				"name": "If Full Load",
 				"type": "IfCondition",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "Oracle SQL Type",
