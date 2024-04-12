@@ -1,0 +1,24 @@
+{
+	"name": "Transform_LS_Databricks_SmallCluster_MIAuth",
+	"properties": {
+		"parameters": {
+			"WorkspaceURL": {
+				"type": "string"
+			},
+			"ResourceId": {
+				"type": "string"
+			},
+			"ClusterId": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "@linkedService().WorkspaceUrl",
+			"authentication": "MSI",
+			"workspaceResourceId": "@concat('/subscriptions/',linkedService().WorkspaceURL,'/resourceGroups/',linkedService().ResourceId,',rg/providers/Microsoft.Databricks/workspaces/{databricksworkspacename}')",
+			"existingClusterId": "@linkedService().ClusterId"
+		}
+	}
+}
