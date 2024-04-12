@@ -17,7 +17,7 @@
 		"typeProperties": {
 			"domain": "@linkedService().WorkspaceUrl",
 			"authentication": "MSI",
-			"workspaceResourceId": "@concat('/subscriptions/',linkedService().WorkspaceURL,'/resourceGroups/',linkedService().ResourceId,',rg/providers/Microsoft.Databricks/workspaces/{databricksworkspacename}')",
+			"workspaceResourceId": "@concat('/subscriptions/',linkedService().WorkspaceURL,'/resourceGroups/CumulusFrameworkDev/providers/Microsoft.Databricks/workspaces/cumulusdatabricksdev')",
 			"existingClusterId": "@linkedService().ClusterId"
 		}
 	}
