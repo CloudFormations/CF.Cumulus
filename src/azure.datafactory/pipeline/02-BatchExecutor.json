@@ -1,7 +1,7 @@
 {
 	"name": "02-BatchExecutor",
 	"properties": {
-		"description": "ADF.procfwk parent pipeline used to bootstrap the orchestration framework in perform the first level ForEach calls in sequence for the metadata stages.",
+		"description": "CF.Cumulus pipeline used to bootstrap the orchestration framework in perform the first level ForEach calls in sequence for the metadata stages.",
 		"activities": [
 			{
 				"name": "Get Stages",
@@ -78,6 +78,9 @@
 									]
 								}
 							],
+							"policy": {
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
@@ -915,9 +918,10 @@
 				"name": "Is Parent Already Running",
 				"description": "Establish before anything else if the parent pipeline is already running. Batch execution aware.",
 				"type": "ExecutePipeline",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
@@ -1001,8 +1005,10 @@
 			"name": "Cumulus.Control"
 		},
 		"annotations": [
-			"procfwk",
-			"Parent"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control",
+			"Batch Executor"
 		]
 	}
 }

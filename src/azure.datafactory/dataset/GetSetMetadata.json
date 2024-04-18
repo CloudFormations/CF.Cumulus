@@ -10,7 +10,9 @@
 			"name": "Cumulus"
 		},
 		"annotations": [
-			"procfwk"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control"
 		],
 		"type": "AzureSqlTable",
 		"schema": []

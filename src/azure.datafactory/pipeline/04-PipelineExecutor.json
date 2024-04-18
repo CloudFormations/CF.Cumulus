@@ -1,7 +1,7 @@
 {
 	"name": "04-PipelineExecutor",
 	"properties": {
-		"description": "procfwk infant pipeline used to check when the processing pipeline called by the Child completes and passes the resulting status back to the metadata database.",
+		"description": "CF.Cumulus pipeline used to check when the processing pipeline called by the Child completes and passes the resulting status back to the metadata database.",
 		"activities": [
 			{
 				"name": "Execute Worker Pipeline",
@@ -361,6 +361,9 @@
 									]
 								}
 							],
+							"policy": {
+								"secureInput": false
+							},
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
@@ -1034,26 +1037,6 @@
 					},
 					"ifFalseActivities": [
 						{
-							"name": "Throw Exception - Invalid Infant",
-							"description": "Throw an exception with details about the invalid worker pipeline name.",
-							"type": "ExecutePipeline",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"pipeline": {
-									"referenceName": "Throw Exception",
-									"type": "PipelineReference"
-								},
-								"waitOnCompletion": true,
-								"parameters": {
-									"Message": {
-										"value": "@concat('Worker pipeline [',variables('WorkerCoreDetails')[0].pipelineName,'] is not valid in target Orchestrator [',variables('WorkerCoreDetails')[0].orchestratorName,']')",
-										"type": "Expression"
-									}
-								}
-							}
-						},
-						{
 							"name": "Update Execution With Invalid Worker",
 							"description": "Update the current execution table with an informed status for the worker pipeline that couldn't be executed.",
 							"type": "SqlServerStoredProcedure",
@@ -1099,6 +1082,20 @@
 							"linkedServiceName": {
 								"referenceName": "cumulusdatabase",
 								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "Throw Exception - Invalid Worker",
+							"description": "Throw an exception with details about the invalid worker pipeline name.",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('Worker pipeline [',variables('WorkerCoreDetails')[0].pipelineName,'] is not valid in target Orchestrator [',variables('WorkerCoreDetails')[0].orchestratorName,']')",
+									"type": "Expression"
+								},
+								"errorCode": "16"
 							}
 						}
 					]
@@ -1304,8 +1301,10 @@
 			"name": "Cumulus.Control"
 		},
 		"annotations": [
-			"procfwk",
-			"Infant"
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control",
+			"Pipeline Executor"
 		]
 	}
 }
