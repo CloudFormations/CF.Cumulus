@@ -38,3 +38,8 @@
 		@ConnectionTypeDisplayName = N'Azure Databricks', 
 		@SourceLanguageType = 'NA',
 		@Enabled = 1;
+		
+	EXEC [ingest].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Azure Resource Group', 
+		@SourceLanguageType = 'NA',
+		@Enabled = 1;
