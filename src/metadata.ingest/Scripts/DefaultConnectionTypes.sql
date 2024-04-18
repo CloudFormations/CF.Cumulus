@@ -33,3 +33,8 @@
 		@ConnectionTypeDisplayName = N'Azure Key Vault', 
 		@SourceLanguageType = 'NA',
 		@Enabled = 1;
+
+	EXEC [ingest].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Azure Databricks', 
+		@SourceLanguageType = 'NA',
+		@Enabled = 1;
