@@ -100,18 +100,18 @@ BEGIN
     -- 
     IF (@LoadType = 'F')
 		BEGIN
-			SET @SourceQuery = @SourceQuery + ';'
+			SET @SourceQuery = @SourceQuery
             SET @LoadAction = 'full'
 		END
 	ELSE IF (@LoadType = 'I' AND @FirstLoad = 1)
 		BEGIN
-			SET @SourceQuery = @SourceQuery + ';'
+			SET @SourceQuery = @SourceQuery
             SET @LoadAction = 'full'
 		END
 	ELSE IF (@LoadType = 'I' AND @FirstLoad = 0)
 		BEGIN
 			SELECT 
-                @SourceQuery = @SourceQuery + ' ' + ds.[CDCWhereClause] + ';'
+                @SourceQuery = @SourceQuery + ' ' + ds.[CDCWhereClause]
             FROM 
                 [ingest].[Datasets] AS ds
             WHERE
@@ -124,7 +124,11 @@ BEGIN
 		BEGIN
 			RAISERROR('Load type condition not yet supported.',16,1);
 		END
-
+	
+	IF @SourceLanguageType IN ('T-SQL', 'PSQL', 'SQL')
+		BEGIN
+			SET @SourceQuery = @SourceQuery + ';'
+		END
 
 	SELECT
 		RIGHT('0000' + CAST(ds.[VersionNumber] AS VARCHAR),4) AS 'VersionNumber',

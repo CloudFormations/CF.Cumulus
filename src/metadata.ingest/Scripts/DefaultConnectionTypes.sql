@@ -21,7 +21,7 @@
 
 	EXEC [ingest].[AddConnectionType] 
 		@ConnectionTypeDisplayName = N'Azure SQL Database', 
-		@SourceLanguageType = 'NA',
+		@SourceLanguageType = 'T-SQL',
 		@Enabled = 1;
 
 	EXEC [ingest].[AddConnectionType] 
