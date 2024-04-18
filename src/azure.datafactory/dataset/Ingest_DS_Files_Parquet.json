@@ -1,0 +1,60 @@
+{
+	"name": "Ingest_DS_Files_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_FileServer_VM02",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSHostName": {
+					"value": "@dataset().DSHostName",
+					"type": "Expression"
+				},
+				"LSUserName": {
+					"value": "@dataset().DSUserName",
+					"type": "Expression"
+				},
+				"LSPassword": {
+					"value": "@dataset().DSPassword",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSHostName": {
+				"type": "string"
+			},
+			"DSUserName": {
+				"type": "string"
+			},
+			"DSDirectory": {
+				"type": "string"
+			},
+			"DSFileName": {
+				"type": "string"
+			},
+			"DSPassword": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": {
+					"value": "@dataset().DSFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().DSDirectory",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
