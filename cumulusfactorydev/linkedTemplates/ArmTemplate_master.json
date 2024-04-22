@@ -7,10 +7,55 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "cumulusfactorydev"
 		},
+		"Ingest_LS_Oracle_SIDAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_Oracle_SIDAuth'",
+			"defaultValue": "host=@{linkedService().LSHostname};port=@{linkedService().LSPortNumber};sid=@{linkedService().LSOracleSid};user id=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
+		},
+		"Ingest_LS_SQLDB_MIAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLDB_MIAuth'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_SQLDB_SQLAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLDB_SQLAuth'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
+		},
+		"Ingest_LS_SQLServer_SQLAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLServer_SQLAuth'",
+			"defaultValue": "Integrated Security=False;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
+		},
+		"Ingest_LS_SQLServer_WinAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLServer_WinAuth'",
+			"defaultValue": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
+		},
 		"cumulusdatabase_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'cumulusdatabase'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
+		},
+		"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}"
+		},
+		"Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "@linkedService().ClusterId"
+		},
+		"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_FileServer_VM02_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUserName}"
+		},
+		"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUsername}"
 		},
 		"cumulusfunctions_properties_typeProperties_functionAppUrl": {
 			"type": "string",
@@ -47,11 +92,41 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"Ingest_LS_SQLDB_MIAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_SQLDB_MIAuth_connectionString')]"
+					},
+					"Ingest_LS_SQLDB_SQLAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_SQLDB_SQLAuth_connectionString')]"
+					},
 					"cumulusdatabase_connectionString": {
 						"value": "[parameters('cumulusdatabase_connectionString')]"
 					},
+					"Ingest_LS_Oracle_SIDAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_Oracle_SIDAuth_connectionString')]"
+					},
+					"Ingest_LS_SQLServer_SQLAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_SQLServer_SQLAuth_connectionString')]"
+					},
+					"Ingest_LS_SQLServer_WinAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_SQLServer_WinAuth_connectionString')]"
+					},
+					"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
+						"value": "[parameters('Ingest_LS_DataLake_MIAuth_properties_typeProperties_url')]"
+					},
+					"Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId')]"
+					},
 					"cumuluskeys_properties_typeProperties_baseUrl": {
 						"value": "[parameters('cumuluskeys_properties_typeProperties_baseUrl')]"
+					},
+					"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
+						"value": "[parameters('Ingest_LS_FileServer_VM02_properties_typeProperties_host')]"
+					},
+					"Ingest_LS_FileServer_VM02_properties_typeProperties_userId": {
+						"value": "[parameters('Ingest_LS_FileServer_VM02_properties_typeProperties_userId')]"
+					},
+					"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
+						"value": "[parameters('Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName')]"
 					},
 					"cumulusfunctions_properties_typeProperties_functionAppUrl": {
 						"value": "[parameters('cumulusfunctions_properties_typeProperties_functionAppUrl')]"
@@ -59,6 +134,26 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "cumulusfactorydev_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'cumulusfactorydev_ArmTemplate_0')]"
+			]
 		}
 	]
 }
