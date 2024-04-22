@@ -1,0 +1,31 @@
+{
+	"name": "Ingest_LS_SQLServer_WinAuth",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"LSHostName": {
+				"type": "string"
+			},
+			"LSDatabaseName": {
+				"type": "string"
+			},
+			"LSUsername": {
+				"type": "string"
+			},
+			"LSPassword": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}",
+			"userName": "@{linkedService().LSUsername}",
+			"password": "@{linkedService().LSPassword}"
+		},
+		"connectVia": {
+			"referenceName": "datasourceVM02",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

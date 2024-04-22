@@ -1,0 +1,25 @@
+{
+	"name": "Ingest_LS_SQLDB_SQLAuth",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"parameters": {
+			"LSHostName": {
+				"type": "string"
+			},
+			"LSDatabaseName": {
+				"type": "string"
+			},
+			"LSUsername": {
+				"type": "string"
+			},
+			"LSPassword": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
+		}
+	}
+}

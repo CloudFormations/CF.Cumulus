@@ -1,0 +1,54 @@
+{
+	"name": "Ingest_DS_Oracle_SIDAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_Oracle_SIDAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSHostName": {
+					"value": "@dataset().DSHostname",
+					"type": "Expression"
+				},
+				"LSUsername": {
+					"value": "@dataset().DSUsername",
+					"type": "Expression"
+				},
+				"LSOracleSid": {
+					"value": "@dataset().DSOracleSid",
+					"type": "Expression"
+				},
+				"LSPortNumber": {
+					"value": "@dataset().DSPortNumber",
+					"type": "Expression"
+				},
+				"LSPassword": {
+					"value": "@dataset().DSPassword",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSHostname": {
+				"type": "string"
+			},
+			"DSUsername": {
+				"type": "string"
+			},
+			"DSOracleSid": {
+				"type": "string"
+			},
+			"DSPortNumber": {
+				"type": "string"
+			},
+			"DSPassword": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "OracleTable",
+		"schema": []
+	}
+}

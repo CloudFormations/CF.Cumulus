@@ -1,0 +1,15 @@
+{
+	"name": "Ingest_LS_DataLake_MIAuth",
+	"properties": {
+		"parameters": {
+			"LSStorageName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}"
+		}
+	}
+}

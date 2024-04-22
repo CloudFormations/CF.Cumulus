@@ -58,8 +58,28 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Security" />
+    <Folder Include="ingest" />
+    <Folder Include="ingest\Tables" />
+    <Folder Include="ingest\Views" />
+    <Folder Include="ingest\Stored Procedures" />
+    <Folder Include="Scripts" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Security\ingest.sql" />
+    <Build Include="ingest\Tables\Attributes.sql" />
+    <Build Include="ingest\Tables\Connections.sql" />
+    <Build Include="ingest\Tables\ConnectionTypes.sql" />
+    <Build Include="ingest\Tables\Datasets.sql" />
+    <Build Include="ingest\Views\DatasetsLatestVersion.sql" />
+    <None Include="Scripts\DefaultConnectionTypes.sql" />
+    <Build Include="ingest\Stored Procedures\AddConnectionType.sql" />
+    <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
+    <Build Include="ingest\Stored Procedures\SetDatasetFirstLoadMetadata.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
   </ItemGroup>
 </Project>
