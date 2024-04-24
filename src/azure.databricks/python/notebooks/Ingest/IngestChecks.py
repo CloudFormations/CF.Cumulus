@@ -1,16 +1,14 @@
 # Databricks notebook source
 # MAGIC %md
-# MAGIC #Merge Functionality
-# MAGIC - Process metadata schemas raw vs cleansed with data typing
-# MAGIC - Allow for Rejected data handling
-# MAGIC - Create SELECT script for the merge operation
-# MAGIC - Functionality for 'F' and 'I' loads:
-# MAGIC   - 'F': recreate cleansed table upon execution
-# MAGIC   - 'I': merge data on top of existing table
+# MAGIC #Merge Check Functionality
+# MAGIC - Check payload validity
+# MAGIC - Confirm storage is accessible
+# MAGIC - Create Delta Table, if required
+# MAGIC - Defensive check Rundate vs Last load date
 # MAGIC
 # MAGIC #TODO items:
 # MAGIC - Unit tests
-# MAGIC - Specify schema flexibility option in merge command
+# MAGIC - Fully populate raw with all datasets created so far for testing
 # MAGIC
 
 # COMMAND ----------
@@ -19,16 +17,12 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../Functions/TransformCreateMergeQuery
-
-# COMMAND ----------
-
-# MAGIC %run ../Functions/WriteDeltaTableHelper
+# MAGIC %run ../Functions/CheckFunctions
 
 # COMMAND ----------
 
 dbutils.widgets.text("Merge Payload","")
-dbutils.widgets.text("Pipeline Run Id","")
+dbutils.widgets.text("pipeline_run_id","")
 #Remove Widgets
 #dbutils.widgets.remove("<widget name>")
 #dbutils.widgets.removeAll()
@@ -38,30 +32,11 @@ dbutils.widgets.text("Pipeline Run Id","")
 import json
 
 payload = json.loads(dbutils.widgets.get("Merge Payload"))
-pipelineRunId = json.loads(dbutils.widgets.get("Pipeline Run Id",""))
 
-# payload = {
-  # 'pipelineId': str, # Unsure if required at this stage
-  # 'tableName': str,
-  # 'attributesList': str, # SQL string cast to list in python
-  # 'loadType': str,
-  # 'computeTarget': str,
-  # 'rawLoadDate': datetime,
-  # 'rawStorageName': str,
-  # 'rawContainerName': str,
-  # 'rawDirectoryName': str, # I think we want to ignore this one
-  # 'rawSchemaName': str # 'rawConnectionName': str
-  # 'rawFileName': str,
-  # 'transformedLastRunDate': datetime, # NULLable
-  # 'cleansedStorageName': str,
-  # 'cleansedContainerName': str,
-  # 'cleansedSchemaName': str # 'cleansedConnectionName': str
-  # 'cleansedFileName': str,
-# }
 
 # COMMAND ----------
 
-#example values for widgets
+
 
 payload = {
     "rawTableName": "control_Pipelines", # ingest.Datasets
@@ -78,7 +53,7 @@ payload = {
 
     "rawFileName": "control_Pipelines", # ingest.Datasets
     "rawFileType": "parquet", # ingest.Datasets
-    "dateTimeFolderHierarchy": "year=2024/month=04/day=18",  # ingest.Datasets
+    "dateTimeFolderHierarchy": "year=2024/month=04/day=09",  # ingest.Datasets
 
     "cleansedTableName": "control_Pipelines", # ingest.Datasets
     "cleansedLastRunDate": "2024-01-01",#Null # ingest.Datasets
@@ -103,32 +78,32 @@ payload = {
     # "cleansedMetadataColumnFormatList": "yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss", # ingest.Datasets
 }
 
-pipelineRunId = 'TestRunIdGUID'
-
 # COMMAND ----------
 
-# create variables for each payload item
 
+# create variables for each payload item
 tableName = payload["cleansedTableName"] 
 loadType = payload["loadType"]
 loadTypeText = "full" if loadType == "F" else "incremental"
 version = f"{int(payload['version']):04d}"
 
-rawStorageName = payload['rawStorageName']
-rawContainerName = payload['rawContainerName']
-rawSecret = payload['rawSecret']
+rawStorageName = payload["rawStorageName"]
+rawContainerName = payload["rawContainerName"]
+rawSecret = payload["rawSecret"]
+rawLoadDate = payload["rawLoadDate"]
 
-rawSchemaName = payload['rawSchemaName']
-rawFileType = payload['rawFileType']
-dateTimeFolderHierarchy = payload['dateTimeFolderHierarchy']
+rawSchemaName = payload["rawSchemaName"]
+rawFileType = payload["rawFileType"]
+dateTimeFolderHierarchy = payload["dateTimeFolderHierarchy"]
 
-cleansedStorageName = payload['cleansedStorageName']
-cleansedContainerName = payload['cleansedContainerName']
-cleansedSecret = payload['cleansedSecret']
+cleansedStorageName = payload["cleansedStorageName"]
+cleansedContainerName = payload["cleansedContainerName"]
+cleansedSecret = payload["cleansedSecret"]
+cleansedLastRunDate = payload["cleansedLastRunDate"]
 
 cleansedSchemaName = payload["cleansedSchemaName"] 
 
-# Semantic checks for these required in the TransformChecks notebook?
+# Semantic checks for these required in the IngestChecks notebook?
 pkList =  payload["cleansedPkList"].split(",")
 partitionList =  payload["cleansedPartitionFields"].split(",") if  payload["cleansedPartitionFields"] != "" else []
 
@@ -149,6 +124,11 @@ totalColumnFormatList = columnsFormatList
 
 # COMMAND ----------
 
+# MAGIC %md
+# MAGIC # Initialisation
+
+# COMMAND ----------
+
 print("Setting raw ABFSS config...")
 setAbfssSparkConfig(rawSecret, rawStorageName)
 
@@ -165,79 +145,59 @@ cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
 
 # COMMAND ----------
 
-# MAGIC %md 
-# MAGIC #Get dataset from raw
+# MAGIC %md
+# MAGIC # Check: Payload Validity
 
 # COMMAND ----------
 
-# Spark read options. Can be customised if needed, but this is standard.
-options = {'header':'True'}
-
-# Extended option, we need to confirm the mergeSchema failure behaviour. When switching versions of dataset, will want this enabled.
-# options = {
-#     'header':'True',
-#     "mergeSchema": "true"
-#     }
-
-
-#different options for specifying, based on how we save abfss folder hierarchy.
-fileFullPath = f"{rawAbfssPath}/{rawSchemaName}/{tableName}/version={version}/{loadTypeText}/{dateTimeFolderHierarchy}/{tableName}.{rawFileType}"
-
-# assuming json,csv, parquet
-df = spark.read \
-    .options(**options) \
-    .format(rawFileType) \
-    .load(fileFullPath)
-
-display(df)
+# Check data types and nullability of each dictionary element
+loadTypeCheck(loadType = loadType)
 
 # COMMAND ----------
 
-# Create temporary table for SELECT statements
-tempViewName = f"{tableName}_{pipelineRunId}"
-df.createOrReplaceTempView(tempViewName)
+# MAGIC %md
+# MAGIC # Check: Storage accessibility
 
 # COMMAND ----------
 
-totalColumnStr = selectSqlColumnsFormatString(totalColumnList, totalColumnTypeList, totalColumnFormatList)
+# Check Raw storage account exists and is accessible.
+abfssCheck(abfssPath=rawAbfssPath)
 
-selectSQLFullString = f"SELECT {totalColumnStr} FROM {tempViewName}"
-print(selectSQLFullString)
-
-# COMMAND ----------
-
-df = spark.sql(selectSQLFullString)
-display(df)
+# Check cleansed storage account exists and is accessible.
+abfssCheck(abfssPath=cleansedAbfssPath)
 
 # COMMAND ----------
 
-if loadType.upper() == "F":
-    print('write mode set to overwrite')
-    writeMode = "overwrite"
-elif loadType.upper() == "I":
-    print('write mode set to merge')
-    writeMode = "merge"
-else: 
-    raise Exception("LoadType not supported.")
-
-deltaApp = DeltaHelper()
-
-output, df = deltaApp.writeToDelta(
-    df=df,
-    tempViewName=tempViewName,
-    abfssPath=cleansedAbfssPath,
-    containerName=cleansedContainerName,
-    schemaName=cleansedSchemaName,
-    tableName=tableName,
-    pkFields=pkList, 
-    partitionFields=partitionList, 
-    writeMode=writeMode)
+# MAGIC %md
+# MAGIC # Check: Delta Table created
 
 # COMMAND ----------
 
-print(output)
+# loadType = 'F'
+# cleansedTablePath = 'failed_table_name'
+# cleansedTablePath = 'failed table name'
+# cleansedTablePath = 'default.people'
+
+cleansedTablePath = setTablePath(schemaName =cleansedSchemaName, tableName =tableName)
+print(cleansedTablePath)
 
 # COMMAND ----------
 
-# explicitly drop the temporary view
-spark.catalog.dropTempView(tempViewName)
+deltaTableExistsCheck(tablePath = cleansedTablePath, loadType = loadType)
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Check: RunDate vs Last load Date
+
+# COMMAND ----------
+
+rawLoadDateFmt = datetime.strptime(rawLoadDate,'%Y-%m-%d').date()
+cleansedLastRunDateFmt = datetime.strptime(cleansedLastRunDate,'%Y-%m-%d').date()
+
+# COMMAND ----------
+
+compareLoadVsLastCleansedDate(rawLoadDate = rawLoadDate, cleansedLastRunDate = cleansedLastRunDate)
+
+# COMMAND ----------
+
