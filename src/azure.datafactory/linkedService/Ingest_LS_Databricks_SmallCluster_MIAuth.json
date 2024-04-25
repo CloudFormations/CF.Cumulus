@@ -23,7 +23,7 @@
 		"typeProperties": {
 			"domain": "@linkedService().WorkspaceURL",
 			"authentication": "MSI",
-			"workspaceResourceId": "@concat('/subscriptions/',linkedService().WorkspaceURL,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
+			"workspaceResourceId": "@concat('/subscriptions/',linkedService().SubscriptionId,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
 			"existingClusterId": "@linkedService().ClusterId"
 		}
 	}
