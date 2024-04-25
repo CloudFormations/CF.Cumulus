@@ -13,6 +13,9 @@
 			},
 			"ClusterId": {
 				"type": "string"
+			},
+			"SubscriptionId": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
