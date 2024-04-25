@@ -84,9 +84,16 @@
 												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
 												"type": "Expression"
 											},
-											"ResourceName": "cumulusdatabricksdev",
+											"ResourceName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
 											"ClusterId": {
 												"value": "@activity('Get Merge Payload').output.firstRow.ComputeClusterId",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
 											}
 										}
