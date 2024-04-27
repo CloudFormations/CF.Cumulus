@@ -1,9 +1,9 @@
 {
-	"name": "Ingest_PL_Files",
+	"name": "Ingest_PL_Oracle",
 	"properties": {
 		"activities": [
 			{
-				"name": "File Type",
+				"name": "Oracle SQL Type",
 				"type": "Switch",
 				"dependsOn": [
 					{
@@ -21,14 +21,14 @@
 					},
 					"cases": [
 						{
-							"value": "Files_Binary",
+							"value": "Oracle_SIDAuth",
 							"activities": [
 								{
-									"name": "Binary Files VM02 Copy",
+									"name": "SQLDB SQLAuth Copy",
 									"type": "Copy",
 									"dependsOn": [
 										{
-											"activity": "Fetch Binary Files Auth Password",
+											"activity": "Fetch SQL Auth Password",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -44,128 +44,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "BinarySource",
-											"storeSettings": {
-												"type": "FileServerReadSettings",
-												"recursive": true
-											},
-											"formatSettings": {
-												"type": "BinaryReadSettings"
-											}
-										},
-										"sink": {
-											"type": "BinarySink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "PreserveHierarchy"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "Ingest_DS_Files_Binary",
-											"type": "DatasetReference",
-											"parameters": {
-												"DSDirectory": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
-													"type": "Expression"
-												},
-												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
-													"type": "Expression"
-												},
-												"DSHostName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
-													"type": "Expression"
-												},
-												"DSUserName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
-													"type": "Expression"
-												},
-												"DSPassword": {
-													"value": "@activity('Fetch Binary Files Auth Password').output.value",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Ingest_DS_DataLake_Binary",
-											"type": "DatasetReference",
-											"parameters": {
-												"DSDirectory": {
-													"value": "@variables('DirectoryName')",
-													"type": "Expression"
-												},
-												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
-													"type": "Expression"
-												},
-												"DSStorageName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
-													"type": "Expression"
-												},
-												"DSContainerName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								},
-								{
-									"name": "Fetch Binary Files Auth Password",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"url": {
-											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
-											"type": "Expression"
-										},
-										"authentication": {
-											"type": "MSI",
-											"resource": "https://vault.azure.net"
-										}
-									}
-								}
-							]
-						},
-						{
-							"value": "Files_Parquet",
-							"activities": [
-								{
-									"name": "Parquet Files VM02 Copy",
-									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Fetch Parquet Files Auth Password",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "ParquetSource",
+											"type": "OracleSource",
 											"additionalColumns": [
 												{
 													"name": "PipelineRunId",
@@ -182,19 +61,18 @@
 													}
 												}
 											],
-											"storeSettings": {
-												"type": "FileServerReadSettings",
-												"recursive": true
+											"oracleReaderQuery": {
+												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"type": "Expression"
 											},
-											"formatSettings": {
-												"type": "ParquetReadSettings"
-											}
+											"partitionOption": "None",
+											"convertDecimalToInteger": false,
+											"queryTimeout": "02:00:00"
 										},
 										"sink": {
 											"type": "ParquetSink",
 											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "PreserveHierarchy"
+												"type": "AzureBlobFSWriteSettings"
 											},
 											"formatSettings": {
 												"type": "ParquetWriteSettings"
@@ -212,27 +90,27 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_Files_Parquet",
+											"referenceName": "Ingest_DS_Oracle_SIDAuth",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSHostName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"DSHostname": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 													"type": "Expression"
 												},
-												"DSUserName": {
+												"DSUsername": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
 													"type": "Expression"
 												},
-												"DSDirectory": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"DSOracleSid": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
 													"type": "Expression"
 												},
-												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+												"DSPortNumber": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
 													"type": "Expression"
 												},
 												"DSPassword": {
-													"value": "@activity('Fetch Parquet Files Auth Password').output.value",
+													"value": "@activity('Fetch SQL Auth Password').output.value",
 													"type": "Expression"
 												}
 											}
@@ -264,7 +142,7 @@
 									]
 								},
 								{
-									"name": "Fetch Parquet Files Auth Password",
+									"name": "Fetch SQL Auth Password",
 									"type": "WebActivity",
 									"dependsOn": [],
 									"policy": {
@@ -443,7 +321,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "File Type",
+						"activity": "Oracle SQL Type",
 						"dependencyConditions": [
 							"Succeeded"
 						]
