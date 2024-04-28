@@ -22,7 +22,7 @@
 # COMMAND ----------
 
 dbutils.widgets.text("Merge Payload","")
-dbutils.widgets.text("pipeline_run_id","")
+dbutils.widgets.text("Pipeline Run Id","")
 #Remove Widgets
 #dbutils.widgets.remove("<widget name>")
 #dbutils.widgets.removeAll()
@@ -39,15 +39,14 @@ payload = json.loads(dbutils.widgets.get("Merge Payload"))
 
 
 payload = {
-    "rawTableName": "control_Pipelines", # ingest.Datasets
-    "loadType": "F", # ingest.Datasets
-    "version": "1", # ingest.Datasets
+    "SourceName": "control_Pipelines", # ingest.Datasets
+    "LoadType": "F", # ingest.Datasets
+    "VersionNumber": "1", # ingest.Datasets
 
-    "rawLoadDate": "2024-01-01", # ingest.Datasets or folderHierarchy
+    "RawLastLoadDate": "2024-01-01", # ingest.Datasets or folderHierarchy
 
-    "computeTarget": "Databricks_small", # ingest.Connections # we could add a defensive check for the execution
-    "rawStorageName": "cumulusframeworkdev", # ingest.Connections
-    "rawContainerName": "raw", # ingest.Connections
+    "SourceStorageName": "cumulusframeworkdev", # ingest.Connections
+    "RawContainerName": "raw", # ingest.Connections
     "rawSchemaName": "MetadataDatabase", # ingest.Connections
     "rawSecret": "cumulusframeworkdevaccesskey", # ingest.Connections
 
@@ -82,34 +81,34 @@ payload = {
 
 
 # create variables for each payload item
-tableName = payload["cleansedTableName"] 
-loadType = payload["loadType"]
+tableName = payload["CleansedTableName"] 
+loadType = payload["LoadAction"]
 loadTypeText = "full" if loadType == "F" else "incremental"
-version = f"{int(payload['version']):04d}"
+versionNumber = f"{int(payload['VersionNumber']):04d}"
 
-rawStorageName = payload["rawStorageName"]
-rawContainerName = payload["rawContainerName"]
-rawSecret = payload["rawSecret"]
-rawLoadDate = payload["rawLoadDate"]
+rawStorageName = payload["RawStorageName"]
+rawContainerName = payload["RawContainerName"]
+rawSecret = payload["RawSecret"] # Infer this from the storage name
+rawLoadDate = payload["RawLastLoadDate"]
 
-rawSchemaName = payload["rawSchemaName"]
-rawFileType = payload["rawFileType"]
-dateTimeFolderHierarchy = payload["dateTimeFolderHierarchy"]
+rawSchemaName = payload["RawSchemaName"]
+rawFileType = payload["RawFileType"]
+dateTimeFolderHierarchy = payload["DateTimeFolderHierarchy"]
 
-cleansedStorageName = payload["cleansedStorageName"]
-cleansedContainerName = payload["cleansedContainerName"]
-cleansedSecret = payload["cleansedSecret"]
-cleansedLastRunDate = payload["cleansedLastRunDate"]
+cleansedStorageName = payload["CleansedStorageName"]
+cleansedContainerName = payload["CleansedContainerName"]
+cleansedSecret = payload["CleansedSecret"]# Infer this from the storage name
+cleansedLastLoadDate = payload["CleansedLastLoadDate"]
 
-cleansedSchemaName = payload["cleansedSchemaName"] 
+cleansedSchemaName = payload["CleansedSchemaName"] 
 
 # Semantic checks for these required in the IngestChecks notebook?
-pkList =  payload["cleansedPkList"].split(",")
-partitionList =  payload["cleansedPartitionFields"].split(",") if  payload["cleansedPartitionFields"] != "" else []
+pkList =  payload["CleansedPkList"].split(",")
+partitionList =  payload["CleansedPartitionFields"].split(",") if  payload["cleansedPartitionFields"] != "" else []
 
-columnsList = payload["cleansedColumnsList"].split(",")
-columnsTypeList = payload["cleansedColumnsTypeList"].split(",")
-columnsFormatList = payload["cleansedColumnsFormatList"].split(",")
+columnsList = payload["CleansedColumnsList"].split(",")
+columnsTypeList = payload["CleansedColumnsTypeList"].split(",")
+columnsFormatList = payload["CleansedColumnsFormatList"].split(",")
 # metadataColumnList = payload["cleansedMetadataColumnList"].split(",")
 # metadataColumnTypeList = payload["cleansedMetadataColumnTypeList"].split(",")
 # metadataColumnFormatList = payload["cleansedMetadataColumnFormatList"].split(",")
