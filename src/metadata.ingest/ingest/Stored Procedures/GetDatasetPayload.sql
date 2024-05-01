@@ -1,3 +1,7 @@
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
 CREATE PROCEDURE [ingest].[GetDatasetPayload]
 	(
 	@DatasetId INT
@@ -7,17 +11,10 @@ BEGIN
 	
 
     -- Set LoadType conditions
-	DECLARE @LoadType CHAR(2)
-	DECLARE @FirstLoad INT
+	DECLARE @LoadType CHAR(1)
     DECLARE @LoadAction VARCHAR(12)
 	
-	SELECT
-		@LoadType = [LoadType],
-		@FirstLoad = [FirstLoad]
-	FROM
-		[ingest].[Datasets]
-	WHERE
-		[DatasetId] = @DatasetId
+	SET @LoadType = ingest.GetIngestLoadAction(@DatasetId, 'Raw')
 
 
     -- Set Source Language Type
@@ -97,18 +94,13 @@ BEGIN
 	ELSE
 		RAISERROR('Language Type not supported.',16,1)
 
-    -- 
+    -- Update with new logic
     IF (@LoadType = 'F')
 		BEGIN
 			SET @SourceQuery = @SourceQuery
             SET @LoadAction = 'full'
 		END
-	ELSE IF (@LoadType = 'I' AND @FirstLoad = 1)
-		BEGIN
-			SET @SourceQuery = @SourceQuery
-            SET @LoadAction = 'full'
-		END
-	ELSE IF (@LoadType = 'I' AND @FirstLoad = 0)
+	ELSE IF (@LoadType = 'I')
 		BEGIN
 			SELECT 
                 @SourceQuery = @SourceQuery + ' ' + ds.[CDCWhereClause]
@@ -140,6 +132,7 @@ BEGIN
 		cn3.[ConnectionLocation] AS 'KeyVaultBaseURL',
 		
 		@SourceQuery AS 'SourceQuery',
+        @LoadType AS 'LoadType',
         @LoadAction AS LoadAction
 		--'SELECT * FROM ' + QUOTENAME(ds.[SourcePath]) + '.' + QUOTENAME(ds.[SourceName]) AS 'SourceQuery'
 	FROM
@@ -147,7 +140,7 @@ BEGIN
 		INNER JOIN [ingest].[Connections] cn1
 			ON ds.[ConnectionFK] = cn1.[ConnectionId]
 		INNER JOIN [ingest].[Connections] cn2
-			ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake'
+			ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] = 'raw'
 		INNER JOIN [ingest].[Connections] cn3
 			ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
 	WHERE
@@ -155,5 +148,3 @@ BEGIN
 
 END
 GO
-
-
