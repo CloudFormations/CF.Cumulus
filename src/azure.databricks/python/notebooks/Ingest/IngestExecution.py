@@ -36,105 +36,52 @@ dbutils.widgets.text("Pipeline Run Id","")
 # COMMAND ----------
 
 import json
+import datetime
+from pyspark.sql.functions import *
+
+# COMMAND ----------
 
 payload = json.loads(dbutils.widgets.get("Merge Payload"))
-pipelineRunId = json.loads(dbutils.widgets.get("Pipeline Run Id",""))
-
-# payload = {
-  # 'pipelineId': str, # Unsure if required at this stage
-  # 'tableName': str,
-  # 'attributesList': str, # SQL string cast to list in python
-  # 'loadType': str,
-  # 'computeTarget': str,
-  # 'rawLoadDate': datetime,
-  # 'rawStorageName': str,
-  # 'rawContainerName': str,
-  # 'rawDirectoryName': str, # I think we want to ignore this one
-  # 'rawSchemaName': str # 'rawConnectionName': str
-  # 'rawFileName': str,
-  # 'transformedLastRunDate': datetime, # NULLable
-  # 'cleansedStorageName': str,
-  # 'cleansedContainerName': str,
-  # 'cleansedSchemaName': str # 'cleansedConnectionName': str
-  # 'cleansedFileName': str,
-# }
+pipelineRunId = dbutils.widgets.get("Pipeline Run Id")
 
 # COMMAND ----------
 
-#example values for widgets
-
-payload = {
-    "rawTableName": "control_Pipelines", # ingest.Datasets
-    "loadType": "F", # ingest.Datasets
-    "version": "1", # ingest.Datasets
-
-    "rawLoadDate": "2024-01-01", # ingest.Datasets or folderHierarchy
-
-    "computeTarget": "Databricks_small", # ingest.Connections # we could add a defensive check for the execution
-    "rawStorageName": "cumulusframeworkdev", # ingest.Connections
-    "rawContainerName": "raw", # ingest.Connections
-    "rawSchemaName": "MetadataDatabase", # ingest.Connections
-    "rawSecret": "cumulusframeworkdevaccesskey", # ingest.Connections
-
-    "rawFileName": "control_Pipelines", # ingest.Datasets
-    "rawFileType": "parquet", # ingest.Datasets
-    "dateTimeFolderHierarchy": "year=2024/month=04/day=18",  # ingest.Datasets
-
-    "cleansedTableName": "control_Pipelines", # ingest.Datasets
-    "cleansedLastRunDate": "2024-01-01",#Null # ingest.Datasets
-    "cleansedStorageName": "cumuluscleanseddev", # ingest.Connections
-    "cleansedContainerName": "cleansed", # ingest.Connections
-    "cleansedSchemaName": "MetadataDatabase", # ingest.Datasets
-    "cleansedFileName": "control_Pipelines", # ingest.Datasets
-    "cleansedSecret":"cumuluscleanseddevaccesskey", # ingest.Connections
-    "cleansedPkList": "PipelineId", # transform.Datasets
-    "cleansedPartitionFields": "", # transform.Datasets
-    "cleansedColumnsList": "PipelineId,OrchestratorId,StageId,PipelineName,LogicalPredecessorId,Enabled,PipelineRunId,PipelineExecutionDateTime", # ingest.Attributes
-    "cleansedColumnsTypeList": "integer,integer,integer,string,integer,boolean,string,string", # ingest.Attributes
-    "cleansedColumnsFormatList": ",,,,,,,", # ingest.Attributes
-
-    #sourceSysDataType
-    #sparkSysDataType
-
-
-    # additional supplementary columns if we want to replace the way we hand rawLoadDate, trasnformedLastRunDate
-    # "cleansedMetadataColumnList": "TimeOfIngestion,TimeOfConformation", # ingest.Datasets
-    # "cleansedMetadataColumnTypeList": "timestamp,timestamp", # ingest.Datasets
-    # "cleansedMetadataColumnFormatList": "yyyy-MM-dd HH:mm:ss,yyyy-MM-dd HH:mm:ss", # ingest.Datasets
-}
-
-pipelineRunId = 'TestRunIdGUID'
-
-# COMMAND ----------
 
 # create variables for each payload item
-
-tableName = payload["cleansedTableName"] 
-loadType = payload["loadType"]
+tableName = payload["DatasetDisplayName"] 
+loadType = payload["LoadAction"]
 loadTypeText = "full" if loadType == "F" else "incremental"
-version = f"{int(payload['version']):04d}"
+versionNumber = f"{int(payload['VersionNumber']):04d}"
 
-rawStorageName = payload['rawStorageName']
-rawContainerName = payload['rawContainerName']
-rawSecret = payload['rawSecret']
+rawStorageName = payload["RawStorageName"]
+rawContainerName = payload["RawContainerName"]
+rawSecret = f'{payload["RawStorageName"]}accesskey'
+rawLastLoadDate = payload["RawLastLoadDate"]
 
-rawSchemaName = payload['rawSchemaName']
-rawFileType = payload['rawFileType']
-dateTimeFolderHierarchy = payload['dateTimeFolderHierarchy']
+rawSchemaName = payload["RawSchemaName"]
+rawFileType = payload["RawFileType"]
+dateTimeFolderHierarchy = payload["DateTimeFolderHierarchy"]
 
-cleansedStorageName = payload['cleansedStorageName']
-cleansedContainerName = payload['cleansedContainerName']
-cleansedSecret = payload['cleansedSecret']
+cleansedStorageName = payload["CleansedStorageName"]
+cleansedContainerName = payload["CleansedContainerName"]
+cleansedSecret = f'{payload["CleansedStorageName"]}accesskey'
+cleansedLastLoadDate = payload["CleansedLastLoadDate"]
 
-cleansedSchemaName = payload["cleansedSchemaName"] 
+cleansedSchemaName = payload["CleansedSchemaName"] 
 
-# Semantic checks for these required in the TransformChecks notebook?
-pkList =  payload["cleansedPkList"].split(",")
-partitionList =  payload["cleansedPartitionFields"].split(",") if  payload["cleansedPartitionFields"] != "" else []
+# Semantic checks for these required in the IngestChecks notebook?
+pkList =  payload["CleansedPkList"].split(",")
+partitionList =  payload["CleansedPartitionFields"].split(",") if  payload["CleansedPartitionFields"] != "" else []
 
-columnsList = payload["cleansedColumnsList"].split(",")
-columnsTypeList = payload["cleansedColumnsTypeList"].split(",")
-columnsFormatList = payload["cleansedColumnsFormatList"].split(",")
+columnsList = payload["CleansedColumnsList"].split(",")
+columnsTypeList = payload["CleansedColumnsTypeList"].split(",")
+columnsFormatList = payload["CleansedColumnsFormatList"].split(",")
+# metadataColumnList = ["PipelineRunId","PipelineExecutionDateTime"]
+# metadataColumnTypeList = ["STRING","TIMESTAMP"]
+# metadataColumnFormatList = ["","yyyy-MM-ddTHH:mm:ss.SSSSSSSZ"]
+
+PipelineExecutionDateTime = datetime.datetime.now(datetime.timezone.utc)
+
 # metadataColumnList = payload["cleansedMetadataColumnList"].split(",")
 # metadataColumnTypeList = payload["cleansedMetadataColumnTypeList"].split(",")
 # metadataColumnFormatList = payload["cleansedMetadataColumnFormatList"].split(",")
@@ -146,6 +93,7 @@ columnsFormatList = payload["cleansedColumnsFormatList"].split(",")
 totalColumnList = columnsList
 totalColumnTypeList = columnsTypeList
 totalColumnFormatList = columnsFormatList
+
 
 # COMMAND ----------
 
@@ -181,7 +129,8 @@ options = {'header':'True'}
 
 
 #different options for specifying, based on how we save abfss folder hierarchy.
-fileFullPath = f"{rawAbfssPath}/{rawSchemaName}/{tableName}/version={version}/{loadTypeText}/{dateTimeFolderHierarchy}/{tableName}.{rawFileType}"
+fileFullPath = f"{rawAbfssPath}/{rawSchemaName}/{tableName}/version={versionNumber}/{loadTypeText}/{dateTimeFolderHierarchy}/{tableName}.{rawFileType}"
+print(fileFullPath)
 
 # assuming json,csv, parquet
 df = spark.read \
@@ -194,7 +143,8 @@ display(df)
 # COMMAND ----------
 
 # Create temporary table for SELECT statements
-tempViewName = f"{tableName}_{pipelineRunId}"
+pipelineRunIdViewExtension = pipelineRunId.replace('-', '_')
+tempViewName = f"{tableName}_{pipelineRunIdViewExtension}"
 df.createOrReplaceTempView(tempViewName)
 
 # COMMAND ----------
@@ -207,6 +157,8 @@ print(selectSQLFullString)
 # COMMAND ----------
 
 df = spark.sql(selectSQLFullString)
+df = df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(PipelineExecutionDateTime)))
+df = df.withColumn('pipelineRunId', lit(pipelineRunId))
 display(df)
 
 # COMMAND ----------
