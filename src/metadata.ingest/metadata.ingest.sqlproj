@@ -74,7 +74,9 @@
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <Build Include="ingest\Stored Procedures\AddConnectionType.sql" />
     <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
-    <Build Include="ingest\Stored Procedures\SetDatasetFirstLoadMetadata.sql" />
+    <Build Include="ingest\Stored Procedures\AddAuditAttribute.sql" />
+    <Build Include="ingest\Tables\AuditAttributes.sql" />
+    <None Include="Scripts\DefaultAuditAttributes.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />

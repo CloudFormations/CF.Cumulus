@@ -4,6 +4,48 @@ CREATE PROCEDURE [ingest].[GetMergePayload]
 	)
 AS
 BEGIN
+
+    -- Defensive check for results returned
+    DECLARE @ResultRowCount INT
+
+    SELECT 
+        @ResultRowCount = COUNT(*)
+    FROM 
+        [ingest].[DatasetsLatestVersion] AS ds
+    INNER JOIN 
+        ingest.Connections AS cn
+    ON  
+        ds.ConnectionFK = cn.ConnectionId
+    INNER JOIN 
+        ingest.connections AS cn2
+    ON 
+        ds.MergeComputeConnectionFK = cn2.ConnectionId
+    INNER JOIN
+        ingest.connections AS cn3
+    ON 
+        cn3.ConnectionDisplayName = 'PrimaryResourceGroup'
+    INNER JOIN
+        ingest.connections AS cn4
+    ON 
+        cn4.ConnectionDisplayName = 'PrimarySubscription'
+    INNER JOIN
+        ingest.connections AS cn5
+    ON 
+        cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation = 'raw'
+    INNER JOIN
+        ingest.connections AS cn6
+    ON 
+        cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
+    
+    WHERE
+        ds.DatasetId = @DatasetId
+
+    IF @ResultRowCount = 0
+    BEGIN
+        RAISERROR('No results returned for the provided Dataset Id. Confirm Dataset is enabled, and related Connections and Attributes are enabled.',16,1)
+    END
+
+
     DECLARE @CleansedColumnsList NVARCHAR(250)
     DECLARE @CleansedColumnsTypeList NVARCHAR(250)
     DECLARE @CleansedColumnsFormatList NVARCHAR(250)
@@ -19,7 +61,7 @@ BEGIN
         @CleansedColumnsTypeList = STRING_AGG(att.AttributeTargetDataType,','),
         @CleansedColumnsFormatList = STRING_AGG(att.AttributeTargetDataFormat, ',')
     FROM 
-        ingest.Datasets AS ds
+        [ingest].[DatasetsLatestVersion] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
@@ -32,7 +74,7 @@ BEGIN
     SELECT 
         @PkAttributesList = STRING_AGG(att.AttributeName,',')
     FROM 
-        ingest.Datasets AS ds
+        [ingest].[DatasetsLatestVersion] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
@@ -48,7 +90,7 @@ BEGIN
     SELECT 
         @PkAttributesList = STRING_AGG(att.AttributeName,',')
     FROM 
-        ingest.Datasets AS ds
+        [ingest].[DatasetsLatestVersion] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
@@ -70,7 +112,7 @@ BEGIN
             @RawLastLoadDate = RawLastFullLoadDate,
             @CleansedLastLoadDate = CleansedLastFullLoadDate
         FROM 
-            ingest.Datasets
+            [ingest].[DatasetsLatestVersion]
         WHERE 
             DatasetId = @DatasetId
     ELSE IF @LoadAction = 'I'
@@ -78,21 +120,21 @@ BEGIN
             @RawLastLoadDate = RawLastIncrementalLoadDate,
             @CleansedLastLoadDate = CleansedLastIncrementalLoadDate
         FROM 
-            ingest.Datasets
+            [ingest].[DatasetsLatestVersion]
         WHERE 
             DatasetId = @DatasetId
     
     ELSE IF @LoadAction = 'X'
-        RAISERROR('Erroneous Load Status. Review the ingest LoadStatus value for the dataset in ingest.Datasets',16,1)
+        RAISERROR('Erroneous Load Status. Review the ingest LoadStatus value for the dataset in [ingest].[DatasetsLatestVersion]',16,1)
     ELSE
-        RAISERROR('Unexpected Load action. Review the ingest LoadStatus value for the dataset in ingest.Datasets',16,1)
+        RAISERROR('Unexpected Load action. Review the ingest LoadStatus value for the dataset in [ingest].[DatasetsLatestVersion]',16,1)
   
     SELECT 
         @DateTimeFolderHierarchy = 'year=' + CAST(FORMAT(@RawLastLoadDate,'yyyy') AS VARCHAR) + '/' + 
         'month=' + CAST(FORMAT(@RawLastLoadDate,'MM') AS VARCHAR) + '/' + 
         'day=' + CAST(FORMAT(@RawLastLoadDate,'dd') AS VARCHAR) 
     FROM 
-        ingest.Datasets AS ds
+        [ingest].[DatasetsLatestVersion] AS ds
     WHERE
         ds.DatasetId = @DatasetId
 
@@ -128,7 +170,7 @@ BEGIN
         @PartitionByAttributesList AS 'CleansedPartitionFields',
         @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy'
     FROM 
-        ingest.Datasets AS ds
+        [ingest].[DatasetsLatestVersion] AS ds
     INNER JOIN 
         ingest.Connections AS cn
     ON  
@@ -153,7 +195,6 @@ BEGIN
         ingest.connections AS cn6
     ON 
         cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
-    
     WHERE
         ds.DatasetId = @DatasetId
 
