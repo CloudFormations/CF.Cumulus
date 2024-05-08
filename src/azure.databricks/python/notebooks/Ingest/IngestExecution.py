@@ -119,13 +119,13 @@ cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
 # COMMAND ----------
 
 # Spark read options. Can be customised if needed, but this is standard.
-options = {'header':'True'}
+# options = {'header':'True'}
 
 # Extended option, we need to confirm the mergeSchema failure behaviour. When switching versions of dataset, will want this enabled.
-# options = {
-#     'header':'True',
-#     "mergeSchema": "true"
-#     }
+options = {
+    'header':'True',
+    "mergeSchema": "true"
+    }
 
 
 #different options for specifying, based on how we save abfss folder hierarchy.
@@ -158,7 +158,7 @@ print(selectSQLFullString)
 
 df = spark.sql(selectSQLFullString)
 df = df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(PipelineExecutionDateTime)))
-df = df.withColumn('pipelineRunId', lit(pipelineRunId))
+df = df.withColumn('PipelineRunId', lit(PipelineRunId))
 display(df)
 
 # COMMAND ----------
