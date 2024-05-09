@@ -55,7 +55,7 @@
 					},
 					"cases": [
 						{
-							"value": "Ingest_LS_Databricks_SmallCluster_MIAuth",
+							"value": "Ingest_LS_Databricks_Cluster_MIAuth",
 							"activities": [
 								{
 									"name": "Check Payload Validity Small Databricks Compute",
