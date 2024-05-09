@@ -63,6 +63,7 @@
     <Folder Include="ingest\Views" />
     <Folder Include="ingest\Stored Procedures" />
     <Folder Include="Scripts" />
+    <Folder Include="ingest\Functions" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Security\ingest.sql" />
@@ -74,7 +75,14 @@
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <Build Include="ingest\Stored Procedures\AddConnectionType.sql" />
     <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
-    <Build Include="ingest\Stored Procedures\SetDatasetFirstLoadMetadata.sql" />
+    <Build Include="ingest\Stored Procedures\AddAuditAttribute.sql" />
+    <Build Include="ingest\Tables\AuditAttributes.sql" />
+    <None Include="Scripts\DefaultAuditAttributes.sql" />
+    <Build Include="ingest\Stored Procedures\GetMergePayload.sql" />
+    <Build Include="ingest\Stored Procedures\SetIngestLoadStatus.sql" />
+    <Build Include="ingest\Functions\GetIngestLoadAction.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Build>
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />

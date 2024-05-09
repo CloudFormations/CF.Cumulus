@@ -1,6 +1,7 @@
 CREATE TABLE [ingest].[Datasets](
 	[DatasetId] [int] IDENTITY(1,1) NOT NULL,
 	[ConnectionFK] [int] NOT NULL,
+	[MergeComputeConnectionFK] [int] NULL,
 	[DatasetDisplayName] [nvarchar](50) NOT NULL,
 	[SourcePath] [nvarchar](100) NOT NULL,
 	[SourceName] [nvarchar](100) NOT NULL,
@@ -8,12 +9,17 @@ CREATE TABLE [ingest].[Datasets](
 	[VersionNumber] [int] NOT NULL,
 	[VersionValidFrom] [datetime2](7) NULL,
 	[VersionValidTo] [datetime2](7) NULL,
-	[FullLoad] [bit] NOT NULL,
-	[FirstLoad] [bit] NOT NULL,
-	[FirstLoadCompleteDate] [datetime2](7) NULL,
 	[LoadType] [char](1) NOT NULL,
+	[LoadStatus] [int] NULL, -- review this to bitwise col
 	[CDCWhereClause] [nvarchar](max) NULL,
-	[Enabled] [bit] NOT NULL,
+	[RawLastFullLoadDate] [datetime2](7) NULL,
+	[RawLastIncrementalLoadDate] [datetime2](7) NULL,
+	[CleansedPath] [nvarchar](100) NOT NULL,
+	[CleansedName] [nvarchar](100) NOT NULL,
+	[CleansedLastIncrementalLoadDate] [datetime2](7) NULL,
+	[CleansedLastFullLoadDate] [datetime2](7) NULL,
+	[Enabled] [bit] NOT NULL
+	
 PRIMARY KEY CLUSTERED 
 (
 	[DatasetId] ASC

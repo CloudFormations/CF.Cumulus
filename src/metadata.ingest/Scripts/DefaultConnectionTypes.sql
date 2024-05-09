@@ -43,3 +43,8 @@
 		@ConnectionTypeDisplayName = N'Azure Resource Group', 
 		@SourceLanguageType = 'NA',
 		@Enabled = 1;
+
+	EXEC [ingest].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Azure Subscription', 
+		@SourceLanguageType = 'NA',
+		@Enabled = 1;

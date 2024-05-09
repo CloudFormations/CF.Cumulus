@@ -1,0 +1,241 @@
+{
+	"name": "Ingest_Merge",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Merge Payload",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[ingest].[GetMergePayload]",
+						"storedProcedureParameters": {
+							"DatasetId": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.DatasetId",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "GetSetMetadata",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Switch Compute",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Get Merge Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@activity('Get Merge Payload').output.firstRow.ComputeLinkedServiceName",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "Ingest_LS_Databricks_SmallCluster_MIAuth",
+							"activities": [
+								{
+									"name": "Check Payload Validity Small Databricks Compute",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/Ingest/IngestChecks",
+										"baseParameters": {
+											"Merge Payload": {
+												"value": "@string(activity('Get Merge Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_SmallCluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceUrl",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ClusterId": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeClusterId",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Raw to Cleansed Execution Small Databricks Compute",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Check Payload Validity Small Databricks Compute",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/Ingest/IngestExecution",
+										"baseParameters": {
+											"Merge Payload": {
+												"value": "@string(activity('Get Merge Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_SmallCluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceUrl",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ClusterId": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeClusterId",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Update Metadata Load Status",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Switch Compute",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[ingest].[SetIngestLoadStatus]",
+					"storedProcedureParameters": {
+						"DatasetId": {
+							"value": {
+								"value": "@pipeline().parameters.DatasetId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"IngestStage": {
+							"value": "Cleansed",
+							"type": "String"
+						},
+						"LoadType": {
+							"value": {
+								"value": "@activity('Get Merge Payload').output.firstRow.LoadAction",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"PipelineRunDateTime": {
+							"value": {
+								"value": "@activity('Get Merge Payload').output.firstRow.RawLastLoadDate",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "cumulusdatabase",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"DatasetId": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Ingest"
+		},
+		"annotations": []
+	}
+}
