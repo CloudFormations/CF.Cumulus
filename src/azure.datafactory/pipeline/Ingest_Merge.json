@@ -83,11 +83,11 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_SmallCluster_MIAuth",
+										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
 											"WorkspaceURL": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceUrl",
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
 												"type": "Expression"
 											},
 											"ResourceGroupName": {
@@ -142,7 +142,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_SmallCluster_MIAuth",
+										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
 											"WorkspaceURL": {
