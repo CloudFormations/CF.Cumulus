@@ -1,0 +1,30 @@
+{
+	"name": "Ingest_LS_Databricks_Cluster_MIAuth",
+	"properties": {
+		"parameters": {
+			"WorkspaceURL": {
+				"type": "string"
+			},
+			"ResourceGroupName": {
+				"type": "string"
+			},
+			"ResourceName": {
+				"type": "string"
+			},
+			"ClusterId": {
+				"type": "string"
+			},
+			"SubscriptionId": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "@linkedService().WorkspaceURL",
+			"authentication": "MSI",
+			"workspaceResourceId": "@concat('/subscriptions/',linkedService().SubscriptionId,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
+			"existingClusterId": "@linkedService().ClusterId"
+		}
+	}
+}
