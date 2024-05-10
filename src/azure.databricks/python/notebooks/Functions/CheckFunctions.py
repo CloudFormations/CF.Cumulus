@@ -100,32 +100,32 @@ def deltaTableExistsCheck(tablePath: str, loadType: str) -> None:
 # Compare the latest load date for the cleansed table with the load date of the raw file.
 # Check nullable condition for each parameter
 # manualOverride may have some quirks to historic delta loads being reapplied. We possibly need to use time-travel or something else in delta to achieve the effect.
-def compareLoadVsLastCleansedDate(rawLoadDate: datetime.date , cleansedLastRunDate: datetime.date, manualOverride: bool = False) -> None:
+def compareRawLoadVsLastCleansedDate(rawLastLoadDate: datetime.date , cleansedLastLoadDate: datetime.date, manualOverride: bool = False) -> None:
     """
     Check that the load date provided in the payload, which comes from the hierarchical folder path in raw, is not more recent than the last runtime of the ingestion into the merged cleansed dataset. If it does, raise an error for investigation.
  
     Args:
-        rawLoadDate (datetime): The raw data load timestamp.
-        cleansedLastRunDate (datetime): The transformation process timestamp for the dataset
+        rawLastLoadDate (datetime): The raw data load timestamp.
+        cleansedLastLoadDate (datetime): The transformation process timestamp for the dataset
         manualOverride (bool): Manual override configuration, allowing users to manually load historic files on top of the current table
     """
-    if rawLoadDate is None:
+    if rawLastLoadDate is None:
         raise Exception("Raw file has not been loaded historically. Confirm the desired file exists and the metadata provided is accurate.")
-    if cleansedLastRunDate is None:
+    if cleansedLastLoadDate is None:
         print('Cleansed has not been populated.') 
         # This should correspond with a full only, based on previous check condition, but possibly worth reviewing...
-
-    # check how this behaves with Nones
-    if (rawLoadDate > cleansedLastRunDate):
-        print('Raw file load date greater than the cleansed last run date. It is safe to load this file.')
-    # check how this behaves with Nones
-    elif (rawLoadDate == cleansedLastRunDate):
-        print('Raw file load date equals than the cleansed last run date. It is safe to load this file.')
-    # review case is accurate and appropriate in event of reapplying incrementals out-of-order
-    elif rawLoadDate < cleansedLastRunDate and (manualOverride is True):
-        print('Raw file load date less than the cleansed last run date. Manual override is selected, and this load historic is intended.')
-    elif rawLoadDate < cleansedLastRunDate and (manualOverride is False):
-        raise Exception('Raw file load date less than the cleansed last run date. This is not supported behaviour and needs manual overriding if intended.')
+    elif (cleansedLastLoadDate is not None):
+        if (rawLastLoadDate > cleansedLastLoadDate):
+            print('Raw file load date greater than the cleansed last run date. It is safe to load this file.')
+        elif (rawLastLoadDate == cleansedLastLoadDate):
+            print('Raw file load date equals than the cleansed last run date. It is safe to load this file.')
+        # review case is accurate and appropriate in event of reapplying incrementals out-of-order
+        elif (rawLastLoadDate < cleansedLastLoadDate) and (manualOverride is True):
+            print('Raw file load date less than the cleansed last run date. Manual override is selected, and this load historic is intended.')
+        elif (rawLastLoadDate < cleansedLastLoadDate) and (manualOverride is False):
+            raise Exception('Raw file load date less than the cleansed last run date. This is not supported behaviour and needs manual overriding if intended.')
+        else:
+            raise Exception('Unexpected state.')
     else:
         raise Exception('Unexpected state.')
 

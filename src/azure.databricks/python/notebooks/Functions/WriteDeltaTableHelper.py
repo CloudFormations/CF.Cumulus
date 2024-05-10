@@ -35,7 +35,7 @@ class DeltaHelper(object):
             schemaName: str, 
             tableName: str,
             abfssPath: str, 
-            pfSQL: str
+            partitionFieldsSQL: str
         ) -> None:
         """
         Summary:
@@ -47,14 +47,14 @@ class DeltaHelper(object):
             abfssPath (str): Name of the ADLS storage account
             schemaName (str): Name of the schema to create the table in
             tableName (str): Name of the target table. This will be created if it does not already exist using the schema of the source dataframe
-            pfSQL (str): SQL Statement based on the partition fields for the Delta table
+            partitionFieldsSQL (str): SQL Statement based on the partition fields for the Delta table
 
         """
         if containerName == "cleansed":
             createTableSQL = f"""
             CREATE TABLE IF NOT EXISTS {schemaName}.{tableName} 
             LOCATION '{abfssPath}{schemaName}/{tableName}'
-            {pfSQL}AS SELECT * FROM {tempViewName}
+            {partitionFieldsSQL}AS SELECT * FROM {tempViewName}
             """
         else: 
             raise Exception(f'Container name ''{containerName}'' not supported.')
@@ -71,12 +71,12 @@ class DeltaHelper(object):
             partitionFields (dict): Dictionary of Attributes in the dataset to partition the Delta table by.
         
         Returns:
-            pfSQL (str): Spark SQL partition by clause containing the provided Attributes.
+            partitionFieldsSQL (str): Spark SQL partition by clause containing the provided Attributes.
         """
-        pfSQL = ''
+        partitionFieldsSQL = ''
         if len(partitionFields) > 0:
-            pfSQL = "\nPARTITIONED BY (" + ",".join(f"{pf}" for pf in partitionFields) + ")\n"
-        return pfSQL
+            partitionFieldsSQL = "\nPARTITIONED BY (" + ",".join(f"{pf}" for pf in partitionFields) + ")\n"
+        return partitionFieldsSQL
 
     def checkDfSize(self, df: DataFrame) -> tuple[bool,dict]:
         """
@@ -94,7 +94,7 @@ class DeltaHelper(object):
             state = True
             output = {}
         else:
-            status = False
+            state = False
             output = {"message": "No New Rows to Process"}
         return state, output
         
@@ -198,13 +198,13 @@ class DeltaHelper(object):
             tuple[dict, DataFrame]: _description_
         """
 
-        pfSQL = self.partitionFieldsSQL(partitionFields = partitionFields)
-        print(pfSQL)
+        partitionFieldsSQL = self.partitionFieldsSQL(partitionFields = partitionFields)
+        print(partitionFieldsSQL)
 
         self.createSchema(schemaName = schemaName)
 
         # folder hierarchy in transformed storage sourceName/tableName, partitioned by partition column where appropriate
-        self.createTable(tempViewName = tempViewName, containerName = containerName, schemaName = schemaName, tableName = tableName, abfssPath = abfssPath, pfSQL = pfSQL)
+        self.createTable(tempViewName = tempViewName, containerName = containerName, schemaName = schemaName, tableName = tableName, abfssPath = abfssPath, partitionFieldsSQL = partitionFieldsSQL)
         
 
         # wrap in function, from >
@@ -224,11 +224,11 @@ class DeltaHelper(object):
 
         # if dfDataFound :
         if writeMode.lower() == "merge":
-            self.mergeSQL(df=df, pkFields=pkFields, partitionFields=partitionFields)
+            self.mergeSQL(df=df, tgt = tgt, pkFields=pkFields, partitionFields=partitionFields)
         elif writeMode.lower() == "insert":
-            self.insertSQL(df, schemaName, tableName)
+            self.insertSQL(df = df, schemaName = schemaName, tableName = tableName)
         elif writeMode.lower() == "overwrite":
-            self.overwriteSQL(df, schemaName, tableName)
+            self.overwriteSQL(df = df, schemaName = schemaName, tableName = tableName)
 
         output = self.getOperationMetrics(schemaName=schemaName, tableName=tableName, output=output)
         return output, df

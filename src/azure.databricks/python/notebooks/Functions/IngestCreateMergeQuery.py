@@ -1,10 +1,10 @@
 # Databricks notebook source
-
 def selectSqlColumnsFormatString(totalColumnList:list,totalColumnTypeList:list, totalColumnFormatList:list) -> list:
 
     sqlFormat = [
-        f"to_timestamp({str(col)},'{_format}') as {str(col)}" if _type == "timestamp" 
-        else f"to_date({str(col)},'{_format}') as {str(col)}" if _type == "date" 
+        f"to_timestamp({str(col)},'{_format}') as {str(col)}" if _type.lower() == "timestamp" 
+        else f"to_timestamp({str(col)}) as {str(col)}" if (_type.lower() == "timestamp" and _format == 'yyyy-MM-ddTHH:mm:ss.SSSSSSSZ')
+        else f"to_date({str(col)},'{_format}') as {str(col)}" if _type.lower() == "date" 
         else f"cast({str(col)} as {_type}) as {str(col)}"
         for col,_type,_format in zip(totalColumnList,totalColumnTypeList, totalColumnFormatList)
         ]

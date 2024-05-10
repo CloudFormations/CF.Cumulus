@@ -2,10 +2,13 @@ CREATE TABLE [ingest].[Attributes](
 	[AttributeId] [int] IDENTITY(1,1) NOT NULL,
 	[DatasetFK] [int] NULL,
 	[AttributeName] [nvarchar](50) NOT NULL,
-	[AttributeDataType] [nvarchar](50) NULL,
+	[AttributeSourceDataType] [nvarchar](50) NULL,
+	[AttributeTargetDataType] [nvarchar](50) NULL,
+	[AttributeTargetDataFormat] [varchar](100) NULL,
 	[AttributeDescription] [nvarchar](200) NULL,
-	[DeltaFilterColumn] [bit] NOT NULL,
-	[Enabled] [bit] NOT NULL,
+	[PkAttribute] [bit] NOT NULL,
+	[PartitionByAttribute] [bit] NOT NULL,
+	[Enabled] [bit] NOT NULL
 PRIMARY KEY CLUSTERED 
 (
 	[AttributeId] ASC
