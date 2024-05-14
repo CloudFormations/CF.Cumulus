@@ -488,7 +488,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": Common_LS_cumulusdatabase,
+					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			}
