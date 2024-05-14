@@ -223,7 +223,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "cumulusdatabase",
+					"referenceName": Common_LS_cumulusdatabase,
 					"type": "LinkedServiceReference"
 				}
 			}
