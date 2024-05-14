@@ -21,7 +21,7 @@
 			"password": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
-					"referenceName": "cumuluskeys",
+					"referenceName": "Common_LS_cumuluskeys",
 					"type": "LinkedServiceReference"
 				},
 				"secretName": "vmadminpassword"
