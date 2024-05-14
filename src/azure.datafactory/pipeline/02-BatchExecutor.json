@@ -140,7 +140,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": Common_LS_cumulusdatabase,
+								"referenceName": "Common_LS_cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -177,7 +177,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": Common_LS_cumulusdatabase,
+								"referenceName": "Common_LS_cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						}
@@ -273,7 +273,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": Common_LS_cumulusdatabase,
+					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -434,7 +434,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": Common_LS_cumulusdatabase,
+								"referenceName": "Common_LS_cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -542,7 +542,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": Common_LS_cumulusdatabase,
+													"referenceName": "Common_LS_cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -591,7 +591,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": Common_LS_cumulusdatabase,
+													"referenceName": "Common_LS_cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -640,7 +640,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": Common_LS_cumulusdatabase,
+													"referenceName": "Common_LS_cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -689,7 +689,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": Common_LS_cumulusdatabase,
+													"referenceName": "Common_LS_cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -745,7 +745,7 @@
 													}
 												},
 												"linkedServiceName": {
-													"referenceName": Common_LS_cumulusdatabase,
+													"referenceName": "Common_LS_cumulusdatabase",
 													"type": "LinkedServiceReference"
 												}
 											}
@@ -800,7 +800,7 @@
 											}
 										},
 										"linkedServiceName": {
-											"referenceName": Common_LS_cumulusdatabase,
+											"referenceName": "Common_LS_cumulusdatabase",
 											"type": "LinkedServiceReference"
 										}
 									}
@@ -854,7 +854,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": Common_LS_cumulusdatabase,
+								"referenceName": "Common_LS_cumulusdatabase",
 								"type": "LinkedServiceReference"
 							}
 						}
@@ -885,7 +885,7 @@
 					"storedProcedureName": "[control].[ExecutePrecursorProcedure]"
 				},
 				"linkedServiceName": {
-					"referenceName": Common_LS_cumulusdatabase,
+					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -985,7 +985,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": Common_LS_cumulusdatabase,
+					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			}
