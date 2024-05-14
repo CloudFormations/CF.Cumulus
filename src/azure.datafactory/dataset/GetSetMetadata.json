@@ -3,7 +3,7 @@
 	"properties": {
 		"description": "Single generic dataset used to get and set all database metadata.",
 		"linkedServiceName": {
-			"referenceName": "cumulusdatabase",
+			"referenceName": "Common_LS_cumulusdatabase",
 			"type": "LinkedServiceReference"
 		},
 		"folder": {
@@ -12,7 +12,7 @@
 		"annotations": [
 			"Cloud Formations",
 			"CF.Cumulus",
-			"Control"
+			"Common"
 		],
 		"type": "AzureSqlTable",
 		"schema": []

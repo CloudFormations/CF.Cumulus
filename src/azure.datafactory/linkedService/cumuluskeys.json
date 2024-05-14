@@ -5,7 +5,7 @@
 		"annotations": [
 			"Cloud Formations",
 			"CF.Cumulus",
-			"Control"
+			"Common"
 		],
 		"type": "AzureKeyVault",
 		"typeProperties": {
