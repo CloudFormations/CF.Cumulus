@@ -1,5 +1,5 @@
 {
-	"name": "cumulusfunctions",
+	"name": "Common_LS_cumulusfunctions",
 	"properties": {
 		"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level.",
 		"annotations": [
@@ -13,7 +13,7 @@
 			"functionKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
-					"referenceName": "cumuluskeys",
+					"referenceName": "Common_LS_cumuluskeys",
 					"type": "LinkedServiceReference"
 				},
 				"secretName": "cumulusfunctionsKey"

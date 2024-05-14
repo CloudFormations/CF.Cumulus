@@ -38,7 +38,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "cumulusfunctions",
+					"referenceName": "Common_LS_cumulusfunctions",
 					"type": "LinkedServiceReference"
 				}
 			},
@@ -455,7 +455,7 @@
 								}
 							},
 							"linkedServiceName": {
-								"referenceName": "cumulusfunctions",
+								"referenceName": "Common_LS_cumulusfunctions",
 								"type": "LinkedServiceReference"
 							}
 						},
@@ -773,7 +773,7 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "cumulusfunctions",
+										"referenceName": "Common_LS_cumulusfunctions",
 										"type": "LinkedServiceReference"
 									}
 								},
@@ -1013,7 +1013,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "cumulusfunctions",
+					"referenceName": "Common_LS_cumulusfunctions",
 					"type": "LinkedServiceReference"
 				}
 			},

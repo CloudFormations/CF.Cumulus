@@ -1,5 +1,5 @@
 {
-	"name": "cumuluskeys",
+	"name": "Common_LS_cumuluskeys",
 	"properties": {
 		"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
 		"annotations": [
