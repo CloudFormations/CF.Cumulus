@@ -227,7 +227,7 @@
 							},
 							"type": "String"
 						},
-						"PipelineRunDateTime": {
+						"FileLoadDateTime": {
 							"value": {
 								"value": "@activity('Get Merge Payload').output.firstRow.RawLastLoadDate",
 								"type": "Expression"
