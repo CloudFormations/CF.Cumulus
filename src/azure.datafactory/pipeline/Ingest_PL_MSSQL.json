@@ -733,7 +733,7 @@
 							},
 							"type": "String"
 						},
-						"PipelineRunDateTime": {
+						"FileLoadDateTime": {
 							"value": {
 								"value": "@variables('LocalRunDateTime')",
 								"type": "Expression"

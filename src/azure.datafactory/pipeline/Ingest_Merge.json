@@ -45,6 +45,12 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
+					},
+					{
+						"activity": "Set Pipeline Run Date Time",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
 				"userProperties": [],
@@ -78,6 +84,10 @@
 											},
 											"Pipeline Run Id": {
 												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
 												"type": "Expression"
 											}
 										}
@@ -137,6 +147,10 @@
 											},
 											"Pipeline Run Id": {
 												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
 												"type": "Expression"
 											}
 										}
@@ -213,7 +227,7 @@
 							},
 							"type": "String"
 						},
-						"PipelineRunDateTime": {
+						"FileLoadDateTime": {
 							"value": {
 								"value": "@activity('Get Merge Payload').output.firstRow.RawLastLoadDate",
 								"type": "Expression"
@@ -226,11 +240,33 @@
 					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Set Pipeline Run Date Time",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PipelineRunDateTime",
+					"value": {
+						"value": "@string(utcnow())",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
 			"DatasetId": {
-				"type": "string"
+				"type": "int"
+			}
+		},
+		"variables": {
+			"PipelineRunDateTime": {
+				"type": "String"
 			}
 		},
 		"folder": {
