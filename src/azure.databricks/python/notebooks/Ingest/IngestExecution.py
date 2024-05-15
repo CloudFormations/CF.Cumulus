@@ -23,12 +23,17 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../Functions/IngestMergePayloadVariables
+
+# COMMAND ----------
+
 # MAGIC %run ../Functions/WriteDeltaTableHelper
 
 # COMMAND ----------
 
 dbutils.widgets.text("Merge Payload","")
 dbutils.widgets.text("Pipeline Run Id","")
+dbutils.widgets.text("Pipeline Run DateTime","")
 #Remove Widgets
 #dbutils.widgets.remove("<widget name>")
 #dbutils.widgets.removeAll()
@@ -38,62 +43,22 @@ dbutils.widgets.text("Pipeline Run Id","")
 import json
 import datetime
 from pyspark.sql.functions import *
+import pandas as pd
 
 # COMMAND ----------
 
 payload = json.loads(dbutils.widgets.get("Merge Payload"))
 pipelineRunId = dbutils.widgets.get("Pipeline Run Id")
+pipelineExecutionDateTimeString = dbutils.widgets.get("Pipeline Run DateTime")
+
+# COMMAND ----------
+
+pipelineExecutionDateTime = pd.to_datetime(pipelineExecutionDateTimeString, format='%Y-%m-%dT%H:%M:%S.%fZ')
 
 # COMMAND ----------
 
 
-# create variables for each payload item
-tableName = payload["DatasetDisplayName"] 
-loadType = payload["LoadAction"]
-loadTypeText = "full" if loadType == "F" else "incremental"
-versionNumber = f"{int(payload['VersionNumber']):04d}"
-
-rawStorageName = payload["RawStorageName"]
-rawContainerName = payload["RawContainerName"]
-rawSecret = f'{payload["RawStorageName"]}accesskey'
-rawLastLoadDate = payload["RawLastLoadDate"]
-
-rawSchemaName = payload["RawSchemaName"]
-rawFileType = payload["RawFileType"]
-dateTimeFolderHierarchy = payload["DateTimeFolderHierarchy"]
-
-cleansedStorageName = payload["CleansedStorageName"]
-cleansedContainerName = payload["CleansedContainerName"]
-cleansedSecret = f'{payload["CleansedStorageName"]}accesskey'
-cleansedLastLoadDate = payload["CleansedLastLoadDate"]
-
-cleansedSchemaName = payload["CleansedSchemaName"] 
-
-# Semantic checks for these required in the IngestChecks notebook?
-pkList =  payload["CleansedPkList"].split(",")
-partitionList =  payload["CleansedPartitionFields"].split(",") if  payload["CleansedPartitionFields"] != "" else []
-
-columnsList = payload["CleansedColumnsList"].split(",")
-columnsTypeList = payload["CleansedColumnsTypeList"].split(",")
-columnsFormatList = payload["CleansedColumnsFormatList"].split(",")
-# metadataColumnList = ["PipelineRunId","PipelineExecutionDateTime"]
-# metadataColumnTypeList = ["STRING","TIMESTAMP"]
-# metadataColumnFormatList = ["","yyyy-MM-ddTHH:mm:ss.SSSSSSSZ"]
-
-PipelineExecutionDateTime = datetime.datetime.now(datetime.timezone.utc)
-
-# metadataColumnList = payload["cleansedMetadataColumnList"].split(",")
-# metadataColumnTypeList = payload["cleansedMetadataColumnTypeList"].split(",")
-# metadataColumnFormatList = payload["cleansedMetadataColumnFormatList"].split(",")
-
-# totalColumnList = columnsList + metadataColumnList
-# totalColumnTypeList = columnsTypeList + metadataColumnTypeList
-# totalColumnFormatList = columnsFormatList + metadataColumnFormatList
-
-totalColumnList = columnsList
-totalColumnTypeList = columnsTypeList
-totalColumnFormatList = columnsFormatList
-
+[tableName, loadType, loadTypeText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList] = getMergePayloadVariables(payload)
 
 # COMMAND ----------
 
@@ -138,7 +103,7 @@ df = spark.read \
     .format(rawFileType) \
     .load(fileFullPath)
 
-display(df)
+# display(df)
 
 # COMMAND ----------
 
@@ -157,9 +122,9 @@ print(selectSQLFullString)
 # COMMAND ----------
 
 df = spark.sql(selectSQLFullString)
-df = df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(PipelineExecutionDateTime)))
-df = df.withColumn('PipelineRunId', lit(PipelineRunId))
-display(df)
+df = df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(pipelineExecutionDateTime)))
+df = df.withColumn('PipelineRunId', lit(pipelineRunId))
+# display(df)
 
 # COMMAND ----------
 
