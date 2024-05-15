@@ -3,7 +3,7 @@ CREATE PROCEDURE [ingest].[SetIngestLoadStatus]
     @DatasetId INT,
     @LoadType VARCHAR(1),
     @IngestStage VARCHAR(20),
-    @PipelineRunDateTime DATETIME2
+    @FileLoadDateTime DATETIME2
 )
 AS
 BEGIN
@@ -26,7 +26,7 @@ BEGIN
 
     UPDATE ingest.Datasets
     SET LoadStatus = @LoadStatus,
-        RawLastFullLoadDate = @PipelineRunDateTime
+        RawLastFullLoadDate = @FileLoadDateTime
     WHERE DatasetId = @DatasetId
 END
 
@@ -36,7 +36,7 @@ BEGIN
 
     UPDATE ingest.Datasets
     SET LoadStatus = @LoadStatus,
-        RawLastIncrementalLoadDate = @PipelineRunDateTime
+        RawLastIncrementalLoadDate = @FileLoadDateTime
     WHERE DatasetId = @DatasetId
 END
 
@@ -50,7 +50,7 @@ BEGIN
 
     UPDATE ingest.Datasets
     SET LoadStatus = @LoadStatus,
-        CleansedLastFullLoadDate = @PipelineRunDateTime
+        CleansedLastFullLoadDate = @FileLoadDateTime
     WHERE DatasetId = @DatasetId
 END
 
@@ -59,9 +59,8 @@ BEGIN
     SET @LoadStatus = @LoadStatus | POWER(2,4)  
     UPDATE ingest.Datasets
     SET LoadStatus = @LoadStatus,
-        CleansedLastIncrementalLoadDate = @PipelineRunDateTime
+        CleansedLastIncrementalLoadDate = @FileLoadDateTime
     WHERE DatasetId = @DatasetId
 END
 
 END
-GO
