@@ -47,7 +47,7 @@
 						]
 					},
 					{
-						"activity": "Set Pipeline Run Date Time",
+						"activity": "Set Pipeline Run DateTime",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -242,7 +242,8 @@
 				}
 			},
 			{
-				"name": "Set Pipeline Run Date Time",
+				"name": "Set Pipeline Run DateTime",
+
 				"type": "SetVariable",
 				"dependsOn": [],
 				"policy": {
@@ -262,6 +263,11 @@
 		"parameters": {
 			"DatasetId": {
 				"type": "int"
+			}
+		},
+		"variables": {
+			"PipelineRunDateTime": {
+				"type": "String"
 			}
 		},
 		"variables": {
