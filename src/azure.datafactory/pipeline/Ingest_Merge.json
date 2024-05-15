@@ -45,6 +45,12 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
+					},
+					{
+						"activity": "Set Pipeline Run DateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
 				"userProperties": [],
@@ -78,6 +84,10 @@
 											},
 											"Pipeline Run Id": {
 												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
 												"type": "Expression"
 											}
 										}
@@ -137,6 +147,10 @@
 											},
 											"Pipeline Run Id": {
 												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
 												"type": "Expression"
 											}
 										}
@@ -226,11 +240,33 @@
 					"referenceName": "cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Set Pipeline Run DateTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PipelineRunDateTime",
+					"value": {
+						"value": "@string(utcnow())",
+						"type": "Expression"
+					}
+				}
 			}
 		],
 		"parameters": {
 			"DatasetId": {
 				"type": "string"
+			}
+		},
+		"variables": {
+			"PipelineRunDateTime": {
+				"type": "String"
 			}
 		},
 		"folder": {
