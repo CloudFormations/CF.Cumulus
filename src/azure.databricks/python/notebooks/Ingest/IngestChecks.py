@@ -71,7 +71,7 @@ cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
 # COMMAND ----------
 
 # Check data types and nullability of each dictionary element
-loadTypeCheck(loadType = loadType)
+checkLoadType(loadType = loadType)
 
 # COMMAND ----------
 
@@ -81,10 +81,10 @@ loadTypeCheck(loadType = loadType)
 # COMMAND ----------
 
 # Check Raw storage account exists and is accessible.
-abfssCheck(abfssPath=rawAbfssPath)
+checkAbfss(abfssPath=rawAbfssPath)
 
 # Check cleansed storage account exists and is accessible.
-abfssCheck(abfssPath=cleansedAbfssPath)
+checkAbfss(abfssPath=cleansedAbfssPath)
 
 # COMMAND ----------
 
@@ -98,7 +98,7 @@ print(cleansedTablePath)
 
 # COMMAND ----------
 
-deltaTableExistsCheck(tablePath = cleansedTablePath, loadType = loadType)
+checkExistsDeltaTable(tablePath = cleansedTablePath, loadType = loadType)
 
 # COMMAND ----------
 
