@@ -5,7 +5,7 @@ from datetime import datetime
 # Payload validity checks:
 
 # check load type in 'F' or 'I' currently supported
-def loadTypeCheck(loadType: str) -> None:
+def checkLoadType(loadType: str) -> None:
     """
     Checks the load type provided to prevent unsupported load types occurring.
     Currently supports Full ('F') and Incremental ('I') loads.
@@ -28,7 +28,7 @@ def loadTypeCheck(loadType: str) -> None:
 
 
 # abfss check path exists in dbutils
-def abfssCheck(abfssPath:str) -> None:
+def checkAbfss(abfssPath:str) -> None:
     """
     Checks the ABFSS path of the container and raises an error if it does not exist.
  
@@ -68,7 +68,7 @@ def setTablePath(schemaName: str, tableName: str) -> str:
 
 
 # Confirm if a Delta table exists and is required to exist given the load type being executed.
-def deltaTableExistsCheck(tablePath: str, loadType: str) -> None:
+def checkExistsDeltaTable(tablePath: str, loadType: str) -> None:
     """
     Check the spark catalog to see if a Delta table exists at the provided location.
     If a table does not exist, and is required to exist for the loadType specified, an error will be raised.
