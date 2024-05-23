@@ -45,6 +45,12 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
+					},
+					{
+						"activity": "Set Pipeline Run DateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
 				"userProperties": [],
@@ -70,7 +76,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/Ingest/IngestChecks",
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/checkpayload/CheckPayloadExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",
@@ -78,6 +84,10 @@
 											},
 											"Pipeline Run Id": {
 												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
 												"type": "Expression"
 											}
 										}
@@ -129,7 +139,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/Ingest/IngestExecution",
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/IngestExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",
@@ -137,6 +147,10 @@
 											},
 											"Pipeline Run Id": {
 												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
 												"type": "Expression"
 											}
 										}
@@ -213,7 +227,7 @@
 							},
 							"type": "String"
 						},
-						"PipelineRunDateTime": {
+						"FileLoadDateTime": {
 							"value": {
 								"value": "@activity('Get Merge Payload').output.firstRow.RawLastLoadDate",
 								"type": "Expression"
@@ -223,14 +237,42 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "cumulusdatabase",
+					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Set Pipeline Run DateTime",
+
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PipelineRunDateTime",
+					"value": {
+						"value": "@string(utcnow())",
+						"type": "Expression"
+					}
 				}
 			}
 		],
 		"parameters": {
 			"DatasetId": {
-				"type": "string"
+				"type": "int"
+			}
+		},
+		"variables": {
+			"PipelineRunDateTime": {
+				"type": "String"
+			}
+		},
+		"variables": {
+			"PipelineRunDateTime": {
+				"type": "String"
 			}
 		},
 		"folder": {

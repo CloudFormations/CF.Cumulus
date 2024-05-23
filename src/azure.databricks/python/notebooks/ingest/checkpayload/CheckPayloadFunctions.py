@@ -2,10 +2,11 @@
 import json
 from datetime import datetime
 
-# Payload validity checks:
+# COMMAND ----------
 
+# DBTITLE 1,Check Payload Validity
 # check load type in 'F' or 'I' currently supported
-def loadTypeCheck(loadType: str) -> None:
+def checkLoadType(loadType: str) -> None:
     """
     Checks the load type provided to prevent unsupported load types occurring.
     Currently supports Full ('F') and Incremental ('I') loads.
@@ -25,10 +26,48 @@ def loadTypeCheck(loadType: str) -> None:
     
     return
 
+# For incremental loads we require primary keys to be used in the merge criteria.
+def checkMergeAndPKConditions(loadType:str, pkList: list[str]) -> None:
+    """
+    Checks the combination of load type and primary key values providedprovided to prevent unsupported load types occurring.
+    Currently supports Full ('F') and Incremental ('I') loads.
+ 
+    Args:
+        loadType (str): The load type supplied from the payload.  
+        pkList (list): The primary keys supplied from the payload.
+    """
+    if loadType.upper() == "I" and len(pkList) > 0:
+        print(f'Incremental loading configured with primary keys. This is a valid combination.')
+    elif loadType.upper() == "F" and len(pkList) > 0:
+        print(f'Full loading configured with primary keys. This is a valid combination.')    
+    elif loadType.upper() == "F" and len(pkList) == 0:
+        print(f'Full loading configured with no primary keys. This is a valid combination, assuming no subsequent incremental loads are due to take place.')
+    elif loadType.upper() == "I" and len(pkList) == 0:
+        raise Exception(f'Incremental loading configured with no primary keys. This is not a valid combination and will result in merge failures as no merge criteria can be specified.')
+    else:
+        raise Exception('Unexpected state.')
 
+
+def checkContainerName(containerName: str) -> None:
+    containers = [
+        'raw',
+        'cleansed',
+        #'curated',
+    ]
+    if containerName in containers:
+        print(f'container name {containerName} is supported.')
+    elif containerName not in containers:
+        raise Exception(f"Container name '{containerName}' not supported.")
+    else:
+        raise Exception('Unexpected state.')
+
+
+# COMMAND ----------
+
+# DBTITLE 1,Check ABFSS
 
 # abfss check path exists in dbutils
-def abfssCheck(abfssPath:str) -> None:
+def checkAbfss(abfssPath:str) -> None:
     """
     Checks the ABFSS path of the container and raises an error if it does not exist.
  
@@ -44,6 +83,29 @@ def abfssCheck(abfssPath:str) -> None:
 
     return
 
+# COMMAND ----------
+
+# DBTITLE 1,Check Delta Objects
+def checkExistsDeltaSchema(schemaName: str) -> bool:
+    """
+    Check the spark catalog to see if the provided Delta schema exists.
+    If a table does not exist, it will be created as part of the execution notebook.
+ 
+    Args:
+        schemaName (str): The schema name the dataset belongs to.
+    """
+    try:
+        schemaExists = spark.catalog.databaseExists(schemaName)
+    except Exception:
+        raise Exception('Syntax error in schema name provided. Please review no erroneous characters, such as " " are included.')
+
+    if (schemaExists == True):
+        print('Schema exists. No action required.')
+    elif (schemaExists == False):
+        print('Schema not found. Schema will be populated as part of this process.')
+    else:
+        raise Exception('Unexpected state.')
+    return schemaExists
 
 def setTablePath(schemaName: str, tableName: str) -> str:
     """
@@ -68,7 +130,7 @@ def setTablePath(schemaName: str, tableName: str) -> str:
 
 
 # Confirm if a Delta table exists and is required to exist given the load type being executed.
-def deltaTableExistsCheck(tablePath: str, loadType: str) -> None:
+def checkExistsDeltaTable(tablePath: str, loadType: str) -> bool:
     """
     Check the spark catalog to see if a Delta table exists at the provided location.
     If a table does not exist, and is required to exist for the loadType specified, an error will be raised.
@@ -94,9 +156,13 @@ def deltaTableExistsCheck(tablePath: str, loadType: str) -> None:
     else:
         raise Exception('Unexpected state.')
 
-    return
+    return tableExists
 
 
+
+# COMMAND ----------
+
+# DBTITLE 1,Compare Load Date Values
 # Compare the latest load date for the cleansed table with the load date of the raw file.
 # Check nullable condition for each parameter
 # manualOverride may have some quirks to historic delta loads being reapplied. We possibly need to use time-travel or something else in delta to achieve the effect.
@@ -130,4 +196,3 @@ def compareRawLoadVsLastCleansedDate(rawLastLoadDate: datetime.date , cleansedLa
         raise Exception('Unexpected state.')
 
     return
-

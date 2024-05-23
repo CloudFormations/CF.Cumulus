@@ -478,7 +478,7 @@
 							},
 							"type": "String"
 						},
-						"PipelineRunDateTime": {
+						"FileLoadDateTime": {
 							"value": {
 								"value": "@variables('LocalRunDateTime')",
 								"type": "Expression"
@@ -488,7 +488,7 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "cumulusdatabase",
+					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			}

@@ -150,12 +150,13 @@ BEGIN
 		[cn5].[SourceLocation] AS 'RawContainerName',
         [cn6].[ConnectionLocation] AS 'CleansedStorageName',
 		[cn6].[SourceLocation] AS 'CleansedContainerName',
+        [cn5].[Username] AS 'RawStorageAccessKey',
+        [cn6].[Username] AS 'CleansedStorageAccessKey',
 
-        -- AS 'RawStorageSecret' inferred from storage name in python
         ds.DatasetDisplayName,
         -- ds.SourcePath AS 'RawSchemaName',
         ds.SourceName,
-        ds.ExtensionType AS 'RawFileType', -- NOT CORRECT??? NEED TO STORE HOW WE SAVE IT
+        ds.ExtensionType AS 'RawFileType',
         ds.VersionNumber,
         [cn].[ConnectionDisplayName] AS 'CleansedSchemaName',
         ds.CleansedName AS 'CleansedTableName',
