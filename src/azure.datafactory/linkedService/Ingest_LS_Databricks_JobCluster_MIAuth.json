@@ -1,0 +1,43 @@
+{
+	"name": "Ingest_LS_Databricks_JobCluster_MIAuth",
+	"properties": {
+		"parameters": {
+			"WorkspaceURL": {
+				"type": "string"
+			},
+			"ResourceId": {
+				"type": "string"
+			},
+			"ClusterVersion": {
+				"type": "string"
+			},
+			"NodeType": {
+				"type": "string"
+			},
+			"PythonVersion": {
+				"type": "string",
+				"defaultValue": "Unused"
+			},
+			"NumWorkers": {
+				"type": "string"
+			}
+		},
+		"annotations": [
+			"JobCluster"
+		],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "@linkedService().WorkspaceURL",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/1b2b1db2-3735-4a51-86a5-18fa41b8bb49/resourceGroups/CumulusFrameworkDev/providers/Microsoft.Databricks/workspaces/cumulusdatabricksdev",
+			"newClusterNodeType": "@linkedService().NodeType",
+			"newClusterNumOfWorker": "@linkedService().NumWorkers",
+			"newClusterSparkEnvVars": {
+				"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+			},
+			"newClusterVersion": "@linkedService().ClusterVersion",
+			"clusterOption": "Autoscaling",
+			"newClusterInitScripts": []
+		}
+	}
+}
