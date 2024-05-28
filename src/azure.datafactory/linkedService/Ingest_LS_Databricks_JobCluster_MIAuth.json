@@ -5,9 +5,6 @@
 			"WorkspaceURL": {
 				"type": "string"
 			},
-			"ResourceId": {
-				"type": "string"
-			},
 			"ClusterVersion": {
 				"type": "string"
 			},
@@ -20,6 +17,15 @@
 			},
 			"NumWorkers": {
 				"type": "string"
+			},
+			"SubscriptionId": {
+				"type": "string"
+			},
+			"ResourceName": {
+				"type": "string"
+			},
+			"ResourceGroupName": {
+				"type": "string"
 			}
 		},
 		"annotations": [
@@ -29,7 +35,7 @@
 		"typeProperties": {
 			"domain": "@linkedService().WorkspaceURL",
 			"authentication": "MSI",
-			"workspaceResourceId": "/subscriptions/1b2b1db2-3735-4a51-86a5-18fa41b8bb49/resourceGroups/CumulusFrameworkDev/providers/Microsoft.Databricks/workspaces/cumulusdatabricksdev",
+			"workspaceResourceId": "@concat('/subscriptions/',linkedService().SubscriptionId,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
 			"newClusterNodeType": "@linkedService().NodeType",
 			"newClusterNumOfWorker": "@linkedService().NumWorkers",
 			"newClusterSparkEnvVars": {
