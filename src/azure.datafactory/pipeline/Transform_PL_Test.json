@@ -1,9 +1,9 @@
 {
-	"name": "Ingest_PL_Merge",
+	"name": "Transform_PL_Test",
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Merge Payload",
+				"name": "Get Notebook Payload",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -17,12 +17,12 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[ingest].[GetMergePayload]",
+						"sqlReaderStoredProcedureName": "[transform].[GetNotebookPayload]",
 						"storedProcedureParameters": {
-							"DatasetId": {
+							"NotebookId": {
 								"type": "Int32",
 								"value": {
-									"value": "@pipeline().parameters.DatasetId",
+									"value": "@pipeline().parameters.NotebookId",
 									"type": "Expression"
 								}
 							}
@@ -41,7 +41,7 @@
 				"type": "Switch",
 				"dependsOn": [
 					{
-						"activity": "Get Merge Payload",
+						"activity": "Get Notebook Payload",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -56,15 +56,15 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@activity('Get Merge Payload').output.firstRow.ComputeLinkedServiceName",
+						"value": "@activity('Get Notebook Payload').output.firstRow.ComputeLinkedServiceName",
 						"type": "Expression"
 					},
 					"cases": [
 						{
-							"value": "Ingest_LS_Databricks_Cluster_MIAuth",
+							"value": "Transform_LS_Databricks_Cluster_MIAuth",
 							"activities": [
 								{
-									"name": "Check Payload Validity Small Databricks Compute",
+									"name": "Test Notebook - Interactive Cluster",
 									"type": "DatabricksNotebook",
 									"dependsOn": [],
 									"policy": {
@@ -76,10 +76,13 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/checkpayload/CheckPayloadExecution",
+										"notebookPath": {
+											"value": "@activity('Get Notebook Payload').output.firstRow.NotebookFullPath",
+											"type": "Expression"
+										},
 										"baseParameters": {
-											"Merge Payload": {
-												"value": "@string(activity('Get Merge Payload').output.firstRow)",
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
 												"type": "Expression"
 											},
 											"Pipeline Run Id": {
@@ -97,39 +100,37 @@
 										"type": "LinkedServiceReference",
 										"parameters": {
 											"WorkspaceURL": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
 												"type": "Expression"
 											},
 											"ResourceGroupName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
 												"type": "Expression"
 											},
 											"ResourceName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
 												"type": "Expression"
 											},
 											"ClusterId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeClusterId",
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
 												"type": "Expression"
 											},
 											"SubscriptionId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
 											}
 										}
 									}
-								},
+								}
+							]
+						},
+						{
+							"value": "Transform_LS_Databricks_JobCluster_MIAuth",
+							"activities": [
 								{
-									"name": "Raw to Cleansed Execution Small Databricks Compute",
+									"name": "Test Notebook - Job Cluster",
 									"type": "DatabricksNotebook",
-									"dependsOn": [
-										{
-											"activity": "Check Payload Validity Small Databricks Compute",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
+									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -139,10 +140,13 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/IngestExecution",
+										"notebookPath": {
+											"value": "@activity('Get Notebook Payload').output.firstRow.NotebookFullPath",
+											"type": "Expression"
+										},
 										"baseParameters": {
-											"Merge Payload": {
-												"value": "@string(activity('Get Merge Payload').output.firstRow)",
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
 												"type": "Expression"
 											},
 											"Pipeline Run Id": {
@@ -156,27 +160,36 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
 											"WorkspaceURL": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceUrl",
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
 												"type": "Expression"
 											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+											"ClusterVersion": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
 												"type": "Expression"
 											},
-											"ResourceName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+											"NodeType": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
 												"type": "Expression"
 											},
-											"ClusterId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeClusterId",
+											"PythonVersion": "3",
+											"NumWorkers": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
 												"type": "Expression"
 											},
 											"SubscriptionId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
 												"type": "Expression"
 											}
 										}
@@ -185,60 +198,6 @@
 							]
 						}
 					]
-				}
-			},
-			{
-				"name": "Update Metadata Load Status",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Switch Compute",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[ingest].[SetIngestLoadStatus]",
-					"storedProcedureParameters": {
-						"DatasetId": {
-							"value": {
-								"value": "@pipeline().parameters.DatasetId",
-								"type": "Expression"
-							},
-							"type": "Int32"
-						},
-						"IngestStage": {
-							"value": "Cleansed",
-							"type": "String"
-						},
-						"LoadType": {
-							"value": {
-								"value": "@activity('Get Merge Payload').output.firstRow.LoadAction",
-								"type": "Expression"
-							},
-							"type": "String"
-						},
-						"FileLoadDateTime": {
-							"value": {
-								"value": "@activity('Get Merge Payload').output.firstRow.RawLastLoadDate",
-								"type": "Expression"
-							},
-							"type": "DateTime"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Common_LS_cumulusdatabase",
-					"type": "LinkedServiceReference"
 				}
 			},
 			{
@@ -260,8 +219,8 @@
 			}
 		],
 		"parameters": {
-			"DatasetId": {
-				"type": "int"
+			"NotebookId": {
+				"type": "string"
 			}
 		},
 		"variables": {
@@ -270,7 +229,7 @@
 			}
 		},
 		"folder": {
-			"name": "Cumulus.Ingest"
+			"name": "Cumulus.Transform"
 		},
 		"annotations": []
 	}
