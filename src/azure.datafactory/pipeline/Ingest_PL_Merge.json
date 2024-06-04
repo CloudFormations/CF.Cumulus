@@ -237,12 +237,13 @@
 					}
 				},
 				"linkedServiceName": {
-					"referenceName": "cumulusdatabase",
+					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
 			},
 			{
 				"name": "Set Pipeline Run DateTime",
+
 				"type": "SetVariable",
 				"dependsOn": [],
 				"policy": {
@@ -261,7 +262,12 @@
 		],
 		"parameters": {
 			"DatasetId": {
-				"type": "string"
+				"type": "int"
+			}
+		},
+		"variables": {
+			"PipelineRunDateTime": {
+				"type": "String"
 			}
 		},
 		"variables": {

@@ -1,11 +1,11 @@
 {
-	"name": "cumulusdatabase",
+	"name": "Common_LS_cumulusdatabase",
 	"properties": {
 		"description": "Connection between ADF and processing framework metadata SQLDB.",
 		"annotations": [
 			"Cloud Formations",
 			"CF.Cumulus",
-			"Control"
+			"Common"
 		],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {

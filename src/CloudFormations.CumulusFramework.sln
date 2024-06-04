@@ -42,9 +42,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integrationRuntime", "integ
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linkedService", "linkedService", "{6859A9D9-8F80-47A8-B688-FECA79DF0923}"
 	ProjectSection(SolutionItems) = preProject
-		azure.datafactory\linkedService\cumulusdatabase.json = azure.datafactory\linkedService\cumulusdatabase.json
 		azure.datafactory\linkedService\cumuluskeys.json = azure.datafactory\linkedService\cumuluskeys.json
-		azure.datafactory\linkedService\cumulusfunctions.json = azure.datafactory\linkedService\cumulusfunctions.json
+		azure.datafactory\linkedService\Common_LS_cumulusdatabase.json = azure.datafactory\linkedService\Common_LS_cumulusdatabase.json
+		azure.datafactory\linkedService\Common_LS_cumulusfunctions.json = azure.datafactory\linkedService\Common_LS_cumulusfunctions.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{D3E5B580-301B-4B04-BDA3-7A17FB0B494C}"
