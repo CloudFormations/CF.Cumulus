@@ -27,7 +27,7 @@ def checkLoadType(loadType: str) -> None:
     return
 
 # For incremental loads we require primary keys to be used in the merge criteria.
-def checkMergeAndPKConditions(loadType:str, pkList: list[str]) -> None:
+def checkMergeAndPKConditions(loadType:str, pkList: list()) -> None:
     """
     Checks the combination of load type and primary key values providedprovided to prevent unsupported load types occurring.
     Currently supports Full ('F') and Incremental ('I') loads.
