@@ -157,7 +157,6 @@ BEGIN
         [cn6].[Username] AS 'CleansedStorageAccessKey',
 
         ds.DatasetDisplayName,
-        -- ds.SourcePath AS 'RawSchemaName',
         ds.SourceName,
         ds.ExtensionType AS 'RawFileType',
         ds.VersionNumber,

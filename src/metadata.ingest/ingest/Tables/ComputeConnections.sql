@@ -18,11 +18,11 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [ingest].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [FK__Connectio__Conne__361223C5] FOREIGN KEY([ConnectionTypeFK])
+ALTER TABLE [ingest].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [FK__Connectio__Conne__361223C6] FOREIGN KEY([ConnectionTypeFK])
 REFERENCES [ingest].[ConnectionTypes] ([ConnectionTypeId])
 GO
 
-ALTER TABLE [ingest].[ComputeConnections] CHECK CONSTRAINT [FK__Connectio__Conne__361223C5]
+ALTER TABLE [ingest].[ComputeConnections] CHECK CONSTRAINT [FK__Connectio__Conne__361223C6]
 GO
 
 ALTER TABLE [ingest].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [chkComputeConnectionDisplayNameNoSpaces] CHECK  ((NOT [ConnectionDisplayName] like '% %'))
