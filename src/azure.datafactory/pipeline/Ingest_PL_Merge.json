@@ -184,6 +184,21 @@
 								}
 							]
 						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Supported Linked Service Type",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('The Linked Service type and authentication combination is not currently supported.')",
+									"type": "Expression"
+								},
+								"errorCode": "16"
+							}
+						}
 					]
 				}
 			},
@@ -243,7 +258,6 @@
 			},
 			{
 				"name": "Set Pipeline Run DateTime",
-
 				"type": "SetVariable",
 				"dependsOn": [],
 				"policy": {
@@ -263,11 +277,6 @@
 		"parameters": {
 			"DatasetId": {
 				"type": "int"
-			}
-		},
-		"variables": {
-			"PipelineRunDateTime": {
-				"type": "String"
 			}
 		},
 		"variables": {
