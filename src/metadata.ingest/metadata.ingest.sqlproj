@@ -83,6 +83,7 @@
     <Build Include="ingest\Functions\GetIngestLoadAction.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Build>
+    <Build Include="ingest\Tables\ComputeConnections.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
