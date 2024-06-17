@@ -20,7 +20,11 @@
 						"sqlReaderStoredProcedureName": "[transform].[GetNotebookPayload]",
 						"storedProcedureParameters": {
 							"DatasetId": {
-								"type": "Int32"
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.DatasetId",
+									"type": "Expression"
+								}
 							}
 						},
 						"queryTimeout": "02:00:00",
@@ -372,7 +376,7 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"storedProcedureName": "[ingest].[SetIngestLoadStatus]",
+					"storedProcedureName": "[transform].[SetTransformLoadStatus]",
 					"storedProcedureParameters": {
 						"DatasetId": {
 							"value": {
@@ -380,14 +384,6 @@
 								"type": "Expression"
 							},
 							"type": "Int32"
-						},
-						"IngestStage": {
-							"value": "Raw",
-							"type": "String"
-						},
-						"LoadType": {
-							"value": "Placeholder",
-							"type": "String"
 						},
 						"FileLoadDateTime": {
 							"value": {
