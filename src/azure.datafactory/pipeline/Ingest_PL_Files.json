@@ -32,13 +32,19 @@
 											"dependencyConditions": [
 												"Succeeded"
 											]
+										},
+										{
+											"activity": "Fetch Binary Files Auth Username",
+											"dependencyConditions": [
+												"Succeeded"
+											]
 										}
 									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
 										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
+										"secureOutput": false,
 										"secureInput": false
 									},
 									"userProperties": [],
@@ -80,7 +86,7 @@
 													"type": "Expression"
 												},
 												"DSUserName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"value": "@activity('Fetch Binary Files Auth Username').output.value",
 													"type": "Expression"
 												},
 												"DSPassword": {
@@ -100,7 +106,7 @@
 													"type": "Expression"
 												},
 												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'.',activity('Get Ingest Payload').output.firstRow.ExtensionType)",
 													"type": "Expression"
 												},
 												"DSStorageName": {
@@ -138,6 +144,30 @@
 											"resource": "https://vault.azure.net"
 										}
 									}
+								},
+								{
+									"name": "Fetch Binary Files Auth Username",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.Username,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
 								}
 							]
 						},
@@ -150,6 +180,12 @@
 									"dependsOn": [
 										{
 											"activity": "Fetch Parquet Files Auth Password",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Fetch Parquet Files Auth Username",
 											"dependencyConditions": [
 												"Succeeded"
 											]
@@ -220,7 +256,7 @@
 													"type": "Expression"
 												},
 												"DSUserName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"value": "@activity('Fetch Parquet Files Auth Username').output.value",
 													"type": "Expression"
 												},
 												"DSDirectory": {
@@ -279,6 +315,30 @@
 										"method": "GET",
 										"url": {
 											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "Fetch Parquet Files Auth Username",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.Username,'?api-version=7.0')",
 											"type": "Expression"
 										},
 										"authentication": {
