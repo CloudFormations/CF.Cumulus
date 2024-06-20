@@ -145,6 +145,7 @@ print(selectSQLFullString)
 # COMMAND ----------
 
 df = spark.sql(selectSQLFullString)
+df.createOrReplaceTempView(tempViewName)
 
 # COMMAND ----------
 
