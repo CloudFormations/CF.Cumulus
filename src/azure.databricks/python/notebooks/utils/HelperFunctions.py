@@ -25,7 +25,7 @@ def checkDfSize(df: DataFrame) -> bool:
 
 # COMMAND ----------
 
-def createPartitionFieldsSQL(partitionFields: list[str] = []) -> str:
+def createPartitionFieldsSQL(partitionFields: list() = []) -> str:
     """
     Summary:
         Create the SQL statement to partition dataset by the partition fields specified in the Transformation payload.
