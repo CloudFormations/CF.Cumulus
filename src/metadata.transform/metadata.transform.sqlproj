@@ -73,10 +73,13 @@
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <Build Include="transform\Stored Procedures\AddConnectionType.sql" />
     <Build Include="transform\Tables\NotebookParameters.sql" />
-    <Build Include="transform\Views\NotebooksLatestVersion.sql" />
-    <Build Include="transform\Stored Procedures\GetNotebookPayload.sql" />
+    <Build Include="transform\Views\DatasetsLatestVersion.sql" />
     <Build Include="transform\Tables\ComputeConnections.sql" />
     <None Include="Security\db_cumulususer.sql" />
+    <Build Include="transform\Tables\Datasets.sql" />
+    <Build Include="transform\Tables\Attributes.sql" />
+    <Build Include="transform\Stored Procedures\GetNotebookPayload.sql" />
+    <Build Include="transform\Stored Procedures\SetTransformLoadStatus.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
