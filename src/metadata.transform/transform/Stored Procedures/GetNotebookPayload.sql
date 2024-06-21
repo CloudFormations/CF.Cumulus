@@ -1,5 +1,3 @@
-
-
 CREATE PROCEDURE [transform].[GetNotebookPayload]
 	(
 	@DatasetId INT
@@ -12,33 +10,37 @@ BEGIN
 
     SELECT 
         @ResultRowCount = COUNT(*)
-    FROM 
-        [transform].[DatasetsLatestVersion] AS ds
+	FROM 
+		[transform].[DatasetsLatestVersion] AS ds
 	INNER JOIN
-		[transform].[Notebooks] AS n
+		[transform].[Notebooks] AS n1
 	ON 
-		n.DatasetFK = ds.DatasetId
-    INNER JOIN 
-        [transform].[ComputeConnections] AS ccn
-    ON
-        ds.ComputeConnectionFK = ccn.ComputeConnectionId
-    INNER JOIN
-        [transform].[Connections] AS cn
-    ON 
-        cn.ConnectionDisplayName = 'PrimaryResourceGroup'
-    INNER JOIN
-        [transform].[Connections] AS cn2
-    ON 
-        cn2.ConnectionDisplayName = 'PrimarySubscription'
-    INNER JOIN
-        [transform].[Connections] AS cn3
-    ON 
-        cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
-    INNER JOIN
-        [transform].[Connections] AS cn4
-    ON 
-        cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
-    WHERE
+		n1.NotebookId = ds.CreateNotebookFK
+	INNER JOIN
+		[transform].[Notebooks] AS n2
+	ON 
+		n2.NotebookId = ds.BusinessLogicNotebookFK
+	INNER JOIN 
+		[transform].[ComputeConnections] AS ccn
+	ON
+		ds.ComputeConnectionFK = ccn.ComputeConnectionId
+	INNER JOIN
+		[transform].[Connections] AS cn
+	ON 
+		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
+	INNER JOIN
+		[transform].[Connections] AS cn2
+	ON 
+		cn2.ConnectionDisplayName = 'PrimarySubscription'
+	INNER JOIN
+		[transform].[Connections] AS cn3
+	ON 
+		cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
+	INNER JOIN
+		[transform].[Connections] AS cn4
+	ON 
+		cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
+	WHERE
         ds.DatasetId = @DatasetId
 
     IF @ResultRowCount = 0
@@ -90,6 +92,12 @@ BEGIN
         ds.DatasetId = @DatasetId
     AND 
         att.SurrogateKeyAttribute = 1
+
+    -- Defensive check: Surrogate Key exists.
+    IF @SurrogateKeyAttribute = ''
+    BEGIN
+        RAISERROR('No Surrogate Key Attribute specified for this dataset. Please ensure this is added to the transform.Attributes table, and specified in your bespoke notebook logic to populate the table.',16,1)
+    END
 
     -- Get Bk columns as comma separated string values for the dataset
     SELECT 
@@ -160,8 +168,8 @@ BEGIN
 
         ds.DatasetName,
         ds.SchemaName,
-        ds.BusinessLogicNotebookPath,
-		n.NotebookPath AS 'ExecutionNotebookPath',
+        n2.NotebookPath AS 'BusinessLogicNotebookPath',
+		n1.NotebookPath AS 'ExecutionNotebookPath',
         @CuratedColumnsList AS 'ColumnsList',
         @CuratedColumnsTypeList AS 'ColumnTypeList',
         @SurrogateKeyAttribute AS 'SurrogateKey',
@@ -171,32 +179,36 @@ BEGIN
         @LoadAction AS 'LoadType',
         ds.LastLoadDate
     FROM 
-        [transform].[DatasetsLatestVersion] AS ds
+		[transform].[DatasetsLatestVersion] AS ds
 	INNER JOIN
-		[transform].[Notebooks] AS n
+		[transform].[Notebooks] AS n1
 	ON 
-		n.DatasetFK = ds.DatasetId
-    INNER JOIN 
-        [transform].[ComputeConnections] AS ccn
-    ON
-        ds.ComputeConnectionFK = ccn.ComputeConnectionId
-    INNER JOIN
-        [transform].[Connections] AS cn
-    ON 
-        cn.ConnectionDisplayName = 'PrimaryResourceGroup'
-    INNER JOIN
-        [transform].[Connections] AS cn2
-    ON 
-        cn2.ConnectionDisplayName = 'PrimarySubscription'
-    INNER JOIN
-        [transform].[Connections] AS cn3
-    ON 
-        cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
-    INNER JOIN
-        [transform].[Connections] AS cn4
-    ON 
-        cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
-    WHERE
+		n1.NotebookId = ds.CreateNotebookFK
+	INNER JOIN
+		[transform].[Notebooks] AS n2
+	ON 
+		n2.NotebookId = ds.BusinessLogicNotebookFK
+	INNER JOIN 
+		[transform].[ComputeConnections] AS ccn
+	ON
+		ds.ComputeConnectionFK = ccn.ComputeConnectionId
+	INNER JOIN
+		[transform].[Connections] AS cn
+	ON 
+		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
+	INNER JOIN
+		[transform].[Connections] AS cn2
+	ON 
+		cn2.ConnectionDisplayName = 'PrimarySubscription'
+	INNER JOIN
+		[transform].[Connections] AS cn3
+	ON 
+		cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
+	INNER JOIN
+		[transform].[Connections] AS cn4
+	ON 
+		cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
+	WHERE
         ds.DatasetId = @DatasetId
 
 END

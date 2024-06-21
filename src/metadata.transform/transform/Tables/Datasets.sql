@@ -1,9 +1,10 @@
 CREATE TABLE [transform].[Datasets](
 	[DatasetId] [int] IDENTITY(1,1) NOT NULL,
-	[ComputeConnectionFK] [int] NULL,
+	[ComputeConnectionFK] [int] NOT NULL,
+	[CreateNotebookFK] [int] NULL,
+	[BusinessLogicNotebookFK] [int] NULL,
 	[SchemaName] [nvarchar](100) NOT NULL,
 	[DatasetName] [nvarchar](100) NOT NULL,
-	[BusinessLogicNotebookPath] [nvarchar](500) NULL,
 	[VersionNumber] [int] NOT NULL,
 	[VersionValidFrom] [datetime2](7) NULL,
 	[VersionValidTo] [datetime2](7) NULL,
