@@ -17,23 +17,23 @@ BEGIN
     ON  
         ds.ConnectionFK = cn.ConnectionId
     INNER JOIN 
-        ingest.connections AS cn2
+        ingest.ComputeConnections AS cn2
     ON 
-        ds.MergeComputeConnectionFK = cn2.ConnectionId
+        ds.MergeComputeConnectionFK = cn2.ComputeConnectionId
     INNER JOIN
-        ingest.connections AS cn3
+        ingest.Connections AS cn3
     ON 
         cn3.ConnectionDisplayName = 'PrimaryResourceGroup'
     INNER JOIN
-        ingest.connections AS cn4
+        ingest.Connections AS cn4
     ON 
         cn4.ConnectionDisplayName = 'PrimarySubscription'
     INNER JOIN
-        ingest.connections AS cn5
+        ingest.Connections AS cn5
     ON 
         cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation = 'raw'
     INNER JOIN
-        ingest.connections AS cn6
+        ingest.Connections AS cn6
     ON 
         cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
     
@@ -141,7 +141,10 @@ BEGIN
     SELECT 
         [cn].[ConnectionDisplayName] AS 'RawSchemaName',
         [cn2].[ConnectionLocation] AS 'ComputeWorkspaceURL',
-        [cn2].[SourceLocation] AS 'ComputeClusterId',
+        [cn2].[ComputeLocation] AS 'ComputeClusterId',
+		[cn2].[ComputeSize] AS 'ComputeSize',
+		[cn2].[ComputeVersion] AS 'ComputeVersion',
+		[cn2].[CountNodes] AS 'CountNodes',
         [cn2].[LinkedServiceName] AS 'ComputeLinkedServiceName',
         [cn2].[AzureResourceName] AS 'ComputeResourceName',
         [cn3].[SourceLocation] AS 'ResourceGroupName',
@@ -154,7 +157,6 @@ BEGIN
         [cn6].[Username] AS 'CleansedStorageAccessKey',
 
         ds.DatasetDisplayName,
-        -- ds.SourcePath AS 'RawSchemaName',
         ds.SourceName,
         ds.ExtensionType AS 'RawFileType',
         ds.VersionNumber,
@@ -177,23 +179,23 @@ BEGIN
     ON  
         ds.ConnectionFK = cn.ConnectionId
     INNER JOIN 
-        ingest.connections AS cn2
+        ingest.ComputeConnections AS cn2
     ON 
-        ds.MergeComputeConnectionFK = cn2.ConnectionId
+        ds.MergeComputeConnectionFK = cn2.ComputeConnectionId
     INNER JOIN
-        ingest.connections AS cn3
+        ingest.Connections AS cn3
     ON 
         cn3.ConnectionDisplayName = 'PrimaryResourceGroup'
     INNER JOIN
-        ingest.connections AS cn4
+        ingest.Connections AS cn4
     ON 
         cn4.ConnectionDisplayName = 'PrimarySubscription'
     INNER JOIN
-        ingest.connections AS cn5
+        ingest.Connections AS cn5
     ON 
         cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation = 'raw'
     INNER JOIN
-        ingest.connections AS cn6
+        ingest.Connections AS cn6
     ON 
         cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
     WHERE
