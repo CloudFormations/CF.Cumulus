@@ -15,7 +15,11 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/Initialise
+# MAGIC %run ../../utils/Initialise
+
+# COMMAND ----------
+
+# MAGIC %run ../../utils/HelperFunctions
 
 # COMMAND ----------
 
@@ -27,23 +31,19 @@
 
 # COMMAND ----------
 
+# MAGIC %run ../../utils/OperationalMetrics
+
+# COMMAND ----------
+
 # MAGIC %run ./CreateMergeQuery
 
 # COMMAND ----------
 
-# MAGIC %run ./IngestFunctions
+# MAGIC %run ../../utils/CreateDeltaObjects
 
 # COMMAND ----------
 
-# MAGIC %run ./CreateDeltaObjects
-
-# COMMAND ----------
-
-# MAGIC %run ./WriteToDelta
-
-# COMMAND ----------
-
-# MAGIC %run ./OperationalMetrics
+# MAGIC %run ../../utils/WriteToDelta
 
 # COMMAND ----------
 
@@ -73,8 +73,7 @@ pipelineExecutionDateTime = pd.to_datetime(pipelineExecutionDateTimeString, form
 
 # COMMAND ----------
 
-
-[tableName, loadType, loadTypeText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList] = getMergePayloadVariables(payload)
+[tableName, loadType, loadAction, loadActionText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList] = getMergePayloadVariables(payload)
 
 # COMMAND ----------
 
@@ -107,7 +106,7 @@ options = {
 
 
 #different options for specifying, based on how we save abfss folder hierarchy.
-fileFullPath = f"{rawAbfssPath}/{rawSchemaName}/{tableName}/version={versionNumber}/{loadTypeText}/{dateTimeFolderHierarchy}/{tableName}.{rawFileType}"
+fileFullPath = f"{rawAbfssPath}/{rawSchemaName}/{tableName}/version={versionNumber}/{loadActionText}/{dateTimeFolderHierarchy}/{tableName}.{rawFileType}"
 print(fileFullPath)
 
 # assuming json,csv, parquet
@@ -117,6 +116,17 @@ df = spark.read \
     .load(fileFullPath)
 
 # display(df)
+
+# COMMAND ----------
+
+df = df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(pipelineExecutionDateTime)))
+df = df.withColumn('PipelineRunId', lit(pipelineRunId))
+# display(df)
+
+# COMMAND ----------
+
+# drop duplicates
+df = df.dropDuplicates()
 
 # COMMAND ----------
 
@@ -135,18 +145,12 @@ print(selectSQLFullString)
 # COMMAND ----------
 
 df = spark.sql(selectSQLFullString)
-df = df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(pipelineExecutionDateTime)))
-df = df.withColumn('PipelineRunId', lit(pipelineRunId))
-# display(df)
+df.createOrReplaceTempView(tempViewName)
 
 # COMMAND ----------
 
 # Set output for operational metrics
 output = {}
-
-# COMMAND ----------
-
-# drop duplicates
 
 # COMMAND ----------
 
@@ -185,7 +189,7 @@ location = setDeltaTableLocation(schemaName=cleansedSchemaName, tableName=tableN
 
 # check Delta table exists
 cleansedTablePath = setTablePath(schemaName =cleansedSchemaName, tableName =tableName)
-tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadType = loadType)
+tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadAction = loadAction, loadType = loadType)
 
 # Create Delta table, if required
 tableCreated = False
@@ -209,19 +213,18 @@ if tableCreated:
 
 # COMMAND ----------
 
-if loadType.upper() == "F":
+if loadAction.upper() == "F":
     print('Write mode set to overwrite')
     writeMode = "overwrite"
-elif loadType.upper() == "I":
+elif loadAction.upper() == "I":
     print('Write mode set to merge')
     writeMode = "merge"
 else: 
-    raise Exception("LoadType not supported.")
+    raise Exception("LoadAction not supported.")
 
-# targetDf = getTargetDeltaTable(df=df)
-targetDf = getTargetDeltaTable(schemaName = cleansedSchemaName, tableName=tableName)
+targetDelta = getTargetDeltaTable(schemaName = cleansedSchemaName, tableName=tableName)
 
-writeToDeltaFunction(writeMode=writeMode, targetDf=targetDf, df=df, schemaName=cleansedSchemaName, tableName=tableName, pkFields=pkList, partitionFields=partitionList)
+writeToDeltaExecutor(writeMode=writeMode, targetDf=targetDelta, df=df, schemaName=cleansedSchemaName, tableName=tableName, pkFields=pkList, columnsList=totalColumnList, partitionFields=partitionList)
 
 # COMMAND ----------
 

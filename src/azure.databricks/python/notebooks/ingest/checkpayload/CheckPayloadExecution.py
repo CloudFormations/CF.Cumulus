@@ -13,7 +13,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/Initialise
+# MAGIC %run ../../utils/Initialise
 
 # COMMAND ----------
 
@@ -40,7 +40,7 @@ payload = json.loads(dbutils.widgets.get("Merge Payload"))
 
 # COMMAND ----------
 
-[tableName, loadType, loadTypeText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList] = getMergePayloadVariables(payload)
+[tableName, loadType, loadAction, loadActionText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList] = getMergePayloadVariables(payload)
 
 # COMMAND ----------
 
@@ -71,11 +71,11 @@ cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
 # COMMAND ----------
 
 # Check data types and nullability of each dictionary element
-checkLoadType(loadType = loadType)
+checkLoadAction(loadAction = loadAction)
 
 # COMMAND ----------
 
-checkMergeAndPKConditions(loadType = loadType, pkList=pkList)
+checkMergeAndPKConditions(loadAction = loadAction, pkList=pkList)
 
 # COMMAND ----------
 
@@ -119,7 +119,7 @@ print(cleansedTablePath)
 
 # COMMAND ----------
 
-tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadType = loadType)
+tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadAction = loadAction, loadType = loadType)
 
 # COMMAND ----------
 
@@ -129,3 +129,7 @@ tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadType = lo
 # COMMAND ----------
 
 compareRawLoadVsLastCleansedDate(rawLastLoadDate = rawLastLoadDate, cleansedLastLoadDate = cleansedLastLoadDate)
+
+# COMMAND ----------
+
+

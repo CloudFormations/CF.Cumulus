@@ -163,6 +163,7 @@ BEGIN
         [cn].[ConnectionDisplayName] AS 'CleansedSchemaName',
         ds.CleansedName AS 'CleansedTableName',
         ds.Enabled,
+		ds.LoadType,
         @LoadAction AS 'LoadAction',
         @RawLastLoadDate AS 'RawLastLoadDate',
         @CleansedLastLoadDate AS 'CleansedLastLoadDate',
@@ -203,4 +204,3 @@ BEGIN
 
 
 END
-GO

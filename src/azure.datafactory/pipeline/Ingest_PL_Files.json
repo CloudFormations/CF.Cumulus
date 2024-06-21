@@ -44,7 +44,7 @@
 										"timeout": "0.12:00:00",
 										"retry": 0,
 										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
+										"secureOutput": false,
 										"secureInput": false
 									},
 									"userProperties": [],
@@ -106,7 +106,7 @@
 													"type": "Expression"
 												},
 												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'.',activity('Get Ingest Payload').output.firstRow.ExtensionType)",
 													"type": "Expression"
 												},
 												"DSStorageName": {

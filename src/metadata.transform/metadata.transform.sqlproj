@@ -7,7 +7,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
     <ProjectGuid>{7248f9c8-f270-48ff-9bbe-7bd82c3d7280}</ProjectGuid>
-    <DSP>Microsoft.Data.Tools.Schema.Sql.Sql130DatabaseSchemaProvider</DSP>
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
@@ -22,6 +22,7 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
+    <DefaultSchema>cumulus.transform</DefaultSchema>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -56,5 +57,33 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="transform" />
+    <Folder Include="Scripts" />
+    <Folder Include="Security" />
+    <Folder Include="transform\Stored Procedures" />
+    <Folder Include="transform\Tables" />
+    <Folder Include="transform\Views" />
+  </ItemGroup>
+  <ItemGroup>
+    <Build Include="Security\transform.sql" />
+    <Build Include="transform\Tables\Notebooks.sql" />
+    <Build Include="transform\Tables\NotebookTypes.sql" />
+    <Build Include="transform\Tables\Connections.sql" />
+    <Build Include="transform\Tables\ConnectionTypes.sql" />
+    <None Include="Scripts\DefaultConnectionTypes.sql" />
+    <Build Include="transform\Stored Procedures\AddConnectionType.sql" />
+    <Build Include="transform\Views\DatasetsLatestVersion.sql" />
+    <Build Include="transform\Tables\ComputeConnections.sql" />
+    <None Include="Security\db_cumulususer.sql" />
+    <Build Include="transform\Tables\Datasets.sql" />
+    <Build Include="transform\Tables\Attributes.sql" />
+    <Build Include="transform\Stored Procedures\GetNotebookPayload.sql" />
+    <Build Include="transform\Stored Procedures\SetTransformLoadStatus.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
 </Project>
