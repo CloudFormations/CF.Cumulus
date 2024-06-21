@@ -184,6 +184,23 @@
 								}
 							]
 						}
+
+					],
+					"defaultActivities": [
+						{
+							"name": "Supported Linked Service Type",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('The Linked Service type and authentication combination is not currently supported.')",
+									"type": "Expression"
+								},
+								"errorCode": "16"
+							}
+						}
+
 					]
 				}
 			},
