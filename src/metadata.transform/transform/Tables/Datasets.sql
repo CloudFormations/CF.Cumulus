@@ -21,3 +21,9 @@ GO
 ALTER TABLE [transform].[Datasets]  WITH CHECK ADD FOREIGN KEY([ComputeConnectionFK])
 REFERENCES [transform].[ComputeConnections] ([ComputeConnectionId])
 GO
+ALTER TABLE [transform].[Datasets]  WITH CHECK ADD FOREIGN KEY([CreateNotebookFK])
+REFERENCES [transform].[Notebooks] ([NotebookId])
+GO
+ALTER TABLE [transform].[Datasets]  WITH CHECK ADD FOREIGN KEY([BusinessLogicNotebookFK])
+REFERENCES [transform].[Notebooks] ([NotebookId])
+GO

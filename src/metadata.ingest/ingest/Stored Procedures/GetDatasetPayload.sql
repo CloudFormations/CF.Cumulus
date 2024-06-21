@@ -142,7 +142,7 @@ BEGIN
 			SET @ParameterDef = N'@OutputResult DATETIME OUTPUT';
 
 			-- Execute the dynamic SQL and save the result to the @Result variable
-			EXEC sp_executesql @SQL, @ParameterDef, @OutputResult=@Result OUTPUT;
+			EXEC dbo.sp_executesql @SQL, @ParameterDef, @OutputResult=@Result OUTPUT;
 
 			-- Update the value in the XML variable
 			SET @CDCWhereClause.modify('replace value of (/filter/condition/@value)[1] with sql:variable("@Result")');
