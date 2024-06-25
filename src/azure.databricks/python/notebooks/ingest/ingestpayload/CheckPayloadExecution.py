@@ -17,7 +17,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ./CheckPayloadFunctions
+# MAGIC %run ../../utils/CheckPayloadFunctions
 
 # COMMAND ----------
 

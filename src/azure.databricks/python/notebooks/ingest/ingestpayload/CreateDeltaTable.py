@@ -96,6 +96,17 @@ if schemaExists == False:
 
 # COMMAND ----------
 
+def formatColumnsSQL(columnsList: list(), typeList: list()) -> str:
+    columnsString = ""
+    for colName, colType in zip(columnsList, typeList): 
+        columnsString += f"`{colName}` {colType}, "
+        # print(colName, colType)
+
+    return columnsString[:-2]
+
+
+# COMMAND ----------
+
 partitionFieldsSQL = createPartitionFieldsSQL(partitionList)
 location = setDeltaTableLocation(schemaName=curatedSchemaName, tableName=curatedDatasetName, abfssPath=curatedAbfssPath)
 columnsString = formatColumnsSQL(columnsList, columnTypeList)
