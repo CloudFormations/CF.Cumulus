@@ -15,7 +15,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run /Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/checkpayload/CheckPayloadFunctions
+# MAGIC %run ../utils/CheckPayloadFunctions
 
 # COMMAND ----------
 
@@ -97,17 +97,6 @@ if schemaExists == False:
 
 # COMMAND ----------
 
-def formatColumnsSQL(columnsList: list(), typeList: list()) -> str:
-    columnsString = ""
-    for colName, colType in zip(columnsList, typeList): 
-        columnsString += f"`{colName}` {colType}, "
-        print(colName, colType)
-
-    return columnsString[:-2]
-
-
-# COMMAND ----------
-
 partitionFieldsSQL = createPartitionFieldsSQL(partitionList)
 location = setDeltaTableLocation(schemaName=curatedSchemaName, tableName=curatedDatasetName, abfssPath=curatedAbfssPath)
 columnsString = formatColumnsSQL(columnsList, columnTypeList)
@@ -119,5 +108,9 @@ createTable(containerName=curatedContainerName, schemaName=curatedSchemaName, ta
 
 # COMMAND ----------
 
+location
+
+
+# COMMAND ----------
 
 

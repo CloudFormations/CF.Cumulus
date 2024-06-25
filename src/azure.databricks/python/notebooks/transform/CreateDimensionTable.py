@@ -15,7 +15,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run /Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/checkpayload/CheckPayloadFunctions
+# MAGIC %run ../utils/CheckPayloadFunctions
 
 # COMMAND ----------
 
@@ -93,17 +93,6 @@ schemaExists = checkExistsDeltaSchema(schemaName=curatedSchemaName)
 # create schema, if required
 if schemaExists == False:
     createSchema(containerName=curatedContainerName, schemaName=curatedSchemaName)
-
-# COMMAND ----------
-
-def formatColumnsSQL(columnsList: list(), typeList: list()) -> str:
-    columnsString = ""
-    for colName, colType in zip(columnsList, typeList): 
-        columnsString += f"`{colName}` {colType}, "
-        # print(colName, colType)
-
-    return columnsString[:-2]
-
 
 # COMMAND ----------
 
