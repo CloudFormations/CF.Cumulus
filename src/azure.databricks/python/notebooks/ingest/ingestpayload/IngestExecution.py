@@ -27,7 +27,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../checkpayload/CheckPayloadFunctions
+# MAGIC %run ../../utils/CheckPayloadFunctions
 
 # COMMAND ----------
 
@@ -35,7 +35,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ./CreateMergeQuery
+# MAGIC %run ../utils/CreateMergeQuery
 
 # COMMAND ----------
 
@@ -145,7 +145,6 @@ print(selectSQLFullString)
 # COMMAND ----------
 
 df = spark.sql(selectSQLFullString)
-df.createOrReplaceTempView(tempViewName)
 
 # COMMAND ----------
 
@@ -195,21 +194,13 @@ tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadAction = 
 tableCreated = False
 
 if tableExists == False:
-    createTable(containerName=cleansedContainerName, tempViewName=tempViewName, schemaName=cleansedSchemaName, tableName=tableName,location=location, partitionFieldsSQL=partitionFieldsSQL)
+    columnsString = formatColumnsSQL(totalColumnList, totalColumnTypeList)
+    createTable(containerName=cleansedContainerName, schemaName=cleansedSchemaName, tableName=tableName,location=location, partitionFieldsSQL=partitionFieldsSQL, columnsString=columnsString)
     tableCreated = True
     
     # get operations metrics 
     output = getOperationMetrics(schemaName=cleansedSchemaName, tableName=tableName, output=output)
 
-
-# COMMAND ----------
-
-# break out of notebook if table created
-if tableCreated:
-    # explicitly drop the temporary view
-    spark.catalog.dropTempView(tempViewName)
-    
-    dbutils.notebook.exit(output)
 
 # COMMAND ----------
 

@@ -177,3 +177,7 @@ def compareRawLoadVsLastCleansedDate(rawLastLoadDate: datetime.date , cleansedLa
         raise Exception('Unexpected state.')
 
     return
+
+# COMMAND ----------
+
+

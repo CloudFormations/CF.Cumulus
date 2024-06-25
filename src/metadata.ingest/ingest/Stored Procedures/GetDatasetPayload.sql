@@ -126,7 +126,7 @@ BEGIN
 		AND 
 			at.Enabled = 1
 
-		IF (@LoadType = 'F')
+		IF (@LoadType = 'I')
 			BEGIN
 			DECLARE @Result DATETIME;
 			DECLARE @SQL NVARCHAR(MAX);
