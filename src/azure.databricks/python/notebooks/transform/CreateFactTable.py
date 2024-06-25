@@ -119,5 +119,9 @@ createTable(containerName=curatedContainerName, schemaName=curatedSchemaName, ta
 
 # COMMAND ----------
 
+location
+
+
+# COMMAND ----------
 
 
