@@ -35,7 +35,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ./CreateMergeQuery
+# MAGIC %run ../utils/CreateMergeQuery
 
 # COMMAND ----------
 
