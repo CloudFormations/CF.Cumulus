@@ -7,6 +7,11 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "cumulusfactorydev"
 		},
+		"Common_LS_cumulusdatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
+		},
 		"Ingest_LS_Oracle_SIDAuth_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_Oracle_SIDAuth'",
@@ -32,16 +37,19 @@
 			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLServer_WinAuth'",
 			"defaultValue": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
 		},
-		"cumulusdatabase_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'cumulusdatabase'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
+		"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://cumulusfunctionappdev.azurewebsites.net"
+		},
+		"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://cumuluskeysdev.vault.azure.net/"
 		},
 		"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}"
 		},
-		"Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId": {
+		"Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
 			"type": "string",
 			"defaultValue": "@linkedService().ClusterId"
 		},
@@ -56,14 +64,6 @@
 		"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "@{linkedService().LSUsername}"
-		},
-		"cumulusfunctions_properties_typeProperties_functionAppUrl": {
-			"type": "string",
-			"defaultValue": "https://cumulusfunctionappdev.azurewebsites.net"
-		},
-		"cumuluskeys_properties_typeProperties_baseUrl": {
-			"type": "string",
-			"defaultValue": "https://cumuluskeysdev.vault.azure.net/"
 		},
 		"containerUri": {
 			"type": "string",
@@ -92,14 +92,14 @@
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
 					},
+					"Common_LS_cumulusdatabase_connectionString": {
+						"value": "[parameters('Common_LS_cumulusdatabase_connectionString')]"
+					},
 					"Ingest_LS_SQLDB_MIAuth_connectionString": {
 						"value": "[parameters('Ingest_LS_SQLDB_MIAuth_connectionString')]"
 					},
 					"Ingest_LS_SQLDB_SQLAuth_connectionString": {
 						"value": "[parameters('Ingest_LS_SQLDB_SQLAuth_connectionString')]"
-					},
-					"cumulusdatabase_connectionString": {
-						"value": "[parameters('cumulusdatabase_connectionString')]"
 					},
 					"Ingest_LS_Oracle_SIDAuth_connectionString": {
 						"value": "[parameters('Ingest_LS_Oracle_SIDAuth_connectionString')]"
@@ -110,14 +110,17 @@
 					"Ingest_LS_SQLServer_WinAuth_connectionString": {
 						"value": "[parameters('Ingest_LS_SQLServer_WinAuth_connectionString')]"
 					},
+					"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
+						"value": "[parameters('Common_LS_cumuluskeys_properties_typeProperties_baseUrl')]"
+					},
 					"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
 						"value": "[parameters('Ingest_LS_DataLake_MIAuth_properties_typeProperties_url')]"
 					},
-					"Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId": {
-						"value": "[parameters('Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId')]"
+					"Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId')]"
 					},
-					"cumuluskeys_properties_typeProperties_baseUrl": {
-						"value": "[parameters('cumuluskeys_properties_typeProperties_baseUrl')]"
+					"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
+						"value": "[parameters('Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl')]"
 					},
 					"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
 						"value": "[parameters('Ingest_LS_FileServer_VM02_properties_typeProperties_host')]"
@@ -127,9 +130,6 @@
 					},
 					"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
 						"value": "[parameters('Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName')]"
-					},
-					"cumulusfunctions_properties_typeProperties_functionAppUrl": {
-						"value": "[parameters('cumulusfunctions_properties_typeProperties_functionAppUrl')]"
 					}
 				}
 			},

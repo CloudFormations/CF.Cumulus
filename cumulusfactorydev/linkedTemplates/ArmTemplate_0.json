@@ -7,6 +7,11 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "cumulusfactorydev"
 		},
+		"Common_LS_cumulusdatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
+		},
 		"Ingest_LS_SQLDB_MIAuth_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLDB_MIAuth'",
@@ -16,11 +21,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLDB_SQLAuth'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
-		},
-		"cumulusdatabase_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'cumulusdatabase'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
 		},
 		"Ingest_LS_Oracle_SIDAuth_connectionString": {
 			"type": "secureString",
@@ -37,17 +37,21 @@
 			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLServer_WinAuth'",
 			"defaultValue": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
 		},
+		"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://cumuluskeysdev.vault.azure.net/"
+		},
 		"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}"
 		},
-		"Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId": {
+		"Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
 			"type": "string",
 			"defaultValue": "@linkedService().ClusterId"
 		},
-		"cumuluskeys_properties_typeProperties_baseUrl": {
+		"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
 			"type": "string",
-			"defaultValue": "https://cumuluskeysdev.vault.azure.net/"
+			"defaultValue": "https://cumulusfunctionappdev.azurewebsites.net"
 		},
 		"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
 			"type": "string",
@@ -60,16 +64,48 @@
 		"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
 			"type": "string",
 			"defaultValue": "@{linkedService().LSUsername}"
-		},
-		"cumulusfunctions_properties_typeProperties_functionAppUrl": {
-			"type": "string",
-			"defaultValue": "https://cumulusfunctionappdev.azurewebsites.net"
 		}
 	},
 	"variables": {
 		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
 	},
 	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Common_LS_cumulusdatabase')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection between ADF and processing framework metadata SQLDB.",
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Common"
+				],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('Common_LS_cumulusdatabase_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Common_LS_cumuluskeys')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Common"
+				],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('Common_LS_cumuluskeys_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Ingest_LS_DataLake_MIAuth')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
@@ -89,7 +125,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Databricks_SmallCluster_MIAuth')]",
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Databricks_Cluster_MIAuth')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -105,6 +141,9 @@
 					},
 					"ClusterId": {
 						"type": "string"
+					},
+					"SubscriptionId": {
+						"type": "string"
 					}
 				},
 				"annotations": [],
@@ -112,8 +151,60 @@
 				"typeProperties": {
 					"domain": "@linkedService().WorkspaceURL",
 					"authentication": "MSI",
-					"workspaceResourceId": "@concat('/subscriptions/',linkedService().WorkspaceURL,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
-					"existingClusterId": "[parameters('Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId')]"
+					"workspaceResourceId": "@concat('/subscriptions/',linkedService().SubscriptionId,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
+					"existingClusterId": "[parameters('Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Databricks_JobCluster_MIAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"WorkspaceURL": {
+						"type": "string"
+					},
+					"ClusterVersion": {
+						"type": "string"
+					},
+					"NodeType": {
+						"type": "string"
+					},
+					"PythonVersion": {
+						"type": "string",
+						"defaultValue": "Unused"
+					},
+					"NumWorkers": {
+						"type": "string"
+					},
+					"SubscriptionId": {
+						"type": "string"
+					},
+					"ResourceName": {
+						"type": "string"
+					},
+					"ResourceGroupName": {
+						"type": "string"
+					}
+				},
+				"annotations": [
+					"JobCluster"
+				],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "@linkedService().WorkspaceURL",
+					"authentication": "MSI",
+					"workspaceResourceId": "@concat('/subscriptions/',linkedService().SubscriptionId,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
+					"newClusterNodeType": "@linkedService().NodeType",
+					"newClusterNumOfWorker": "@linkedService().NumWorkers",
+					"newClusterSparkEnvVars": {
+						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+					},
+					"newClusterVersion": "@linkedService().ClusterVersion",
+					"clusterOption": "Autoscaling",
+					"newClusterInitScripts": []
 				}
 			},
 			"dependsOn": []
@@ -167,42 +258,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/cumulusdatabase')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Connection between ADF and processing framework metadata SQLDB.",
-				"annotations": [
-					"Cloud Formations",
-					"CF.Cumulus",
-					"Control"
-				],
-				"type": "AzureSqlDatabase",
-				"typeProperties": {
-					"connectionString": "[parameters('cumulusdatabase_connectionString')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/cumuluskeys')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
-				"annotations": [
-					"Cloud Formations",
-					"CF.Cumulus",
-					"Control"
-				],
-				"type": "AzureKeyVault",
-				"typeProperties": {
-					"baseUrl": "[parameters('cumuluskeys_properties_typeProperties_baseUrl')]"
-				}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/FunctionalTestingTrigger')]",
 			"type": "Microsoft.DataFactory/factories/triggers",
 			"apiVersion": "2018-06-01",
@@ -242,7 +297,7 @@
 			"properties": {
 				"description": "Single generic dataset used to get and set all database metadata.",
 				"linkedServiceName": {
-					"referenceName": "cumulusdatabase",
+					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				},
 				"folder": {
@@ -251,14 +306,14 @@
 				"annotations": [
 					"Cloud Formations",
 					"CF.Cumulus",
-					"Control"
+					"Common"
 				],
 				"type": "AzureSqlTable",
 				"schema": [],
 				"typeProperties": {}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/cumulusdatabase')]"
+				"[concat(variables('factoryId'), '/linkedServices/Common_LS_cumulusdatabase')]"
 			]
 		},
 		{
@@ -468,6 +523,35 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Common_LS_cumulusfunctions')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level.",
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Common"
+				],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl')]",
+					"authentication": "Anonymous",
+					"functionKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "cumulusfunctionsKey"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Common_LS_cumuluskeys')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Ingest_LS_FileServer_VM02')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
@@ -492,7 +576,7 @@
 					"password": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
-							"referenceName": "cumuluskeys",
+							"referenceName": "Common_LS_cumuluskeys",
 							"type": "LinkedServiceReference"
 						},
 						"secretName": "vmadminpassword"
@@ -505,7 +589,7 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/datasourceVM02')]",
-				"[concat(variables('factoryId'), '/linkedServices/cumuluskeys')]"
+				"[concat(variables('factoryId'), '/linkedServices/Common_LS_cumuluskeys')]"
 			]
 		},
 		{
@@ -610,35 +694,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/datasourceVM02')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/cumulusfunctions')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level.",
-				"annotations": [
-					"Cloud Formations",
-					"CF.Cumulus",
-					"Control"
-				],
-				"type": "AzureFunction",
-				"typeProperties": {
-					"functionAppUrl": "[parameters('cumulusfunctions_properties_typeProperties_functionAppUrl')]",
-					"functionKey": {
-						"type": "AzureKeyVaultSecret",
-						"store": {
-							"referenceName": "cumuluskeys",
-							"type": "LinkedServiceReference"
-						},
-						"secretName": "cumulusfunctionsKey"
-					},
-					"authentication": "Anonymous"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/cumuluskeys')]"
 			]
 		},
 		{
@@ -1290,78 +1345,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/GetSetMetadata')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Email Sender')]",
-			"type": "Microsoft.DataFactory/factories/pipelines",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Provide a simple abstract over the send email function with request body item exposed as pipeline parameters.",
-				"activities": [
-					{
-						"name": "Send Email",
-						"description": "Use an Azure Function to perform an SMTP client email send operation.",
-						"type": "AzureFunctionActivity",
-						"dependsOn": [],
-						"policy": {
-							"timeout": "0.00:10:00",
-							"retry": 0,
-							"retryIntervalInSeconds": 30,
-							"secureOutput": false,
-							"secureInput": false
-						},
-						"userProperties": [],
-						"typeProperties": {
-							"functionName": "SendEmail",
-							"body": {
-								"value": "{\n\"emailRecipients\": \"@{pipeline().parameters.Recipients}\",\n\"emailCcRecipients\": \"@{pipeline().parameters.CcRecipients}\",\n\"emailBccRecipients\": \"@{pipeline().parameters.BccRecipients}\",\n\"emailSubject\": \"@{pipeline().parameters.Subject}\",\n\"emailBody\": \"@{pipeline().parameters.Body}\",\n\"emailImportance\": \"@{pipeline().parameters.Importance}\"\n}",
-								"type": "Expression"
-							},
-							"headers": {},
-							"method": "POST"
-						},
-						"linkedServiceName": {
-							"referenceName": "cumulusfunctions",
-							"type": "LinkedServiceReference"
-						}
-					}
-				],
-				"policy": {
-					"elapsedTimeMetric": {}
-				},
-				"parameters": {
-					"Recipients": {
-						"type": "string"
-					},
-					"CcRecipients": {
-						"type": "string"
-					},
-					"BccRecipients": {
-						"type": "string"
-					},
-					"Subject": {
-						"type": "string"
-					},
-					"Body": {
-						"type": "string"
-					},
-					"Importance": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "Cumulus.Utils"
-				},
-				"annotations": [
-					"Cloud Formations",
-					"CF.Cumulus",
-					"Control",
-					"Send Alerts"
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/cumulusfunctions')]"
 			]
 		}
 	]

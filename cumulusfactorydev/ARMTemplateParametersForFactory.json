@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "cumulusfactorydev"
 		},
+		"Common_LS_cumulusdatabase_connectionString": {
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
+		},
 		"Ingest_LS_Oracle_SIDAuth_connectionString": {
 			"value": "host=@{linkedService().LSHostname};port=@{linkedService().LSPortNumber};sid=@{linkedService().LSOracleSid};user id=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
 		},
@@ -20,13 +23,16 @@
 		"Ingest_LS_SQLServer_WinAuth_connectionString": {
 			"value": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
 		},
-		"cumulusdatabase_connectionString": {
-			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
+		"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
+			"value": "https://cumulusfunctionappdev.azurewebsites.net"
+		},
+		"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
+			"value": "https://cumuluskeysdev.vault.azure.net/"
 		},
 		"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
 			"value": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}"
 		},
-		"Ingest_LS_Databricks_SmallCluster_MIAuth_properties_typeProperties_existingClusterId": {
+		"Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
 			"value": "@linkedService().ClusterId"
 		},
 		"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
@@ -37,12 +43,6 @@
 		},
 		"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
 			"value": "@{linkedService().LSUsername}"
-		},
-		"cumulusfunctions_properties_typeProperties_functionAppUrl": {
-			"value": "https://cumulusfunctionappdev.azurewebsites.net"
-		},
-		"cumuluskeys_properties_typeProperties_baseUrl": {
-			"value": "https://cumuluskeysdev.vault.azure.net/"
 		}
 	}
 }
