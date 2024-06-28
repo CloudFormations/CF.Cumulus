@@ -2,8 +2,9 @@
 def getMergePayloadVariables(payload: dict()) -> list():
     # create variables for each payload item
     tableName = payload["DatasetDisplayName"] 
-    loadType = payload["LoadAction"]
-    loadTypeText = "full" if loadType == "F" else "incremental"
+    loadType = payload["LoadType"]
+    loadAction = payload["LoadAction"]
+    loadActionText = "full" if loadAction == "F" else "incremental"
     versionNumber = f"{int(payload['VersionNumber']):04d}"
 
     rawStorageName = payload["RawStorageName"]
@@ -45,6 +46,6 @@ def getMergePayloadVariables(payload: dict()) -> list():
     # totalColumnTypeList = columnsTypeList
     # totalColumnFormatList = columnsFormatList
 
-    output = [tableName, loadType, loadTypeText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList]
+    output = [tableName, loadType, loadAction, loadActionText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList]
 
     return output

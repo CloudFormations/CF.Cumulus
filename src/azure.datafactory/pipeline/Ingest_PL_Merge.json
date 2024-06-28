@@ -76,7 +76,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/checkpayload/CheckPayloadExecution",
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/CheckPayloadExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",

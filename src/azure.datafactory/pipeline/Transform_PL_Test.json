@@ -1,0 +1,236 @@
+{
+	"name": "Transform_PL_Test",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Notebook Payload",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[transform].[GetNotebookPayload]",
+						"storedProcedureParameters": {
+							"NotebookId": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.NotebookId",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "GetSetMetadata",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Switch Compute",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Get Notebook Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set Pipeline Run DateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@activity('Get Notebook Payload').output.firstRow.ComputeLinkedServiceName",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "Transform_LS_Databricks_Cluster_MIAuth",
+							"activities": [
+								{
+									"name": "Test Notebook - Interactive Cluster",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": {
+											"value": "@activity('Get Notebook Payload').output.firstRow.NotebookFullPath",
+											"type": "Expression"
+										},
+										"baseParameters": {
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ClusterId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "Transform_LS_Databricks_JobCluster_MIAuth",
+							"activities": [
+								{
+									"name": "Test Notebook - Job Cluster",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": {
+											"value": "@activity('Get Notebook Payload').output.firstRow.NotebookFullPath",
+											"type": "Expression"
+										},
+										"baseParameters": {
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ClusterVersion": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
+												"type": "Expression"
+											},
+											"NodeType": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
+												"type": "Expression"
+											},
+											"PythonVersion": "3",
+											"NumWorkers": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			},
+			{
+				"name": "Set Pipeline Run DateTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PipelineRunDateTime",
+					"value": {
+						"value": "@string(utcnow())",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"NotebookId": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"PipelineRunDateTime": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Transform"
+		},
+		"annotations": []
+	}
+}
