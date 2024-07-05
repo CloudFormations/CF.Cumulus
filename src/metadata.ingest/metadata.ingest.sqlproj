@@ -84,6 +84,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Build>
     <Build Include="ingest\Tables\ComputeConnections.sql" />
+    <Build Include="Scripts\DynamicsGetAttributeMetadata.sql" />
+    <Build Include="Scripts\OracleGetAttributeMetadata.sql" />
+    <Build Include="Scripts\SqlGetAttributeMetadata.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
