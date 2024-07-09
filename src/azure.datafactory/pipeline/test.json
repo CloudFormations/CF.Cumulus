@@ -1,0 +1,30 @@
+{
+	"name": "test",
+	"properties": {
+		"activities": [
+			{
+				"name": "Set variable1",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "fr",
+					"value": "sdfsdfsd"
+				}
+			}
+		],
+		"variables": {
+			"fr": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Control"
+		},
+		"annotations": []
+	}
+}
