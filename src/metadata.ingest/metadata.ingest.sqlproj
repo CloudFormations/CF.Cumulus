@@ -89,6 +89,7 @@
     <Build Include="ingest\Stored Procedures\AddIngestPayloadPipeline.sql" />
     <Build Include="Security\db_cumulususer.sql" />
     <Build Include="Security\ingest.sql" />
+    <Build Include="ingest\Stored Procedures\AddIngestPayloadPipelineDependencies.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
