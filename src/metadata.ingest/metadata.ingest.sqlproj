@@ -66,7 +66,6 @@
     <Folder Include="ingest\Functions" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Security\ingest.sql" />
     <Build Include="ingest\Tables\Attributes.sql" />
     <Build Include="ingest\Tables\Connections.sql" />
     <Build Include="ingest\Tables\ConnectionTypes.sql" />
@@ -84,6 +83,13 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Build>
     <Build Include="ingest\Tables\ComputeConnections.sql" />
+    <Build Include="Scripts\DynamicsGetAttributeMetadata.sql" />
+    <Build Include="Scripts\OracleGetAttributeMetadata.sql" />
+    <Build Include="Scripts\SqlGetAttributeMetadata.sql" />
+    <Build Include="ingest\Stored Procedures\AddIngestPayloadPipeline.sql" />
+    <Build Include="Security\db_cumulususer.sql" />
+    <Build Include="Security\ingest.sql" />
+    <Build Include="ingest\Stored Procedures\AddIngestPayloadPipelineDependencies.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />

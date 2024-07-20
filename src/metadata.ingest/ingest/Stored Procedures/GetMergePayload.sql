@@ -55,11 +55,11 @@ BEGIN
 
     DECLARE @DateTimeFolderHierarchy NVARCHAR(250)
 
-    -- Get attribute data as comma separated string values for the dataset
+        -- Get attribute data as comma separated string values for the dataset
     SELECT 
-        @CleansedColumnsList = STRING_AGG(att.AttributeName,','),
-        @CleansedColumnsTypeList = STRING_AGG(att.AttributeTargetDataType,','),
-        @CleansedColumnsFormatList = STRING_AGG(att.AttributeTargetDataFormat, ',')
+        @CleansedColumnsList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),','),
+        @CleansedColumnsTypeList = STRING_AGG(CAST(att.AttributeTargetDataType AS NVARCHAR(MAX)),','),
+        @CleansedColumnsFormatList = STRING_AGG(CAST(att.AttributeTargetDataFormat AS NVARCHAR(MAX)), ',')
     FROM 
         [ingest].[DatasetsLatestVersion] AS ds
     INNER JOIN 
@@ -72,7 +72,7 @@ BEGIN
 
     -- Get pk columns as comma separated string values for the dataset
     SELECT 
-        @PkAttributesList = STRING_AGG(att.AttributeName,',')
+        @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),',')
     FROM 
         [ingest].[DatasetsLatestVersion] AS ds
     INNER JOIN 
@@ -88,7 +88,7 @@ BEGIN
 
     -- Get pk columns as comma separated string values for the dataset
     SELECT 
-        @PkAttributesList = STRING_AGG(att.AttributeName,',')
+        @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),',')
     FROM 
         [ingest].[DatasetsLatestVersion] AS ds
     INNER JOIN 
