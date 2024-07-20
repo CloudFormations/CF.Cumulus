@@ -46,16 +46,16 @@ BEGIN
     END
 
 
-    DECLARE @CleansedColumnsList NVARCHAR(250)
-    DECLARE @CleansedColumnsTypeList NVARCHAR(250)
-    DECLARE @CleansedColumnsFormatList NVARCHAR(250)
+    DECLARE @CleansedColumnsList NVARCHAR(MAX)
+    DECLARE @CleansedColumnsTypeList NVARCHAR(MAX)
+    DECLARE @CleansedColumnsFormatList NVARCHAR(MAX)
 
-    DECLARE @PkAttributesList NVARCHAR(250) = ''
-    DECLARE @PartitionByAttributesList NVARCHAR(250) = ''
+    DECLARE @PkAttributesList NVARCHAR(MAX) = ''
+    DECLARE @PartitionByAttributesList NVARCHAR(MAX) = ''
 
-    DECLARE @DateTimeFolderHierarchy NVARCHAR(250)
+    DECLARE @DateTimeFolderHierarchy NVARCHAR(1000)
 
-        -- Get attribute data as comma separated string values for the dataset
+    -- Get attribute data as comma separated string values for the dataset
     SELECT 
         @CleansedColumnsList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),','),
         @CleansedColumnsTypeList = STRING_AGG(CAST(att.AttributeTargetDataType AS NVARCHAR(MAX)),','),
@@ -163,6 +163,7 @@ BEGIN
         [cn].[ConnectionDisplayName] AS 'CleansedSchemaName',
         ds.CleansedName AS 'CleansedTableName',
         ds.Enabled,
+		ds.LoadType,
         @LoadAction AS 'LoadAction',
         @RawLastLoadDate AS 'RawLastLoadDate',
         @CleansedLastLoadDate AS 'CleansedLastLoadDate',
