@@ -6,44 +6,44 @@ from datetime import datetime
 
 # DBTITLE 1,Check Payload Validity
 # check load type in 'F' or 'I' currently supported
-def checkLoadType(loadType: str) -> None:
+def checkLoadAction(loadAction: str) -> None:
     """
     Checks the load type provided to prevent unsupported load types occurring.
     Currently supports Full ('F') and Incremental ('I') loads.
  
     Args:
-        loadType (str): The load type supplied from the payload.  
+        loadAction (str): The load type supplied from the payload.  
     """
 
-    loadTypeAllowedValues = ['F','I']
+    loadActionAllowedValues = ['F','I']
 
-    if loadType in loadTypeAllowedValues:
-        print(f'Success, load type = {loadType}')
-    elif loadType not in loadTypeAllowedValues: 
-        raise Exception(f'Load Type of {loadType} not yet supported in cleansed layer logic. Please review.')
+    if loadAction in loadActionAllowedValues:
+        print(f'Success, load type = {loadAction}')
+    elif loadAction not in loadActionAllowedValues: 
+        raise Exception(f'Load Type of {loadAction} not yet supported in cleansed layer logic. Please review.')
     else:
         raise Exception('Unexpected state.')
     
     return
 
 # For incremental loads we require primary keys to be used in the merge criteria.
-def checkMergeAndPKConditions(loadType:str, pkList: list()) -> None:
+def checkMergeAndPKConditions(loadAction:str, pkList: list()) -> None:
     """
     Checks the combination of load type and primary key values providedprovided to prevent unsupported load types occurring.
     Currently supports Full ('F') and Incremental ('I') loads.
  
     Args:
-        loadType (str): The load type supplied from the payload.  
+        loadAction (str): The load type supplied from the payload.  
         pkList (list): The primary keys supplied from the payload.
     """
-    if loadType.upper() == "I" and len(pkList) > 0:
-        print(f'Incremental loading configured with primary keys. This is a valid combination.')
-    elif loadType.upper() == "F" and len(pkList) > 0:
-        print(f'Full loading configured with primary keys. This is a valid combination.')    
-    elif loadType.upper() == "F" and len(pkList) == 0:
-        print(f'Full loading configured with no primary keys. This is a valid combination, assuming no subsequent incremental loads are due to take place.')
-    elif loadType.upper() == "I" and len(pkList) == 0:
-        raise Exception(f'Incremental loading configured with no primary keys. This is not a valid combination and will result in merge failures as no merge criteria can be specified.')
+    if loadAction.upper() == "I" and len(pkList) > 0:
+        print(f'Incremental loading configured with primary/business keys. This is a valid combination.')
+    elif loadAction.upper() == "F" and len(pkList) > 0:
+        print(f'Full loading configured with primary/business keys. This is a valid combination.')    
+    elif loadAction.upper() == "F" and len(pkList) == 0:
+        print(f'Full loading configured with no primary/business keys. This is a valid combination, assuming no subsequent incremental loads are due to take place.')
+    elif loadAction.upper() == "I" and len(pkList) == 0:
+        raise Exception(f'Incremental loading configured with no primary/business keys. This is not a valid combination and will result in merge failures as no merge criteria can be specified.')
     else:
         raise Exception('Unexpected state.')
 
@@ -52,7 +52,7 @@ def checkContainerName(containerName: str) -> None:
     containers = [
         'raw',
         'cleansed',
-        #'curated',
+        'curated',
     ]
     if containerName in containers:
         print(f'container name {containerName} is supported.')
@@ -61,27 +61,6 @@ def checkContainerName(containerName: str) -> None:
     else:
         raise Exception('Unexpected state.')
 
-
-# COMMAND ----------
-
-# DBTITLE 1,Check ABFSS
-
-# abfss check path exists in dbutils
-def checkAbfss(abfssPath:str) -> None:
-    """
-    Checks the ABFSS path of the container and raises an error if it does not exist.
- 
-    Args:
-        abfssPath (str): The abfss path of the ADLS storage account container.
- 
-    """
-    try:
-        filesInPath = dbutils.fs.ls(abfssPath)
-        print(f'Abfss path {abfssPath} exists. {len(filesInPath)} files found at first level.')
-    except Exception: 
-        raise Exception('Storage location not accessible. Please check ADLS location exists, the Databricks account has access and no typing mistakes are present.')
-
-    return
 
 # COMMAND ----------
 
@@ -129,15 +108,15 @@ def setTablePath(schemaName: str, tableName: str) -> str:
     return f'{schemaName}.{tableName}'
 
 
-# Confirm if a Delta table exists and is required to exist given the load type being executed.
-def checkExistsDeltaTable(tablePath: str, loadType: str) -> bool:
+# Confirm if a Delta table exists and is required to exist given the load Action being executed.
+def checkExistsDeltaTable(tablePath: str, loadAction: str, loadType: str) -> bool:
     """
     Check the spark catalog to see if a Delta table exists at the provided location.
-    If a table does not exist, and is required to exist for the loadType specified, an error will be raised.
+    If a table does not exist, and is required to exist for the loadAction specified, an error will be raised.
  
     Args:
         tablePath (str): The path for the Delta table for the Dataset. This only requires the schemaName.tableName information, and is separate from the full ADLS path. 
-        loadType (str): The load type being run. Different load types will determine if an error will occur if no (cleansed) Dataset Delta table is found.
+        loadAction (str): The load Action being run. Different load ctions will determine if an error will occur if no (cleansed) Dataset Delta table is found.
     """
 
     try:
@@ -145,13 +124,15 @@ def checkExistsDeltaTable(tablePath: str, loadType: str) -> bool:
     except Exception:
         raise Exception('Syntax error in table name provided. Please review no erroneous characters, such as " " are included.')
 
-    if (tableExists == True) and (loadType == 'I'):
+    if (tableExists == True) and (loadAction == 'I'):
         print('Table exists. No action required.')
-    elif (tableExists == True) and (loadType == 'F'):
-        raise Exception('Table found but running full load. Please confirm that this is expected.')
-    elif (tableExists == False) and (loadType == 'F'):
+    elif (tableExists == True) and (loadAction == 'F') and (loadType == 'I'):
+        raise Exception('Table found but running full load for Dataset which supports incremental load. Please confirm that this is expected.')
+    elif (tableExists == True) and (loadAction == 'F') and (loadType == 'F'):
+        print('Table found but running full load for Dataset which only supports full loads. This will be overwritten, as expected.')
+    elif (tableExists == False) and (loadAction == 'F'):
         print('Table not found. Full load being run, table will be created by default as part of this process.')
-    elif (tableExists == False) and (loadType == 'I'):
+    elif (tableExists == False) and (loadAction == 'I'):
         raise Exception('Table not found, raise error.')
     else:
         raise Exception('Unexpected state.')
@@ -196,3 +177,7 @@ def compareRawLoadVsLastCleansedDate(rawLastLoadDate: datetime.date , cleansedLa
         raise Exception('Unexpected state.')
 
     return
+
+# COMMAND ----------
+
+

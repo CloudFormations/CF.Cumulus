@@ -61,7 +61,8 @@ BEGIN
             ON ds.[DatasetId] = at.[DatasetFK]
         WHERE
             ds.DatasetId = @DatasetId
-
+		AND 
+			at.Enabled = 1
 
 		SELECT 
             @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + QUOTENAME(ds.[SourcePath]) + '.' + QUOTENAME(ds.[SourceName])
@@ -81,21 +82,77 @@ BEGIN
             ON ds.[DatasetId] = at.[DatasetFK]
         WHERE
             ds.DatasetId = @DatasetId
-
+		AND 
+			at.Enabled = 1
 
 		SELECT 
             @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + UPPER(ds.[SourcePath]) + '.' + UPPER(ds.[SourceName])
-
-
         FROM 
             [ingest].[DatasetsLatestVersion] AS ds
         WHERE
             ds.DatasetId = @DatasetId
+		
 	END
 
+	-- Logic not required/built yet.
     ELSE IF @SourceLanguageType = 'SQL'
     BEGIN
         SET @SourceQuery = @SourceQuery
+    END
+
+	ELSE IF @SourceLanguageType = 'XML'
+    BEGIN
+		DECLARE @CDCWhereClause XML
+		
+		-- Start building the XML statement for the query
+		SET @SourceQuery = '<fetch>'
+		
+		SELECT
+			@SourceQuery += '<entity name="' + [SourceName] + '">'
+			,@CDCWhereClause = CDCWhereClause -- Unused if we're running a full load.
+		FROM
+			[ingest].[DatasetsLatestVersion] AS ds
+		WHERE
+			ds.DatasetId = @DatasetId
+
+		-- recursively add the attributes to load
+		SELECT
+			@SourceQuery += '<attribute name="' + [AttributeName] + '" />'
+		FROM
+			[ingest].[DatasetsLatestVersion] AS ds
+		INNER JOIN [ingest].[Attributes] AS at
+			ON ds.[DatasetId] = at.[DatasetFK]
+		WHERE
+			ds.DatasetId = @DatasetId
+		AND 
+			at.Enabled = 1
+
+		IF (@LoadType = 'I')
+			BEGIN
+			DECLARE @Result DATETIME;
+			DECLARE @SQL NVARCHAR(MAX);
+			DECLARE @ParameterDef NVARCHAR(MAX);
+			DECLARE @XmlValue NVARCHAR(MAX)
+
+			SELECT @XmlValue = @CDCWhereClause.value('(/filter/condition/@value)[1]', 'NVARCHAR(MAX)')
+
+			-- Define the dynamic SQL query -- replace value of (/filter/condition/@value)[1]      with "Jun 20 2023 12:41PM"
+			SET @SQL = N'SELECT @OutputResult = ' + @XmlValue;
+
+			-- Define the parameter definition for the OUTPUT parameter
+			SET @ParameterDef = N'@OutputResult DATETIME OUTPUT';
+
+			-- Execute the dynamic SQL and save the result to the @Result variable
+			EXEC dbo.sp_executesql @SQL, @ParameterDef, @OutputResult=@Result OUTPUT;
+
+			-- Update the value in the XML variable
+			SET @CDCWhereClause.modify('replace value of (/filter/condition/@value)[1] with sql:variable("@Result")');
+
+
+			SET @SourceQuery += CAST(@CDCWhereClause AS nvarchar(MAX));
+
+		END 
+		SET @SourceQuery += '</entity></fetch>'
     END
 
     ELSE IF @SourceLanguageType = 'NA'
@@ -114,13 +171,13 @@ BEGIN
 		RAISERROR('Language Type not supported.',16,1)
 		RETURN 0;
 	END
-    -- Update with new logic
+
     IF (@LoadType = 'F')
 		BEGIN
 			SET @SourceQuery = @SourceQuery
             SET @LoadAction = 'full'
 		END
-	ELSE IF (@LoadType = 'I')
+	ELSE IF (@LoadType = 'I') AND @SourceLanguageType <> 'XML'
 		BEGIN
 			SELECT 
                 @SourceQuery = @SourceQuery + ' ' + ds.[CDCWhereClause]
@@ -128,6 +185,11 @@ BEGIN
                 [ingest].[DatasetsLatestVersion] AS ds
             WHERE
                 ds.DatasetId = @DatasetId
+            SET @LoadAction = 'incremental'
+		END
+	ELSE IF (@LoadType = 'I') AND @SourceLanguageType = 'XML'
+		BEGIN
+			SET @SourceQuery = @SourceQuery
             SET @LoadAction = 'incremental'
 		END
 	--ELSE IF @LoadType = 'FW'
@@ -147,6 +209,7 @@ BEGIN
 		RIGHT('0000' + CAST(ds.[VersionNumber] AS VARCHAR),4) AS 'VersionNumber',
 		ds.[SourceName],
 		ds.[DatasetDisplayName],
+		ds.[ExtensionType],
 		cn1.*,
 		cn2.[ConnectionLocation] AS 'TargetStorageName',
 		cn2.[SourceLocation] AS 'TargetStorageContainer',

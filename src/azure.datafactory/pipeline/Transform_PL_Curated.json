@@ -1,0 +1,570 @@
+{
+	"name": "Transform_PL_Curated",
+	"properties": {
+		"activities": [
+			{
+				"name": "Get Notebook Payload",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[transform].[GetNotebookPayload]",
+						"storedProcedureParameters": {
+							"DatasetId": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.DatasetId",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "GetSetMetadata",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Switch Compute",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Get Notebook Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set Pipeline Run DateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@activity('Get Notebook Payload').output.firstRow.ComputeLinkedServiceName",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "Transform_LS_Databricks_Cluster_MIAuth",
+							"activities": [
+								{
+									"name": "Create Table",
+									"description": "Dimension or Fact tables",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Validate Payload",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": {
+											"value": "@activity('Get Notebook Payload').output.firstRow.ExecutionNotebookPath",
+											"type": "Expression"
+										},
+										"baseParameters": {
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ClusterId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Transform Data",
+									"description": "",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Create Table",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/TransformExecution",
+										"baseParameters": {
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ClusterId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Validate Payload",
+									"description": "",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/CheckPayloadExecution",
+										"baseParameters": {
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ClusterId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "Transform_LS_Databricks_JobCluster_MIAuth",
+							"activities": [
+								{
+									"name": "Create Table - Job Cluster",
+									"description": "Dimension or Facts",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Validate Payload - Job Cluster",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": {
+											"value": "@activity('Get Notebook Payload').output.firstRow.ExecutionNotebookPath",
+											"type": "Expression"
+										},
+										"baseParameters": {
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ClusterVersion": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
+												"type": "Expression"
+											},
+											"NodeType": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
+												"type": "Expression"
+											},
+											"PythonVersion": "3",
+											"NumWorkers": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Transform Data - Job Cluster",
+									"description": "Dimension or Facts",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Create Table - Job Cluster",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/TransformExecution",
+										"baseParameters": {
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ClusterVersion": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
+												"type": "Expression"
+											},
+											"NodeType": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
+												"type": "Expression"
+											},
+											"PythonVersion": "3",
+											"NumWorkers": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Validate Payload - Job Cluster",
+									"description": "",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/CheckPayloadExecution",
+										"baseParameters": {
+											"Notebook Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ClusterVersion": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
+												"type": "Expression"
+											},
+											"NodeType": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
+												"type": "Expression"
+											},
+											"PythonVersion": "3",
+											"NumWorkers": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Supported Linked Service Type",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('The Linked Service type and authentication combination is not currently supported.')",
+									"type": "Expression"
+								},
+								"errorCode": "16"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Set Pipeline Run DateTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "PipelineRunDateTime",
+					"value": {
+						"value": "@string(utcnow())",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Update Metadata Load Status",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Switch Compute",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[transform].[SetTransformLoadStatus]",
+					"storedProcedureParameters": {
+						"DatasetId": {
+							"value": {
+								"value": "@pipeline().parameters.DatasetId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"FileLoadDateTime": {
+							"value": {
+								"value": "@variables('PipelineRunDateTime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Common_LS_cumulusdatabase",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"DatasetId": {
+				"type": "string"
+			}
+		},
+		"variables": {
+			"PipelineRunDateTime": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Transform"
+		},
+		"annotations": []
+	}
+}

@@ -10,7 +10,7 @@ CREATE TABLE [ingest].[Datasets](
 	[VersionValidFrom] [datetime2](7) NULL,
 	[VersionValidTo] [datetime2](7) NULL,
 	[LoadType] [char](1) NOT NULL,
-	[LoadStatus] [int] NULL, -- review this to bitwise col
+	[LoadStatus] [int] NULL,
 	[CDCWhereClause] [nvarchar](max) NULL,
 	[RawLastFullLoadDate] [datetime2](7) NULL,
 	[RawLastIncrementalLoadDate] [datetime2](7) NULL,
@@ -31,4 +31,12 @@ ALTER TABLE [ingest].[Datasets]  WITH CHECK ADD  CONSTRAINT [chkDatasetDisplayNa
 GO
 
 ALTER TABLE [ingest].[Datasets] CHECK CONSTRAINT [chkDatasetDisplayNameNoSpaces]
+GO
+
+ALTER TABLE[ingest].[Datasets]  WITH CHECK ADD FOREIGN KEY([MergeComputeConnectionFK])
+REFERENCES [ingest].[ComputeConnections] ([ComputeConnectionId])
+GO
+
+ALTER TABLE[ingest].[Datasets]  WITH CHECK ADD FOREIGN KEY([ConnectionFK])
+REFERENCES [ingest].[Connections] ([ConnectionId])
 GO

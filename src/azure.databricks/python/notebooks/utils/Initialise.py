@@ -1,6 +1,7 @@
 # Databricks notebook source
 # Set abfss initialisation
 # Set abfss paths
+# Check abfss exists
 
 # COMMAND ----------
 
@@ -31,3 +32,22 @@ def setAbfssPath(storageName: str, containerName: str) -> str:
  
     """
     return f"abfss://{containerName}@{storageName}.dfs.core.windows.net/"
+
+# COMMAND ----------
+
+# abfss check path exists in dbutils
+def checkAbfss(abfssPath:str) -> None:
+    """
+    Checks the ABFSS path of the container and raises an error if it does not exist.
+ 
+    Args:
+        abfssPath (str): The abfss path of the ADLS storage account container.
+ 
+    """
+    try:
+        filesInPath = dbutils.fs.ls(abfssPath)
+        print(f'Abfss path {abfssPath} exists. {len(filesInPath)} files found at first level.')
+    except Exception: 
+        raise Exception('Storage location not accessible. Please check ADLS location exists, the Databricks account has access and no typing mistakes are present.')
+
+    return
