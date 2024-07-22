@@ -183,6 +183,148 @@
 									}
 								}
 							]
+						},
+						{
+							"value": "Ingest_LS_Databricks_JobCluster_MIAuth",
+							"activities": [
+								{
+									"name": "Check Payload Validity Small Databricks Compute Job",
+									"type": "DatabricksNotebook",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/CheckPayloadExecution",
+										"baseParameters": {
+											"Merge Payload": {
+												"value": "@string(activity('Get Merge Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ClusterVersion": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeVersion",
+												"type": "Expression"
+											},
+											"NodeType": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeSize",
+												"type": "Expression"
+											},
+											"PythonVersion": "3",
+											"NumWorkers": {
+												"value": "@activity('Get Merge Payload').output.firstRow.CountNodes",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Raw to Cleansed Execution Small Databricks Compute Job",
+									"type": "DatabricksNotebook",
+									"dependsOn": [
+										{
+											"activity": "Check Payload Validity Small Databricks Compute Job",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/IngestExecution",
+										"baseParameters": {
+											"Merge Payload": {
+												"value": "@string(activity('Get Merge Payload').output.firstRow)",
+												"type": "Expression"
+											},
+											"Pipeline Run Id": {
+												"value": "@pipeline().RunId",
+												"type": "Expression"
+											},
+											"Pipeline Run DateTime": {
+												"value": "@variables('PipelineRunDateTime')",
+												"type": "Expression"
+											}
+										}
+									},
+									"linkedServiceName": {
+										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"type": "LinkedServiceReference",
+										"parameters": {
+											"WorkspaceURL": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ClusterVersion": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeVersion",
+												"type": "Expression"
+											},
+											"NodeType": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeSize",
+												"type": "Expression"
+											},
+											"PythonVersion": "3",
+											"NumWorkers": {
+												"value": "@activity('Get Merge Payload').output.firstRow.CountNodes",
+												"type": "Expression"
+											},
+											"SubscriptionId": {
+												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											}
+										}
+									}
+								}
+							]
 						}
 					],
 					"defaultActivities": [
