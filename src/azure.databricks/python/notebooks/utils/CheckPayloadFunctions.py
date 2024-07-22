@@ -37,13 +37,13 @@ def checkMergeAndPKConditions(loadAction:str, pkList: list()) -> None:
         pkList (list): The primary keys supplied from the payload.
     """
     if loadAction.upper() == "I" and len(pkList) > 0:
-        print(f'Incremental loading configured with primary keys. This is a valid combination.')
+        print(f'Incremental loading configured with primary/business keys. This is a valid combination.')
     elif loadAction.upper() == "F" and len(pkList) > 0:
-        print(f'Full loading configured with primary keys. This is a valid combination.')    
+        print(f'Full loading configured with primary/business keys. This is a valid combination.')    
     elif loadAction.upper() == "F" and len(pkList) == 0:
-        print(f'Full loading configured with no primary keys. This is a valid combination, assuming no subsequent incremental loads are due to take place.')
+        print(f'Full loading configured with no primary/business keys. This is a valid combination, assuming no subsequent incremental loads are due to take place.')
     elif loadAction.upper() == "I" and len(pkList) == 0:
-        raise Exception(f'Incremental loading configured with no primary keys. This is not a valid combination and will result in merge failures as no merge criteria can be specified.')
+        raise Exception(f'Incremental loading configured with no primary/business keys. This is not a valid combination and will result in merge failures as no merge criteria can be specified.')
     else:
         raise Exception('Unexpected state.')
 
@@ -52,7 +52,7 @@ def checkContainerName(containerName: str) -> None:
     containers = [
         'raw',
         'cleansed',
-        #'curated',
+        'curated',
     ]
     if containerName in containers:
         print(f'container name {containerName} is supported.')
