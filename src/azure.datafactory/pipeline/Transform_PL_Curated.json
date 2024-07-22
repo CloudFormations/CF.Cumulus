@@ -207,7 +207,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"notebookPath": {
-											"value": "@activity('Get Notebook Payload').output.firstRow.NotebookFullPath",
+											"value": "@activity('Get Notebook Payload').output.firstRow.ExecutionNotebookPath",
 											"type": "Expression"
 										},
 										"baseParameters": {
