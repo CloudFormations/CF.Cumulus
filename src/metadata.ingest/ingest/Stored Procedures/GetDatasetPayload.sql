@@ -24,6 +24,7 @@ BEGIN
     IF @ResultRowCount = 0
     BEGIN
         RAISERROR('No results returned for the provided Dataset Id. Confirm Dataset is enabled, and related Connections are enabled.',16,1)
+		RETURN 0;
     END
     
 
@@ -166,7 +167,10 @@ BEGIN
             ds.DatasetId = @DatasetId
     END
 	ELSE
+	BEGIN
 		RAISERROR('Language Type not supported.',16,1)
+		RETURN 0;
+	END
 
     IF (@LoadType = 'F')
 		BEGIN
@@ -193,6 +197,7 @@ BEGIN
 	ELSE
 		BEGIN
 			RAISERROR('Load type condition not yet supported.',16,1);
+			RETURN 0;
 		END
 	
 	IF @SourceLanguageType IN ('T-SQL', 'PSQL', 'SQL')

@@ -17,10 +17,12 @@ AND ds.DatasetDisplayName = @DatasetDisplayName
 IF @DatasetCount = 0
 BEGIN
     RAISERROR('No rows returned. Please review the Dataset Id provided and confirm this is enabled.',16,1)
+    RETURN 0;
 END
 IF @DatasetCount > 1
 BEGIN
     RAISERROR('More than 1 row returned. Please review there is 1 active Dataset for the provided Dataset Id, and the connection details.',16,1)
+    RETURN 0;
 END
 
 SELECT 
@@ -71,14 +73,17 @@ SELECT @PipelineIdResult, @DependantPipelineIdResult
 IF @PipelineIdResult IS NULL AND @DependantPipelineIdResult IS NULL
 BEGIN 
 	RAISERROR('Missing Ids for this Dataset',16,1)
+    RETURN 0;
 END
 ELSE IF @PipelineIdResult IS NULL AND @DependantPipelineIdResult IS NOT NULL
 BEGIN 
 	RAISERROR('Missing PipelineId (Raw Ingest Pipeline)',16,1)
+    RETURN 0;
 END
 ELSE IF @PipelineIdResult IS NOT NULL AND @DependantPipelineIdResult IS NULL
 BEGIN 
 	RAISERROR('Missing DependantPipelineId (Cleansed Merge Pipeline)',16,1)
+    RETURN 0;
 END
 ELSE IF @PipelineIdResult IS NOT NULL AND @DependantPipelineIdResult IS NOT NULL
 BEGIN 
@@ -93,5 +98,6 @@ END
 ELSE 
 BEGIN
 	RAISERROR('Unexpected Error',16,1)
+    RETURN 0;
 END
 
