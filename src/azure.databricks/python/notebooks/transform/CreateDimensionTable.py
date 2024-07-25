@@ -29,26 +29,6 @@ payload = json.loads(dbutils.widgets.get("Notebook Payload"))
 
 # COMMAND ----------
 
-# payload = {
-#     "CuratedStorageAccessKey": "cumulusframeworkdevcuratedaccesskey",
-#     "CuratedStorageName": "cumulusframeworkdev", 
-#     "CuratedContainerName": "curated", 
-#     "CleansedStorageAccessKey": "cumulusframeworkdevcleansedaccesskey",
-#     "CleansedStorageName": "cumulusframeworkdev", 
-#     "CleansedContainerName": "cleansed", 
-#     "SchemaName": "Dimensions",
-#     "DatasetName": "GoldTable1",
-#     "ColumnsList": "AddressId,FullAddress",
-#     "ColumnTypeList": "INTEGER,STRING",
-#     "BkAttributesList": "AddressId",
-#     "PartitionByAttributesList": "",
-#     "SurrogateKey": "GoldTable1Id",
-#     "LoadType": "F",
-#     "BusinessLogicNotebookPath": "./businesslogicnotebooks/BespokeNotebook",
-# }
-
-# COMMAND ----------
-
 cleansedSecret, cleansedStorageName, cleansedContainerName, curatedSecret, curatedStorageName, curatedContainerName, curatedSchemaName, curatedDatasetName, columnsList, columnTypeList, bkList, partitionList, surrogateKey, loadType, businessLogicNotebookPath = getTransformPayloadVariables(payload)
 
 # COMMAND ----------
