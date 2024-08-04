@@ -1,9 +1,9 @@
 {
-	"name": "Transform_PL_Test",
+	"name": "Transform_PL_UnmanagedNotebook",
 	"properties": {
 		"activities": [
 			{
-				"name": "Get Notebook Payload",
+				"name": "Get Unmanaged Notebook Payload",
 				"type": "Lookup",
 				"dependsOn": [],
 				"policy": {
@@ -17,12 +17,12 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[transform].[GetNotebookPayload]",
+						"sqlReaderStoredProcedureName": "[transform].[GetUnmanagedNotebookPayload]",
 						"storedProcedureParameters": {
-							"NotebookId": {
+							"DatasetId": {
 								"type": "Int32",
 								"value": {
-									"value": "@pipeline().parameters.NotebookId",
+									"value": "@pipeline().parameters.DatasetId",
 									"type": "Expression"
 								}
 							}
@@ -41,7 +41,7 @@
 				"type": "Switch",
 				"dependsOn": [
 					{
-						"activity": "Get Notebook Payload",
+						"activity": "Get Unmanaged Notebook Payload",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -56,7 +56,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@activity('Get Notebook Payload').output.firstRow.ComputeLinkedServiceName",
+						"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeLinkedServiceName",
 						"type": "Expression"
 					},
 					"cases": [
@@ -64,7 +64,7 @@
 							"value": "Transform_LS_Databricks_Cluster_MIAuth",
 							"activities": [
 								{
-									"name": "Test Notebook - Interactive Cluster",
+									"name": "Unmanaged Notebook - Interactive Cluster",
 									"type": "DatabricksNotebook",
 									"dependsOn": [],
 									"policy": {
@@ -77,12 +77,12 @@
 									"userProperties": [],
 									"typeProperties": {
 										"notebookPath": {
-											"value": "@activity('Get Notebook Payload').output.firstRow.NotebookFullPath",
+											"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.NotebookFullPath",
 											"type": "Expression"
 										},
 										"baseParameters": {
 											"Notebook Payload": {
-												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"value": "@string(activity('Get Unmanaged Notebook Payload').output.firstRow)",
 												"type": "Expression"
 											},
 											"Pipeline Run Id": {
@@ -100,23 +100,23 @@
 										"type": "LinkedServiceReference",
 										"parameters": {
 											"WorkspaceURL": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
 												"type": "Expression"
 											},
 											"ResourceGroupName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ResourceGroupName",
 												"type": "Expression"
 											},
 											"ResourceName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeResourceName",
 												"type": "Expression"
 											},
 											"ClusterId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeClusterId",
 												"type": "Expression"
 											},
 											"SubscriptionId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
 											}
 										}
@@ -128,7 +128,7 @@
 							"value": "Transform_LS_Databricks_JobCluster_MIAuth",
 							"activities": [
 								{
-									"name": "Test Notebook - Job Cluster",
+									"name": "Unmanaged Notebook - Job Cluster",
 									"type": "DatabricksNotebook",
 									"dependsOn": [],
 									"policy": {
@@ -141,12 +141,12 @@
 									"userProperties": [],
 									"typeProperties": {
 										"notebookPath": {
-											"value": "@activity('Get Notebook Payload').output.firstRow.NotebookFullPath",
+											"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.NotebookFullPath",
 											"type": "Expression"
 										},
 										"baseParameters": {
 											"Notebook Payload": {
-												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
+												"value": "@string(activity('Get Unmanaged Notebook Payload').output.firstRow)",
 												"type": "Expression"
 											},
 											"Pipeline Run Id": {
@@ -164,32 +164,32 @@
 										"type": "LinkedServiceReference",
 										"parameters": {
 											"WorkspaceURL": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeWorkspaceURL",
 												"type": "Expression"
 											},
 											"ClusterVersion": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeVersion",
 												"type": "Expression"
 											},
 											"NodeType": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeSize",
 												"type": "Expression"
 											},
 											"PythonVersion": "3",
 											"NumWorkers": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.CountNodes",
 												"type": "Expression"
 											},
 											"SubscriptionId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
 											},
 											"ResourceName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeResourceName",
 												"type": "Expression"
 											},
 											"ResourceGroupName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ResourceGroupName",
 												"type": "Expression"
 											}
 										}
@@ -219,7 +219,7 @@
 			}
 		],
 		"parameters": {
-			"NotebookId": {
+			"DatasetId": {
 				"type": "string"
 			}
 		},

@@ -71,29 +71,6 @@ targetDf = spark.read.format("delta").load(location)
 
 # COMMAND ----------
 
-# DataFrame Validation: 
-# Check Columns in metadata match those in DataFrame
-# Check DF result is non-zero before overwriting
-# ADVISORY: Check for unadvised column types (e.g. STRING)
-# ADVISORY: Check aggregations exist
-# ADVISORY: Check for partitionby fields being used if data size is expected < 1TB
-
-# COMMAND ----------
-
-# # check schemas match
-# if sourceDf.schema == targetDf.schema:
-#     print("Target vs Source Schema Validation Successful")
-# elif sourceDf.schema != targetDf.schema:
-#     raise Exception("Target vs Source Schema Validation Unsuccessful")
-# elif type(sourceDf) != "pyspark.sql.dataframe.DataFrame":
-#     raise TypeError("Error in Source DataFrame provided.")
-# elif type(targetDf) != "pyspark.sql.dataframe.DataFrame":
-#     raise TypeError("Error in Target DataFrame provided.")
-# else:
-#     raise Exception("Unexpected state. Please review.")
-
-# COMMAND ----------
-
 output = {}
 
 # COMMAND ----------
