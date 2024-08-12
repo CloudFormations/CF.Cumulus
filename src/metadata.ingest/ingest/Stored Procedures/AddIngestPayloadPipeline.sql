@@ -16,10 +16,12 @@ WHERE StageName = @StageName
 IF @StageCount = 0
 BEGIN
     RAISERROR('No rows returned. Please review the Stage Details provided and confirm this is enabled.',16,1)
+    RETURN 0;
 END
 IF @StageCount > 1
 BEGIN
     RAISERROR('Multiple rows returned. Please review the Stage Details provided.',16,1)
+    RETURN 0;
 END
 
 
@@ -42,10 +44,12 @@ AND ds.DatasetDisplayName = @DatasetDisplayName
 IF @DatasetCount = 0
 BEGIN
     RAISERROR('No rows returned. Please review the Dataset Id provided and confirm this is enabled.',16,1)
+    RETURN 0;
 END
 IF @DatasetCount > 1
 BEGIN
     RAISERROR('More than 1 row returned. Please review there is 1 active Dataset for the provided Dataset Id, and the connection details.',16,1)
+    RETURN 0;
 END
 
 -- Store all dataset ids associated with DatasetDisplayName

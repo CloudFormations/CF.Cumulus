@@ -43,6 +43,7 @@ BEGIN
     IF @ResultRowCount = 0
     BEGIN
         RAISERROR('No results returned for the provided Dataset Id. Confirm Dataset is enabled, and related Connections and Attributes are enabled.',16,1)
+        RETURN 0;
     END
 
 
@@ -125,10 +126,15 @@ BEGIN
             DatasetId = @DatasetId
     
     ELSE IF @LoadAction = 'X'
+    BEGIN
         RAISERROR('Erroneous Load Status. Review the ingest LoadStatus value for the dataset in [ingest].[DatasetsLatestVersion]',16,1)
+        RETURN 0;
+    END
     ELSE
+    BEGIN
         RAISERROR('Unexpected Load action. Review the ingest LoadStatus value for the dataset in [ingest].[DatasetsLatestVersion]',16,1)
-  
+        RETURN 0;
+    END
     SELECT 
         @DateTimeFolderHierarchy = 'year=' + CAST(FORMAT(@RawLastLoadDate,'yyyy') AS VARCHAR) + '/' + 
         'month=' + CAST(FORMAT(@RawLastLoadDate,'MM') AS VARCHAR) + '/' + 
