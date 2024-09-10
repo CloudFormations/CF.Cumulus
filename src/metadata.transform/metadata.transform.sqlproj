@@ -79,6 +79,7 @@
     <Build Include="transform\Tables\Attributes.sql" />
     <Build Include="transform\Stored Procedures\GetNotebookPayload.sql" />
     <Build Include="transform\Stored Procedures\SetTransformLoadStatus.sql" />
+    <Build Include="transform\Stored Procedures\GetUnmanagedNotebookPayload.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
