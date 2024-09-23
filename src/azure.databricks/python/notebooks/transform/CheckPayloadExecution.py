@@ -38,35 +38,7 @@ dbutils.widgets.text("Pipeline Run Id","")
 
 import json
 
-# payload = json.loads(dbutils.widgets.get("Notebook Payload"))
-payload = {
-		"ComputeWorkspaceURL": "https://adb-3718702953738155.15.azuredatabricks.net",
-		"ComputeClusterId": "0428-080256-zv6uka2b",
-		"ComputeSize": "Standard_D4ds_v4",
-		"ComputeVersion": "14.3.x-scala2.12",
-		"CountNodes": 1,
-		"ComputeLinkedServiceName": "Transform_LS_Databricks_Cluster_MIAuth",
-		"ComputeResourceName": "cumulusdatabricksdev",
-		"ResourceGroupName": "CumulusFrameworkDev",
-		"SubscriptionId": "1b2b1db2-3735-4a51-86a5-18fa41b8bb49",
-		"CuratedStorageName": "cumulusframeworkdev",
-		"CuratedContainerName": "curated",
-		"CleansedStorageName": "cumulusframeworkdev",
-		"CleansedContainerName": "cleansed",
-		"CuratedStorageAccessKey": "cumulusframeworkdevcuratedaccesskey",
-		"CleansedStorageAccessKey": "cumulusframeworkdevcleansedaccesskey",
-		"DatasetName": "WordDictionary",
-		"SchemaName": "Dimensions",
-		"BusinessLogicNotebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/businesslogicnotebooks/Dimensions/WordDictionary",
-		"ExecutionNotebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/CreateDimensionTable",
-		"ColumnsList": "WordIndex,English,Hiragana,Kanji,DateAdded,Rank,Active",
-		"ColumnTypeList": "INTEGER,STRING,STRING,STRING,DATE,INTEGER,INTEGER",
-		"SurrogateKey": "WordDictionaryId",
-		"BkAttributesList": "WordIndex",
-		"PartitionByAttributesList": "",
-		"LoadType": "I",
-		"LastLoadDate": "2024-06-21T09:03:29.9233333Z"
-	}
+payload = json.loads(dbutils.widgets.get("Notebook Payload"))
 
 # COMMAND ----------
 
@@ -166,7 +138,3 @@ print(curatedTablePath)
 # add loadtype to sp results + variables
 # rename existing loadType to loadAction in the prevtests 
 tableExists = checkExistsDeltaTable(tablePath = curatedTablePath, loadAction = loadType, loadType = loadType)
-
-# COMMAND ----------
-
-
