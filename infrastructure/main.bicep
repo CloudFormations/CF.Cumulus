@@ -258,7 +258,7 @@ module functionAppRoleAssignmentsDeploy 'modules/roleassignments/functionapp.tem
   params: {
     namePrefix: namePrefix
     nameSuffix: nameSuffix
-    firstDeployment: true
+    firstDeployment: firstDeployment
   }
   dependsOn: [
     dataFactoryDeployOrchestrator
