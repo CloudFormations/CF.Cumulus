@@ -7,3 +7,4 @@
 | Version | Overview | Version Details & Release Notes |
 |:----:|--------------|--------|
 | 0.1 |Product early release and upgrade from [ProcFwk.com](https://mrpaulandrew.github.io/procfwk/). | See blog post [here.](https://mrpaulandrew.com/2024/01/07/procfwk-is-getting-an-upgrade-to-cf-cumulus/)  |
+| 0.2 |Ingest and Transform components are now live. | More detail can be found in the release blogs for [Ingest](https://www.cloudformations.org/post/introducing-cf-cumulus-ingest) and [Transform](https://www.cloudformations.org/post/launching-cf-cumulus-transform). |
