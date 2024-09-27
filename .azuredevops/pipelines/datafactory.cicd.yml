@@ -1,0 +1,99 @@
+name: DataFactory-CICD-Pipeline-$(Date:yyyyMMdd)$(Rev:.r)
+
+# ADF is the shortened version of Azure Data Factory
+
+trigger:
+- main # Will trigger the pipeline after a commit to the main branch. Can update to trigger: none to only run the pipeline manually.
+
+pool:
+  vmImage: "windows-latest"
+
+stages:
+- stage: BuildDEVDataFactory
+  displayName: "Build DEV Data Factory"
+  
+  variables:
+  - template: ../.././infrastructure/configuration/dev/dev-variables.yaml
+
+  jobs:
+  - job: ValidateAndBuildDataFactoryTemplate
+    displayName: "Build DEV Data Factory"
+    steps:
+    - template: datafactory.build.yaml
+      parameters:
+        DataFactoryName: "${{ variables.BuildDataFactoryName }}"
+        ResourceGroupName: "${{ variables.BuildDataFactoryResourceGroupName }}"
+        ADFArtifactName: "${{ variables.ADFArtifactName }}"
+        WorkingDirectory: "${{ variables.WorkingDirectory }}"
+
+# DEPLOY TO Test Factory
+- stage: DeployToTestFactory
+  dependsOn: BuildDEVDataFactory
+  condition: succeeded()
+  displayName: "Deploy To Test Factory"
+  
+  variables:
+  - template: ../.././infrastructure/configuration/test/test-variables.yaml
+
+  jobs:
+  - deployment: ApprovalCheckDeployToTestFactory
+    displayName: "Approval Check To Deploy To Test Factory"
+    environment: Test
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - powershell: |
+              Write-Host "Deploy To Test Factory has been fully approved. Starting the deployment to Test."
+
+  - job: DeployDataFactory
+    displayName: "Deploy ADF ARM Template To Target ADF Factory"
+    dependsOn: ApprovalCheckDeployToTestFactory
+    condition: succeeded()
+    steps:
+    - template: datafactory.deploy.yaml
+      parameters:
+        AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
+        DataFactoryName: "${{ variables.DataFactoryNameFactory }}"
+        DataFactoryTemplateParametersFilePath: "${{ variables.DataFactoryTemplateParametersFilePathFactory }}"
+        ResourceGroupName: "${{ variables.ADFResourceGroupName }}"
+        ResourceGroupLocation: "${{ variables.ResourceGroupLocation }}"
+        ADFArtifactName: "${{ variables.ADFArtifactName }}"
+        Environment: "${{ variables.Environment }}"
+
+# DEPLOY TO Test Workers
+- stage: DeployToTestWorkers
+  dependsOn: BuildDEVDataFactory
+  condition: succeeded()
+  displayName: "Deploy To Test Workers"
+  
+  variables:
+  - template: ../.././infrastructure/configuration/test/test-variables.yaml
+
+  jobs:
+  - deployment: ApprovalCheckDeployToTestWorkers
+    displayName: "Approval Check To Deploy To Test Workers"
+    environment: Test
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - powershell: |
+              Write-Host "Deploy To Test Workers has been fully approved. Starting the deployment to Test."
+
+  - job: DeployDataWorkers
+    displayName: "Deploy ADF ARM Template To Target ADF Workers"
+    dependsOn: ApprovalCheckDeployToTestWorkers
+    condition: succeeded()
+    steps:
+    - template: datafactory.deploy.yaml
+      parameters:
+        AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
+        DataFactoryName: "${{ variables.DataFactoryNameWorkers }}"
+        DataFactoryTemplateParametersFilePath: "${{ variables.DataFactoryTemplateParametersFilePathWorkers }}"
+        ResourceGroupName: "${{ variables.ADFResourceGroupName }}"
+        ResourceGroupLocation: "${{ variables.ResourceGroupLocation }}"
+        ADFArtifactName: "${{ variables.ADFArtifactName }}"
+        Environment: "${{ variables.Environment }}"
+
+

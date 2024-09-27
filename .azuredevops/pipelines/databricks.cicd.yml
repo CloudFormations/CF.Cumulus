@@ -1,0 +1,81 @@
+name: 'Databricks Deployment'
+
+parameters:
+- name: Dev
+  displayName: 'Deploy to Development Environment'
+  type: boolean
+  default: true
+
+- name: Test
+  displayName: 'Deploy to Test Environment'
+  type: boolean
+  default: false
+
+- name: Prod
+  displayName: 'Deploy to Production Environment'
+  type: boolean
+  default: false
+  
+
+
+trigger:
+  - main
+
+stages:
+  - stage: Build
+    displayName: 'Build Artifact'
+    jobs:
+      - job: Build
+        steps:
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)/src/azure.databricks/python/notebooks/ingest/'
+              Contents: '**'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'        
+          - publish: '$(Build.ArtifactStagingDirectory)'
+            artifact: 'DatabricksArtifacts'
+
+  - ${{ each pair in parameters }}:
+    - ${{ if eq(pair.value, true) }}:
+      - stage: DeployTo${{ pair.key }}
+        displayName: 'Deploy to ${{ pair.key }} env'
+        variables:
+          - group: 'Databricks${{ pair.key }}'
+        jobs:
+          - deployment: "Deployment"
+            environment: ${{ pair.key }}
+            strategy:
+              runOnce:
+                deploy:
+                  steps:
+                    - task: DownloadPipelineArtifact@2
+                      inputs:
+                        buildType: 'current'
+                        artifactName: 'DatabricksArtifacts'
+                        targetPath: '$(System.DefaultWorkingDirectory)/IngestNotebooks'
+
+                    - task: UsePythonVersion@0
+                      inputs:
+                        versionSpec: '3.9'
+                        addToPath: true
+
+                    - script: |
+                        pip install databricks-cli==0.18
+                      displayName: 'Install databricks cli'
+
+
+                    - script: |
+                        databricks workspace rm /Shared/Live --recursive
+                      displayName: Delete folder
+                      continueOnError: True
+                      env:
+                        DATABRICKS_HOST: $(DATABRICKS_HOST)
+                        DATABRICKS_TOKEN: $(DATABRICKS_TOKEN)
+
+
+                    - script: |
+                        databricks workspace import_dir $(System.DefaultWorkingDirectory)/IngestNotebooks  /Shared/Live --exclude-hidden-files -o
+                      displayName: Deploy
+                      env:
+                        DATABRICKS_HOST: $(DATABRICKS_HOST)
+                        DATABRICKS_TOKEN: $(DATABRICKS_TOKEN)
