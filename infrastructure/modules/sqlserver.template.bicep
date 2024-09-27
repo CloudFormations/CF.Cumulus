@@ -20,7 +20,7 @@ resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
     administratorLogin: 'sqladmin'
     administratorLoginPassword: sqlPassword
     version: '12.0'
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
     primaryUserAssignedIdentityId: null
   }
 }
