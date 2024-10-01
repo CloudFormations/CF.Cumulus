@@ -22,8 +22,8 @@ parameters:
     enabled: false
     subscriptionName: 'Dev Connection'
 
-trigger:
-- main
+# trigger:
+# - main
 
 stages:
   - ${{ each pair in parameters }}:
