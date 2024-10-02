@@ -3,16 +3,16 @@
     "contentVersion": "1.0.0.0",
     "parameters": {
         "factoryName": {
-            "value": "cfcinternaltestfactoryuks02"
+            "value": "cfcinternalprodfactoryuks02"
         },
         "Common_LS_cumulusdatabase_connectionString": {
-            "value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcinternaltestsqldbuks02.database.windows.net;Initial Catalog=metadata-db"
+            "value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcinternalprodsqldbuks02.database.windows.net;Initial Catalog=metadata-db"
         },
         "Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
-            "value": "https://cfcinternaltestfuncuks02.azurewebsites.net"
+            "value": "https://cfcinternalprodfuncuks02.azurewebsites.net"
         },
         "Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
-            "value": "https://cfcinternaltestkvuks02.vault.azure.net/"
+            "value": "https://cfcinternalprodkvuks02.vault.azure.net/"
         }
     }
 }

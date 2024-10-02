@@ -1,4 +1,4 @@
-# TEST Pipeline Variables
+# PROD Pipeline Variables
 
 variables: 
 
@@ -6,26 +6,26 @@ variables:
   value: Dev Connection
 
 - name: DataFactoryNameFactory
-  value: cfcinternaltestfactoryuks02
+  value: cfcinternalprodfactoryuks02
 
 - name: DataFactoryNameWorkers
-  value: cfcinternaltestworkersuks02
+  value: cfcinternalprodworkersuks02
 
 - name: ADFResourceGroupName
-  value: cfcinternaltestrguks02
+  value: cfcinternalprodrguks02
 
 - name: ADFArtifactName # Data Factory artifact name created during the datafactory.build.yml job template
   value: ADFArtifact
 
 - name: DataFactoryTemplateParametersFilePathFactory
-  value: "$(Build.Repository.LocalPath)/infrastructure/configuration/test/adf-test-factory-template-parameters.json"
+  value: "$(Build.Repository.LocalPath)/infrastructure/configuration/prod/adf-prod-factory-template-parameters.json"
 
 - name: DataFactoryTemplateParametersFilePathWorkers
-  value: "$(Build.Repository.LocalPath)/infrastructure/configuration/test/adf-test-workers-template-parameters.json"
+  value: "$(Build.Repository.LocalPath)/infrastructure/configuration/prod/adf-prod-workers-template-parameters.json"
 
 # Shared
 - name: ResourceGroupLocation
   value: "UK South"
 
 - name: Environment
-  value: TEST
+  value: PROD
