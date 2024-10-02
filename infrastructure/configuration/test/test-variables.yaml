@@ -14,14 +14,14 @@ variables:
 - name: ADFResourceGroupName
   value: cfcinternaltestrguks02
 
-- name: ADFArtifactName # Data Factory artifact name created during the adf-build.yml job template
+- name: ADFArtifactName # Data Factory artifact name created during the datafactory.build.yml job template
   value: ADFArtifact
 
 - name: DataFactoryTemplateParametersFilePathFactory
-  value: "$(Build.Repository.LocalPath)/infrastructure/configuration/test/adf-test-factory-template-parameters.json"
+  value: "$(Build.Repository.LocalPath)/infrastructurex/configuration/test/adf-test-factory-template-parameters.json"
 
 - name: DataFactoryTemplateParametersFilePathWorkers
-  value: "$(Build.Repository.LocalPath)/infrastructure/configuration/test/adf-test-workers-template-parameters.json"
+  value: "$(Build.Repository.LocalPath)/infrastructurex/configuration/test/adf-test-workers-template-parameters.json"
 
 # Shared
 - name: ResourceGroupLocation
