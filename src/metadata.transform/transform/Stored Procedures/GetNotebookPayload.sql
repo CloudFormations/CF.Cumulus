@@ -46,11 +46,13 @@ BEGIN
     IF @ResultRowCount = 0
     BEGIN
         RAISERROR('No results returned for the provided Dataset Id.  Confirm Dataset is enabled, and related Connections and Notebooks Parameters are enabled.',16,1)
+        RETURN 0;
     END
 
     IF @ResultRowCount > 1
     BEGIN
         RAISERROR('Multiple results returned for the provided Dataset Id. Confirm that only a single active dataset is being referenced.',16,1)
+        RETURN 0;
     END
 
 
@@ -97,6 +99,7 @@ BEGIN
     IF @SurrogateKeyAttribute = ''
     BEGIN
         RAISERROR('No Surrogate Key Attribute specified for this dataset. Please ensure this is added to the transform.Attributes table, and specified in your bespoke notebook logic to populate the table.',16,1)
+        RETURN 0;
     END
 
     -- Get Bk columns as comma separated string values for the dataset
@@ -147,6 +150,7 @@ BEGIN
     IF @LoadAction = 'X'
     BEGIN
         RAISERROR('Unexpected Load Type specified for Curated data load.',16,1)
+        RETURN 0;
     END
 
 	SELECT 
