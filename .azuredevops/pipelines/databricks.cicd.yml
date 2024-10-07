@@ -29,7 +29,7 @@ stages:
         steps:
           - task: CopyFiles@2
             inputs:
-              SourceFolder: '$(System.DefaultWorkingDirectory)/src/azure.databricks/python/notebooks/ingest/'
+              SourceFolder: '$(System.DefaultWorkingDirectory)/src/azure.databricks/python/notebooks/'
               Contents: '**'
               TargetFolder: '$(Build.ArtifactStagingDirectory)'        
           - publish: '$(Build.ArtifactStagingDirectory)'
