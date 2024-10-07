@@ -56,11 +56,13 @@ BEGIN
     IF @ResultRowCount = 0
     BEGIN
         RAISERROR('No results returned for the provided Dataset Id.  Confirm Dataset is enabled, and related Connections and Notebooks Parameters are enabled.',16,1)
+        RETURN 0;
     END
 
     IF @ResultRowCount > 1
     BEGIN
         RAISERROR('Multiple results returned for the provided Dataset Id. Confirm that only a single active dataset is being referenced.',16,1)
+        RETURN 0;
     END
 
 	SELECT 

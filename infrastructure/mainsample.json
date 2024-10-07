@@ -1,0 +1,292 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.30.23.60470",
+      "templateHash": "5260567615838337167"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "uksouth"
+    },
+    "envName": {
+      "type": "string"
+    },
+    "domainName": {
+      "type": "string",
+      "defaultValue": "cfc"
+    },
+    "orgName": {
+      "type": "string",
+      "defaultValue": "internal"
+    },
+    "uniqueIdentifier": {
+      "type": "string",
+      "defaultValue": "02"
+    },
+    "nameStorage": {
+      "type": "string",
+      "defaultValue": "dls"
+    },
+    "functionStorageName": {
+      "type": "string",
+      "defaultValue": "fst"
+    },
+    "deploymentTimestamp": {
+      "type": "string",
+      "defaultValue": "[utcNow('yy-MM-dd-HHmm')]"
+    },
+    "firstDeployment": {
+      "type": "bool",
+      "defaultValue": false
+    }
+  },
+  "variables": {
+    "locationShortCodes": {
+      "uksouth": "uks",
+      "ukwest": "ukw",
+      "eastus": "eus"
+    },
+    "locationShortCode": "[variables('locationShortCodes')[parameters('location')]]",
+    "namePrefix": "[format('{0}{1}{2}', parameters('domainName'), parameters('orgName'), parameters('envName'))]",
+    "nameSuffix": "[format('{0}{1}', variables('locationShortCode'), parameters('uniqueIdentifier'))]",
+    "rgName": "[format('{0}rg{1}', variables('namePrefix'), variables('nameSuffix'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2024-03-01",
+      "name": "[variables('rgName')]",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('sql-server{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "adminName": {
+            "value": "matthew.collins@cloudformations.org"
+          },
+          "adminSid": {
+            "value": "ec9f7400-e769-4198-b9d4-cb556962b397"
+          },
+          "databaseName": {
+            "value": "dummy"
+          },
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "useFirewall": {
+            "value": true
+          },
+          "startIP": {
+            "value": "192.168.0.6"
+          },
+          "endIP": {
+            "value": "192.168.0.6"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.30.23.60470",
+              "templateHash": "17806577293378122723"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "namePrefix": {
+              "type": "string"
+            },
+            "nameSuffix": {
+              "type": "string"
+            },
+            "databaseName": {
+              "type": "string"
+            },
+            "randomGuid": {
+              "type": "string",
+              "defaultValue": "[newGuid()]"
+            },
+            "adminSid": {
+              "type": "securestring"
+            },
+            "adminName": {
+              "type": "securestring"
+            },
+            "useFirewall": {
+              "type": "bool",
+              "defaultValue": false
+            },
+            "startIP": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "endIP": {
+              "type": "string",
+              "defaultValue": ""
+            }
+          },
+          "variables": {
+            "name": "[format('{0}sqldb{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "specialChars": "!@#$%^&*",
+            "sqlPassword": "[format('{0}{1}1A', take(parameters('randomGuid'), 16), take(variables('specialChars'), 2))]",
+            "keyVaultName": "[format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Sql/servers",
+              "apiVersion": "2023-05-01-preview",
+              "name": "[variables('name')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "administrators": {
+                  "azureADOnlyAuthentication": false,
+                  "administratorType": "ActiveDirectory",
+                  "principalType": "Application",
+                  "sid": "[parameters('adminSid')]",
+                  "login": "[parameters('adminName')]"
+                },
+                "restrictOutboundNetworkAccess": "Disabled",
+                "minimalTlsVersion": "1.2",
+                "version": "12.0",
+                "publicNetworkAccess": "Enabled",
+                "primaryUserAssignedIdentityId": null
+              },
+              "identity": {
+                "type": "SystemAssigned"
+              }
+            },
+            {
+              "condition": "[parameters('useFirewall')]",
+              "type": "Microsoft.Sql/servers/firewallRules",
+              "apiVersion": "2023-08-01-preview",
+              "name": "[format('{0}/{1}', variables('name'), 'MyFirewallRule')]",
+              "properties": {
+                "startIpAddress": "[parameters('startIP')]",
+                "endIpAddress": "[parameters('endIP')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('name'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Sql/servers/databases",
+              "apiVersion": "2023-05-01-preview",
+              "name": "[format('{0}/{1}', variables('name'), format('{0}-db', parameters('databaseName')))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 2147483648
+              },
+              "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 5
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('name'))]"
+              ]
+            },
+            {
+              "condition": "[not(equals(variables('keyVaultName'), null()))]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}-kv-secrets', variables('name'))]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "keyVaultName": {
+                    "value": "[variables('keyVaultName')]"
+                  },
+                  "secrets": {
+                    "value": [
+                      {
+                        "name": "[format('{0}-adminusername', variables('name'))]",
+                        "value": "sqladmin"
+                      },
+                      {
+                        "name": "[format('{0}-adminpassword', variables('name'))]",
+                        "value": "[variables('sqlPassword')]"
+                      }
+                    ]
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.30.23.60470",
+                      "templateHash": "10795766585134450707"
+                    }
+                  },
+                  "parameters": {
+                    "keyVaultName": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Key Vault Name for the Key Vault to be created"
+                      }
+                    },
+                    "secrets": {
+                      "type": "array",
+                      "metadata": {
+                        "description": "Array of secrets to be created in the Key Vault"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "copy": {
+                        "name": "keyVaultSecrets",
+                        "count": "[length(parameters('secrets'))]"
+                      },
+                      "type": "Microsoft.KeyVault/vaults/secrets",
+                      "apiVersion": "2019-09-01",
+                      "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('secrets')[copyIndex()].name)]",
+                      "properties": {
+                        "value": "[parameters('secrets')[copyIndex()].value]"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('name'))]"
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+# This steps template automatically builds the ARM template and additional scripts for an Azure Data Factory (ADF) resource
+
+parameters:
+- name: DataFactoryName
+  type: string
+- name: ResourceGroupName
+  type: string
+- name: ADFArtifactName
+  type: string
+- name: WorkingDirectory # Used to grab the ADF template parameter files and any other files needed to build the ADF
+  type: string
+
+steps:
+- checkout: self
+  displayName: "Checkout Source Repo Code"
+  
+- powershell: |
+    Write-Host "Attempting to validate and build the ADF ARM template from Data Factory: ${{ parameters.DataFactoryName }} in resource group: ${{ parameters.ResourceGroupName }}."
+  displayName: "Display The Build ADF Info"
+
+- task: NodeTool@0
+  displayName: "Install Node.js"
+  inputs:
+    versionSpec: "18.x"
+
+- task: Npm@1
+  displayName: "Install NPM Package"
+  inputs:
+    command: "install"
+    workingDir: "${{ parameters.WorkingDirectory }}"
+    verbose: true
+
+- task: Npm@1
+  displayName: "Validate And Generate ADF ARM Template And Scripts"
+  inputs:
+    command: "custom"
+    workingDir: ${{ parameters.WorkingDirectory }}
+    customCommand: 'run build export ${{ parameters.WorkingDirectory }} /subscriptions/$(DEVSubscriptionID)/resourceGroups/${{ parameters.ResourceGroupName }}/providers/Microsoft.DataFactory/factories/${{ parameters.DataFactoryName }} "ArmTemplate"' 
+    # DEVSubscriptionID is a secret variable. Go to the pipeline in Azure DevOps and select edit pipeline and then click variables and click the checkbox to save a variable as secret variable.
+
+- task: PublishPipelineArtifact@1
+  displayName: "Publish ADF ARM Template And Scripts"
+  inputs:
+    targetPath: "${{ parameters.WorkingDirectory }}/ArmTemplate"
+    artifactName: "${{ parameters.ADFArtifactName }}"
+    publishLocation: "pipeline"
