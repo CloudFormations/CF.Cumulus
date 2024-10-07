@@ -2,10 +2,10 @@
 
 variables: 
 - name: BuildDataFactoryName
-  value: cfcinternaldevfactoryuks02
+  value: cfcdemodevfactoryuks01
 
 - name: BuildDataFactoryResourceGroupName
-  value: cfcinternaldevrguks02
+  value: cfcdemodevrguks01
 
 - name: ADFArtifactName # Data Factory artifact name created during the adf-build.yml job template
   value: ADFArtifact
