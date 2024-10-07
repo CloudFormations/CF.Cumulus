@@ -1,0 +1,18 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "value": "cfcdemoprodfactoryuks01"
+        },
+        "Common_LS_cumulusdatabase_connectionString": {
+            "value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemoprodsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
+        },
+        "Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
+            "value": "https://cfcdemoprodfuncuks01.azurewebsites.net"
+        },
+        "Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
+            "value": "https://cfcdemoprodkvuks01.vault.azure.net/"
+        }
+    }
+}
