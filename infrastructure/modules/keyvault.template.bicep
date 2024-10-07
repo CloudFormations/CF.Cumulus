@@ -16,6 +16,7 @@ resource kv 'Microsoft.KeyVault/vaults@2023-07-01' = if (!keyVaultExists) {
   name: name
   location: location
   properties:{
+    enableRbacAuthorization: true
     sku: {
       name: 'premium'
       family: 'A'

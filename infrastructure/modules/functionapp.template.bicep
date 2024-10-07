@@ -119,3 +119,6 @@ resource name_ftp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-0
     allow: true
   }
 }
+
+
+// Save Function Key to AKV

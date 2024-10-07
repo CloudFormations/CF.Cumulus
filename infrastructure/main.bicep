@@ -3,8 +3,8 @@ targetScope = 'subscription'
 param location string = 'uksouth'
 param envName string
 param domainName string = 'cfc'
-param orgName string = 'internal'
-param uniqueIdentifier string = '02'
+param orgName string = 'demo'
+param uniqueIdentifier string = '01'
 param nameStorage string = 'dls'
 
 param functionStorageName string = 'fst'
