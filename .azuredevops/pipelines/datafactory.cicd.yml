@@ -3,7 +3,7 @@ name: DataFactory-CICD-Pipeline-$(Date:yyyyMMdd)$(Rev:.r)
 # ADF is the shortened version of Azure Data Factory
 
 trigger:
-- main # Will trigger the pipeline after a commit to the main branch. Can update to trigger: none to only run the pipeline manually.
+- none # Will trigger the pipeline after a commit to the main branch. Can update to trigger: none to only run the pipeline manually.
 
 pool:
   vmImage: "windows-latest"

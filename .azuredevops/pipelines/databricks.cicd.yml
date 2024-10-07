@@ -19,7 +19,7 @@ parameters:
 
 
 trigger:
-  - main
+  - none
 
 stages:
   - stage: Build
