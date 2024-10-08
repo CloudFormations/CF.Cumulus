@@ -13,13 +13,13 @@ stages:
   displayName: "Build DEV Data Factory"
   
   variables:
-  - template: ../.././infrastructure/configuration/dev/dev-variables.yaml
+  - template: ../.././infrastructure/configuration/dev/dev-variables.yml
 
   jobs:
   - job: ValidateAndBuildDataFactoryTemplate
     displayName: "Build DEV Data Factory"
     steps:
-    - template: datafactory.build.yaml
+    - template: datafactory.build.yml
       parameters:
         DataFactoryName: "${{ variables.BuildDataFactoryName }}"
         ResourceGroupName: "${{ variables.BuildDataFactoryResourceGroupName }}"
@@ -33,7 +33,7 @@ stages:
   displayName: "Deploy To Test Factory"
   
   variables:
-  - template: ../.././infrastructure/configuration/test/test-variables.yaml
+  - template: ../.././infrastructure/configuration/test/test-variables.yml
 
   jobs:
   - deployment: ApprovalCheckDeployToTestFactory
@@ -51,7 +51,7 @@ stages:
     dependsOn: ApprovalCheckDeployToTestFactory
     condition: succeeded()
     steps:
-    - template: datafactory.deploy.yaml
+    - template: datafactory.deploy.yml
       parameters:
         AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
         DataFactoryName: "${{ variables.DataFactoryNameFactory }}"
@@ -68,7 +68,7 @@ stages:
   displayName: "Deploy To Test Workers"
   
   variables:
-  - template: ../.././infrastructure/configuration/test/test-variables.yaml
+  - template: ../.././infrastructure/configuration/test/test-variables.yml
 
   jobs:
   - deployment: ApprovalCheckDeployToTestWorkers
@@ -86,7 +86,7 @@ stages:
     dependsOn: ApprovalCheckDeployToTestWorkers
     condition: succeeded()
     steps:
-    - template: datafactory.deploy.yaml
+    - template: datafactory.deploy.yml
       parameters:
         AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
         DataFactoryName: "${{ variables.DataFactoryNameWorkers }}"
