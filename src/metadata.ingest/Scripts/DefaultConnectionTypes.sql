@@ -48,3 +48,8 @@
 		@ConnectionTypeDisplayName = N'Azure Subscription', 
 		@SourceLanguageType = 'NA',
 		@Enabled = 1;
+
+	EXEC [ingest].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Dynamics CRM', 
+		@SourceLanguageType = 'XML',
+		@Enabled = 1;
