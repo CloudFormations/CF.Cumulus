@@ -70,7 +70,6 @@ stages:
 
       jobs:            
         - job: Publish
-          dependsOn: BuildTo_DEV
           pool:
             vmImage: 'windows-latest'
           steps:
