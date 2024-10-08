@@ -13,13 +13,13 @@ stages:
   displayName: "Build DEV Data Factory"
   
   variables:
-  - template: ../.././infrastructure/configuration/dev/dev-variables.yaml
+  - template: ../.././infrastructure/configuration/dev/dev-variables.yml
 
   jobs:
   - job: ValidateAndBuildDataFactoryTemplate
     displayName: "Build DEV Data Factory"
     steps:
-    - template: datafactory.build.yaml
+    - template: datafactory.build.yml
       parameters:
         DataFactoryName: "${{ variables.BuildDataFactoryName }}"
         ResourceGroupName: "${{ variables.BuildDataFactoryResourceGroupName }}"
@@ -33,7 +33,7 @@ stages:
   displayName: "Deploy To Test Factory"
   
   variables:
-  - template: ../.././infrastructure/configuration/test/test-variables.yaml
+  - template: ../.././infrastructure/configuration/test/test-variables.yml
 
   jobs:
   - deployment: ApprovalCheckDeployToTestFactory
@@ -51,7 +51,7 @@ stages:
     dependsOn: ApprovalCheckDeployToTestFactory
     condition: succeeded()
     steps:
-    - template: datafactory.deploy.yaml
+    - template: datafactory.deploy.yml
       parameters:
         AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
         DataFactoryName: "${{ variables.DataFactoryNameFactory }}"
@@ -68,7 +68,7 @@ stages:
   displayName: "Deploy To Test Workers"
   
   variables:
-  - template: ../.././infrastructure/configuration/test/test-variables.yaml
+  - template: ../.././infrastructure/configuration/test/test-variables.yml
 
   jobs:
   - deployment: ApprovalCheckDeployToTestWorkers
@@ -86,7 +86,7 @@ stages:
     dependsOn: ApprovalCheckDeployToTestWorkers
     condition: succeeded()
     steps:
-    - template: datafactory.deploy.yaml
+    - template: datafactory.deploy.yml
       parameters:
         AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
         DataFactoryName: "${{ variables.DataFactoryNameWorkers }}"
@@ -96,4 +96,73 @@ stages:
         ADFArtifactName: "${{ variables.ADFArtifactName }}"
         Environment: "${{ variables.Environment }}"
 
+# DEPLOY TO Prod Factory
+- stage: DeployToProdFactory
+  dependsOn: BuildDEVDataFactory
+  condition: succeeded()
+  displayName: "Deploy To Prod Factory"
+  
+  variables:
+  - template: ../.././infrastructure/configuration/prod/prod-variables.yml
+
+  jobs:
+  - deployment: ApprovalCheckDeployToProdFactory
+    displayName: "Approval Check To Deploy To Prod Factory"
+    environment: Prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - powershell: |
+              Write-Host "Deploy To Prod Factory has been fully approved. Starting the deployment to Prod."
+
+  - job: DeployDataFactory
+    displayName: "Deploy ADF ARM Template To Target ADF Factory"
+    dependsOn: ApprovalCheckDeployToProdFactory
+    condition: succeeded()
+    steps:
+    - template: datafactory.deploy.yml
+      parameters:
+        AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
+        DataFactoryName: "${{ variables.DataFactoryNameFactory }}"
+        DataFactoryTemplateParametersFilePath: "${{ variables.DataFactoryTemplateParametersFilePathFactory }}"
+        ResourceGroupName: "${{ variables.ADFResourceGroupName }}"
+        ResourceGroupLocation: "${{ variables.ResourceGroupLocation }}"
+        ADFArtifactName: "${{ variables.ADFArtifactName }}"
+        Environment: "${{ variables.Environment }}"
+
+# DEPLOY TO Prod Workers
+- stage: DeployToProdWorkers
+  dependsOn: BuildDEVDataFactory
+  condition: succeeded()
+  displayName: "Deploy To Prod Workers"
+  
+  variables:
+  - template: ../.././infrastructure/configuration/prod/prod-variables.yml
+
+  jobs:
+  - deployment: ApprovalCheckDeployToProdWorkers
+    displayName: "Approval Check To Deploy To Prod Workers"
+    environment: Prod
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - powershell: |
+              Write-Host "Deploy To Prod Workers has been fully approved. Starting the deployment to Prod."
+
+  - job: DeployDataWorkers
+    displayName: "Deploy ADF ARM Template To Target ADF Workers"
+    dependsOn: ApprovalCheckDeployToProdWorkers
+    condition: succeeded()
+    steps:
+    - template: datafactory.deploy.yml
+      parameters:
+        AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
+        DataFactoryName: "${{ variables.DataFactoryNameWorkers }}"
+        DataFactoryTemplateParametersFilePath: "${{ variables.DataFactoryTemplateParametersFilePathWorkers }}"
+        ResourceGroupName: "${{ variables.ADFResourceGroupName }}"
+        ResourceGroupLocation: "${{ variables.ResourceGroupLocation }}"
+        ADFArtifactName: "${{ variables.ADFArtifactName }}"
+        Environment: "${{ variables.Environment }}"
 

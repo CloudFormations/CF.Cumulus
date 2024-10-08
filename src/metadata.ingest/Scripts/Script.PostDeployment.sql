@@ -11,4 +11,4 @@ Post-Deployment Script Template
 */
 --load default metadata
 :r .\DefaultConnectionTypes.sql
-:r .\DefaultAuditAttributes.sql
+
