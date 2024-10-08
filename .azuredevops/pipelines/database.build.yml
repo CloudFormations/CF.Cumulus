@@ -1,83 +1,47 @@
 name: 'Azure SQL DB Deployment'
 
-parameters:
-- name: DEV
-  displayName: 'Deploy to Development Environment'
-  type: object
-  default: 
-    enabled: true
-    subscriptionName: 'Dev Connection'
-
-- name: TEST
-  displayName: 'Deploy to Test Environment'
-  type: object
-  default: 
-    enabled: false
-    subscriptionName: 'Dev Connection'
-
-- name: PROD
-  displayName: 'Deploy to Production Environment'
-  type: object
-  default: 
-    enabled: false
-    subscriptionName: 'Dev Connection'
-
 trigger:
 - none
-
 variables:
-  - name: SqlProjects
+  - name:  SqlProjects
     value: metadata.control, metadata.ingest, metadata.transform
 
 stages:
-  - ${{ if eq(parameters.DEV.enabled, true) }}:
-    - stage: BuildTo_DEV
-      displayName: Build Sql Projects
-
-      jobs:
-        - job: InstallPackets
-          pool:
-            vmImage: 'windows-latest'
-          steps:
-            - checkout: self
-            - task: NuGetToolInstaller@1
+  - stage: BuildAndPublish
+    displayName: Build And Publish Sql Projects
+    jobs:
+      - job: InstallPackets
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - checkout: self
+          - task: NuGetToolInstaller@1
+            inputs:
+              versionSpec: 
+          - task: NuGetCommand@2
+            inputs:
+              restoreSolution: false
+              feedsToUse: 'select'
+              includeNuGetOrg: true
+              nuGetConfigPath: 'NuGet.config'
+              nuGetFeedType: 'internal'
+      - job: Build
+        dependsOn: InstallPackets
+        pool:
+          vmImage: 'windows-latest'
+        steps:
+          - ${{ each SqlProject in split(variables.SqlProjects, ', ') }}:
+            - task: VSBuild@1
+              displayName: Build ${{ SqlProject }}
               inputs:
-                versionSpec: 
-            - task: NuGetCommand@2
-              inputs:
-                restoreSolution: false
-                feedsToUse: 'select'
-                includeNuGetOrg: true
-                nuGetConfigPath: 'NuGet.config'
-                nuGetFeedType: 'internal'
-        - job: Build
-          dependsOn: InstallPackets
-          pool:
-            vmImage: 'windows-latest'
-          steps:
-            - ${{ each SqlProject in split(variables.SqlProjects, ', ') }}:
-              - task: VSBuild@1
-                displayName: Build ${{ SqlProject }}
-                inputs:
-                  solution: '$(System.DefaultWorkingDirectory)/src/${{ SqlProject }}//${{ SqlProject }}.sqlproj'
-                  msbuildArgs: '/p:Configuration=Release'
-                  platform: 'Any CPU'
-                  configuration: 'Release'
-
-  - ${{ if eq(parameters.DEV.enabled, true) }}:
-    - stage: PublishTo_DEV
-      displayName: Publish Sql Projects
-
-      jobs:            
-        - job: Publish
-          pool:
-            vmImage: 'windows-latest'
-          steps:
-            - ${{ each SqlProject in split(variables.SqlProjects, ', ') }}:
-              - task: CopyFiles@2
-                inputs:
-                  SourceFolder: '$(System.DefaultWorkingDirectory)/src'
-                  Contents: '**/bin/**'
-                  TargetFolder: '$(Build.ArtifactStagingDirectory)'        
-              - publish: '$(Build.ArtifactStagingDirectory)'
-                artifact: 'SqlArtifacts'
+                solution:  '$(System.DefaultWorkingDirectory)/src/${{ SqlProject }}//${{ SqlProject }}.sqlproj'
+                msbuildArgs: '/p:Configuration=Release'
+                platform: 'Any CPU'
+                configuration: 'Release'
+          - task: CopyFiles@2
+            inputs:
+              SourceFolder: '$(System.DefaultWorkingDirectory)/src'
+              Contents: '**/bin/**'
+              TargetFolder: '$(Build.ArtifactStagingDirectory)'        
+          - publish: '$(Build.ArtifactStagingDirectory)'
+            artifact: 'SqlArtifacts'
