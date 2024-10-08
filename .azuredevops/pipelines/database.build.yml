@@ -42,7 +42,7 @@ stages:
             - checkout: self
             - task: NuGetToolInstaller@1
               inputs:
-                versionSpec: 'latest'
+                versionSpec: 
             - task: NuGetCommand@2
               inputs:
                 restoreSolution: false
