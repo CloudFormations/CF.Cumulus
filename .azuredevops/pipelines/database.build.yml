@@ -21,7 +21,7 @@ parameters:
   default: 
     enabled: false
     subscriptionName: 'Dev Connection'
-    
+
 trigger:
 - none
 
@@ -70,7 +70,7 @@ stages:
 
       jobs:            
         - job: Publish
-          dependsOn: Build
+          dependsOn: BuildTo_DEV
           pool:
             vmImage: 'windows-latest'
           steps:
