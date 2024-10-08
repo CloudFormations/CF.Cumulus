@@ -60,7 +60,7 @@ stages:
             - job: BicepDeploy_${{ pair.key }}
               displayName: 'Bicep Deployment to ${{ upper(pair.key) }} Environment'
               dependsOn: BicepPreview_${{ pair.key }}
-              # dependsOn: ManualValidation_${{ pair.key }}
+              dependsOn: ManualValidation_${{ pair.key }}
               condition: >
                 and(succeeded(),
                   or(
