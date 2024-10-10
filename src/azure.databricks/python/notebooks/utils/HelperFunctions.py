@@ -40,3 +40,13 @@ def createPartitionFieldsSQL(partitionFields: list() = []) -> str:
     if len(partitionFields) > 0:
         partitionFieldsSQL = "\nPARTITIONED BY (" + ",".join(f"{pf}" for pf in partitionFields) + ")\n"
     return partitionFieldsSQL
+
+# COMMAND ----------
+
+# For incremental loads or depending on source file format, columns may not be loaded to bronze, despite being specified in the schema. Example - reading entirely NULL columns from Dynamics 365 excludes these from the Parquet which is written.
+def getColumnsNotInSchema(columnsList: list(), df: DataFrame) -> list():
+    return [column for column in columnsList if column not in df.columns]
+
+# Add to DataFrame as NULL columns
+def setNullColumn(df: DataFrame, column: str) -> DataFrame:
+    return df.withColumn(column, lit(None))
