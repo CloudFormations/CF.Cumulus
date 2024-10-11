@@ -1,0 +1,39 @@
+{
+	"name": "Ingest_LS_HTTP_AnonAuth",
+	"properties": {
+		"parameters": {
+			"BaseURL": {
+				"type": "string"
+			},
+			"XAPIKey": {
+				"type": "String"
+			},
+			"Authorization": {
+				"type": "String"
+			},
+			"APIKey": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "@{linkedService().BaseURL}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous",
+			"authHeaders": {
+				"Authorization": {
+					"type": "AzureKeyVaultSecret",
+					"store": {
+						"referenceName": "Common_LS_cumuluskeys",
+						"type": "LinkedServiceReference"
+					},
+					"secretName": {
+						"value": "@linkedService().Authorization",
+						"type": "Expression"
+					}
+				}
+			}
+		}
+	}
+}
