@@ -5,13 +5,7 @@
 			"BaseURL": {
 				"type": "string"
 			},
-			"XAPIKey": {
-				"type": "String"
-			},
 			"Authorization": {
-				"type": "String"
-			},
-			"APIKey": {
 				"type": "String"
 			}
 		},
