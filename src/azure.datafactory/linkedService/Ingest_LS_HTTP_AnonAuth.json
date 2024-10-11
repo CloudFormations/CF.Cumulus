@@ -4,9 +4,6 @@
 		"parameters": {
 			"BaseURL": {
 				"type": "string"
-			},
-			"Authorization": {
-				"type": "String"
 			}
 		},
 		"annotations": [],
@@ -14,20 +11,7 @@
 		"typeProperties": {
 			"url": "@{linkedService().BaseURL}",
 			"enableServerCertificateValidation": true,
-			"authenticationType": "Anonymous",
-			"authHeaders": {
-				"Authorization": {
-					"type": "AzureKeyVaultSecret",
-					"store": {
-						"referenceName": "Common_LS_cumuluskeys",
-						"type": "LinkedServiceReference"
-					},
-					"secretName": {
-						"value": "@linkedService().Authorization",
-						"type": "Expression"
-					}
-				}
-			}
+			"authenticationType": "Anonymous"
 		}
 	}
 }
