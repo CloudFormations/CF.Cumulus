@@ -1,0 +1,40 @@
+{
+	"name": "Ingest_DS_DataLake_JSON",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_DataLake_MIAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSStorageName": "@dataset().DSStorageName"
+			}
+		},
+		"parameters": {
+			"DSStorageName": {
+				"type": "string"
+			},
+			"DSContainerName": {
+				"type": "string"
+			},
+			"DSDirectoryName": {
+				"type": "string"
+			},
+			"DSFileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@concat(dataset().DSFileName,'.json')",
+					"type": "Expression"
+				},
+				"folderPath": "@dataset().DSDirectoryName",
+				"fileSystem": "@dataset().DSContainerName"
+			}
+		},
+		"schema": {}
+	}
+}
