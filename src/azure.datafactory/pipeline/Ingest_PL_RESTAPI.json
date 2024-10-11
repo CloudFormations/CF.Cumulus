@@ -3,47 +3,6 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Web API Call",
-				"type": "WebActivity",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"method": "GET",
-					"url": "https://v2.jokeapi.dev/joke/Any?amount=3"
-				}
-			},
-			{
-				"name": "Web API Call_copy1",
-				"type": "WebActivity",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"method": "GET",
-					"headers": {
-						"User-Agent": "node.js"
-					},
-					"url": "https://api.github.com/users/MattPCollins"
-				}
-			},
-			{
 				"name": "Get Ingest Payload",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -58,16 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "[ingest].[GetDatasetPayloadAPI]",
-						"storedProcedureParameters": {
-							"DatasetId": {
-								"type": "Int16",
-								"value": {
-									"value": "@pipeline().parameters.DatasetId",
-									"type": "Expression"
-								}
-							}
-						},
+						"sqlReaderQuery": "SELECT\n\tc.ConnectionLocation,\n\t'full' AS LoadAction,\n\tc.ConnectionDisplayName,\n\tds.DatasetDisplayName,\n\tds.VersionNumber,\n\tc.LinkedServiceName,\n\tds.LoadType,\n\tds.SourcePath,\n\tds.SourceName,\n\tCASE \n\t\tWHEN ds.DatasetId = 2 THEN 'Ath brer' \n\t\tWHEN ds.DatasetId = 1 THEN ''\n\t\tELSE ''\n\tEND AS SourceQuery,\n    --cn2.[ConnectionLocation] AS 'TargetStorageName',\n    --cn2.[SourceLocation] AS 'TargetStorageContainer',\n\t'cfcdemodevdlsuks01' AS 'TargetStorageName',\n    'raw' AS 'TargetStorageContainer'\nFROM ingest.Datasets AS ds\nINNER JOIN ingest.Connections AS c\nON ds.ConnectionFK = c.ConnectionId\nINNER JOIN ingest.ComputeConnections AS cc\nON ds.MergeComputeConnectionFK = cc.ComputeConnectionId\nWHERE\n    [DatasetId] = 2\n    AND \n        ds.[Enabled] = 1\n    AND \n        c.[Enabled] = 1",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -198,12 +148,14 @@
 								{
 									"name": "REST API AnonAuth Copy",
 									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
 										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
+										"secureOutput": false,
 										"secureInput": false
 									},
 									"userProperties": [],
@@ -220,12 +172,12 @@
 											}
 										},
 										"sink": {
-											"type": "ParquetSink",
+											"type": "JsonSink",
 											"storeSettings": {
 												"type": "AzureBlobFSWriteSettings"
 											},
 											"formatSettings": {
-												"type": "ParquetWriteSettings"
+												"type": "JsonWriteSettings"
 											}
 										},
 										"enableStaging": false
@@ -235,14 +187,20 @@
 											"referenceName": "Ingest_DS_JSON_HTTP_AnonAuth",
 											"type": "DatasetReference",
 											"parameters": {
-												"RelativeURL": "/user/repos",
-												"BaseURL": "https://api.github.com"
+												"RelativeURL": {
+													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName)",
+													"type": "Expression"
+												},
+												"BaseURL": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"type": "Expression"
+												}
 											}
 										}
 									],
 									"outputs": [
 										{
-											"referenceName": "Ingest_DS_DataLake_Parquet",
+											"referenceName": "Ingest_DS_DataLake_JSON",
 											"type": "DatasetReference",
 											"parameters": {
 												"DSStorageName": {
@@ -259,6 +217,74 @@
 												},
 												"DSFileName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"name": "REST API AnonAuth Copy_copy1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_REST",
+											"type": "DatasetReference",
+											"parameters": {
+												"BaseURL": "https://api.github.com",
+												"RelativeURL": "/repos/octocat/Spoon-Knife/issues"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_JSON",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSStorageName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@variables('DirectoryName')",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'PAGINATIONEXAMPLE2')",
 													"type": "Expression"
 												}
 											}
@@ -288,6 +314,8 @@
 			{
 				"name": "Update Metadata Load Status",
 				"type": "SqlServerStoredProcedure",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "REST API Auth Type",
@@ -342,10 +370,11 @@
 		],
 		"parameters": {
 			"RunDateTime": {
-				"type": "string"
+				"type": "string",
+				"defaultValue": " "
 			},
 			"DatasetId": {
-				"type": "string"
+				"type": "int"
 			}
 		},
 		"variables": {
