@@ -18,7 +18,11 @@
 				"type": "string"
 			}
 		},
-		"annotations": [],
+		"annotations": [
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Ingest"
+		],
 		"type": "SharePointOnlineList",
 		"typeProperties": {
 			"siteUrl": "@{linkedService().SiteURL}",
