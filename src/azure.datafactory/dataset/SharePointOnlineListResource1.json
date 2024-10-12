@@ -1,0 +1,12 @@
+{
+	"name": "SharePointOnlineListResource1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_SharePointList_SPCert",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SharePointOnlineListResource",
+		"schema": []
+	}
+}
