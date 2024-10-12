@@ -1,9 +1,20 @@
 {
 	"name": "Ingest_LS_SharePointList_SPCert",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
 			"SiteURL": {
+				"type": "string"
+			},
+			"ServicePrincipalId": {
+				"type": "string"
+			},
+			"ServicePrincipalCertificateSecretName": {
+				"type": "string"
+			},
+			"ServicePrincipalCertificatePasswordSecretName": {
+				"type": "string"
+			},
+			"TenantId": {
 				"type": "string"
 			}
 		},
@@ -11,10 +22,32 @@
 		"type": "SharePointOnlineList",
 		"typeProperties": {
 			"siteUrl": "@{linkedService().SiteURL}",
-			"tenantId": "d562890e-82fc-42c7-8033-b62200df3d96",
-			"servicePrincipalId": "fsdfsd",
-			"servicePrincipalCredentialType": "ServicePrincipalKey",
-			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkRBVEFGQUNUT1JZQEY2NEJEQTlELUJBMkEtNDhERC05NkEzLTMyM0Q0MTNDMjFBMV9hMDdlNTMzYS1kN2Q4LTQ3YTEtYmI3MC01NmQyOTIzZjQ5MGEiDQp9"
+			"tenantId": "@{linkedService().TenantId}",
+			"servicePrincipalId": "@{linkedService().ServicePrincipalId}",
+			"servicePrincipalCredentialType": "ServicePrincipalCert",
+			"servicePrincipalEmbeddedCert": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().ServicePrincipalCertificateSecretName",
+					"type": "Expression"
+				}
+			},
+			"servicePrincipalEmbeddedCertPassword": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().ServicePrincipalCertificatePasswordSecretName",
+					"type": "Expression"
+				}
+			}
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
