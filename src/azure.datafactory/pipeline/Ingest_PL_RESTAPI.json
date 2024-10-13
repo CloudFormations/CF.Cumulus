@@ -165,6 +165,10 @@
 											"storeSettings": {
 												"type": "HttpReadSettings",
 												"requestMethod": "GET",
+												"additionalHeaders": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+													"type": "Expression"
+												},
 												"requestTimeout": ""
 											},
 											"formatSettings": {
