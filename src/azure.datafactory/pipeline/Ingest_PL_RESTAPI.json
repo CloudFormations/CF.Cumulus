@@ -143,13 +143,11 @@
 					},
 					"cases": [
 						{
-							"value": "RESTAPI_AnonAuth",
+							"value": "RESTAPI_HTTP_AnonAuth",
 							"activities": [
 								{
-									"name": "REST API AnonAuth Copy",
+									"name": "REST API HTTP AnonAuth Copy",
 									"type": "Copy",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
@@ -226,9 +224,14 @@
 											}
 										}
 									]
-								},
+								}
+							]
+						},
+						{
+							"value": "RESTAPI_REST_AnonAuth",
+							"activities": [
 								{
-									"name": "REST API AnonAuth Copy_copy1",
+									"name": "REST API REST AnonAuth Copy",
 									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
