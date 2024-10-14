@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT\n\tc.ConnectionLocation,\n\t'full' AS LoadAction,\n\tc.ConnectionDisplayName,\n\tds.DatasetDisplayName,\n\tds.VersionNumber,\n\tc.LinkedServiceName,\n\tds.LoadType,\n\tds.SourcePath,\n\tds.SourceName,\n\tc.username,\n\tc.keyvaultsecret,\n\tCASE \n\t\tWHEN ds.DatasetId = 2 THEN 'Authorization: POPULATE_TOKEN'\n\t\tWHEN ds.DatasetId = 1 THEN ''\n\t\tELSE ''\n\tEND AS SourceQuery,\n    --cn2.[ConnectionLocation] AS 'TargetStorageName',\n    --cn2.[SourceLocation] AS 'TargetStorageContainer',\n\t'cfcdemodevdlsuks01' AS 'TargetStorageName',\n    'raw' AS 'TargetStorageContainer'\nFROM ingest.Datasets AS ds\nINNER JOIN ingest.Connections AS c\n--ON ds.ConnectionFK = c.ConnectionId\nON c.ConnectionId = 5\nINNER JOIN ingest.ComputeConnections AS cc\nON ds.MergeComputeConnectionFK = cc.ComputeConnectionId\nWHERE\n    [DatasetId] = 2\n    AND \n        ds.[Enabled] = 1\n    AND \n        c.[Enabled] = 1\n\t\t",
+						"sqlReaderQuery": "SELECT\n\tc.ConnectionLocation,\n\t'full' AS LoadAction,\n\tc.ConnectionDisplayName,\n\tds.DatasetDisplayName,\n\tds.VersionNumber,\n\tc.LinkedServiceName,\n\tds.LoadType,\n\tds.SourcePath,\n\tds.SourceName,\n\tc.username,\n\tc.keyvaultsecret,\n\tCASE \n\t\tWHEN ds.DatasetId = 2 THEN 'Authorization: POPULATE_TOKEN'\n\t\tWHEN ds.DatasetId = 1 THEN ''\n\t\tELSE ''\n\tEND AS SourceQuery,\n    --cn2.[ConnectionLocation] AS 'TargetStorageName',\n    --cn2.[SourceLocation] AS 'TargetStorageContainer',\n\t'cfcdemodevdlsuks01' AS 'TargetStorageName',\n    'raw' AS 'TargetStorageContainer'\nFROM ingest.Datasets AS ds\nINNER JOIN ingest.Connections AS c\n--ON ds.ConnectionFK = c.ConnectionId\nON c.ConnectionId = 4\nINNER JOIN ingest.ComputeConnections AS cc\nON ds.MergeComputeConnectionFK = cc.ComputeConnectionId\nWHERE\n    [DatasetId] = 3\n    AND \n        ds.[Enabled] = 1\n    AND \n        c.[Enabled] = 1\n\t\t",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -446,6 +446,162 @@
 				"linkedServiceName": {
 					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Lookup result",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "REST API Auth Type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "JsonSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "JsonReadSettings"
+						}
+					},
+					"dataset": {
+						"referenceName": "Ingest_DS_DataLake_JSON",
+						"type": "DatasetReference",
+						"parameters": {
+							"DSStorageName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+								"type": "Expression"
+							},
+							"DSContainerName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+								"type": "Expression"
+							},
+							"DSDirectoryName": {
+								"value": "@variables('DirectoryName')",
+								"type": "Expression"
+							},
+							"DSFileName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+								"type": "Expression"
+							}
+						}
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "Set Authorization",
+				"description": "Get Authorization value from LoadClause JSON",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Authorization",
+					"value": {
+						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Authorization",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Relative URL Parameter String",
+				"description": "Get RelURLParameterString value from LoadClause JSON",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RelativeURLParameterString",
+					"value": {
+						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).RelURLParameterString",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Request Body",
+				"description": "Get Request Body value from LoadClause JSON",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "RequestBody",
+					"value": {
+						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).RequestBody",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Headers",
+				"description": "Get Headers value from LoadClause JSON",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "Headers",
+					"value": {
+						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Headers",
+						"type": "Expression"
+					}
 				}
 			}
 		],
