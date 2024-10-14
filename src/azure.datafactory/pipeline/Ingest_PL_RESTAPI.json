@@ -171,7 +171,7 @@
 												"type": "HttpReadSettings",
 												"requestMethod": "GET",
 												"additionalHeaders": {
-													"value": "@replace(activity('Get Ingest Payload').output.firstRow.SourceQuery,'POPULATE_TOKEN',activity('Fetch Bearer Token HTTPS').output.value)",
+													"value": "@replace(variables('Authorization'),'POPULATE_TOKEN',activity('Fetch Bearer Token HTTPS').output.value)",
 													"type": "Expression"
 												},
 												"requestTimeout": ""
@@ -451,6 +451,8 @@
 			{
 				"name": "Lookup result",
 				"type": "Lookup",
+				"state": "Inactive",
+				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "REST API Auth Type",
@@ -625,6 +627,18 @@
 				"type": "String"
 			},
 			"LocalRunDateTime": {
+				"type": "String"
+			},
+			"Authorization": {
+				"type": "String"
+			},
+			"Headers": {
+				"type": "String"
+			},
+			"RequestBody": {
+				"type": "String"
+			},
+			"RelURLParameterString": {
 				"type": "String"
 			}
 		},
