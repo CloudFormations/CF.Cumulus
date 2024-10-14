@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT\n\tc.ConnectionLocation,\n\t'full' AS LoadAction,\n\tc.ConnectionDisplayName,\n\tds.DatasetDisplayName,\n\tds.VersionNumber,\n\tc.LinkedServiceName,\n\tds.LoadType,\n\tds.SourcePath,\n\tds.SourceName,\n\tCASE \n\t\tWHEN ds.DatasetId = 2 THEN 'Ath brer' \n\t\tWHEN ds.DatasetId = 1 THEN ''\n\t\tELSE ''\n\tEND AS SourceQuery,\n    --cn2.[ConnectionLocation] AS 'TargetStorageName',\n    --cn2.[SourceLocation] AS 'TargetStorageContainer',\n\t'cfcdemodevdlsuks01' AS 'TargetStorageName',\n    'raw' AS 'TargetStorageContainer'\nFROM ingest.Datasets AS ds\nINNER JOIN ingest.Connections AS c\nON ds.ConnectionFK = c.ConnectionId\nINNER JOIN ingest.ComputeConnections AS cc\nON ds.MergeComputeConnectionFK = cc.ComputeConnectionId\nWHERE\n    [DatasetId] = 2\n    AND \n        ds.[Enabled] = 1\n    AND \n        c.[Enabled] = 1",
+						"sqlReaderQuery": "SELECT\n\tc.ConnectionLocation,\n\t'full' AS LoadAction,\n\tc.ConnectionDisplayName,\n\tds.DatasetDisplayName,\n\tds.VersionNumber,\n\tc.LinkedServiceName,\n\tds.LoadType,\n\tds.SourcePath,\n\tds.SourceName,\n\tc.username,\n\tc.keyvaultsecret,\n\tCASE \n\t\tWHEN ds.DatasetId = 2 THEN 'Authorization: POPULATE_TOKEN'\n\t\tWHEN ds.DatasetId = 1 THEN ''\n\t\tELSE ''\n\tEND AS SourceQuery,\n    --cn2.[ConnectionLocation] AS 'TargetStorageName',\n    --cn2.[SourceLocation] AS 'TargetStorageContainer',\n\t'cfcdemodevdlsuks01' AS 'TargetStorageName',\n    'raw' AS 'TargetStorageContainer'\nFROM ingest.Datasets AS ds\nINNER JOIN ingest.Connections AS c\n--ON ds.ConnectionFK = c.ConnectionId\nON c.ConnectionId = 5\nINNER JOIN ingest.ComputeConnections AS cc\nON ds.MergeComputeConnectionFK = cc.ComputeConnectionId\nWHERE\n    [DatasetId] = 2\n    AND \n        ds.[Enabled] = 1\n    AND \n        c.[Enabled] = 1\n\t\t",
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -143,12 +143,19 @@
 					},
 					"cases": [
 						{
-							"value": "RESTAPI_HTTP_AnonAuth",
+							"value": "RESTAPI_HTTPS_AnonAuth",
 							"activities": [
 								{
 									"name": "REST API HTTP AnonAuth Copy",
 									"type": "Copy",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Fetch Bearer Token HTTPS",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -164,7 +171,7 @@
 												"type": "HttpReadSettings",
 												"requestMethod": "GET",
 												"additionalHeaders": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+													"value": "@replace(activity('Get Ingest Payload').output.firstRow.SourceQuery,'POPULATE_TOKEN',activity('Fetch Bearer Token HTTPS').output.value)",
 													"type": "Expression"
 												},
 												"requestTimeout": ""
@@ -224,6 +231,30 @@
 											}
 										}
 									]
+								},
+								{
+									"name": "Fetch Bearer Token HTTPS",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
 								}
 							]
 						},
@@ -233,7 +264,14 @@
 								{
 									"name": "REST API REST AnonAuth Copy",
 									"type": "Copy",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Fetch Bearer Token",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -248,6 +286,12 @@
 											"httpRequestTimeout": "00:01:40",
 											"requestInterval": "00.00:00:00.010",
 											"requestMethod": "GET",
+											"additionalHeaders": {
+												"Authorization": {
+													"value": "@activity('Fetch Bearer Token').output.value",
+													"type": "Expression"
+												}
+											},
 											"paginationRules": {
 												"supportRFC5988": "true"
 											}
@@ -268,8 +312,14 @@
 											"referenceName": "Ingest_DS_REST",
 											"type": "DatasetReference",
 											"parameters": {
-												"BaseURL": "https://api.github.com",
-												"RelativeURL": "/repos/octocat/Spoon-Knife/issues"
+												"BaseURL": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"type": "Expression"
+												},
+												"RelativeURL": {
+													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName)",
+													"type": "Expression"
+												}
 											}
 										}
 									],
@@ -291,12 +341,36 @@
 													"type": "Expression"
 												},
 												"DSFileName": {
-													"value": "@concat(activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'PAGINATIONEXAMPLE2')",
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
 													"type": "Expression"
 												}
 											}
 										}
 									]
+								},
+								{
+									"name": "Fetch Bearer Token",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
 								}
 							]
 						}
