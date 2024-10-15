@@ -129,7 +129,7 @@
 				"type": "Switch",
 				"dependsOn": [
 					{
-						"activity": "If Condition1",
+						"activity": "If Authorization Required",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -445,111 +445,35 @@
 				}
 			},
 			{
-				"name": "Set Authorization",
-				"description": "Get Authorization value from LoadClause JSON",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get Ingest Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "Authorization",
-					"value": {
-						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Authorization",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set Relative URL Parameter String",
-				"description": "Get RelURLParameterString value from LoadClause JSON",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get Ingest Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "RelURLParameterString",
-					"value": {
-						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).RelURLParameterString",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set Request Body",
-				"description": "Get Request Body value from LoadClause JSON",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get Ingest Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "RequestBody",
-					"value": {
-						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).RequestBody",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Set Headers",
-				"description": "Get Headers value from LoadClause JSON",
-				"type": "SetVariable",
-				"dependsOn": [
-					{
-						"activity": "Get Ingest Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"variableName": "Headers",
-					"value": {
-						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Headers",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "If Condition1",
+				"name": "If Authorization Required",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
 						"activity": "Set Directory Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Validate Authorization Exists in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Validate Headers Exist in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Validate Request Body Exists in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Validate API Parameters Exist in Payload",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -628,6 +552,210 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Validate Authorization Exists in Payload",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@contains(activity('Get Ingest Payload').output.firstRow.SourceQuery,'\"Authorization\":')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Load Clause requires all values populated in the metadata table. Authorization is missing.",
+								"errorCode": "16"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set Authorization",
+							"description": "Get Authorization value from LoadClause JSON",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Authorization",
+								"value": {
+									"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Authorization",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Validate Headers Exist in Payload",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@contains(activity('Get Ingest Payload').output.firstRow.SourceQuery,'\"Headers\":')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail Headers missing",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Load Clause requires all values populated in the metadata table. Headers is missing.",
+								"errorCode": "16"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set Headers",
+							"description": "Get Headers value from LoadClause JSON",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Headers",
+								"value": {
+									"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Headers",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Validate Request Body Exists in Payload",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@contains(activity('Get Ingest Payload').output.firstRow.SourceQuery,'\"RequestBody\":')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail Request Body missing",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Load Clause requires all values populated in the metadata table. Request Body is missing.",
+								"errorCode": "16"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set Request Body",
+							"description": "Get Request Body value from LoadClause JSON",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "RequestBody",
+								"value": {
+									"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).RequestBody",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Validate API Parameters Exist in Payload",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@contains(activity('Get Ingest Payload').output.firstRow.SourceQuery,'\"RelURLParameterString\":')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail API Parameters missing",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Load Clause requires all values populated in the metadata table. RelURLParameterString is missing.",
+								"errorCode": "16"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set Relative URL Parameter String",
+							"description": "Get RelURLParameterString value from LoadClause JSON",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "RelURLParameterString",
+								"value": {
+									"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).RelURLParameterString",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
 			}
 		],
 		"parameters": {
@@ -665,6 +793,9 @@
 				"type": "String"
 			},
 			"A2": {
+				"type": "String"
+			},
+			"testvar": {
 				"type": "String"
 			}
 		},
