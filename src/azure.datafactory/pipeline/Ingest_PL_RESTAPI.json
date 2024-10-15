@@ -154,7 +154,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@concat(replace(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'Ingest_LS_',''),'_',variables('PaginationType'))",
+						"value": "@concat(replace(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'Ingest_LS_',''),variables('PaginationType'))",
 						"type": "Expression"
 					},
 					"cases": [
