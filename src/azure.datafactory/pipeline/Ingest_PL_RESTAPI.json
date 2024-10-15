@@ -135,6 +135,7 @@
 			},
 			{
 				"name": "REST API Auth Type",
+				"description": "Switch on Linked Service and Pagination Rules",
 				"type": "Switch",
 				"dependsOn": [
 					{
@@ -153,7 +154,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@replace(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'Ingest_LS_','')",
+						"value": "@concat(replace(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'Ingest_LS_',''),'_',variables('PaginationType'))",
 						"type": "Expression"
 					},
 					"cases": [
@@ -328,7 +329,7 @@
 							]
 						},
 						{
-							"value": "Case3",
+							"value": "RESTAPI_REST_AnonAuth_RFC",
 							"activities": [
 								{
 									"name": "REST API REST AnonAuth Copy_copy1",
@@ -406,6 +407,82 @@
 													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
 													"type": "Expression"
 												}
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"value": "RESTAPI_REST_AnonAuth_Headers",
+							"activities": [
+								{
+									"name": "REST API REST AnonAuth Pagination with HeadersCopy",
+									"description": "Note: Offset Param must equal limit value\ne.g. ?limit=100&offset={offset}\nThen offset = 100 as well.",
+									"type": "Copy",
+									"state": "Inactive",
+									"onInactiveMarkAs": "Succeeded",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"additionalHeaders": {
+												"Authorization": {
+													"value": "@variables('AuthorizationOutput')",
+													"type": "Expression"
+												}
+											},
+											"paginationRules": {
+												"QueryParameters.{offset}": {
+													"value": "@variables('PaginationLogic')",
+													"type": "Expression"
+												}
+											}
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_REST",
+											"type": "DatasetReference",
+											"parameters": {
+												"BaseURL": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+												"RelativeURL": {
+													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_JSON",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSStorageName": "cfcdemodevdlsuks01",
+												"DSContainerName": "raw",
+												"DSDirectoryName": "test",
+												"DSFileName": "test"
 											}
 										}
 									]
