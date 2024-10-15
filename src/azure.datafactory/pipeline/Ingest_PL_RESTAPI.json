@@ -17,7 +17,16 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderQuery": "SELECT\n\tc.ConnectionLocation,\n\t'full' AS LoadAction,\n\tc.ConnectionDisplayName,\n\tds.DatasetDisplayName,\n\tds.VersionNumber,\n\tc.LinkedServiceName,\n\tds.LoadType,\n\tds.SourcePath,\n\tds.SourceName,\n\tc.username,\n\tc.keyvaultsecret,\n\tCASE \n\t\tWHEN ds.DatasetId = 2 THEN 'Authorization: POPULATE_TOKEN'\n\t\tWHEN ds.DatasetId = 1 THEN ''\n\t\tWHEN ds.DatasetId = 4 THEN CDCWhereClause\n\t\tELSE ''\n\tEND AS SourceQuery,\n    --cn2.[ConnectionLocation] AS 'TargetStorageName',\n    --cn2.[SourceLocation] AS 'TargetStorageContainer',\n\t'cfcdemodevdlsuks01' AS 'TargetStorageName',\n    'raw' AS 'TargetStorageContainer'\nFROM ingest.Datasets AS ds\nINNER JOIN ingest.Connections AS c\nON ds.ConnectionFK = c.ConnectionId\n--ON c.ConnectionId = 4\nINNER JOIN ingest.ComputeConnections AS cc\nON ds.MergeComputeConnectionFK = cc.ComputeConnectionId\nWHERE 1 = 1 \nAND [DatasetId] = 4\nAND \n    ds.[Enabled] = 1\nAND \n    c.[Enabled] = 1",
+						"sqlReaderStoredProcedureName": "ingest.GetAPIPayload",
+						"storedProcedureParameters": {
+							"DatasetId": {
+								"type": "Int32",
+								"value": {
+									"value": "@pipeline().parameters.DatasetId",
+									"type": "Expression"
+								}
+							}
+						},
 						"queryTimeout": "02:00:00",
 						"partitionOption": "None"
 					},
@@ -129,6 +138,12 @@
 				"type": "Switch",
 				"dependsOn": [
 					{
+						"activity": "Set Directory Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
 						"activity": "If Authorization Required",
 						"dependencyConditions": [
 							"Succeeded"
@@ -164,7 +179,7 @@
 												"type": "HttpReadSettings",
 												"requestMethod": "GET",
 												"additionalHeaders": {
-													"value": "@replace(variables('Authorization'),'POPULATE_TOKEN',variables('A2'))",
+													"value": "@if(\n    equals(variables('AuthorizationOutput'),''), \n    '',\n    concat('Authorization: ', variables('AuthorizationOutput'))\n)",
 													"type": "Expression"
 												},
 												"requestTimeout": ""
@@ -190,7 +205,7 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"RelativeURL": {
-													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,'/',variables('RelURLParameterString'))",
+													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
 													"type": "Expression"
 												},
 												"BaseURL": {
@@ -250,7 +265,7 @@
 											"requestMethod": "GET",
 											"additionalHeaders": {
 												"Authorization": {
-													"value": "@variables('A2')",
+													"value": "@variables('AuthorizationOutput')",
 													"type": "Expression"
 												}
 											},
@@ -279,7 +294,92 @@
 													"type": "Expression"
 												},
 												"RelativeURL": {
-													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,'/',variables('RelURLParameterString'))",
+													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_JSON",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSStorageName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@variables('DirectoryName')",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						},
+						{
+							"value": "Case3",
+							"activities": [
+								{
+									"name": "REST API REST AnonAuth Copy_copy1",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "RestSource",
+											"httpRequestTimeout": "00:01:40",
+											"requestInterval": "00.00:00:00.010",
+											"requestMethod": "GET",
+											"additionalHeaders": {
+												"Authorization": {
+													"value": "@variables('AuthorizationOutput')",
+													"type": "Expression"
+												}
+											},
+											"paginationRules": {
+												"supportRFC5988": "true"
+											}
+										},
+										"sink": {
+											"type": "JsonSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "JsonWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_REST",
+											"type": "DatasetReference",
+											"parameters": {
+												"BaseURL": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+													"type": "Expression"
+												},
+												"RelativeURL": {
+													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
 													"type": "Expression"
 												}
 											}
@@ -387,73 +487,9 @@
 				}
 			},
 			{
-				"name": "Lookup result",
-				"type": "Lookup",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [
-					{
-						"activity": "REST API Auth Type",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "JsonSource",
-						"storeSettings": {
-							"type": "AzureBlobFSReadSettings",
-							"recursive": true,
-							"enablePartitionDiscovery": false
-						},
-						"formatSettings": {
-							"type": "JsonReadSettings"
-						}
-					},
-					"dataset": {
-						"referenceName": "Ingest_DS_DataLake_JSON",
-						"type": "DatasetReference",
-						"parameters": {
-							"DSStorageName": {
-								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
-								"type": "Expression"
-							},
-							"DSContainerName": {
-								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
-								"type": "Expression"
-							},
-							"DSDirectoryName": {
-								"value": "@variables('DirectoryName')",
-								"type": "Expression"
-							},
-							"DSFileName": {
-								"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
-								"type": "Expression"
-							}
-						}
-					},
-					"firstRowOnly": false
-				}
-			},
-			{
 				"name": "If Authorization Required",
 				"type": "IfCondition",
 				"dependsOn": [
-					{
-						"activity": "Set Directory Path",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
 					{
 						"activity": "Validate Authorization Exists in Payload",
 						"dependencyConditions": [
@@ -477,6 +513,12 @@
 						"dependencyConditions": [
 							"Succeeded"
 						]
+					},
+					{
+						"activity": "Validate Pagination Exists in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
 					}
 				],
 				"userProperties": [],
@@ -496,7 +538,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "A2",
+								"variableName": "AuthorizationOutput",
 								"value": " "
 							}
 						}
@@ -543,7 +585,7 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "A2",
+								"variableName": "AuthorizationOutput",
 								"value": {
 									"value": "@activity('Fetch Bearer Token').output.value",
 									"type": "Expression"
@@ -747,9 +789,133 @@
 							},
 							"userProperties": [],
 							"typeProperties": {
-								"variableName": "RelURLParameterString",
+								"variableName": "ParametersString",
 								"value": {
 									"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).RelURLParameterString",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set Relative URL Parameter String Complete",
+							"description": "Add '/' character if the RelURLParameterString is not ''",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set Relative URL Parameter String",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "ParametersStringComplete",
+								"value": {
+									"value": "@if(\n    equals(\n        variables('ParametersString'),''),\n        '',\n        concat('/', variables('ParametersString')\n        )\n    )",
+									"type": "Expression"
+								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Validate Pagination Exists in Payload",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@contains(activity('Get Ingest Payload').output.firstRow.SourceQuery,'\"Pagination\":')",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Fail Pagination missing",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Load Clause requires all values populated in the metadata table. Pagination is missing.",
+								"errorCode": "16"
+							}
+						}
+					],
+					"ifTrueActivities": [
+						{
+							"name": "Set Pagination",
+							"description": "Get Request Body value from LoadClause JSON",
+							"type": "SetVariable",
+							"dependsOn": [],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "Pagination",
+								"value": {
+									"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Pagination",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set Pagination Type",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set Pagination",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "PaginationType",
+								"value": {
+									"value": "@if(equals(variables('Pagination'),''),'',json(variables('Pagination')).Type)",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Set Pagination Logic",
+							"type": "SetVariable",
+							"dependsOn": [
+								{
+									"activity": "Set Pagination",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"variableName": "PaginationLogic",
+								"value": {
+									"value": "@if(equals(variables('Pagination'),''),'',json(variables('Pagination')).Logic)",
 									"type": "Expression"
 								}
 							}
@@ -792,10 +958,22 @@
 			"RelURLParameterString": {
 				"type": "String"
 			},
-			"A2": {
+			"ParametersStringComplete": {
 				"type": "String"
 			},
-			"testvar": {
+			"ParametersString": {
+				"type": "String"
+			},
+			"AuthorizationOutput": {
+				"type": "String"
+			},
+			"Pagination": {
+				"type": "String"
+			},
+			"PaginationType": {
+				"type": "String"
+			},
+			"PaginationLogic": {
 				"type": "String"
 			}
 		},
