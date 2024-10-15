@@ -10,6 +10,7 @@ CREATE TABLE [ingest].[ComputeConnections](
 	[AzureResourceName] [nvarchar](100) NULL,
 	[LinkedServiceName] [nvarchar](200) NOT NULL,
 	[IntegrationRuntimeName] [nvarchar](200) NOT NULL,
+	[EnvironmentName] [nvarchar](10) NULL,
 	[Enabled] [bit] NOT NULL
 PRIMARY KEY CLUSTERED 
 (
@@ -18,8 +19,11 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [ingest].[ComputeConnections] WITH CHECK ADD FOREIGN KEY([ConnectionTypeFK])
+ALTER TABLE [ingest].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [FK__Connectio__Conne__361223C6] FOREIGN KEY([ConnectionTypeFK])
 REFERENCES [ingest].[ConnectionTypes] ([ConnectionTypeId])
+GO
+
+ALTER TABLE [ingest].[ComputeConnections] CHECK CONSTRAINT [FK__Connectio__Conne__361223C6]
 GO
 
 ALTER TABLE [ingest].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [chkComputeConnectionDisplayNameNoSpaces] CHECK  ((NOT [ConnectionDisplayName] like '% %'))
