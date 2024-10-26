@@ -11,7 +11,7 @@ CREATE TABLE [ingest].[Datasets](
 	[VersionValidTo] [datetime2](7) NULL,
 	[LoadType] [char](1) NOT NULL,
 	[LoadStatus] [int] NULL,
-	[CDCWhereClause] [nvarchar](max) NULL,
+	[LoadClause] [nvarchar](max) NULL,
 	[RawLastFullLoadDate] [datetime2](7) NULL,
 	[RawLastIncrementalLoadDate] [datetime2](7) NULL,
 	[CleansedPath] [nvarchar](100) NOT NULL,

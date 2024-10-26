@@ -48,3 +48,13 @@
 		@ConnectionTypeDisplayName = N'Azure Subscription', 
 		@SourceLanguageType = 'NA',
 		@Enabled = 1;
+
+	EXEC [ingest].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Dynamics 365', 
+		@SourceLanguageType = 'XML',
+		@Enabled = 1;
+
+	EXEC [ingest].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'REST API', 
+		@SourceLanguageType = 'NA',
+		@Enabled = 1;

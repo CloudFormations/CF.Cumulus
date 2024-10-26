@@ -1,7 +1,7 @@
 CREATE PROCEDURE [ingest].[GetMergePayload]
-	(
-	@DatasetId INT
-	)
+    (
+    @DatasetId INT
+    )
 AS
 BEGIN
 
@@ -11,7 +11,7 @@ BEGIN
     SELECT 
         @ResultRowCount = COUNT(*)
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Connections AS cn
     ON  
@@ -36,9 +36,23 @@ BEGIN
         ingest.Connections AS cn6
     ON 
         cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
-    
+
     WHERE
         ds.DatasetId = @DatasetId
+    AND
+        ds.[Enabled] = 1
+    AND
+        cn.[Enabled] = 1
+    AND
+        cn2.[Enabled] = 1
+    AND
+        cn3.[Enabled] = 1
+    AND
+        cn4.[Enabled] = 1
+    AND
+        cn5.[Enabled] = 1
+    AND
+        cn6.[Enabled] = 1
 
     IF @ResultRowCount = 0
     BEGIN
@@ -62,28 +76,37 @@ BEGIN
         @CleansedColumnsTypeList = STRING_AGG(CAST(att.AttributeTargetDataType AS NVARCHAR(MAX)),','),
         @CleansedColumnsFormatList = STRING_AGG(CAST(att.AttributeTargetDataFormat AS NVARCHAR(MAX)), ',')
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
         att.DatasetFK = ds.DatasetId
     WHERE
         ds.DatasetId = @DatasetId
+    AND
+        ds.[Enabled] = 1
+    AND
+        att.[Enabled] = 1
+
     GROUP BY ds.DatasetId
 
     -- Get pk columns as comma separated string values for the dataset
     SELECT 
         @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),',')
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
         att.DatasetFK = ds.DatasetId
     WHERE
         ds.DatasetId = @DatasetId
+    AND
+        ds.[Enabled] = 1
     AND 
-        att.PkAttribute = 1
+        att.[PkAttribute] = 1
+    AND 
+        att.[Enabled] = 1
     GROUP BY 
         ds.DatasetId
 
@@ -91,15 +114,19 @@ BEGIN
     SELECT 
         @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),',')
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
         att.DatasetFK = ds.DatasetId
     WHERE
-        ds.DatasetId = @DatasetId
+        ds.[DatasetId] = @DatasetId
     AND 
-        att.PartitionByAttribute = 1
+        ds.[Enabled] = 1
+    AND 
+        att.[Enabled] = 1
+    AND 
+        att.[PartitionByAttribute] = 1
     GROUP BY 
         ds.DatasetId
 
@@ -113,52 +140,59 @@ BEGIN
             @RawLastLoadDate = RawLastFullLoadDate,
             @CleansedLastLoadDate = CleansedLastFullLoadDate
         FROM 
-            [ingest].[DatasetsLatestVersion]
+            [ingest].[Datasets] AS ds
         WHERE 
-            DatasetId = @DatasetId
+            ds.[DatasetId] = @DatasetId
+        AND 
+            ds.[Enabled] = 1
     ELSE IF @LoadAction = 'I'
         SELECT 
             @RawLastLoadDate = RawLastIncrementalLoadDate,
             @CleansedLastLoadDate = CleansedLastIncrementalLoadDate
         FROM 
-            [ingest].[DatasetsLatestVersion]
+            [ingest].[Datasets] AS ds
         WHERE 
-            DatasetId = @DatasetId
-    
+            ds.[DatasetId] = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+
     ELSE IF @LoadAction = 'X'
     BEGIN
-        RAISERROR('Erroneous Load Status. Review the ingest LoadStatus value for the dataset in [ingest].[DatasetsLatestVersion]',16,1)
+        RAISERROR('Erroneous Load Status. Review the ingest LoadStatus value for the dataset in [ingest].[Datasets]',16,1)
         RETURN 0;
     END
     ELSE
     BEGIN
-        RAISERROR('Unexpected Load action. Review the ingest LoadStatus value for the dataset in [ingest].[DatasetsLatestVersion]',16,1)
+        RAISERROR('Unexpected Load action. Review the ingest LoadStatus value for the dataset in [ingest].[Datasets]',16,1)
         RETURN 0;
     END
     SELECT 
         @DateTimeFolderHierarchy = 'year=' + CAST(FORMAT(@RawLastLoadDate,'yyyy') AS VARCHAR) + '/' + 
         'month=' + CAST(FORMAT(@RawLastLoadDate,'MM') AS VARCHAR) + '/' + 
-        'day=' + CAST(FORMAT(@RawLastLoadDate,'dd') AS VARCHAR) 
+        'day=' + CAST(FORMAT(@RawLastLoadDate,'dd') AS VARCHAR) + '/' + 
+        'hour=' + CAST(FORMAT(@RawLastLoadDate,'HH') AS VARCHAR) 
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     WHERE
         ds.DatasetId = @DatasetId
+    AND 
+        ds.[Enabled] = 1
 
     SELECT 
         [cn].[ConnectionDisplayName] AS 'RawSchemaName',
         [cn2].[ConnectionLocation] AS 'ComputeWorkspaceURL',
         [cn2].[ComputeLocation] AS 'ComputeClusterId',
-		[cn2].[ComputeSize] AS 'ComputeSize',
-		[cn2].[ComputeVersion] AS 'ComputeVersion',
-		[cn2].[CountNodes] AS 'CountNodes',
+    [cn2].[ComputeSize] AS 'ComputeSize',
+    [cn2].[ComputeVersion] AS 'ComputeVersion',
+    [cn2].[CountNodes] AS 'CountNodes',
         [cn2].[LinkedServiceName] AS 'ComputeLinkedServiceName',
-        [cn2].[AzureResourceName] AS 'ComputeResourceName',
+        [cn2].[ResourceName] AS 'ComputeResourceName',
         [cn3].[SourceLocation] AS 'ResourceGroupName',
         [cn4].[SourceLocation] AS 'SubscriptionId',
         [cn5].[ConnectionLocation] AS 'RawStorageName',
-		[cn5].[SourceLocation] AS 'RawContainerName',
+    [cn5].[SourceLocation] AS 'RawContainerName',
         [cn6].[ConnectionLocation] AS 'CleansedStorageName',
-		[cn6].[SourceLocation] AS 'CleansedContainerName',
+    [cn6].[SourceLocation] AS 'CleansedContainerName',
         [cn5].[Username] AS 'RawStorageAccessKey',
         [cn6].[Username] AS 'CleansedStorageAccessKey',
 
@@ -169,7 +203,7 @@ BEGIN
         [cn].[ConnectionDisplayName] AS 'CleansedSchemaName',
         ds.CleansedName AS 'CleansedTableName',
         ds.Enabled,
-		ds.LoadType,
+    ds.LoadType,
         @LoadAction AS 'LoadAction',
         @RawLastLoadDate AS 'RawLastLoadDate',
         @CleansedLastLoadDate AS 'CleansedLastLoadDate',
@@ -180,7 +214,7 @@ BEGIN
         @PartitionByAttributesList AS 'CleansedPartitionFields',
         @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy'
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Connections AS cn
     ON  
@@ -207,6 +241,22 @@ BEGIN
         cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
     WHERE
         ds.DatasetId = @DatasetId
+    AND
+        ds.[Enabled] = 1
+    AND
+        cn.[Enabled] = 1
+    AND
+        cn2.[Enabled] = 1
+    AND
+        cn3.[Enabled] = 1
+    AND
+        cn4.[Enabled] = 1
+    AND
+        cn5.[Enabled] = 1
+    AND
+        cn6.[Enabled] = 1
 
 
 END
+GO
+

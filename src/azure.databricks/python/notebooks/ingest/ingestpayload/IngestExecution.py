@@ -125,6 +125,17 @@ df = df.withColumn('PipelineRunId', lit(pipelineRunId))
 
 # COMMAND ----------
 
+# For incremental loads or depending on source file format, columns may not be loaded to bronze, despite being specified in the schema. Example - reading entirely NULL columns from Dynamics 365 excludes these from the Parquet which is written.
+
+columnsNotInSchema = getColumnsNotInSchema(columnsList, df)
+
+for column in columnsNotInSchema:
+    df = setNullColumn(df, column)
+
+# display(df)
+
+# COMMAND ----------
+
 # drop duplicates
 df = df.dropDuplicates()
 

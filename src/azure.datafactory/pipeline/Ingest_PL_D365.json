@@ -1,9 +1,9 @@
 {
-	"name": "Ingest_PL_Oracle",
+	"name": "Ingest_PL_D365",
 	"properties": {
 		"activities": [
 			{
-				"name": "Oracle SQL Type",
+				"name": "File Type",
 				"type": "Switch",
 				"dependsOn": [
 					{
@@ -21,36 +21,23 @@
 					},
 					"cases": [
 						{
-							"value": "Oracle_SIDAuth",
+							"value": "DynamicsCRM_UamiAuth",
 							"activities": [
 								{
-									"name": "SQLDB SQLAuth Copy",
+									"name": "Dynamics CRM Copy",
 									"type": "Copy",
-									"dependsOn": [
-										{
-											"activity": "Fetch SQL Auth Password",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
-										{
-											"activity": "Fetch SQL Auth Username",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										}
-									],
+									"dependsOn": [],
 									"policy": {
-										"timeout": "0.12:00:00",
+										"timeout": "0.23:50:00",
 										"retry": 0,
 										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
+										"secureOutput": false,
 										"secureInput": false
 									},
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "OracleSource",
+											"type": "DynamicsCrmSource",
 											"additionalColumns": [
 												{
 													"name": "PipelineRunId",
@@ -67,56 +54,34 @@
 													}
 												}
 											],
-											"oracleReaderQuery": {
+											"query": {
 												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 												"type": "Expression"
-											},
-											"partitionOption": "None",
-											"convertDecimalToInteger": false,
-											"queryTimeout": "02:00:00"
+											}
 										},
 										"sink": {
 											"type": "ParquetSink",
 											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings"
+												"type": "AzureBlobFSWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
 											},
 											"formatSettings": {
 												"type": "ParquetWriteSettings"
 											}
 										},
-										"enableStaging": false,
-										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
-										}
+										"enableStaging": false
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_Oracle_SIDAuth",
+											"referenceName": "Ingest_DS_DynamicsCRM_UamiAuth",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSHostname": {
+												"DSServiceURI": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 													"type": "Expression"
 												},
-												"DSUsername": {
-													"value": "@activity('Fetch SQL Auth Username').output.value",
-													"type": "Expression"
-												},
-												"DSOracleSid": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
-													"type": "Expression"
-												},
-												"DSPortNumber": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
-													"type": "Expression"
-												},
-												"DSPassword": {
-													"value": "@activity('Fetch SQL Auth Password').output.value",
+												"DSEntityName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
 													"type": "Expression"
 												}
 											}
@@ -146,54 +111,6 @@
 											}
 										}
 									]
-								},
-								{
-									"name": "Fetch SQL Auth Password",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"url": {
-											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
-											"type": "Expression"
-										},
-										"authentication": {
-											"type": "MSI",
-											"resource": "https://vault.azure.net"
-										}
-									}
-								},
-								{
-									"name": "Fetch SQL Auth Username",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"url": {
-											"value": "@concat(activity('Get Ingest Payload').output.firstRow.Username,'?api-version=7.0')",
-											"type": "Expression"
-										},
-										"authentication": {
-											"type": "MSI",
-											"resource": "https://vault.azure.net"
-										}
-									}
 								}
 							]
 						}
@@ -351,7 +268,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "Oracle SQL Type",
+						"activity": "File Type",
 						"dependencyConditions": [
 							"Succeeded"
 						]
