@@ -70,7 +70,6 @@
     <Build Include="ingest\Tables\Connections.sql" />
     <Build Include="ingest\Tables\ConnectionTypes.sql" />
     <Build Include="ingest\Tables\Datasets.sql" />
-    <Build Include="ingest\Views\Datasets.sql" />
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <Build Include="ingest\Stored Procedures\AddConnectionType.sql" />
     <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
