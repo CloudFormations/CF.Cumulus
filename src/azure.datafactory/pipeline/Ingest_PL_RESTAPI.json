@@ -1045,7 +1045,7 @@
 				"type": "String"
 			},
 			"Pagination": {
-				"type": "String"
+				"type": "Array"
 			},
 			"PaginationType": {
 				"type": "String"
