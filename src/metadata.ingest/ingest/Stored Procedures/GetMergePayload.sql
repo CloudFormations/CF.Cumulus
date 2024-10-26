@@ -11,7 +11,7 @@ BEGIN
     SELECT 
         @ResultRowCount = COUNT(*)
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Connections AS cn
     ON  
@@ -76,7 +76,7 @@ BEGIN
         @CleansedColumnsTypeList = STRING_AGG(CAST(att.AttributeTargetDataType AS NVARCHAR(MAX)),','),
         @CleansedColumnsFormatList = STRING_AGG(CAST(att.AttributeTargetDataFormat AS NVARCHAR(MAX)), ',')
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
@@ -94,7 +94,7 @@ BEGIN
     SELECT 
         @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),',')
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
@@ -114,7 +114,7 @@ BEGIN
     SELECT 
         @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),',')
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Attributes AS att
     ON 
@@ -140,7 +140,7 @@ BEGIN
             @RawLastLoadDate = RawLastFullLoadDate,
             @CleansedLastLoadDate = CleansedLastFullLoadDate
         FROM 
-            [ingest].[DatasetsLatestVersion] AS ds
+            [ingest].[Datasets] AS ds
         WHERE 
             ds.[DatasetId] = @DatasetId
         AND 
@@ -150,7 +150,7 @@ BEGIN
             @RawLastLoadDate = RawLastIncrementalLoadDate,
             @CleansedLastLoadDate = CleansedLastIncrementalLoadDate
         FROM 
-            [ingest].[DatasetsLatestVersion] AS ds
+            [ingest].[Datasets] AS ds
         WHERE 
             ds.[DatasetId] = @DatasetId
         AND 
@@ -158,12 +158,12 @@ BEGIN
 
     ELSE IF @LoadAction = 'X'
     BEGIN
-        RAISERROR('Erroneous Load Status. Review the ingest LoadStatus value for the dataset in [ingest].[DatasetsLatestVersion]',16,1)
+        RAISERROR('Erroneous Load Status. Review the ingest LoadStatus value for the dataset in [ingest].[Datasets]',16,1)
         RETURN 0;
     END
     ELSE
     BEGIN
-        RAISERROR('Unexpected Load action. Review the ingest LoadStatus value for the dataset in [ingest].[DatasetsLatestVersion]',16,1)
+        RAISERROR('Unexpected Load action. Review the ingest LoadStatus value for the dataset in [ingest].[Datasets]',16,1)
         RETURN 0;
     END
     SELECT 
@@ -172,7 +172,7 @@ BEGIN
         'day=' + CAST(FORMAT(@RawLastLoadDate,'dd') AS VARCHAR) + '/' + 
         'hour=' + CAST(FORMAT(@RawLastLoadDate,'HH') AS VARCHAR) 
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     WHERE
         ds.DatasetId = @DatasetId
     AND 
@@ -186,7 +186,7 @@ BEGIN
     [cn2].[ComputeVersion] AS 'ComputeVersion',
     [cn2].[CountNodes] AS 'CountNodes',
         [cn2].[LinkedServiceName] AS 'ComputeLinkedServiceName',
-        [cn2].[AzureResourceName] AS 'ComputeResourceName',
+        [cn2].[ResourceName] AS 'ComputeResourceName',
         [cn3].[SourceLocation] AS 'ResourceGroupName',
         [cn4].[SourceLocation] AS 'SubscriptionId',
         [cn5].[ConnectionLocation] AS 'RawStorageName',
@@ -214,7 +214,7 @@ BEGIN
         @PartitionByAttributesList AS 'CleansedPartitionFields',
         @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy'
     FROM 
-        [ingest].[DatasetsLatestVersion] AS ds
+        [ingest].[Datasets] AS ds
     INNER JOIN 
         ingest.Connections AS cn
     ON  

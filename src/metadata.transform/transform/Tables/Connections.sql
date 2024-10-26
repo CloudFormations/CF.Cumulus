@@ -5,10 +5,8 @@ CREATE TABLE [transform].[Connections](
 	[ConnectionLocation] [nvarchar](200) NULL,
 	[ConnectionPort] [nvarchar](50) NULL,
 	[SourceLocation] [nvarchar](200) NOT NULL,
-	[AzureResourceName] [nvarchar](100) NULL,
+	[ResourceName] [nvarchar](100) NULL,
 	[LinkedServiceName] [nvarchar](200) NOT NULL,
-	[IntegrationRuntimeName] [nvarchar](200) NOT NULL,
-	[TemplatePipelineName] [nvarchar](200) NOT NULL,
 	[Username] [nvarchar](100) NOT NULL,
 	[KeyVaultSecret] [nvarchar](100) NOT NULL,
 	[Enabled] [bit] NOT NULL

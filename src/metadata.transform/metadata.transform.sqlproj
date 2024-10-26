@@ -72,7 +72,7 @@
     <Build Include="transform\Tables\ConnectionTypes.sql" />
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <Build Include="transform\Stored Procedures\AddConnectionType.sql" />
-    <Build Include="transform\Views\DatasetsLatestVersion.sql" />
+    <Build Include="transform\Views\Datasets.sql" />
     <Build Include="transform\Tables\ComputeConnections.sql" />
     <None Include="Security\db_cumulususer.sql" />
     <Build Include="transform\Tables\Datasets.sql" />

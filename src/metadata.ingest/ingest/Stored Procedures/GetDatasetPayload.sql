@@ -11,7 +11,7 @@ BEGIN
     SELECT 
         @ResultRowCount = COUNT(*)
     FROM
-    [ingest].[DatasetsLatestVersion] ds
+    [ingest].[Datasets] ds
     INNER JOIN [ingest].[Connections] cn1
         ON ds.[ConnectionFK] = cn1.[ConnectionId]
     INNER JOIN [ingest].[Connections] cn2
@@ -51,7 +51,7 @@ BEGIN
     FROM [ingest].[ConnectionTypes] AS ct
     INNER JOIN [ingest].[Connections] AS cn
         ON ct.ConnectionTypeId = cn.ConnectionTypeFK
-    INNER JOIN [ingest].[DatasetsLatestVersion] AS ds
+    INNER JOIN [ingest].[Datasets] AS ds
         ON cn.ConnectionId = ds.ConnectionFK
     WHERE 
         ds.DatasetId = @DatasetId
@@ -70,7 +70,7 @@ BEGIN
     SELECT
     @SourceQuery += ',' + [AttributeName]
     FROM
-    [ingest].[DatasetsLatestVersion] AS ds
+    [ingest].[Datasets] AS ds
         INNER JOIN [ingest].[Attributes] AS at
             ON ds.[DatasetId] = at.[DatasetFK]
         WHERE
@@ -83,7 +83,7 @@ BEGIN
     SELECT 
             @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + QUOTENAME(ds.[SourcePath]) + '.' + QUOTENAME(ds.[SourceName])
         FROM 
-            [ingest].[DatasetsLatestVersion] AS ds
+            [ingest].[Datasets] AS ds
         WHERE
             ds.DatasetId = @DatasetId 
         AND 
@@ -95,7 +95,7 @@ BEGIN
     SELECT
     @SourceQuery += ',' + [AttributeName]
     FROM
-    [ingest].[DatasetsLatestVersion] AS ds
+    [ingest].[Datasets] AS ds
         INNER JOIN [ingest].[Attributes] AS at
             ON ds.[DatasetId] = at.[DatasetFK]
         WHERE
@@ -108,7 +108,7 @@ BEGIN
     SELECT 
             @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + UPPER(ds.[SourcePath]) + '.' + UPPER(ds.[SourceName])
         FROM 
-            [ingest].[DatasetsLatestVersion] AS ds
+            [ingest].[Datasets] AS ds
         WHERE
             ds.DatasetId = @DatasetId
         AND 
@@ -123,16 +123,16 @@ BEGIN
 
     ELSE IF @SourceLanguageType = 'XML'
     BEGIN
-    DECLARE @CDCWhereClause XML
+    DECLARE @LoadClause XML
 
     -- Start building the XML statement for the query
     SET @SourceQuery = '<fetch>'
 
     SELECT
     @SourceQuery += '<entity name="' + [SourceName] + '">'
-    ,@CDCWhereClause = CDCWhereClause -- Unused if we're running a full load.
+    ,@LoadClause = LoadClause -- Unused if we're running a full load.
     FROM
-    [ingest].[DatasetsLatestVersion] AS ds
+    [ingest].[Datasets] AS ds
     WHERE
     ds.DatasetId = @DatasetId
         AND 
@@ -142,7 +142,7 @@ BEGIN
     SELECT
     @SourceQuery += '<attribute name="' + [AttributeName] + '" />'
     FROM
-    [ingest].[DatasetsLatestVersion] AS ds
+    [ingest].[Datasets] AS ds
     INNER JOIN [ingest].[Attributes] AS at
     ON ds.[DatasetId] = at.[DatasetFK]
     WHERE
@@ -159,7 +159,7 @@ BEGIN
     DECLARE @ParameterDef NVARCHAR(MAX);
     DECLARE @XmlValue NVARCHAR(MAX)
 
-    SELECT @XmlValue = @CDCWhereClause.value('(/filter/condition/@value)[1]', 'NVARCHAR(MAX)')
+    SELECT @XmlValue = @LoadClause.value('(/filter/condition/@value)[1]', 'NVARCHAR(MAX)')
 
     -- Define the dynamic SQL query -- replace value of (/filter/condition/@value)[1]      with "Jun 20 2023 12:41PM"
     SET @SQL = N'SELECT @OutputResult = ' + @XmlValue;
@@ -171,10 +171,10 @@ BEGIN
     EXEC sp_executesql @SQL, @ParameterDef, @OutputResult=@Result OUTPUT;
 
     -- Update the value in the XML variable
-    SET @CDCWhereClause.modify('replace value of (/filter/condition/@value)[1] with sql:variable("@Result")');
+    SET @LoadClause.modify('replace value of (/filter/condition/@value)[1] with sql:variable("@Result")');
 
 
-    SET @SourceQuery += CAST(@CDCWhereClause AS nvarchar(MAX));
+    SET @SourceQuery += CAST(@LoadClause AS nvarchar(MAX));
 
     END 
     SET @SourceQuery += '</entity></fetch>'
@@ -185,7 +185,7 @@ BEGIN
         SELECT 
             @SourceQuery = cn.SourceLocation + '/' + ds.SourcePath
         FROM 
-            [ingest].[DatasetsLatestVersion] AS ds
+            [ingest].[Datasets] AS ds
         INNER JOIN [ingest].[Connections] AS cn
             ON ds.ConnectionFK = cn.ConnectionId
         WHERE
@@ -207,9 +207,9 @@ BEGIN
     ELSE IF (@LoadType = 'I') AND @SourceLanguageType <> 'XML'
     BEGIN
     SELECT 
-                @SourceQuery = @SourceQuery + ' ' + ds.[CDCWhereClause]
+                @SourceQuery = @SourceQuery + ' ' + ds.[LoadClause]
             FROM 
-                [ingest].[DatasetsLatestVersion] AS ds
+                [ingest].[Datasets] AS ds
             WHERE
                 ds.DatasetId = @DatasetId
             AND 
@@ -250,7 +250,7 @@ BEGIN
         @LoadAction AS LoadAction
     --'SELECT * FROM ' + QUOTENAME(ds.[SourcePath]) + '.' + QUOTENAME(ds.[SourceName]) AS 'SourceQuery'
     FROM
-    [ingest].[DatasetsLatestVersion] ds
+    [ingest].[Datasets] ds
     INNER JOIN [ingest].[Connections] cn1
     ON ds.[ConnectionFK] = cn1.[ConnectionId]
     INNER JOIN [ingest].[Connections] cn2

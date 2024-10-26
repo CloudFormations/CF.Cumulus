@@ -1,5 +1,5 @@
 {
-	"name": "Ingest_LS_DynamicsCRM_UamiAuth",
+	"name": "Ingest_LS_Dynamics_UamiAuth",
 	"properties": {
 		"parameters": {
 			"ServiceURI": {
