@@ -11,7 +11,7 @@ BEGIN
     SELECT 
         @ResultRowCount = COUNT(*)
 	FROM 
-		[transform].[DatasetsLatestVersion] AS ds
+		[transform].[Datasets] AS ds
 	INNER JOIN
 		[transform].[Notebooks] AS n1
 	ON 
@@ -70,7 +70,7 @@ BEGIN
         @CuratedColumnsList = STRING_AGG(att.AttributeName,','),
         @CuratedColumnsTypeList = STRING_AGG(att.AttributeTargetDataType,',')
     FROM 
-        [transform].[DatasetsLatestVersion] AS ds
+        [transform].[Datasets] AS ds
     INNER JOIN 
         transform.Attributes AS att
     ON 
@@ -85,7 +85,7 @@ BEGIN
     SELECT 
         @SurrogateKeyAttribute = att.AttributeName
     FROM 
-        [transform].[DatasetsLatestVersion] AS ds
+        [transform].[Datasets] AS ds
     INNER JOIN 
         transform.Attributes AS att
     ON 
@@ -106,7 +106,7 @@ BEGIN
     SELECT 
         @BkAttributesList = STRING_AGG(att.AttributeName,',')
     FROM 
-        [transform].[DatasetsLatestVersion] AS ds
+        [transform].[Datasets] AS ds
     INNER JOIN 
         transform.Attributes AS att
     ON 
@@ -122,7 +122,7 @@ BEGIN
     SELECT 
         @PartitionByAttributesList = STRING_AGG(att.AttributeName,',')
     FROM 
-        [transform].[DatasetsLatestVersion] AS ds
+        [transform].[Datasets] AS ds
     INNER JOIN 
         transform.Attributes AS att
     ON 
@@ -144,7 +144,7 @@ BEGIN
             WHEN LoadType = 'I' AND LoadStatus <> 0 THEN 'I'
             ELSE 'X'
         END 
-    FROM [transform].[DatasetsLatestVersion]
+    FROM [transform].[Datasets]
     WHERE DatasetId = @DatasetId
 
     IF @LoadAction = 'X'
@@ -160,7 +160,7 @@ BEGIN
         [ccn].[ComputeVersion],
         [ccn].[CountNodes],
         [ccn].[LinkedServiceName] AS 'ComputeLinkedServiceName',
-        [ccn].[AzureResourceName] AS 'ComputeResourceName',
+        [ccn].[ResourceName] AS 'ComputeResourceName',
         [cn].[SourceLocation] AS 'ResourceGroupName',
         [cn2].[SourceLocation] AS 'SubscriptionId',
         [cn3].[ConnectionLocation] AS 'CuratedStorageName',
@@ -183,7 +183,7 @@ BEGIN
         @LoadAction AS 'LoadType',
         ds.LastLoadDate
     FROM 
-		[transform].[DatasetsLatestVersion] AS ds
+		[transform].[Datasets] AS ds
 	INNER JOIN
 		[transform].[Notebooks] AS n1
 	ON 

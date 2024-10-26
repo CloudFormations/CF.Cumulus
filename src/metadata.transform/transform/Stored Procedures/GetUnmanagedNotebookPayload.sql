@@ -11,7 +11,7 @@ BEGIN
     SELECT 
         @ResultRowCount = COUNT(*)
 	FROM 
-		[transform].[DatasetsLatestVersion] AS ds
+		[transform].[Datasets] AS ds
 	INNER JOIN
 		[transform].[Notebooks] AS n
 	ON 
@@ -72,7 +72,7 @@ BEGIN
         [ccn].[ComputeVersion],
         [ccn].[CountNodes],
         [ccn].[LinkedServiceName] AS 'ComputeLinkedServiceName',
-        [ccn].[AzureResourceName] AS 'ComputeResourceName',
+        [ccn].[ResourceName] AS 'ComputeResourceName',
         [cn].[SourceLocation] AS 'ResourceGroupName',
         [cn2].[SourceLocation] AS 'SubscriptionId',
         
@@ -89,7 +89,7 @@ BEGIN
         ds.SchemaName,
         n.NotebookPath AS 'NotebookFullPath'
     FROM 
-		[transform].[DatasetsLatestVersion] AS ds
+		[transform].[Datasets] AS ds
 	INNER JOIN
 		[transform].[Notebooks] AS n
 	ON 

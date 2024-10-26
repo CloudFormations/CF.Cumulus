@@ -7,9 +7,8 @@ CREATE TABLE [ingest].[ComputeConnections](
 	[ComputeSize] [nvarchar](200) NOT NULL,
 	[ComputeVersion] [nvarchar](100) NOT NULL,
 	[CountNodes] int NOT NULL,
-	[AzureResourceName] [nvarchar](100) NULL,
+	[ResourceName] [nvarchar](100) NULL,
 	[LinkedServiceName] [nvarchar](200) NOT NULL,
-	[IntegrationRuntimeName] [nvarchar](200) NOT NULL,
 	[EnvironmentName] [nvarchar](10) NULL,
 	[Enabled] [bit] NOT NULL
 PRIMARY KEY CLUSTERED 
