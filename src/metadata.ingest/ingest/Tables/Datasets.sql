@@ -16,8 +16,8 @@ CREATE TABLE [ingest].[Datasets](
 	[RawLastIncrementalLoadDate] [datetime2](7) NULL,
 	[CleansedPath] [nvarchar](100) NOT NULL,
 	[CleansedName] [nvarchar](100) NOT NULL,
-	[CleansedLastIncrementalLoadDate] [datetime2](7) NULL,
 	[CleansedLastFullLoadDate] [datetime2](7) NULL,
+	[CleansedLastIncrementalLoadDate] [datetime2](7) NULL,
 	[Enabled] [bit] NOT NULL
 	
 PRIMARY KEY CLUSTERED 
