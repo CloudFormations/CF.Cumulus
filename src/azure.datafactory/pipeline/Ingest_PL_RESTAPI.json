@@ -269,9 +269,6 @@
 													"value": "@variables('AuthorizationOutput')",
 													"type": "Expression"
 												}
-											},
-											"paginationRules": {
-												"supportRFC5988": "true"
 											}
 										},
 										"sink": {
@@ -329,10 +326,10 @@
 							]
 						},
 						{
-							"value": "RESTAPI_REST_AnonAuth_RFC",
+							"value": "RESTAPI_REST_AnonAuthRFC",
 							"activities": [
 								{
-									"name": "REST API REST AnonAuth Copy_copy1",
+									"name": "REST API REST AnonAuth RFC Copy",
 									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
@@ -414,14 +411,12 @@
 							]
 						},
 						{
-							"value": "RESTAPI_REST_AnonAuth_Headers",
+							"value": "RESTAPI_REST_AnonAuthHeaders",
 							"activities": [
 								{
 									"name": "REST API REST AnonAuth Pagination with HeadersCopy",
 									"description": "Note: Offset Param must equal limit value\ne.g. ?limit=100&offset={offset}\nThen offset = 100 as well.",
 									"type": "Copy",
-									"state": "Inactive",
-									"onInactiveMarkAs": "Succeeded",
 									"dependsOn": [],
 									"policy": {
 										"timeout": "0.12:00:00",
@@ -479,10 +474,10 @@
 											"referenceName": "Ingest_DS_DataLake_JSON",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSStorageName": "cfcdemodevdlsuks01",
-												"DSContainerName": "raw",
-												"DSDirectoryName": "test",
-												"DSFileName": "test"
+												"DSStorageName": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+												"DSContainerName": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+												"DSDirectoryName": "@variables('DirectoryName')",
+												"DSFileName": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName"
 											}
 										}
 									]
@@ -944,7 +939,7 @@
 							"typeProperties": {
 								"variableName": "Pagination",
 								"value": {
-									"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Pagination",
+									"value": "@string(json(activity('Get Ingest Payload').output.firstRow.SourceQuery).Pagination)",
 									"type": "Expression"
 								}
 							}
