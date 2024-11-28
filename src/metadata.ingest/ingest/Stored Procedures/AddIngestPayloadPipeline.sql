@@ -2,7 +2,7 @@ CREATE PROCEDURE [ingest].[AddIngestPayloadPipeline] (
 	@StageName VARCHAR(25),
 	@PipelineName VARCHAR(50),
 	@DatasetDisplayName VARCHAR(50),
-	@OrchestratorId INT = 1
+	@OrchestratorName VARCHAR(50)
 ) AS
 DECLARE @StageId INT
 DECLARE @StageCount INT
@@ -10,18 +10,18 @@ DECLARE @StageCount INT
 -- defensive check stage exists
 SELECT 
 	@StageCount = COUNT(*)
-FROM [control].[stages]
+FROM [control].[Stages]
 WHERE StageName = @StageName
 
 IF @StageCount = 0
 BEGIN
     RAISERROR('No rows returned. Please review the Stage Details provided and confirm this is enabled.',16,1)
-    RETURN 0;
+	RETURN 0;
 END
 IF @StageCount > 1
 BEGIN
     RAISERROR('Multiple rows returned. Please review the Stage Details provided.',16,1)
-    RETURN 0;
+	RETURN 0;
 END
 
 
@@ -35,21 +35,18 @@ DECLARE @DatasetCount INT
 
 SELECT @DatasetCount = COUNT(*)
 FROM [ingest].[Datasets] AS ds
-INNER JOIN [ingest].[Connections] AS cs
-ON ds.ConnectionFK = cs.ConnectionId
 WHERE ds.Enabled = 1
-AND cs.Enabled = 1
 AND ds.DatasetDisplayName = @DatasetDisplayName
 
 IF @DatasetCount = 0
 BEGIN
     RAISERROR('No rows returned. Please review the Dataset Id provided and confirm this is enabled.',16,1)
-    RETURN 0;
+	RETURN 0;
 END
 IF @DatasetCount > 1
 BEGIN
     RAISERROR('More than 1 row returned. Please review there is 1 active Dataset for the provided Dataset Id, and the connection details.',16,1)
-    RETURN 0;
+	RETURN 0;
 END
 
 -- Store all dataset ids associated with DatasetDisplayName
@@ -75,6 +72,19 @@ WHERE pp.parametervalue IN (SELECT CAST(datasetid AS VARCHAR(5))  FROM @Datasets
 AND pp.ParameterName = 'DatasetId'
 AND p.PipelineName = @PipelineName
 
+DECLARE @OrchestratorId INT
+
+SELECT @OrchestratorId = OrchestratorId
+FROM [control].[Orchestrators]
+WHERE OrchestratorName = @OrchestratorName
+
+IF @OrchestratorId IS NULL
+BEGIN
+	DECLARE @OrchestratorErrorMsg VARCHAR(150)
+	SET @OrchestratorErrorMsg = 'No Orchestrator Registered to the name ' + @OrchestratorName + '. Please confirm the correct Data Factory name is provided, and exists within this environment.'
+	RAISERROR(@OrchestratorErrorMsg, 16,1)
+	RETURN 0;
+END
 
 DECLARE @Enabled INT = 1
 
@@ -120,5 +130,9 @@ WHEN NOT MATCHED THEN
     VALUES (sourceParams.PipelineId, 'DatasetId', sourceParams.ParameterValue, sourceParams.ParameterValueLastUsed)
 WHEN MATCHED THEN
     UPDATE SET targetParams.ParameterValue = sourceParams.ParameterValue;
+
+
+
+
 GO
 
