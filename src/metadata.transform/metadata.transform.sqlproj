@@ -63,23 +63,20 @@
     <Folder Include="transform\Stored Procedures" />
     <Folder Include="transform\Tables" />
     <Folder Include="transform\Views" />
+    <Folder Include="Synonyms" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Security\transform.sql" />
     <Build Include="transform\Tables\Notebooks.sql" />
     <Build Include="transform\Tables\NotebookTypes.sql" />
-    <Build Include="transform\Tables\Connections.sql" />
-    <Build Include="transform\Tables\ConnectionTypes.sql" />
-    <None Include="Scripts\DefaultConnectionTypes.sql" />
-    <Build Include="transform\Stored Procedures\AddConnectionType.sql" />
-    <Build Include="transform\Views\Datasets.sql" />
-    <Build Include="transform\Tables\ComputeConnections.sql" />
     <None Include="Security\db_cumulususer.sql" />
     <Build Include="transform\Tables\Datasets.sql" />
     <Build Include="transform\Tables\Attributes.sql" />
     <Build Include="transform\Stored Procedures\GetNotebookPayload.sql" />
     <Build Include="transform\Stored Procedures\SetTransformLoadStatus.sql" />
     <Build Include="transform\Stored Procedures\GetUnmanagedNotebookPayload.sql" />
+    <Build Include="Synonyms\ComputeConnections.sql" />
+    <Build Include="Synonyms\Connections.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />

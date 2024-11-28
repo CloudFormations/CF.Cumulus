@@ -1,4 +1,4 @@
-CREATE TABLE [transform].[ComputeConnections](
+CREATE TABLE [common].[ComputeConnections](
 	[ComputeConnectionId] [int] IDENTITY(1,1) NOT NULL,
 	[ConnectionTypeFK] [int] NOT NULL,
 	[ConnectionDisplayName] [nvarchar](50) NOT NULL,
@@ -9,6 +9,7 @@ CREATE TABLE [transform].[ComputeConnections](
 	[CountNodes] int NOT NULL,
 	[ResourceName] [nvarchar](100) NULL,
 	[LinkedServiceName] [nvarchar](200) NOT NULL,
+	[EnvironmentName] [nvarchar](10) NULL,
 	[Enabled] [bit] NOT NULL
 PRIMARY KEY CLUSTERED 
 (
@@ -17,15 +18,15 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [transform].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [FK__Connectio__Conne__361213C5] FOREIGN KEY([ConnectionTypeFK])
-REFERENCES [transform].[ConnectionTypes] ([ConnectionTypeId])
+ALTER TABLE [common].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [FK__Connectio__Conne__361223C6] FOREIGN KEY([ConnectionTypeFK])
+REFERENCES [common].[ConnectionTypes] ([ConnectionTypeId])
 GO
 
-ALTER TABLE [transform].[ComputeConnections] CHECK CONSTRAINT [FK__Connectio__Conne__361213C5]
+ALTER TABLE [common].[ComputeConnections] CHECK CONSTRAINT [FK__Connectio__Conne__361223C6]
 GO
 
-ALTER TABLE [transform].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [chkComputeConnectionDisplayNameNoSpaces] CHECK  ((NOT [ConnectionDisplayName] like '% %'))
+ALTER TABLE [common].[ComputeConnections]  WITH CHECK ADD  CONSTRAINT [chkComputeConnectionDisplayNameNoSpaces] CHECK  ((NOT [ConnectionDisplayName] like '% %'))
 GO
 
-ALTER TABLE [transform].[ComputeConnections] CHECK CONSTRAINT [chkComputeConnectionDisplayNameNoSpaces]
+ALTER TABLE [common].[ComputeConnections] CHECK CONSTRAINT [chkComputeConnectionDisplayNameNoSpaces]
 GO
