@@ -33,6 +33,7 @@ GO
 ALTER TABLE [ingest].[Datasets] CHECK CONSTRAINT [chkDatasetDisplayNameNoSpaces]
 GO
 
+/*
 ALTER TABLE[ingest].[Datasets]  WITH CHECK ADD FOREIGN KEY([MergeComputeConnectionFK])
 REFERENCES [ingest].[ComputeConnections] ([ComputeConnectionId])
 GO
@@ -40,3 +41,4 @@ GO
 ALTER TABLE[ingest].[Datasets]  WITH CHECK ADD FOREIGN KEY([ConnectionFK])
 REFERENCES [ingest].[Connections] ([ConnectionId])
 GO
+*/

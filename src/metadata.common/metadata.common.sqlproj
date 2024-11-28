@@ -3,16 +3,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>metadata.ingest</Name>
+    <Name>metadata.common</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{882d4321-8587-45d2-8db3-a88efb3fcb7a}</ProjectGuid>
+    <ProjectGuid>{dc651660-66ad-4c01-8b25-0b86b98ca405}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>metadata.ingest</RootNamespace>
-    <AssemblyName>metadata.ingest</AssemblyName>
+    <RootNamespace>metadata.common</RootNamespace>
+    <AssemblyName>metadata.common</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
@@ -22,7 +22,7 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
-    <DefaultSchema>cumulus.ingest</DefaultSchema>
+    <DefaultSchema>cumulus.common</DefaultSchema>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -57,33 +57,20 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="Security" />
-    <Folder Include="ingest" />
-    <Folder Include="ingest\Tables" />
-    <Folder Include="ingest\Views" />
-    <Folder Include="ingest\Stored Procedures" />
+    <Folder Include="common" />
     <Folder Include="Scripts" />
-    <Folder Include="ingest\Functions" />
-    <Folder Include="ingest\Synonyms" />
+    <Folder Include="Security" />
+    <Folder Include="common\Stored Procedures" />
+    <Folder Include="common\Tables" />
+    <Folder Include="common\Views" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="ingest\Tables\Attributes.sql" />
-    <Build Include="ingest\Tables\Datasets.sql" />
-    <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
-    <Build Include="ingest\Stored Procedures\GetMergePayload.sql" />
-    <Build Include="ingest\Stored Procedures\SetIngestLoadStatus.sql" />
-    <Build Include="ingest\Functions\GetIngestLoadAction.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Build>
-    <Build Include="Scripts\DynamicsGetAttributeMetadata.sql" />
-    <Build Include="Scripts\OracleGetAttributeMetadata.sql" />
-    <Build Include="Scripts\SqlGetAttributeMetadata.sql" />
-    <Build Include="ingest\Stored Procedures\AddIngestPayloadPipeline.sql" />
-    <Build Include="Security\db_cumulususer.sql" />
-    <Build Include="Security\ingest.sql" />
-    <Build Include="ingest\Stored Procedures\AddIngestPayloadPipelineDependencies.sql" />
-    <Build Include="ingest\Synonyms\Connections.sql" />
-    <Build Include="ingest\Synonyms\ComputeConnections.sql" />
+    <Build Include="common\Stored Procedures\AddConnectionType.sql" />
+    <Build Include="common\Tables\ComputeConnections.sql" />
+    <Build Include="common\Tables\Connections.sql" />
+    <Build Include="common\Tables\ConnectionTypes.sql" />
+    <Build Include="Security\common.sql" />
+    <None Include="Scripts\DefaultConnectionTypes.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />

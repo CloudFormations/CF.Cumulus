@@ -1,4 +1,4 @@
-CREATE TABLE [ingest].[Connections](
+CREATE TABLE [common].[Connections](
 	[ConnectionId] [int] IDENTITY(1,1) NOT NULL,
 	[ConnectionTypeFK] [int] NOT NULL,
 	[ConnectionDisplayName] [nvarchar](50) NOT NULL,
@@ -17,15 +17,15 @@ PRIMARY KEY CLUSTERED
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [ingest].[Connections]  WITH CHECK ADD  CONSTRAINT [FK__Connectio__Conne__361203C5] FOREIGN KEY([ConnectionTypeFK])
-REFERENCES [ingest].[ConnectionTypes] ([ConnectionTypeId])
+ALTER TABLE [common].[Connections]  WITH CHECK ADD  CONSTRAINT [FK__Connectio__Conne__361203C5] FOREIGN KEY([ConnectionTypeFK])
+REFERENCES [common].[ConnectionTypes] ([ConnectionTypeId])
 GO
 
-ALTER TABLE [ingest].[Connections] CHECK CONSTRAINT [FK__Connectio__Conne__361203C5]
+ALTER TABLE [common].[Connections] CHECK CONSTRAINT [FK__Connectio__Conne__361203C5]
 GO
 
-ALTER TABLE [ingest].[Connections]  WITH CHECK ADD  CONSTRAINT [chkConnectionDisplayNameNoSpaces] CHECK  ((NOT [ConnectionDisplayName] like '% %'))
+ALTER TABLE [common].[Connections]  WITH CHECK ADD  CONSTRAINT [chkConnectionDisplayNameNoSpaces] CHECK  ((NOT [ConnectionDisplayName] like '% %'))
 GO
 
-ALTER TABLE [ingest].[Connections] CHECK CONSTRAINT [chkConnectionDisplayNameNoSpaces]
+ALTER TABLE [common].[Connections] CHECK CONSTRAINT [chkConnectionDisplayNameNoSpaces]
 GO

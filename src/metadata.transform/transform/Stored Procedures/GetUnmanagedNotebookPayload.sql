@@ -21,23 +21,23 @@ BEGIN
 	ON 
 		n.NotebookTypeFK = nt.NotebookTypeId
 	INNER JOIN 
-		[transform].[ComputeConnections] AS ccn
+		[common].[ComputeConnections] AS ccn
 	ON
 		ds.ComputeConnectionFK = ccn.ComputeConnectionId
 	INNER JOIN
-		[transform].[Connections] AS cn
+		[common].[Connections] AS cn
 	ON 
 		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
 	INNER JOIN
-		[transform].[Connections] AS cn2
+		[common].[Connections] AS cn2
 	ON 
 		cn2.ConnectionDisplayName = 'PrimarySubscription'
 	INNER JOIN
-		[transform].[Connections] AS cn3
+		[common].[Connections] AS cn3
 	ON 
 		cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
 	INNER JOIN
-		[transform].[Connections] AS cn4
+		[common].[Connections] AS cn4
 	ON 
 		cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
 	WHERE
@@ -99,23 +99,23 @@ BEGIN
 	ON 
 		n.NotebookTypeFK = nt.NotebookTypeId
 	INNER JOIN 
-		[transform].[ComputeConnections] AS ccn
+		[common].[ComputeConnections] AS ccn
 	ON
 		ds.ComputeConnectionFK = ccn.ComputeConnectionId
 	INNER JOIN
-		[transform].[Connections] AS cn
+		[common].[Connections] AS cn
 	ON 
 		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
 	INNER JOIN
-		[transform].[Connections] AS cn2
+		[common].[Connections] AS cn2
 	ON 
 		cn2.ConnectionDisplayName = 'PrimarySubscription'
 	INNER JOIN
-		[transform].[Connections] AS cn3
+		[common].[Connections] AS cn3
 	ON 
 		cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
 	INNER JOIN
-		[transform].[Connections] AS cn4
+		[common].[Connections] AS cn4
 	ON 
 		cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
 	WHERE

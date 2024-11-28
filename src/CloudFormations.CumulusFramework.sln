@@ -42,9 +42,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "integrationRuntime", "integ
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "linkedService", "linkedService", "{6859A9D9-8F80-47A8-B688-FECA79DF0923}"
 	ProjectSection(SolutionItems) = preProject
-		azure.datafactory\linkedService\cumuluskeys.json = azure.datafactory\linkedService\cumuluskeys.json
 		azure.datafactory\linkedService\Common_LS_cumulusdatabase.json = azure.datafactory\linkedService\Common_LS_cumulusdatabase.json
 		azure.datafactory\linkedService\Common_LS_cumulusfunctions.json = azure.datafactory\linkedService\Common_LS_cumulusfunctions.json
+		azure.datafactory\linkedService\cumuluskeys.json = azure.datafactory\linkedService\cumuluskeys.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "pipelines", "pipelines", "{D3E5B580-301B-4B04-BDA3-7A17FB0B494C}"
@@ -72,6 +72,8 @@ EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "metadata.helpers", "metadata.helpers\metadata.helpers.sqlproj", "{80410129-BB8B-4387-AF73-297F98D7B583}"
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "framework.reporting", "framework.reporting\framework.reporting.sqlproj", "{3BAA9710-A73D-4B19-85A7-5D55A3E089B9}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "metadata.common", "metadata.common\metadata.common.sqlproj", "{DC651660-66AD-4C01-8B25-0B86B98CA405}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -123,6 +125,12 @@ Global
 		{3BAA9710-A73D-4B19-85A7-5D55A3E089B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BAA9710-A73D-4B19-85A7-5D55A3E089B9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3BAA9710-A73D-4B19-85A7-5D55A3E089B9}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,23 +21,23 @@ BEGIN
 	ON 
 		n2.NotebookId = ds.BusinessLogicNotebookFK
 	INNER JOIN 
-		[transform].[ComputeConnections] AS ccn
+		[common].[ComputeConnections] AS ccn
 	ON
 		ds.ComputeConnectionFK = ccn.ComputeConnectionId
 	INNER JOIN
-		[transform].[Connections] AS cn
+		[common].[Connections] AS cn
 	ON 
 		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
 	INNER JOIN
-		[transform].[Connections] AS cn2
+		[common].[Connections] AS cn2
 	ON 
 		cn2.ConnectionDisplayName = 'PrimarySubscription'
 	INNER JOIN
-		[transform].[Connections] AS cn3
+		[common].[Connections] AS cn3
 	ON 
 		cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
 	INNER JOIN
-		[transform].[Connections] AS cn4
+		[common].[Connections] AS cn4
 	ON 
 		cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
 	WHERE
@@ -72,7 +72,7 @@ BEGIN
     FROM 
         [transform].[Datasets] AS ds
     INNER JOIN 
-        transform.Attributes AS att
+        [transform].[Attributes] AS att
     ON 
         att.DatasetFK = ds.DatasetId
     WHERE
@@ -87,7 +87,7 @@ BEGIN
     FROM 
         [transform].[Datasets] AS ds
     INNER JOIN 
-        transform.Attributes AS att
+        [transform].[Attributes] AS att
     ON 
         att.DatasetFK = ds.DatasetId
     WHERE
@@ -108,7 +108,7 @@ BEGIN
     FROM 
         [transform].[Datasets] AS ds
     INNER JOIN 
-        transform.Attributes AS att
+        [transform].[Attributes] AS att
     ON 
         att.DatasetFK = ds.DatasetId
     WHERE
@@ -124,7 +124,7 @@ BEGIN
     FROM 
         [transform].[Datasets] AS ds
     INNER JOIN 
-        transform.Attributes AS att
+        [transform].[Attributes] AS att
     ON 
         att.DatasetFK = ds.DatasetId
     WHERE
@@ -193,23 +193,23 @@ BEGIN
 	ON 
 		n2.NotebookId = ds.BusinessLogicNotebookFK
 	INNER JOIN 
-		[transform].[ComputeConnections] AS ccn
+		[common].[ComputeConnections] AS ccn
 	ON
 		ds.ComputeConnectionFK = ccn.ComputeConnectionId
 	INNER JOIN
-		[transform].[Connections] AS cn
+		[common].[Connections] AS cn
 	ON 
 		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
 	INNER JOIN
-		[transform].[Connections] AS cn2
+		[common].[Connections] AS cn2
 	ON 
 		cn2.ConnectionDisplayName = 'PrimarySubscription'
 	INNER JOIN
-		[transform].[Connections] AS cn3
+		[common].[Connections] AS cn3
 	ON 
 		cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
 	INNER JOIN
-		[transform].[Connections] AS cn4
+		[common].[Connections] AS cn4
 	ON 
 		cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
 	WHERE

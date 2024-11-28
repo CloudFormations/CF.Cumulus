@@ -1,4 +1,4 @@
-CREATE TABLE [ingest].[ConnectionTypes](
+CREATE TABLE [common].[ConnectionTypes](
 	[ConnectionTypeId] [int] IDENTITY(1,1) NOT NULL,
 	[SourceLanguageType] [varchar](5) NULL,
 	[ConnectionTypeDisplayName] [nvarchar](50) NOT NULL,
