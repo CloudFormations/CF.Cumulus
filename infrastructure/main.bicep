@@ -13,7 +13,7 @@ param location string = 'uksouth'
 param envName string
 param domainName string = 'cfc'
 param orgName string = 'debug'
-param uniqueIdentifier string = '01'
+param uniqueIdentifier string = '02'
 param datalakeName string = 'dls' //Storage account name prefix
 param functionBlobName string = 'st' //Function app storage name prefix
 
@@ -31,6 +31,8 @@ param deployADBWorkspace bool = true
 param deployADBCluster bool = false // Controls ADB Cluster creation - TODO
 param deployPAT bool = false // - TODO
 param setRoleAssignments bool = false
+
+
 
 // Mapping of Azure regions to short codes for naming conventions
 var locationShortCodes = {
@@ -63,6 +65,38 @@ var rgName = '${namePrefix}rg${nameSuffix}'
 
 //var databaseName string = 'Metadata' //SQL Database name
 var databaseName = '${namePrefix}sqldb${nameSuffix}' //SQL Database name
+
+// Network configuration based on environment
+// Placeholder variables for now.
+var networkConfig = {
+  dev: {
+    vnetAddressPrefix: '0.0.0.0/22'
+    subnetPrefixes: {
+      privateSubnetCIDR: '0.0.0.0/24'
+      publicSubnetCIDR: '0.0.0.0/24'
+      serviceEndpoint: '0.0.0.0/24'
+      privateEndpoint: '0.0.0.0/24'
+    }
+  }
+  tst: {
+    vnetAddressPrefix: '0.0.0.0/22'
+    subnetPrefixes: {
+      privateSubnetCIDR: '0.0.0.0/24'
+      publicSubnetCIDR: '0.0.0.0/24'
+      serviceEndpoint: '0.0.0.0/24'
+      privateEndpoint: '0.0.0.0/24'
+    }
+  }
+  prd: {
+    vnetAddressPrefix: '0.0.0.0/22'
+    subnetPrefixes: {
+      privateSubnetCIDR: '0.0.0.0/24'
+      publicSubnetCIDR: '0.0.0.0/24'
+      serviceEndpoint: '0.0.0.0/24'
+      privateEndpoint: '0.0.0.0/24'
+    }
+  }
+}
 
 
 // Do we need to register Microsoft.AlertsManagement provider?
@@ -188,6 +222,7 @@ module networkingDeploy './modules/networking.template.bicep' = if (deployNetwor
     namePrefix: namePrefix
     nameSuffix: nameSuffix
     environment: envName
+    networkConfig: networkConfig
   }
   dependsOn: [
     keyVaultDeploy

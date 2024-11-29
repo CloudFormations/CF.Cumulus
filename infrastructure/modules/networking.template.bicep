@@ -5,6 +5,8 @@ param namePrefix string
 param nameSuffix string
 param environment string
 
+param networkConfig object
+
 
 // Names for Databricks-specific resources
 var names = {
@@ -19,37 +21,7 @@ var names = {
 }
 
 
-// Network configuration based on environment
-// Placeholder variables for now.
-var networkConfig = {
-  dev: {
-    vnetAddressPrefix: '0.0.0.0/22'
-    subnetPrefixes: {
-      privateSubnetCIDR: '0.0.0.0/24'
-      publicSubnetCIDR: '0.0.0.0/24'
-      serviceEndpoint: '0.0.0.0/24'
-      privateEndpoint: '0.0.0.0/24'
-    }
-  }
-  tst: {
-    vnetAddressPrefix: '0.0.0.0/22'
-    subnetPrefixes: {
-      privateSubnetCIDR: '0.0.0.0/24'
-      publicSubnetCIDR: '0.0.0.0/24'
-      serviceEndpoint: '0.0.0.0/24'
-      privateEndpoint: '0.0.0.0/24'
-    }
-  }
-  prd: {
-    vnetAddressPrefix: '0.0.0.0/22'
-    subnetPrefixes: {
-      privateSubnetCIDR: '0.0.0.0/24'
-      publicSubnetCIDR: '0.0.0.0/24'
-      serviceEndpoint: '0.0.0.0/24'
-      privateEndpoint: '0.0.0.0/24'
-    }
-  }
-}
+
 
 // Select network configuration based on environment
 var selectedNetworkConfig = networkConfig[environment]
