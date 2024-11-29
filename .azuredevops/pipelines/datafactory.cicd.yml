@@ -86,7 +86,7 @@ stages:
     dependsOn: ApprovalCheckDeployToTestWorkers
     condition: succeeded()
     steps:
-    - template: datafactory.deploy.yml
+    - template: datafactory.deploy.yaml
       parameters:
         AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
         DataFactoryName: "${{ variables.DataFactoryNameWorkers }}"

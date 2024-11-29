@@ -60,14 +60,8 @@ stages:
             - job: BicepDeploy_${{ pair.key }}
               displayName: 'Bicep Deployment to ${{ upper(pair.key) }} Environment'
               dependsOn: BicepPreview_${{ pair.key }}
-              # dependsOn: ManualValidation_${{ pair.key }}
               condition: >
-                and(succeeded(),
-                  or(
-                    ne('${{ pair.key }}', 'prod'), 
-                    and(eq('${{ pair.key }}', 'prod'), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-                  )
-                )
+                succeeded()
               steps:
                 - task: AzureCLI@2
                   displayName: 'Azure CLI for Bicep Deployment'
