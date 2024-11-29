@@ -1,17 +1,23 @@
+// Input parameters for resource naming and location
 param location string = resourceGroup().location
-
 param namePrefix string 
 param nameSuffix string 
 param nameFactory string
 param nameStorage string
+param statusADB bool
+param statusFunction bool
 
+// Construct the Data Factory name using prefix, factory name, and suffix
 var name = '${namePrefix}${nameFactory}${nameSuffix}'
 
+// Reference to existing Data Factory resource
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
   name: name
 }
 
-resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (nameFactory == 'factory') {
+// Assign Data Factory Contributor role to the Data Factory's managed identity
+// Only created if nameFactory is 'factory' or 'adf'
+resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (nameFactory == 'factory' || nameFactory == 'adf') {
   name: guid(dataFactory.id, dataFactory.id, 'Contributor')
   scope: dataFactory
   properties: {
@@ -20,10 +26,12 @@ resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
   }
 }
 
+// Reference to existing Key Vault resource
 resource keyVault  'Microsoft.KeyVault/vaults@2019-09-01' existing = {
   name: '${namePrefix}kv${nameSuffix}'
 }
 
+// Assign Key Vault Secrets User role to allow Data Factory to access secrets
 resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(dataFactory.id, keyVault.id, 'Reader')
   scope: keyVault
@@ -33,10 +41,12 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
   }
 }
 
+// Reference to existing SQL Server resource
 resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' existing = {
-  name: '${namePrefix}sqldb${nameSuffix}'
+  name: '${namePrefix}sql${nameSuffix}'
 }
 
+// Assign Reader role to Data Factory for SQL Server access
 resource sqlRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(dataFactory.id, sqlServer.id, 'Reader')
   scope: sqlServer
@@ -46,11 +56,13 @@ resource sqlRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
   }
 }
 
-resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' existing = {
+// Reference to existing Databricks workspace
+resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' existing = if (statusADB ) {
   name: '${namePrefix}dbw${nameSuffix}'
 }
 
-resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+// Assign Contributor role to Data Factory for Databricks workspace access
+resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (statusADB ) {
   name: guid(dataFactory.id, databricks.id, 'Contributor')
   scope: databricks
   properties: {
@@ -59,11 +71,13 @@ resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-
   }
 }
 
-resource functionApp 'Microsoft.Web/sites@2023-12-01' existing = {
+//Reference to existing Function App
+resource functionApp 'Microsoft.Web/sites@2023-12-01' existing = if (statusFunction) {
   name: '${namePrefix}func${nameSuffix}'
 }
 
-resource functionAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+// Assign Contributor role to Data Factory for Function App access
+resource functionAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' =  if (statusFunction) {
   name: guid(dataFactory.id, functionApp.id, 'Contributor')
   scope: functionApp
   properties: {
@@ -72,10 +86,12 @@ resource functionAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
   }
 }
 
+// Reference to existing Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
   name: '${namePrefix}${nameStorage}${nameSuffix}'
 }
 
+// Assign Storage Blob Data Contributor role to Data Factory for storage access
 resource storageAccountRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(dataFactory.id, storageAccount.id, 'StorageBlobDataContributor')
   scope: storageAccount
@@ -85,7 +101,7 @@ resource storageAccountRoleAssignment 'Microsoft.Authorization/roleAssignments@2
   }
 }
 
-
+// Output important resource information
 output location string = location
 output name string = dataFactory.name
 output resourceGroupName string = resourceGroup().name

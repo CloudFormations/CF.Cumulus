@@ -9,5 +9,3 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
---load default metadata
-:r .\DefaultConnectionTypes.sql

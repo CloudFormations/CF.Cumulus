@@ -5,17 +5,10 @@ param nameSuffix string
 param nameFactory string
 param envName string
 
+param logAnalyticsWorkspaceId string
 
 var name = '${namePrefix}${nameFactory}${nameSuffix}'
-// var repoConfig = {
-//   accountName: 'cfsource'
-//   collaborationBranch: 'main'
-//   projectName: 'CF.Cumulus'
-//   repositoryName: 'CF.Cumulus'
-//   rootFolder: '/src/azure.datafactory'
-//   type: 'FactoryVSTSConfiguration'
-//   tenantId: subscription().tenantId
-// }
+
 var repoConfig = {
   accountName: 'cfsource'
   repositoryName: 'CF.Cumulus'
@@ -46,3 +39,32 @@ output location string = location
 output name string = dataFactory.name
 output resourceGroupName string = resourceGroup().name
 output resourceId string = dataFactory.id
+
+resource dataFactoryDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  scope: dataFactory
+  name: 'logs-${dataFactory.name}'
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logAnalyticsDestinationType: 'Dedicated'
+    logs: [
+      {
+        category: 'ActivityRuns'
+        enabled: true
+      }
+      {
+        category: 'PipelineRuns'
+        enabled: true
+      }
+      {
+        category: 'TriggerRuns'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+  }
+}

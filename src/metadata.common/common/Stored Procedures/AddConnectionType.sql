@@ -1,5 +1,5 @@
 
-CREATE PROCEDURE [transform].[AddConnectionType]
+CREATE PROCEDURE [common].[AddConnectionType]
 	(
 	@ConnectionTypeDisplayName NVARCHAR(128),
     @SourceLanguageType NVARCHAR(5),
@@ -7,7 +7,7 @@ CREATE PROCEDURE [transform].[AddConnectionType]
 	)
 AS
 BEGIN
-	MERGE INTO  [transform].[ConnectionTypes] AS target
+	MERGE INTO  [common].[ConnectionTypes] AS target
 		USING 
 			(SELECT
 				@ConnectionTypeDisplayName AS ConnectionTypeDisplayName

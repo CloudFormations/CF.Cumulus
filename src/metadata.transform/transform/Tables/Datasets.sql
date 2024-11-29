@@ -18,9 +18,11 @@ PRIMARY KEY CLUSTERED
 )WITH (STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
+/*
 ALTER TABLE [transform].[Datasets]  WITH CHECK ADD FOREIGN KEY([ComputeConnectionFK])
-REFERENCES [transform].[ComputeConnections] ([ComputeConnectionId])
+REFERENCES [common].[ComputeConnections] ([ComputeConnectionId])
 GO
+*/
 ALTER TABLE [transform].[Datasets]  WITH CHECK ADD FOREIGN KEY([CreateNotebookFK])
 REFERENCES [transform].[Notebooks] ([NotebookId])
 GO

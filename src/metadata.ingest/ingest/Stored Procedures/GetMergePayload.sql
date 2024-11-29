@@ -13,11 +13,11 @@ BEGIN
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 
-        ingest.Connections AS cn
+        [common].Connections AS cn
     ON  
         ds.ConnectionFK = cn.ConnectionId
     INNER JOIN 
-        ingest.ComputeConnections AS cn2
+        [common].ComputeConnections AS cn2
     ON 
         ds.MergeComputeConnectionFK = cn2.ComputeConnectionId
     INNER JOIN
@@ -25,15 +25,15 @@ BEGIN
     ON 
         cn3.ConnectionDisplayName = 'PrimaryResourceGroup'
     INNER JOIN
-        ingest.Connections AS cn4
+        [common].Connections AS cn4
     ON 
         cn4.ConnectionDisplayName = 'PrimarySubscription'
     INNER JOIN
-        ingest.Connections AS cn5
+        [common].Connections AS cn5
     ON 
         cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation = 'raw'
     INNER JOIN
-        ingest.Connections AS cn6
+        [common].Connections AS cn6
     ON 
         cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
 
@@ -182,17 +182,17 @@ BEGIN
         [cn].[ConnectionDisplayName] AS 'RawSchemaName',
         [cn2].[ConnectionLocation] AS 'ComputeWorkspaceURL',
         [cn2].[ComputeLocation] AS 'ComputeClusterId',
-    [cn2].[ComputeSize] AS 'ComputeSize',
-    [cn2].[ComputeVersion] AS 'ComputeVersion',
-    [cn2].[CountNodes] AS 'CountNodes',
+        [cn2].[ComputeSize] AS 'ComputeSize',
+        [cn2].[ComputeVersion] AS 'ComputeVersion',
+        [cn2].[CountNodes] AS 'CountNodes',
         [cn2].[LinkedServiceName] AS 'ComputeLinkedServiceName',
         [cn2].[ResourceName] AS 'ComputeResourceName',
         [cn3].[SourceLocation] AS 'ResourceGroupName',
         [cn4].[SourceLocation] AS 'SubscriptionId',
         [cn5].[ConnectionLocation] AS 'RawStorageName',
-    [cn5].[SourceLocation] AS 'RawContainerName',
+        [cn5].[SourceLocation] AS 'RawContainerName',
         [cn6].[ConnectionLocation] AS 'CleansedStorageName',
-    [cn6].[SourceLocation] AS 'CleansedContainerName',
+        [cn6].[SourceLocation] AS 'CleansedContainerName',
         [cn5].[Username] AS 'RawStorageAccessKey',
         [cn6].[Username] AS 'CleansedStorageAccessKey',
 
@@ -203,7 +203,7 @@ BEGIN
         [cn].[ConnectionDisplayName] AS 'CleansedSchemaName',
         ds.CleansedName AS 'CleansedTableName',
         ds.Enabled,
-    ds.LoadType,
+        ds.LoadType,
         @LoadAction AS 'LoadAction',
         @RawLastLoadDate AS 'RawLastLoadDate',
         @CleansedLastLoadDate AS 'CleansedLastLoadDate',
@@ -216,27 +216,27 @@ BEGIN
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 
-        ingest.Connections AS cn
+        [common].Connections AS cn
     ON  
         ds.ConnectionFK = cn.ConnectionId
     INNER JOIN 
-        ingest.ComputeConnections AS cn2
+        [common].ComputeConnections AS cn2
     ON 
         ds.MergeComputeConnectionFK = cn2.ComputeConnectionId
     INNER JOIN
-        ingest.Connections AS cn3
+        [common].Connections AS cn3
     ON 
         cn3.ConnectionDisplayName = 'PrimaryResourceGroup'
     INNER JOIN
-        ingest.Connections AS cn4
+        [common].Connections AS cn4
     ON 
         cn4.ConnectionDisplayName = 'PrimarySubscription'
     INNER JOIN
-        ingest.Connections AS cn5
+        [common].Connections AS cn5
     ON 
         cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation = 'raw'
     INNER JOIN
-        ingest.Connections AS cn6
+        [common].Connections AS cn6
     ON 
         cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
     WHERE

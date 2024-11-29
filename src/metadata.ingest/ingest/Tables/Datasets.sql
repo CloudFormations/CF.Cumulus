@@ -16,8 +16,8 @@ CREATE TABLE [ingest].[Datasets](
 	[RawLastIncrementalLoadDate] [datetime2](7) NULL,
 	[CleansedPath] [nvarchar](100) NOT NULL,
 	[CleansedName] [nvarchar](100) NOT NULL,
-	[CleansedLastIncrementalLoadDate] [datetime2](7) NULL,
 	[CleansedLastFullLoadDate] [datetime2](7) NULL,
+	[CleansedLastIncrementalLoadDate] [datetime2](7) NULL,
 	[Enabled] [bit] NOT NULL
 	
 PRIMARY KEY CLUSTERED 
@@ -33,6 +33,7 @@ GO
 ALTER TABLE [ingest].[Datasets] CHECK CONSTRAINT [chkDatasetDisplayNameNoSpaces]
 GO
 
+/*
 ALTER TABLE[ingest].[Datasets]  WITH CHECK ADD FOREIGN KEY([MergeComputeConnectionFK])
 REFERENCES [ingest].[ComputeConnections] ([ComputeConnectionId])
 GO
@@ -40,3 +41,4 @@ GO
 ALTER TABLE[ingest].[Datasets]  WITH CHECK ADD FOREIGN KEY([ConnectionFK])
 REFERENCES [ingest].[Connections] ([ConnectionId])
 GO
+*/

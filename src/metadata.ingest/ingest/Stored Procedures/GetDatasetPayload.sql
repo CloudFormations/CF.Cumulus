@@ -12,11 +12,11 @@ BEGIN
         @ResultRowCount = COUNT(*)
     FROM
     [ingest].[Datasets] ds
-    INNER JOIN [ingest].[Connections] cn1
+    INNER JOIN [common].[Connections] cn1
         ON ds.[ConnectionFK] = cn1.[ConnectionId]
-    INNER JOIN [ingest].[Connections] cn2
+    INNER JOIN [common].[Connections] cn2
         ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] = 'raw'
-    INNER JOIN [ingest].[Connections] cn3
+    INNER JOIN [common].[Connections] cn3
         ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
     WHERE
     ds.[DatasetId] = @DatasetId
@@ -48,8 +48,8 @@ BEGIN
 
     SELECT 
         @SourceLanguageType = ct.[SourceLanguageType]
-    FROM [ingest].[ConnectionTypes] AS ct
-    INNER JOIN [ingest].[Connections] AS cn
+    FROM [common].[ConnectionTypes] AS ct
+    INNER JOIN [common].[Connections] AS cn
         ON ct.ConnectionTypeId = cn.ConnectionTypeFK
     INNER JOIN [ingest].[Datasets] AS ds
         ON cn.ConnectionId = ds.ConnectionFK
@@ -107,6 +107,31 @@ BEGIN
 
     SELECT 
             @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + UPPER(ds.[SourcePath]) + '.' + UPPER(ds.[SourceName])
+        FROM 
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1    
+    END
+
+    ELSE IF @SourceLanguageType = 'SOQL'
+    BEGIN
+    SELECT
+    @SourceQuery += ',' + [AttributeName]
+    FROM
+    [ingest].[Datasets] AS ds
+        INNER JOIN [ingest].[Attributes] AS at
+            ON ds.[DatasetId] = at.[DatasetFK]
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+    AND 
+    at.Enabled = 1
+
+    SELECT 
+            @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + UPPER(ds.[SourceName])
         FROM 
             [ingest].[Datasets] AS ds
         WHERE
@@ -186,7 +211,7 @@ BEGIN
             @SourceQuery = cn.SourceLocation + '/' + ds.SourcePath
         FROM 
             [ingest].[Datasets] AS ds
-        INNER JOIN [ingest].[Connections] AS cn
+        INNER JOIN [common].[Connections] AS cn
             ON ds.ConnectionFK = cn.ConnectionId
         WHERE
             ds.DatasetId = @DatasetId
@@ -251,11 +276,11 @@ BEGIN
     --'SELECT * FROM ' + QUOTENAME(ds.[SourcePath]) + '.' + QUOTENAME(ds.[SourceName]) AS 'SourceQuery'
     FROM
     [ingest].[Datasets] ds
-    INNER JOIN [ingest].[Connections] cn1
+    INNER JOIN [common].[Connections] cn1
     ON ds.[ConnectionFK] = cn1.[ConnectionId]
-    INNER JOIN [ingest].[Connections] cn2
+    INNER JOIN [common].[Connections] cn2
     ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] = 'raw'
-    INNER JOIN [ingest].[Connections] cn3
+    INNER JOIN [common].[Connections] cn3
     ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
     WHERE
     [DatasetId] = @DatasetId
