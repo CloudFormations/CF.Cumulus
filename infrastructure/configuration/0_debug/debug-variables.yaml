@@ -1,0 +1,14 @@
+# DEV Pipeline Variables
+
+variables: 
+- name: BuildDataFactoryName
+  value: cfcdemodevfactoryuks01
+
+- name: BuildDataFactoryResourceGroupName
+  value: cfcdemodevrguks01
+
+- name: ADFArtifactName # Data Factory artifact name created during the adf-build.yml job template
+  value: ADFArtifact
+
+- name: WorkingDirectory
+  value: "$(Build.Repository.LocalPath)/src/azure.datafactory" # Predefined Azure Pipeline variable that specifies the beginning of the checked out code

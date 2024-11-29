@@ -64,7 +64,7 @@ stages:
 # DEPLOY TO Test Workers
 - stage: DeployToTestWorkers
   dependsOn: BuildDEVDataFactory
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables['DeployWorkers'], 'true'))
   displayName: "Deploy To Test Workers"
   
   variables:
@@ -86,7 +86,7 @@ stages:
     dependsOn: ApprovalCheckDeployToTestWorkers
     condition: succeeded()
     steps:
-    - template: datafactory.deploy.yml
+    - template: datafactory.deploy.yaml
       parameters:
         AzureResourceManagerConnection: "${{ variables.AzureResourceManagerConnection }}"
         DataFactoryName: "${{ variables.DataFactoryNameWorkers }}"
@@ -134,7 +134,7 @@ stages:
 # DEPLOY TO Prod Workers
 - stage: DeployToProdWorkers
   dependsOn: BuildDEVDataFactory
-  condition: succeeded()
+  condition: and(succeeded(), eq(variables['DeployWorkers'], 'true'))
   displayName: "Deploy To Prod Workers"
   
   variables:
@@ -165,4 +165,3 @@ stages:
         ResourceGroupLocation: "${{ variables.ResourceGroupLocation }}"
         ADFArtifactName: "${{ variables.ADFArtifactName }}"
         Environment: "${{ variables.Environment }}"
-

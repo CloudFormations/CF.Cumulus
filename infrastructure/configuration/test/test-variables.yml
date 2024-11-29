@@ -29,3 +29,6 @@ variables:
 
 - name: Environment
   value: TEST
+
+- name: DeployWorkers
+  value: "true"
