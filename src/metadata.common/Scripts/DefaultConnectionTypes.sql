@@ -20,6 +20,16 @@
 		@Enabled = 0;
 
 	EXEC [common].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Azure Synapse',
+		@SourceLanguageType = 'NA',
+		@Enabled = 0;
+
+	EXEC [common].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Fabric',
+		@SourceLanguageType = 'NA',
+		@Enabled = 0;
+
+	EXEC [common].[AddConnectionType] 
 		@ConnectionTypeDisplayName = N'Azure SQL Database', 
 		@SourceLanguageType = 'T-SQL',
 		@Enabled = 1;
@@ -65,11 +75,6 @@
 		@Enabled = 1;
 
 	EXEC [common].[AddConnectionType] 
-		@ConnectionTypeDisplayName = N'Azure Synapse',
-		@SourceLanguageType = 'NA',
-		@Enabled = 0;
-
-	EXEC [common].[AddConnectionType] 
-		@ConnectionTypeDisplayName = N'Fabric',
-		@SourceLanguageType = 'NA',
-		@Enabled = 0;
+		@ConnectionTypeDisplayName = N'Salesforce',
+		@SourceLanguageType = 'SOQL',
+		@Enabled = 1;
