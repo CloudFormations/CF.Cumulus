@@ -12,8 +12,8 @@ targetScope = 'subscription'
 param location string = 'uksouth'
 param envName string
 param domainName string = 'cfc'
-param orgName string = 'debug'
-param uniqueIdentifier string = '02'
+param orgName string = 'demo'
+param uniqueIdentifier string = '01'
 param datalakeName string = 'dls' //Storage account name prefix
 param functionBlobName string = 'st' //Function app storage name prefix
 
@@ -23,14 +23,14 @@ param deploymentTimestamp string = utcNow('yy-MM-dd-HHmm')
 param firstDeployment bool = true
 param deployADF bool = true
 param deployWorkers bool = false
-param deployVM bool = false
+param deployVM bool = true
 param deploySQL bool = true
 param deployFunction bool = true
 param deployNetworking bool = true
 param deployADBWorkspace bool = true
 param deployADBCluster bool = false // Controls ADB Cluster creation - TODO
 param deployPAT bool = false // - TODO
-param setRoleAssignments bool = false
+param setRoleAssignments bool = true
 
 
 
