@@ -1,13 +1,23 @@
-CREATE PROCEDURE [ingest].[AddIngestPayloadPipeline] (
+CREATE PROCEDURE [common].[AddIngestOrTransformPayloadPipeline] (
+	@ComponentName VARCHAR(25),
 	@StageName VARCHAR(25),
 	@PipelineName VARCHAR(50),
 	@DatasetDisplayName VARCHAR(50),
 	@OrchestratorName VARCHAR(50)
 ) AS
+
+
+-- defensive check component in ('Ingest', 'Transform')
+IF @ComponentName NOT IN ('Ingest', 'Transform')
+BEGIN
+    RAISERROR('This Functionality may only be used for adding Datasets from either Ingest or Transform schemas to the Control Pipeline. If you require different functionality to be added to control.pipelines, please proceed with a manual INSERT statement.',16,1)
+	RETURN 0;
+END
+
+-- defensive check stage exists
 DECLARE @StageId INT
 DECLARE @StageCount INT
 
--- defensive check stage exists
 SELECT 
 	@StageCount = COUNT(*)
 FROM [control].[Stages]
@@ -33,10 +43,21 @@ WHERE StageName = @StageName
 -- defensive checks only 1 dataset id returned
 DECLARE @DatasetCount INT
 
-SELECT @DatasetCount = COUNT(*)
-FROM [ingest].[Datasets] AS ds
-WHERE ds.Enabled = 1
-AND ds.DatasetDisplayName = @DatasetDisplayName
+IF @ComponentName = 'Ingest'
+BEGIN
+	SELECT @DatasetCount = COUNT(*)
+	FROM [ingest].[Datasets] AS ids
+	WHERE ids.Enabled = 1
+	AND ids.DatasetDisplayName = @DatasetDisplayName
+END
+
+IF @ComponentName = 'Transform'
+BEGIN
+	SELECT @DatasetCount = COUNT(*)
+	FROM [transform].[Datasets] AS tds
+	WHERE tds.Enabled = 1
+	AND tds.DatasetName = @DatasetDisplayName
+END
 
 IF @DatasetCount = 0
 BEGIN
@@ -56,11 +77,23 @@ DECLARE @Datasets TABLE (
 )
 
 
-INSERT INTO @Datasets
-SELECT 
-    DatasetId, Enabled
-FROM [ingest].[Datasets]
-WHERE DatasetDisplayName = @DatasetDisplayName
+IF @ComponentName = 'Ingest'
+BEGIN
+	INSERT INTO @Datasets
+	SELECT 
+		DatasetId, Enabled
+	FROM [ingest].[Datasets]
+	WHERE DatasetDisplayName = @DatasetDisplayName
+END
+
+IF @ComponentName = 'Transform'
+BEGIN
+	INSERT INTO @Datasets
+	SELECT 
+		DatasetId, Enabled
+	FROM [transform].[Datasets]
+	WHERE DatasetName = @DatasetDisplayName
+END
 
 DECLARE @PipelineId INT
 
@@ -81,7 +114,7 @@ WHERE OrchestratorName = @OrchestratorName
 IF @OrchestratorId IS NULL
 BEGIN
 	DECLARE @OrchestratorErrorMsg VARCHAR(150)
-	SET @OrchestratorErrorMsg = 'No Orchestrator Registered to the name ' + @OrchestratorName + '. Please confirm the correct Data Factory name is provided, and exists within this environment.'
+	SET @OrchestratorErrorMsg = 'No Orchestrator registered to the name ' + @OrchestratorName + '. Please confirm the correct Data Factory name is provided, and exists within this environment.'
 	RAISERROR(@OrchestratorErrorMsg, 16,1)
 	RETURN 0;
 END
