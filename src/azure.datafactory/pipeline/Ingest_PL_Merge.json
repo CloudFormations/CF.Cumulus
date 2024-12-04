@@ -56,12 +56,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@activity('Get Merge Payload').output.firstRow.ComputeLinkedServiceName",
+						"value": "@replace(activity('Get Merge Payload').output.firstRow.ComputeLinkedServiceName,'Ingest_LS_','')",
 						"type": "Expression"
 					},
 					"cases": [
 						{
-							"value": "Ingest_LS_Databricks_Cluster_MIAuth",
+							"value": "Databricks_Cluster_MIAuth",
 							"activities": [
 								{
 									"name": "Check Payload Validity Small Databricks Compute",
@@ -76,7 +76,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/CheckPayloadExecution",
+										"notebookPath": "/Workspace/Shared/Live/ingest/ingestpayload/CheckPayloadExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",
@@ -139,7 +139,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/IngestExecution",
+										"notebookPath": "/Workspace/Shared/Live/ingest/ingestpayload/IngestExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",
@@ -185,7 +185,7 @@
 							]
 						},
 						{
-							"value": "Ingest_LS_Databricks_JobCluster_MIAuth",
+							"value": "Databricks_JobCluster_MIAuth",
 							"activities": [
 								{
 									"name": "Check Payload Validity Small Databricks Compute Job",
@@ -200,7 +200,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/CheckPayloadExecution",
+										"notebookPath": "/Workspace/Shared/Live/ingest/ingestpayload/CheckPayloadExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",
@@ -272,7 +272,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/ingest/ingestpayload/IngestExecution",
+										"notebookPath": "/Workspace/Shared/Live/ingest/ingestpayload/IngestExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",

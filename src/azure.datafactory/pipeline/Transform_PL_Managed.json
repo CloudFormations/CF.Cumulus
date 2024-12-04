@@ -56,12 +56,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@activity('Get Notebook Payload').output.firstRow.ComputeLinkedServiceName",
+						"value": "@replace(activity('Get Notebook Payload').output.firstRow.ComputeLinkedServiceName,'Transform_LS_','')",
 						"type": "Expression"
 					},
 					"cases": [
 						{
-							"value": "Transform_LS_Databricks_Cluster_MIAuth",
+							"value": "Databricks_Cluster_MIAuth",
 							"activities": [
 								{
 									"name": "Create Table",
@@ -151,7 +151,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/TransformExecution",
+										"notebookPath": "/Workspace/Shared/Live/transform/TransformExecution",
 										"baseParameters": {
 											"Notebook Payload": {
 												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
@@ -208,7 +208,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/CheckPayloadExecution",
+										"notebookPath": "/Workspace/Shared/Live/transform/CheckPayloadExecution",
 										"baseParameters": {
 											"Notebook Payload": {
 												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
@@ -254,7 +254,7 @@
 							]
 						},
 						{
-							"value": "Transform_LS_Databricks_JobCluster_MIAuth",
+							"value": "Databricks_JobCluster_MIAuth",
 							"activities": [
 								{
 									"name": "Create Table - Job Cluster",
@@ -353,7 +353,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/TransformExecution",
+										"notebookPath": "/Workspace/Shared/Live/transform/TransformExecution",
 										"baseParameters": {
 											"Notebook Payload": {
 												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
@@ -419,7 +419,10 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Repos/matthew.collins@cloudformations.org/CF.Cumulus/src/azure.databricks/python/notebooks/transform/CheckPayloadExecution",
+										"notebookPath": {
+											"value": "/Workspace/Shared/Live/transform/CheckPayloadExecution",
+											"type": "Expression"
+										},
 										"baseParameters": {
 											"Notebook Payload": {
 												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
