@@ -93,12 +93,6 @@ checkSurrogateKey(surrogateKey=surrogateKey)
 
 # COMMAND ----------
 
-sizeInBytes = spark.sql("describe detail dimensions.worddictionary").select("sizeInBytes").collect()[0][0]
-partitionByThreshold = (1024**4) # 1TB
-compareDeltaTableSizeVsPartitionThreshold(sizeInBytes, partitionByThreshold)
-
-# COMMAND ----------
-
 checkEmptyPartitionByFields(partitionList)
 
 # COMMAND ----------

@@ -56,12 +56,12 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeLinkedServiceName",
+						"value": "@replace(activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeLinkedServiceName,'Transform_LS_','')",
 						"type": "Expression"
 					},
 					"cases": [
 						{
-							"value": "Transform_LS_Databricks_Cluster_MIAuth",
+							"value": "Databricks_Cluster_MIAuth",
 							"activities": [
 								{
 									"name": "Unmanaged Notebook - Interactive Cluster",
@@ -125,7 +125,7 @@
 							]
 						},
 						{
-							"value": "Transform_LS_Databricks_JobCluster_MIAuth",
+							"value": "Databricks_JobCluster_MIAuth",
 							"activities": [
 								{
 									"name": "Unmanaged Notebook - Job Cluster",
