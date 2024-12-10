@@ -4,7 +4,7 @@ trigger:
 - none
 variables:
   - name:  SqlProjects
-    value: metadata.control, metadata.ingest, metadata.transform
+    value: metadata.common, metadata.control, metadata.ingest, metadata.transform
 
 stages:
   - stage: BuildAndPublish
