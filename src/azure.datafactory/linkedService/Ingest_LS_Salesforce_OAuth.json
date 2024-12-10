@@ -13,7 +13,7 @@
         "annotations": [],
         "type": "SalesforceV2",
         "typeProperties": {
-            "environmentUrl": "https://syncron--preprod.sandbox.my.salesforce.com/",
+            "environmentUrl": "",
             "clientId": "@{linkedService().LSClientId}",
             "clientSecret": {
                 "type": "AzureKeyVaultSecret",
