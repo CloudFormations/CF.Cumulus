@@ -463,7 +463,7 @@
 											"parameters": {
 												"BaseURL": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 												"RelativeURL": {
-													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
 													"type": "Expression"
 												}
 											}
