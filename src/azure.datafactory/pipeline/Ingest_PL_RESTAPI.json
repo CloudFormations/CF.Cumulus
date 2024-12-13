@@ -1045,6 +1045,9 @@
 			},
 			"PaginationLogic": {
 				"type": "String"
+			},
+			"refresh": {
+				"type": "String"
 			}
 		},
 		"folder": {
