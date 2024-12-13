@@ -28,6 +28,10 @@
 		},
 		"annotations": [],
 		"type": "AzureSqlTable",
-		"schema": []
+		"schema": [],
+		"typeProperties": {
+			"schema": "ingest",
+			"table": "apirequestlogging"
+		}
 	}
 }

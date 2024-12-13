@@ -505,8 +505,6 @@
 			{
 				"name": "Update Metadata Load Status",
 				"type": "SqlServerStoredProcedure",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
 				"dependsOn": [
 					{
 						"activity": "REST API Auth Type",
