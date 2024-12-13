@@ -3,11 +3,8 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "REST API REST AnonAuth Pagination with HeadersCopy",
-				"description": "Note: Offset Param must equal limit value\ne.g. ?limit=100&offset={offset}\nThen offset = 100 as well.",
-				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
+				"name": "Web1",
+				"type": "WebActivity",
 				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
@@ -18,76 +15,30 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "RestSource",
-						"httpRequestTimeout": "00:01:40",
-						"requestInterval": "00.00:00:00.010",
-						"requestMethod": "GET",
-						"additionalHeaders": {
-							"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkNTgxZGI5Yi1kMjRkLTQxMjItYjYyOC1lMTYyYWZjNzEwMTMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQxMiIsImh0dHA6Ly93d3cuYXNwbmV0Ym9pbGVycGxhdGUuY29tL2lkZW50aXR5L2NsYWltcy90ZW5hbnRJZCI6IjQwIiwibmJmIjoxNzM0MDI0MDYxLCJleHAiOjE3MzQwMjQ2NjEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3QiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0In0.B5QPRUfacXyAKelVBhh42gy7OInSYYrIk2P0gIsCKi0"
-						},
-						"paginationRules": {
-							"QueryParameters.{offset}": {
-								"value": "RANGE:0:$.totalPages:1",
-								"type": "Expression"
-							}
-						}
+					"method": "POST",
+					"headers": {
+						"Content-Type": "application/json"
 					},
-					"sink": {
-						"type": "JsonSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "JsonWriteSettings"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "Ingest_DS_REST",
-						"type": "DatasetReference",
-						"parameters": {
-							"BaseURL": {
-								"value": "https://nhg-template.integrator.plus/dataApi/v1/assets",
-								"type": "Expression"
-							},
-							"RelativeURL": "details/paged-list/{offset}/500"
-						}
+					"url": "https://nhg-data-trial.integrator.plus/dataApi/v1/auth/refreshIdentityToken",
+					"body": {
+						"identityToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlMzU3ZjUxNC1mZTg0LTRmNjYtYmZhYi05OTk4YzBmNTkyYzMiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQxMiIsImh0dHA6Ly93d3cuYXNwbmV0Ym9pbGVycGxhdGUuY29tL2lkZW50aXR5L2NsYWltcy90ZW5hbnRJZCI6IjQwIiwibmJmIjoxNzM0MTE0NjcyLCJleHAiOjE3MzQxMTUyNzIsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3QiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0In0.YaBCXyul7BMB5pysXtgZNMI2emgsiW3gKgDyJB5zNl0",
+						"identityTokenExpires": "2024-12-13T18:41:12.7497399Z",
+						"refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkYzU3N2JlNi1jMmNhLTRiYTktYjhiNS1lOTJjNGJkYmYyNTYiLCJuYmYiOjE3MzQxMTQ2NzIsImV4cCI6MTc0OTgzOTQ3MiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdCIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3QifQ.zBmYt6L1QmFc6qkpPugjx-CIaU_b2L0MukezncJ_bCg",
+						"refreshTokenExpires": "2025-06-13T18:31:12.7497399Z"
 					}
-				],
-				"outputs": [
-					{
-						"referenceName": "Ingest_DS_DataLake_JSON",
-						"type": "DatasetReference",
-						"parameters": {
-							"DSStorageName": {
-								"value": "cfcdemodevdlsuks01",
-								"type": "Expression"
-							},
-							"DSContainerName": {
-								"value": "raw",
-								"type": "Expression"
-							},
-							"DSDirectoryName": {
-								"value": "apitest",
-								"type": "Expression"
-							},
-							"DSFileName": {
-								"value": "filename",
-								"type": "Expression"
-							}
-						}
-					}
-				]
+				}
 			},
 			{
-				"name": "REST API HTTP AnonAuth Copy",
-				"type": "Copy",
-				"state": "Inactive",
-				"onInactiveMarkAs": "Succeeded",
-				"dependsOn": [],
+				"name": "Stored procedure1",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Web1",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -97,118 +48,28 @@
 				},
 				"userProperties": [],
 				"typeProperties": {
-					"source": {
-						"type": "JsonSource",
-						"storeSettings": {
-							"type": "HttpReadSettings",
-							"requestMethod": "POST",
-							"additionalHeaders": "Content-Type: application/json",
-							"requestBody": "{\n    \"identityToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmZDFmOTdhZS1jYzBiLTQ1MGItOTFkNC0yZTkyNzZmODExYzUiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQxMiIsImh0dHA6Ly93d3cuYXNwbmV0Ym9pbGVycGxhdGUuY29tL2lkZW50aXR5L2NsYWltcy90ZW5hbnRJZCI6IjQwIiwibmJmIjoxNzM0MTA5MDAxLCJleHAiOjE3MzQxMDk2MDEsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3QiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0In0.6cBvijwldsswgTWO2zfilet9Uxs9LwgTptWn8Up8cF4\",\n    \"identityTokenExpires\": \"2024-12-13T17:06:41.1886516Z\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5NjkzNTU5Yi00YjIwLTQwMTgtYjY0NC1hOWU5MjZmOWVhYzEiLCJuYmYiOjE3MzQxMDkwMDEsImV4cCI6MTc0OTgzMzgwMSwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdCIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3QifQ.QZdxCBFRhHKl9x4Pts6JOjJ4hldmXuADeJ1C1jAOwmU\",\n    \"refreshTokenExpires\": \"2025-06-13T16:56:41.1886516Z\"\n}",
-							"requestTimeout": ""
-						},
-						"formatSettings": {
-							"type": "JsonReadSettings"
-						}
-					},
-					"sink": {
-						"type": "JsonSink",
-						"storeSettings": {
-							"type": "AzureBlobFSWriteSettings"
-						},
-						"formatSettings": {
-							"type": "JsonWriteSettings"
-						}
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "Ingest_DS_JSON_HTTP_AnonAuth",
-						"type": "DatasetReference",
-						"parameters": {
-							"RelativeURL": "v1/auth/refreshIdentityToken",
-							"BaseURL": "https://nhg-data-trial.integrator.plus/dataApi"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "Ingest_DS_DataLake_JSON",
-						"type": "DatasetReference",
-						"parameters": {
-							"DSStorageName": {
-								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+					"storedProcedureName": "ingest.writeapirequestlogs",
+					"storedProcedureParameters": {
+						"Input": {
+							"value": {
+								"value": "@string(activity('Web1').output)",
 								"type": "Expression"
 							},
-							"DSContainerName": {
-								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
-								"type": "Expression"
-							},
-							"DSDirectoryName": {
-								"value": "@variables('DirectoryName')",
-								"type": "Expression"
-							},
-							"DSFileName": {
-								"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
-								"type": "Expression"
-							}
+							"type": "String"
 						}
 					}
-				]
-			},
-			{
-				"name": "REST API REST AnonAuth RFC Copy",
-				"type": "Copy",
-				"dependsOn": [],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": false,
-					"secureInput": false
 				},
-				"userProperties": [],
-				"typeProperties": {
-					"source": {
-						"type": "RestSource",
-						"httpRequestTimeout": "00:01:40",
-						"requestInterval": "00.00:00:00.010",
-						"requestMethod": "POST",
-						"requestBody": "{\n    \"identityToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5MzBiODE1Ni1lYTA3LTQxYTQtOWViYi03ZDcxZjRlM2JlM2YiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQxMiIsImh0dHA6Ly93d3cuYXNwbmV0Ym9pbGVycGxhdGUuY29tL2lkZW50aXR5L2NsYWltcy90ZW5hbnRJZCI6IjQwIiwibmJmIjoxNzM0MTEwNjY4LCJleHAiOjE3MzQxMTEyNjgsImlzcyI6Imh0dHA6Ly9sb2NhbGhvc3QiLCJhdWQiOiJodHRwOi8vbG9jYWxob3N0In0.qXH0KY9FkUDHzoe3-4ePm9mMLDNkEKpjvvSnGXmCOL4\",\n    \"identityTokenExpires\": \"2024-12-13T17:06:41.1886516Z\",\n    \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJjN2QwNzc2OC1hMDZlLTRhOTctYTI5Ni0xY2ZiOTQ1ZGNkNjMiLCJuYmYiOjE3MzQxMTA2NjgsImV4cCI6MTc0OTgzNTQ2OCwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdCIsImF1ZCI6Imh0dHA6Ly9sb2NhbGhvc3QifQ._SQa90QYNVkTrfxPg0Bt4EzQRP6beEJCgK6FYuF6sPM\",\n    \"refreshTokenExpires\": \"2025-06-13T16:56:41.1886516Z\"\n}",
-						"additionalHeaders": {
-							"Content-Type": "application/json"
-						}
-					},
-					"sink": {
-						"type": "AzureSqlSink",
-						"writeBehavior": "insert",
-						"sqlWriterUseTableLock": false,
-						"disableMetricsCollection": false
-					},
-					"enableStaging": false
-				},
-				"inputs": [
-					{
-						"referenceName": "Ingest_DS_REST",
-						"type": "DatasetReference",
-						"parameters": {
-							"BaseURL": "https://nhg-data-trial.integrator.plus/dataApi",
-							"RelativeURL": "v1/auth/refreshIdentityToken"
-						}
-					}
-				],
-				"outputs": [
-					{
-						"referenceName": "Ingest_DS_SQLDB_MIAuth",
-						"type": "DatasetReference",
-						"parameters": {
-							"DSHostname": "cfcdemodevsqldbuks01.database.windows.net",
-							"DSDatabaseName": "metadata-db"
-						}
-					}
-				]
+				"linkedServiceName": {
+					"referenceName": "Common_LS_cumulusdatabase",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
+		"variables": {
+			"refresh": {
+				"type": "String"
+			}
+		},
 		"annotations": []
 	}
 }
