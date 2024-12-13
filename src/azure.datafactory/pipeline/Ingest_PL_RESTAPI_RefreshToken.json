@@ -1068,7 +1068,7 @@
 									"typeProperties": {
 										"variableName": "AuthorizationOutput",
 										"value": {
-											"value": "@activity('Lookup latest Refresh and Identity Tokens').output.firstRow.IdentityToken",
+											"value": "@concat('Bearer ',activity('Lookup latest Refresh and Identity Tokens').output.firstRow.IdentityToken)",
 											"type": "Expression"
 										}
 									}
