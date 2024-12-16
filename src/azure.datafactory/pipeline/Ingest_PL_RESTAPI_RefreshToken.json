@@ -1,5 +1,5 @@
 {
-	"name": "Ingest_PL_RESTAPI",
+	"name": "Ingest_PL_RESTAPI_RefreshToken",
 	"properties": {
 		"activities": [
 			{
@@ -145,7 +145,7 @@
 						]
 					},
 					{
-						"activity": "If Authorization Required",
+						"activity": "Switch Authorization Type",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -557,115 +557,6 @@
 				}
 			},
 			{
-				"name": "If Authorization Required",
-				"type": "IfCondition",
-				"dependsOn": [
-					{
-						"activity": "Validate Authorization Exists in Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Validate Headers Exist in Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Validate Request Body Exists in Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Validate API Parameters Exist in Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					},
-					{
-						"activity": "Validate Pagination Exists in Payload",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"expression": {
-						"value": "@not(equals(variables('Authorization'),''))",
-						"type": "Expression"
-					},
-					"ifFalseActivities": [
-						{
-							"name": "Set Authorization Output 2",
-							"type": "SetVariable",
-							"dependsOn": [],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "AuthorizationOutput",
-								"value": " "
-							}
-						}
-					],
-					"ifTrueActivities": [
-						{
-							"name": "Fetch Bearer Token",
-							"type": "WebActivity",
-							"dependsOn": [],
-							"policy": {
-								"timeout": "0.12:00:00",
-								"retry": 0,
-								"retryIntervalInSeconds": 30,
-								"secureOutput": true,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"method": "GET",
-								"url": {
-									"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
-									"type": "Expression"
-								},
-								"authentication": {
-									"type": "MSI",
-									"resource": "https://vault.azure.net"
-								}
-							}
-						},
-						{
-							"name": "Set Authorization Output",
-							"type": "SetVariable",
-							"dependsOn": [
-								{
-									"activity": "Fetch Bearer Token",
-									"dependencyConditions": [
-										"Succeeded"
-									]
-								}
-							],
-							"policy": {
-								"secureOutput": false,
-								"secureInput": false
-							},
-							"userProperties": [],
-							"typeProperties": {
-								"variableName": "AuthorizationOutput",
-								"value": {
-									"value": "@activity('Fetch Bearer Token').output.value",
-									"type": "Expression"
-								}
-							}
-						}
-					]
-				}
-			},
-			{
 				"name": "Validate Authorization Exists in Payload",
 				"type": "IfCondition",
 				"dependsOn": [
@@ -988,6 +879,212 @@
 									"value": "@if(equals(variables('Pagination'),''),'',json(variables('Pagination')).Logic)",
 									"type": "Expression"
 								}
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Switch Authorization Type",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Validate Authorization Exists in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Validate Headers Exist in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Validate Request Body Exists in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Validate API Parameters Exist in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Validate Pagination Exists in Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@variables('Authorization')",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": " ",
+							"activities": [
+								{
+									"name": "Set Authorization Output 2_copy1",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "AuthorizationOutput",
+										"value": " "
+									}
+								}
+							]
+						},
+						{
+							"value": "POPULATE_TOKEN",
+							"activities": [
+								{
+									"name": "Fetch Bearer Token_copy1",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "Set Authorization Output_copy1",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Fetch Bearer Token_copy1",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "AuthorizationOutput",
+										"value": {
+											"value": "@activity('Fetch Bearer Token_copy1').output.value",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"value": "POPULATE_TOKEN_REFRESH_LOGIC",
+							"activities": [
+								{
+									"name": "Execute RefreshToken Pipeline",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "RefreshToken",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true
+									}
+								},
+								{
+									"name": "Lookup latest Refresh and Identity Tokens",
+									"type": "Lookup",
+									"dependsOn": [
+										{
+											"activity": "Execute RefreshToken Pipeline",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"sqlReaderStoredProcedureName": "ingest.getlatestrefreshtoken",
+											"queryTimeout": "02:00:00",
+											"partitionOption": "None"
+										},
+										"dataset": {
+											"referenceName": "GetSetMetadata",
+											"type": "DatasetReference"
+										}
+									}
+								},
+								{
+									"name": "Set IdentityToken",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Lookup latest Refresh and Identity Tokens",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "AuthorizationOutput",
+										"value": {
+											"value": "@concat('Bearer ',activity('Lookup latest Refresh and Identity Tokens').output.firstRow.IdentityToken)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Fail1",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Generic",
+								"errorCode": "16"
 							}
 						}
 					]
