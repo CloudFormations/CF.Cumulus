@@ -292,7 +292,7 @@
 													"type": "Expression"
 												},
 												"RelativeURL": {
-													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
 													"type": "Expression"
 												}
 											}
@@ -377,7 +377,7 @@
 													"type": "Expression"
 												},
 												"RelativeURL": {
-													"value": "@concat('/',activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.SourcePath,'/',activity('Get Ingest Payload').output.firstRow.SourceName,variables('ParametersStringComplete'))",
 													"type": "Expression"
 												}
 											}
@@ -852,7 +852,7 @@
 							"typeProperties": {
 								"variableName": "PaginationType",
 								"value": {
-									"value": "@if(equals(variables('Pagination'),''),'',json(variables('Pagination')).Type)",
+									"value": "@if(equals(variables('Pagination'),'{}'),'',json(variables('Pagination')).Type)",
 									"type": "Expression"
 								}
 							}
@@ -876,7 +876,7 @@
 							"typeProperties": {
 								"variableName": "PaginationLogic",
 								"value": {
-									"value": "@if(equals(variables('Pagination'),''),'',json(variables('Pagination')).Logic)",
+									"value": "@if(equals(variables('Pagination'),'{}'),'',json(variables('Pagination')).Logic)",
 									"type": "Expression"
 								}
 							}
