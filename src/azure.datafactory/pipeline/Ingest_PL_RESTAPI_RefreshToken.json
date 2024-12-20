@@ -1014,7 +1014,13 @@
 											"referenceName": "RefreshToken",
 											"type": "PipelineReference"
 										},
-										"waitOnCompletion": true
+										"waitOnCompletion": true,
+										"parameters": {
+											"DatasetId": {
+												"value": "@pipeline().parameters.DatasetId",
+												"type": "Expression"
+											}
+										}
 									}
 								},
 								{
@@ -1040,6 +1046,15 @@
 										"source": {
 											"type": "AzureSqlSource",
 											"sqlReaderStoredProcedureName": "ingest.getlatestrefreshtoken",
+											"storedProcedureParameters": {
+												"DatasetId": {
+													"type": "Int32",
+													"value": {
+														"value": "@pipeline().parameters.DatasetId",
+														"type": "Expression"
+													}
+												}
+											},
 											"queryTimeout": "02:00:00",
 											"partitionOption": "None"
 										},
@@ -1144,6 +1159,9 @@
 				"type": "String"
 			},
 			"refresh": {
+				"type": "String"
+			},
+			"placeholder": {
 				"type": "String"
 			}
 		},
