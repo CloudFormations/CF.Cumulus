@@ -20,10 +20,6 @@
 		"type": "SqlServer",
 		"typeProperties": {
 			"connectionString": "Integrated Security=False;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
-		},
-		"connectVia": {
-			"referenceName": "datasourceVM02",
-			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
