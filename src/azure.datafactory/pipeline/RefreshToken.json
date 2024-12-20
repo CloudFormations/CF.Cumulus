@@ -3,80 +3,6 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "Refresh Tokens",
-				"type": "WebActivity",
-				"dependsOn": [
-					{
-						"activity": "Lookup Latest Refresh and Identity Tokens",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"method": "POST",
-					"headers": {
-						"Content-Type": "application/json"
-					},
-					"url": "https://nhg-data-trial.integrator.plus/dataApi/v1/auth/refreshIdentityToken",
-					"body": {
-						"value": "@json(string(activity('Lookup latest Refresh and Identity Tokens').output.firstRow))",
-						"type": "Expression"
-					}
-				}
-			},
-			{
-				"name": "Save New Tokens",
-				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "Refresh Tokens",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"policy": {
-					"timeout": "0.12:00:00",
-					"retry": 0,
-					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
-					"secureInput": true
-				},
-				"userProperties": [],
-				"typeProperties": {
-					"storedProcedureName": "[ingest].[SetLatestRefreshToken]",
-					"storedProcedureParameters": {
-						"DatasetId": {
-							"value": {
-								"value": "@pipeline().parameters.DatasetId",
-								"type": "Expression"
-							},
-							"type": "Int32"
-						},
-						"Input": {
-							"value": {
-								"value": "@string(activity('Refresh Tokens').output)",
-								"type": "Expression"
-							},
-							"type": "String"
-						}
-					}
-				},
-				"linkedServiceName": {
-					"referenceName": "Common_LS_cumulusdatabase",
-					"type": "LinkedServiceReference"
-				}
-			},
-			{
 				"name": "Lookup Latest Refresh and Identity Tokens",
 				"type": "Lookup",
 				"dependsOn": [],
@@ -84,7 +10,7 @@
 					"timeout": "0.12:00:00",
 					"retry": 0,
 					"retryIntervalInSeconds": 30,
-					"secureOutput": true,
+					"secureOutput": false,
 					"secureInput": false
 				},
 				"userProperties": [],
@@ -108,6 +34,94 @@
 						"referenceName": "GetSetMetadata",
 						"type": "DatasetReference"
 					}
+				}
+			},
+			{
+				"name": "If Current Bearer Token is Valid",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Lookup Latest Refresh and Identity Tokens",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(activity('Lookup Latest Refresh and Identity Tokens').output.firstRow.IdentityTokenExpiryDateTime,addMinutes(utcNow(), 3))",
+						"type": "Expression"
+					},
+					"ifFalseActivities": [
+						{
+							"name": "Refresh Tokens",
+							"type": "WebActivity",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"method": "POST",
+								"headers": {
+									"Content-Type": "application/json"
+								},
+								"url": "https://nhg-data-trial.integrator.plus/dataApi/v1/auth/refreshIdentityToken",
+								"body": {
+									"value": "@json(string(activity('Lookup latest Refresh and Identity Tokens').output.firstRow))",
+									"type": "Expression"
+								}
+							}
+						},
+						{
+							"name": "Save New Tokens",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Refresh Tokens",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": true,
+								"secureInput": true
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"storedProcedureName": "[ingest].[SetLatestRefreshToken]",
+								"storedProcedureParameters": {
+									"DatasetId": {
+										"value": {
+											"value": "@pipeline().parameters.DatasetId",
+											"type": "Expression"
+										},
+										"type": "Int32"
+									},
+									"Input": {
+										"value": {
+											"value": "@string(activity('Refresh Tokens').output)",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "Common_LS_cumulusdatabase",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
 				}
 			}
 		],
