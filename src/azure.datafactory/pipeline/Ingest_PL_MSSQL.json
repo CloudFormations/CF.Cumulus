@@ -265,7 +265,11 @@
 												"type": "ParquetWriteSettings"
 											}
 										},
-										"enableStaging": false
+										"enableStaging": false,
+										"translator": {
+											"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceDestMapping)",
+											"type": "Expression"
+										}
 									},
 									"inputs": [
 										{
@@ -431,12 +435,8 @@
 										},
 										"enableStaging": false,
 										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
+											"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceDestMapping)",
+											"type": "Expression"
 										}
 									},
 									"inputs": [
@@ -603,12 +603,8 @@
 										},
 										"enableStaging": false,
 										"translator": {
-											"type": "TabularTranslator",
-											"typeConversion": true,
-											"typeConversionSettings": {
-												"allowDataTruncation": true,
-												"treatBooleanAsNumber": false
-											}
+											"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceDestMapping)",
+											"type": "Expression"
 										}
 									},
 									"inputs": [

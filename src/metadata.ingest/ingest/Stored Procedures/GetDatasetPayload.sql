@@ -68,7 +68,7 @@ BEGIN
     IF @SourceLanguageType = 'T-SQL'
     BEGIN
     SELECT
-    @SourceQuery += ',' + [AttributeName]
+    @SourceQuery += ',[' + [AttributeName] + ']'
     FROM
     [ingest].[Datasets] AS ds
         INNER JOIN [ingest].[Attributes] AS at
@@ -260,6 +260,32 @@ BEGIN
     SET @SourceQuery = @SourceQuery + ';'
     END
 
+    -- Source to Destination Mapping
+    -- Construct source to destination "TabularTranslator" mapping object
+    DECLARE @SourceDestMapping NVARCHAR(MAX) = ''
+
+    SELECT
+    @SourceDestMapping += ',{"source":{"name":"' + at.[AttributeName] + '"},"sink":{"name":"' + ISNULL(at.[AttributeTargetName], at.[AttributeName]) + '"}}'
+    FROM
+    [ingest].[Datasets] AS ds
+        INNER JOIN [ingest].[Attributes] AS at
+            ON ds.[DatasetId] = at.[DatasetFK]
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+    AND 
+    at.Enabled = 1
+
+    SELECT 
+            @SourceDestMapping = '{"type":"TabularTranslator","mappings":[' + STUFF(@SourceDestMapping,1,1,'') + ']}'
+        FROM 
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId 
+        AND 
+            ds.[Enabled] = 1
+
     SELECT
     RIGHT('0000' + CAST(ds.[VersionNumber] AS VARCHAR),4) AS 'VersionNumber',
     ds.[SourceName],
@@ -271,8 +297,9 @@ BEGIN
     cn3.[ConnectionLocation] AS 'KeyVaultBaseURL',
 
     @SourceQuery AS 'SourceQuery',
-        @LoadType AS 'LoadType',
-        @LoadAction AS LoadAction
+    @SourceDestMapping AS 'SourceDestMapping',
+    @LoadType AS 'LoadType',
+    @LoadAction AS LoadAction
     --'SELECT * FROM ' + QUOTENAME(ds.[SourcePath]) + '.' + QUOTENAME(ds.[SourceName]) AS 'SourceQuery'
     FROM
     [ingest].[Datasets] ds

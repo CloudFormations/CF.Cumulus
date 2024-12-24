@@ -3,6 +3,7 @@ CREATE TABLE [ingest].[Attributes](
 	[DatasetFK] [int] NULL,
 	[AttributeName] [nvarchar](50) NOT NULL,
 	[AttributeSourceDataType] [nvarchar](50) NULL,
+	[AttributeTargetName] [nvarchar](50) NULL,
 	[AttributeTargetDataType] [nvarchar](50) NULL,
 	[AttributeTargetDataFormat] [varchar](100) NULL,
 	[AttributeDescription] [nvarchar](200) NULL,
