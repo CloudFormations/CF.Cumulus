@@ -52,16 +52,13 @@ def splitStringToList(listAsString:str) -> list:
 # COMMAND ----------
 
 def selectSqlExplodedOptionString(totalColumnList:list,totalColumnTypeList:list, totalColumnFormatList:list) -> list:
-    """
-    Format SQL statement for any lateral views required in exploded columns.
-    """
 
     totalColumnListLowercase = [x.lower() for x in totalColumnList]
     totalColumnTypeListLowercase = [x.lower() for x in totalColumnTypeList]
     totalColumnFormatListLowercase = [x.lower() for x in totalColumnFormatList]
 
     unstructuredFormat = [
-        f'lateral view explode({(_format.split(".")[0]).replace("explode:","")}) as {(_format.split(".")[0]).replace("explode:","")}_exploded' if ("explode:" in _format and "." in _format)
+        f'lateral view explode({_format.replace("explode:(","").split(")")[0]}) as {_format.replace("explode:(","").split(")")[0].split(".")[-1]}_exploded' if ("explode:" in _format)
         else f'lateral view explode({_format.replace("explode:","")}) as {_format.replace("explode:","")}_exploded' if ("explode:" in _format and not "." in _format)
         # else f"cast({str(col)} as {_type}) as {str(col)}"
         else ''
@@ -76,15 +73,11 @@ def selectSqlExplodedOptionString(totalColumnList:list,totalColumnTypeList:list,
     return unstructuredFormatStr
 
 def formatAttributeTargetDataFormatList(AttributeTargetDataFormat:list) -> list:
-    """
-    Extract exploded column formats.
-    """
 
     AttributeTargetDataFormatLowercase = [x.lower() for x in AttributeTargetDataFormat]
     
     formatAttributeTargetDataFormat = [
-        _str.replace("explode:","").replace('.','_exploded.') if ("explode:" in _str and "." in _str)
-        else f'{_str.replace("explode:","")}_exploded' if ("explode:" in _str and not "." in _str)
+        f'{_str.replace("explode:(","").split(")")[0].split(".")[-1]}_exploded{_str.replace("explode:(","").split(")")[1]}'if ("explode:" in _str)
         else ''
         for _str in AttributeTargetDataFormatLowercase]
 
