@@ -1,5 +1,5 @@
 {
-	"name": "Ingest_PL_RESTAPI_RefreshToken",
+	"name": "Ingest_PL_RESTAPI",
 	"properties": {
 		"activities": [
 			{
@@ -17,7 +17,7 @@
 				"typeProperties": {
 					"source": {
 						"type": "AzureSqlSource",
-						"sqlReaderStoredProcedureName": "ingest.GetAPIPayload",
+						"sqlReaderStoredProcedureName": "[ingest].[GetDatasetPayload]",
 						"storedProcedureParameters": {
 							"DatasetId": {
 								"type": "Int32",
