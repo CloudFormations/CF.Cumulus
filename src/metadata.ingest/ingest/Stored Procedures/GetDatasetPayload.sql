@@ -326,6 +326,7 @@ BEGIN
     SELECT
         RIGHT('0000' + CAST(ds.[VersionNumber] AS VARCHAR),4) AS 'VersionNumber',
         ds.[SourceName],
+		ds.[SourcePath],
         ds.[DatasetDisplayName],
         ds.[ExtensionType],
         cn1.*,
