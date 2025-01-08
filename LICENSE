@@ -1,4 +1,4 @@
-Modified MIT License
+This license is based on the MIT License but includes additional restrictions on redistribution and resale.
 
 Copyright (c) 2025, Cloud Formations, Cloud Formations Ltd (cloudformations.org)
 
@@ -14,6 +14,9 @@ copies or substantial portions of the Software.
 
 The software may not be sold, sublicensed, or distributed as part of any product 
 or service unless as part of a larger application with substantial added value.
+
+Substantial added value is defined as significant new functionality, features, 
+or integrations beyond the original scope of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
