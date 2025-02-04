@@ -1,0 +1,32 @@
+{
+	"name": "Ingest_DS_REST",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_REST_AnonAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"BaseURL": {
+					"value": "@dataset().BaseURL",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"BaseURL": {
+				"type": "string"
+			},
+			"RelativeURL": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": {
+				"value": "@dataset().RelativeURL",
+				"type": "Expression"
+			}
+		},
+		"schema": []
+	}
+}

@@ -31,11 +31,11 @@ BEGIN
     INNER JOIN
         [common].Connections AS cn5
     ON 
-        cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation = 'raw'
+        cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation IN ('raw','bronze')
     INNER JOIN
         [common].Connections AS cn6
     ON 
-        cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
+        cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation IN ('cleansed', 'silver')
 
     WHERE
         ds.DatasetId = @DatasetId
@@ -234,11 +234,11 @@ BEGIN
     INNER JOIN
         [common].Connections AS cn5
     ON 
-        cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation = 'raw'
+        cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation IN ('raw','bronze')
     INNER JOIN
         [common].Connections AS cn6
     ON 
-        cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation = 'cleansed'
+        cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation IN ('cleansed','silver')
     WHERE
         ds.DatasetId = @DatasetId
     AND
