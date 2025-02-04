@@ -9,7 +9,7 @@
 		],
 		"type": "AzureKeyVault",
 		"typeProperties": {
-			"baseUrl": "https://cumuluskeysdev.vault.azure.net/"
+			"baseUrl": "https://cfcdemodevkvuks01.vault.azure.net/"
 		}
 	}
 }

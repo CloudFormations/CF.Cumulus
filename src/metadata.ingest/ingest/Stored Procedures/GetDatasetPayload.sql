@@ -15,7 +15,7 @@ BEGIN
     INNER JOIN [common].[Connections] cn1
         ON ds.[ConnectionFK] = cn1.[ConnectionId]
     INNER JOIN [common].[Connections] cn2
-        ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] = 'raw'
+        ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] IN ('raw','bronze')
     INNER JOIN [common].[Connections] cn3
         ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
     WHERE
@@ -45,9 +45,11 @@ BEGIN
 
     -- Set Source Language Type
     DECLARE @SourceLanguageType VARCHAR(5)
+    DECLARE @ConnectionType VARCHAR(50)
 
     SELECT 
-        @SourceLanguageType = ct.[SourceLanguageType]
+        @SourceLanguageType = ct.[SourceLanguageType],
+        @ConnectionType = ct.[ConnectionTypeDisplayName]
     FROM [common].[ConnectionTypes] AS ct
     INNER JOIN [common].[Connections] AS cn
         ON ct.ConnectionTypeId = cn.ConnectionTypeFK
@@ -205,7 +207,7 @@ BEGIN
     SET @SourceQuery += '</entity></fetch>'
     END
 
-    ELSE IF @SourceLanguageType = 'NA'
+    ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType <> 'REST API'
     BEGIN
         SELECT 
             @SourceQuery = cn.SourceLocation + '/' + ds.SourcePath
@@ -218,35 +220,96 @@ BEGIN
         AND 
             ds.[Enabled] = 1
     END
+
+    ELSE IF @ConnectionType = 'REST API'
+    BEGIN
+        DECLARE @LoadClauseAPI NVARCHAR(MAX);
+        DECLARE @LoadClauseAPIReplaced NVARCHAR(MAX);
+
+        -- Define all your parameters and their corresponding values
+        DECLARE @params TABLE (ParamName NVARCHAR(50), ParamValue NVARCHAR(30));
+
+        INSERT INTO @params (ParamName, ParamValue)
+        VALUES
+        ('PARAMETER_GT_1_YEAR', CONVERT(NVARCHAR, DATEADD(YEAR, -1, GETUTCDATE()), 126)),
+        ('PARAMETER_GT_1_MONTH', CONVERT(NVARCHAR, DATEADD(MONTH, -1, GETUTCDATE()), 126)),
+        ('PARAMETER_GT_1_DAY', CONVERT(NVARCHAR, DATEADD(DAY, -1, GETUTCDATE()), 126)),
+        ('PARAMETER_GT_1_HOUR', CONVERT(NVARCHAR, DATEADD(HOUR, -1, GETUTCDATE()), 126)),
+        ('PARAMETER_NOW', CONVERT(NVARCHAR, GETUTCDATE(), 126)),
+        ('PARAMETER_LT_1_YEAR', CONVERT(NVARCHAR, DATEADD(YEAR, 1, GETUTCDATE()), 126)),
+        ('PARAMETER_LT_1_MONTH', CONVERT(NVARCHAR, DATEADD(MONTH, 1, GETUTCDATE()), 126)),
+        ('PARAMETER_LT_1_DAY', CONVERT(NVARCHAR, DATEADD(DAY, 1, GETUTCDATE()), 126)),
+        ('PARAMETER_LT_1_HOUR', CONVERT(NVARCHAR, DATEADD(HOUR, 1, GETUTCDATE()), 126));
+
+        -- Original LoadClause
+        SELECT 
+        @LoadClauseAPI = LoadClause,
+        @LoadClauseAPIReplaced = LoadClause
+        FROM ingest.Datasets
+        WHERE DatasetId = @DatasetId
+
+        -- Perform the replacements
+        SET @LoadClauseAPIReplaced = @LoadClauseAPI;
+
+        DECLARE @param NVARCHAR(50), @value NVARCHAR(30);
+
+        DECLARE param_cursor CURSOR FOR 
+        SELECT ParamName, ParamValue FROM @params;
+
+        OPEN param_cursor;
+        FETCH NEXT FROM param_cursor INTO @param, @value;
+
+        WHILE @@FETCH_STATUS = 0
+        BEGIN
+            SET @LoadClauseAPIReplaced = REPLACE(@LoadClauseAPIReplaced, @param, @value);
+            FETCH NEXT FROM param_cursor INTO @param, @value;
+        END;
+        
+        SET @SourceQuery = @LoadClauseAPIReplaced; 
+
+        CLOSE param_cursor;
+        DEALLOCATE param_cursor;
+
+    END
+
     ELSE
     BEGIN
-    RAISERROR('Language Type not supported.',16,1)
+    RAISERROR('Connection Type / Language Type combination not supported.',16,1)
     RETURN 0;
     END
 
     IF (@LoadType = 'F')
     BEGIN
-    SET @SourceQuery = @SourceQuery
-            SET @LoadAction = 'full'
+        SET @SourceQuery = @SourceQuery
+        SET @LoadAction = 'full'
     END
-    ELSE IF (@LoadType = 'I') AND @SourceLanguageType <> 'XML'
-    BEGIN
-    SELECT 
-                @SourceQuery = @SourceQuery + ' ' + ds.[LoadClause]
-            FROM 
-                [ingest].[Datasets] AS ds
-            WHERE
-                ds.DatasetId = @DatasetId
-            AND 
-                ds.[Enabled] = 1
 
-            SET @LoadAction = 'incremental'
-    END
-    ELSE IF (@LoadType = 'I') AND @SourceLanguageType = 'XML'
+    ELSE IF (@LoadType = 'I') AND (@ConnectionType = 'REST API')
     BEGIN
-    SET @SourceQuery = @SourceQuery
-            SET @LoadAction = 'incremental'
+        SET @SourceQuery = @SourceQuery
+        SET @LoadAction = 'incremental'
     END
+
+    ELSE IF (@LoadType = 'I') AND (@SourceLanguageType <> 'XML') AND (@ConnectionType <> 'REST API')
+    BEGIN
+        SELECT 
+            @SourceQuery = @SourceQuery + ' ' + ds.[LoadClause]
+        FROM 
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+
+        SET @LoadAction = 'incremental'
+    END
+
+    ELSE IF (@LoadType = 'I') AND (@SourceLanguageType = 'XML')
+    BEGIN
+        SET @SourceQuery = @SourceQuery
+        SET @LoadAction = 'incremental'
+    END
+
     --ELSE IF @LoadType = 'FW'
     --ELSE IF @LoadType = 'H'
     ELSE
@@ -261,29 +324,28 @@ BEGIN
     END
 
     SELECT
-    RIGHT('0000' + CAST(ds.[VersionNumber] AS VARCHAR),4) AS 'VersionNumber',
-    ds.[SourceName],
-    ds.[DatasetDisplayName],
-    ds.[ExtensionType],
-    cn1.*,
-    cn2.[ConnectionLocation] AS 'TargetStorageName',
-    cn2.[SourceLocation] AS 'TargetStorageContainer',
-    cn3.[ConnectionLocation] AS 'KeyVaultBaseURL',
-
-    @SourceQuery AS 'SourceQuery',
+        RIGHT('0000' + CAST(ds.[VersionNumber] AS VARCHAR),4) AS 'VersionNumber',
+        ds.[SourceName],
+		ds.[SourcePath],
+        ds.[DatasetDisplayName],
+        ds.[ExtensionType],
+        cn1.*,
+        cn2.[ConnectionLocation] AS 'TargetStorageName',
+        cn2.[SourceLocation] AS 'TargetStorageContainer',
+        cn3.[ConnectionLocation] AS 'KeyVaultBaseURL',
+        @SourceQuery AS 'SourceQuery',
         @LoadType AS 'LoadType',
         @LoadAction AS LoadAction
-    --'SELECT * FROM ' + QUOTENAME(ds.[SourcePath]) + '.' + QUOTENAME(ds.[SourceName]) AS 'SourceQuery'
-    FROM
-    [ingest].[Datasets] ds
+    FROM 
+        [ingest].[Datasets] ds
     INNER JOIN [common].[Connections] cn1
     ON ds.[ConnectionFK] = cn1.[ConnectionId]
     INNER JOIN [common].[Connections] cn2
-    ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] = 'raw'
+    ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] IN ('raw','bronze')
     INNER JOIN [common].[Connections] cn3
     ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
     WHERE
-    [DatasetId] = @DatasetId
+        [DatasetId] = @DatasetId
     AND 
         ds.[Enabled] = 1
     AND 

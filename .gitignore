@@ -253,3 +253,6 @@ paket-files/
 /PipelineExecutor/local.settings.json
 /Functions/local.settings.json
 /docs
+
+.databricks
+databricks.yml

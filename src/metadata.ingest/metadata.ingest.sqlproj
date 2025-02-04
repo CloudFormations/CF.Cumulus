@@ -64,7 +64,7 @@
     <Folder Include="ingest\Stored Procedures" />
     <Folder Include="Scripts" />
     <Folder Include="ingest\Functions" />
-    <Folder Include="ingest\Synonyms" />
+    <Folder Include="Synonyms" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="ingest\Tables\Attributes.sql" />
@@ -78,12 +78,15 @@
     <Build Include="Scripts\DynamicsGetAttributeMetadata.sql" />
     <Build Include="Scripts\OracleGetAttributeMetadata.sql" />
     <Build Include="Scripts\SqlGetAttributeMetadata.sql" />
-    <Build Include="ingest\Stored Procedures\AddIngestPayloadPipeline.sql" />
     <Build Include="Security\db_cumulususer.sql" />
     <Build Include="Security\ingest.sql" />
     <Build Include="ingest\Stored Procedures\AddIngestPayloadPipelineDependencies.sql" />
-    <Build Include="ingest\Synonyms\Connections.sql" />
-    <Build Include="ingest\Synonyms\ComputeConnections.sql" />
+    <Build Include="Synonyms\ComputeConnections.sql" />
+    <Build Include="Synonyms\Connections.sql" />
+    <Build Include="Synonyms\ConnectionTypes.sql" />
+    <Build Include="ingest\Stored Procedures\GetLatestRefreshToken.sql" />
+    <Build Include="ingest\Tables\APITokens.sql" />
+    <Build Include="ingest\Stored Procedures\SetLatestRefreshToken.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
