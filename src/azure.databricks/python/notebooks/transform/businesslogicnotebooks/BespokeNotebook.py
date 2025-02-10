@@ -1,7 +1,6 @@
 # Databricks notebook source
 strSQL = """
-    SELECT AddressId, CONCAT_WS(',' , AddressLine1,AddressLine2) as FullAddress 
-    FROM adventureworkssqlserver.salesdemo_address
+    SELECT 1 AS Dummy
 """
 
 # COMMAND ----------
