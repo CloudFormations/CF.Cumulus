@@ -1,0 +1,32 @@
+{
+	"name": "Ingest_DS_DynamicsCRM_UamiAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_Dynamics_UamiAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"ServiceURI": "testvalue"
+			}
+		},
+		"parameters": {
+			"DSServiceURI": {
+				"type": "string"
+			},
+			"DSEntityName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "DynamicsCrmEntity",
+		"schema": [],
+		"typeProperties": {
+			"entityName": {
+				"value": "@dataset().DSEntityName",
+				"type": "Expression"
+			}
+		}
+	}
+}
