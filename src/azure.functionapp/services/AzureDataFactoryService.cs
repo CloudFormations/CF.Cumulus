@@ -56,13 +56,36 @@ namespace cloudformations.cumulus.services
             _logger.LogInformation("Validating ADF pipeline.");
 
             DataFactoryPipelineCollection collection = dataFactory.GetDataFactoryPipelines();
-
-            NullableResponse<DataFactoryPipelineResource> response = collection.GetIfExists(request.PipelineName);
-            DataFactoryPipelineResource? result = response.HasValue ? response.Value : null;
-
             ArgumentNullException.ThrowIfNull(request.PipelineName);
 
-            if (result == null)
+            try
+            {
+                NullableResponse<DataFactoryPipelineResource> response = collection.GetIfExists(request.PipelineName);
+                DataFactoryPipelineResource? result = response.HasValue ? response.Value : null;
+
+                return new PipelineDescription()
+                {
+                    PipelineExists = "True",
+                    PipelineName = response.Value.Data.Name,
+                    PipelineId = response.Value.Data.Id,
+                    PipelineType = response.Value.Data.ResourceType,
+                    ActivityCount = response.Value.Data.Activities.Count
+                };
+            }
+            catch (System.InvalidCastException) //for bug in underlying activity classes, pipeline does exist
+            {
+                _logger.LogInformation("Validated ADF pipeline exists.");
+
+                return new PipelineDescription()
+                {
+                    PipelineExists = "True",
+                    PipelineName = request.PipelineName,
+                    PipelineId = "Unknown",
+                    PipelineType = "Unknown",
+                    ActivityCount = 0
+                };
+            }
+            catch (Azure.RequestFailedException)
             {
                 _logger.LogInformation("Validated ADF pipeline does not exist.");
 
@@ -75,20 +98,13 @@ namespace cloudformations.cumulus.services
                     ActivityCount = 0
                 };
             }
-            else
+            catch (Exception ex)
             {
-                _logger.LogInformation("Validated ADF pipeline exists.");
-
-                return new PipelineDescription()
-                {
-                    PipelineExists = "True",
-                    PipelineName = response.Value.Data.Name,
-                    PipelineId = response.Value.Data.Id,
-                    PipelineType = response.Value.Data.ResourceType,
-                    ActivityCount = response.Value.Data.Activities.Count
-                };
+                _logger.LogInformation(ex.Message);
+                _logger.LogInformation(ex.GetType().ToString());
+                throw new InvalidRequestException("Failed to validate pipeline. ", ex);
             }
-        }
+        }      
 
         public override PipelineRunStatus PipelineExecute(PipelineRequest request)
         {
