@@ -2,15 +2,10 @@
 # MAGIC %md
 # MAGIC #Merge Functionality
 # MAGIC - Process metadata schemas raw vs cleansed with data typing
-# MAGIC - Allow for Rejected data handling
 # MAGIC - Create SELECT script for the merge operation
 # MAGIC - Functionality for 'F' and 'I' loads:
 # MAGIC   - 'F': recreate cleansed table upon execution
 # MAGIC   - 'I': merge data on top of existing table
-# MAGIC
-# MAGIC #TODO items:
-# MAGIC - Unit tests
-# MAGIC - Specify schema flexibility option in merge command
 # MAGIC
 
 # COMMAND ----------
@@ -104,7 +99,6 @@ options = {
     "mergeSchema": "true"
     }
 
-
 #different options for specifying, based on how we save abfss folder hierarchy.
 fileFullPath = f"{rawAbfssPath}/{rawSchemaName}/{tableName}/version={versionNumber}/{loadActionText}/{dateTimeFolderHierarchy}/{tableName}.{rawFileType}"
 print(fileFullPath)
@@ -148,9 +142,13 @@ df.createOrReplaceTempView(tempViewName)
 
 # COMMAND ----------
 
-totalColumnStr = selectSqlColumnsFormatString(totalColumnList, totalColumnTypeList, totalColumnFormatList)
+additionalConfig = selectSqlExplodedOptionString(totalColumnList, totalColumnTypeList, totalColumnFormatList)
 
-selectSQLFullString = f"SELECT {totalColumnStr} FROM {tempViewName}"
+formatTotalColumnFormatList = formatAttributeTargetDataFormatList(totalColumnFormatList)
+
+totalColumnStr = selectSqlColumnsFormatString(totalColumnList, totalColumnTypeList, formatTotalColumnFormatList)
+
+selectSQLFullString = f"SELECT {totalColumnStr} FROM {tempViewName} {additionalConfig}"
 print(selectSQLFullString)
 
 # COMMAND ----------

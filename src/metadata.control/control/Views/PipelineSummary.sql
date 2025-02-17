@@ -16,7 +16,12 @@ SELECT
 	pp.ParameterValue,
 	p.PipelineId,
 	s.StageName,
-	pd.DependantPipelineId
+	pd.DependantPipelineId,
+	CASE 
+		WHEN ids.DatasetDisplayname IS NOT NULL THEN p.Enabled & ids.Enabled
+		WHEN tds.DatasetName IS NOT NULL THEN p.Enabled & tds.Enabled
+		ELSE p.Enabled
+	END AS Enabled
 FROM control.pipelines AS p
 INNER JOIN control.pipelineparameters AS pp
 ON p.PipelineId = pp.PipelineId
@@ -27,7 +32,7 @@ ON p.StageId = s.StageId
 LEFT JOIN ingest.Datasets AS ids
 ON pp.parametervalue = CAST(ids.datasetid AS VARCHAR(4))
 AND p.pipelineName LIKE 'Ingest_PL_%'
-LEFT JOIN transform.Datasets as tds
+LEFT JOIN transform.Datasets AS tds
 ON pp.parametervalue = CAST(tds.datasetid AS VARCHAR(4))
 AND p.pipelineName LIKE 'Transform_PL_%'
 )

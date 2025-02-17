@@ -67,7 +67,7 @@ def overwriteDelta(df: DataFrame, schemaName: str, tableName: str) -> None:
         tableName (str): Name of the target table for the dataset.
 
     """
-    df.write.format("delta").mode("overwrite").insertInto(f"{schemaName}.{tableName}")
+    df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{schemaName}.{tableName}")
     
     return
 
