@@ -2,10 +2,13 @@
 	"name": "Ingest_DS_DynamicsCRM_UamiAuth",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Ingest_LS_Dynamics_UamiAuth",
+			"referenceName": "Ingest_LS_DynamicsCRM_UamiAuth",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"ServiceURI": "testvalue"
+				"ServiceURI": {
+					"value": "@dataset().DSServiceURI",
+					"type": "Expression"
+				}
 			}
 		},
 		"parameters": {
