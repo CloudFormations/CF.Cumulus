@@ -83,6 +83,14 @@
 												"DSEntityName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
 													"type": "Expression"
+												},
+												"DSServicePrincipalId": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"type": "Expression"
+												},
+												"DSServicePrincipalKVSecretName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
+													"type": "Expression"
 												}
 											}
 										}
