@@ -1,0 +1,22 @@
+{
+	"name": "Ingest_LS_Dynamics_SPNAuth",
+	"properties": {
+		"annotations": [],
+		"type": "DynamicsCrm",
+		"typeProperties": {
+			"deploymentType": "Online",
+			"serviceUri": "d",
+			"authenticationType": "AADServicePrincipal",
+			"servicePrincipalId": "1",
+			"servicePrincipalCredential": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "1"
+			},
+			"servicePrincipalCredentialType": "ServicePrincipalKey"
+		}
+	}
+}
