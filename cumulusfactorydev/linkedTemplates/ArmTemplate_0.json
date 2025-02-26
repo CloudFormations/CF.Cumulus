@@ -10,7 +10,7 @@
 		"Common_LS_cumulusdatabase_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
 		},
 		"Ingest_LS_SQLDB_MIAuth_connectionString": {
 			"type": "secureString",

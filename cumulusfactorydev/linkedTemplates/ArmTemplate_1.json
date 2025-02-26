@@ -16,7 +16,7 @@
 			"type": "string",
 			"defaultValue": "https://cumulusfunctionappdev.azurewebsites.net"
 		},
-		"Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId": {
+		"Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().ServicePrincipalId}"
 		},
@@ -214,7 +214,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Dynamics_UamiAuth')]",
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Dynamics_SPNAuth')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -239,7 +239,7 @@
 					"deploymentType": "Online",
 					"serviceUri": "@{linkedService().ServiceURI}",
 					"authenticationType": "AADServicePrincipal",
-					"servicePrincipalId": "[parameters('Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId')]",
+					"servicePrincipalId": "[parameters('Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId')]",
 					"servicePrincipalCredential": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
@@ -3369,12 +3369,12 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DynamicsCRM_UamiAuth')]",
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DynamicsCRM_SPNAuth')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "Ingest_LS_Dynamics_UamiAuth",
+					"referenceName": "Ingest_LS_Dynamics_SPNAuth",
 					"type": "LinkedServiceReference",
 					"parameters": {
 						"ServiceURI": {
@@ -3419,7 +3419,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_Dynamics_UamiAuth')]"
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_Dynamics_SPNAuth')]"
 			]
 		},
 		{
@@ -5015,7 +5015,7 @@
 											},
 											"inputs": [
 												{
-													"referenceName": "Ingest_DS_DynamicsCRM_UamiAuth",
+													"referenceName": "Ingest_DS_DynamicsCRM_SPNAuth",
 													"type": "DatasetReference",
 													"parameters": {
 														"DSServiceURI": {
@@ -5305,7 +5305,7 @@
 				]
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/datasets/Ingest_DS_DynamicsCRM_UamiAuth')]"
+				"[concat(variables('factoryId'), '/datasets/Ingest_DS_DynamicsCRM_SPNAuth')]"
 			]
 		}
 	]

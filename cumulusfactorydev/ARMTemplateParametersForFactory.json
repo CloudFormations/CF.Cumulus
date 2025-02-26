@@ -6,7 +6,7 @@
 			"value": "cumulusfactorydev"
 		},
 		"Common_LS_cumulusdatabase_connectionString": {
-			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
+			"value": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
 		},
 		"Ingest_LS_Oracle_SIDAuth_connectionString": {
 			"value": "host=@{linkedService().LSHostname};port=@{linkedService().LSPortNumber};sid=@{linkedService().LSOracleSid};user id=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
@@ -35,7 +35,7 @@
 		"Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
 			"value": "@linkedService().ClusterId"
 		},
-		"Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId": {
+		"Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId": {
 			"value": "@{linkedService().ServicePrincipalId}"
 		},
 		"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {

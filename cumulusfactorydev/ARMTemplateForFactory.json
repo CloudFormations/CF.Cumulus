@@ -10,7 +10,7 @@
 		"Common_LS_cumulusdatabase_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
-			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cumulussqlinstancedev.database.windows.net;Initial Catalog=cumulusdatabasedev"
 		},
 		"Ingest_LS_Oracle_SIDAuth_connectionString": {
 			"type": "secureString",
@@ -53,7 +53,7 @@
 			"type": "string",
 			"defaultValue": "@linkedService().ClusterId"
 		},
-		"Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId": {
+		"Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId": {
 			"type": "string",
 			"defaultValue": "@{linkedService().ServicePrincipalId}"
 		},
@@ -3430,7 +3430,7 @@
 											},
 											"inputs": [
 												{
-													"referenceName": "Ingest_DS_DynamicsCRM_UamiAuth",
+													"referenceName": "Ingest_DS_DynamicsCRM_SPNAuth",
 													"type": "DatasetReference",
 													"parameters": {
 														"DSServiceURI": {
@@ -3722,7 +3722,7 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/GetSetMetadata')]",
 				"[concat(variables('factoryId'), '/linkedServices/Common_LS_cumulusdatabase')]",
-				"[concat(variables('factoryId'), '/datasets/Ingest_DS_DynamicsCRM_UamiAuth')]",
+				"[concat(variables('factoryId'), '/datasets/Ingest_DS_DynamicsCRM_SPNAuth')]",
 				"[concat(variables('factoryId'), '/datasets/Ingest_DS_DataLake_Parquet')]"
 			]
 		},
@@ -8506,12 +8506,12 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DynamicsCRM_UamiAuth')]",
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DynamicsCRM_SPNAuth')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
 			"properties": {
 				"linkedServiceName": {
-					"referenceName": "Ingest_LS_Dynamics_UamiAuth",
+					"referenceName": "Ingest_LS_Dynamics_SPNAuth",
 					"type": "LinkedServiceReference",
 					"parameters": {
 						"ServiceURI": {
@@ -8556,7 +8556,7 @@
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_Dynamics_UamiAuth')]"
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_Dynamics_SPNAuth')]"
 			]
 		},
 		{
@@ -9197,7 +9197,7 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Dynamics_UamiAuth')]",
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Dynamics_SPNAuth')]",
 			"type": "Microsoft.DataFactory/factories/linkedServices",
 			"apiVersion": "2018-06-01",
 			"properties": {
@@ -9222,7 +9222,7 @@
 					"deploymentType": "Online",
 					"serviceUri": "@{linkedService().ServiceURI}",
 					"authenticationType": "AADServicePrincipal",
-					"servicePrincipalId": "[parameters('Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId')]",
+					"servicePrincipalId": "[parameters('Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId')]",
 					"servicePrincipalCredential": {
 						"type": "AzureKeyVaultSecret",
 						"store": {
