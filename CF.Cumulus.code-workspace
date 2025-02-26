@@ -6,6 +6,10 @@
 	],
 	"settings": {
 		"debug.internalConsoleOptions": "neverOpen",
-		"azureFunctions.showTargetFrameworkWarning": false
+		"azureFunctions.showTargetFrameworkWarning": false,
+		"cSpell.words": [
+			"datalake",
+			"sqldb"
+		]
 	}
 }
