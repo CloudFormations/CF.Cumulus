@@ -12,10 +12,6 @@
 			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
 		},
-		"Ingest_LS_Dynamics_UamiAuth_servicePrincipalCredential": {
-			"type": "secureString",
-			"metadata": "Secure string for 'servicePrincipalCredential' of 'Ingest_LS_Dynamics_UamiAuth'"
-		},
 		"Ingest_LS_Oracle_SIDAuth_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_Oracle_SIDAuth'",
@@ -59,7 +55,7 @@
 		},
 		"Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId": {
 			"type": "string",
-			"defaultValue": "testprincipalid"
+			"defaultValue": "@{linkedService().ServicePrincipalId}"
 		},
 		"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
 			"type": "string",
@@ -3443,6 +3439,14 @@
 														},
 														"DSEntityName": {
 															"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+															"type": "Expression"
+														},
+														"DSServicePrincipalId": {
+															"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+															"type": "Expression"
+														},
+														"DSServicePrincipalKVSecretName": {
+															"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
 															"type": "Expression"
 														}
 													}
@@ -8415,6 +8419,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "Ingest"
+				},
 				"annotations": [],
 				"type": "Json",
 				"typeProperties": {
@@ -8507,7 +8514,18 @@
 					"referenceName": "Ingest_LS_Dynamics_UamiAuth",
 					"type": "LinkedServiceReference",
 					"parameters": {
-						"ServiceURI": "testvalue"
+						"ServiceURI": {
+							"value": "@dataset().DSServiceURI",
+							"type": "Expression"
+						},
+						"ServicePrincipalId": {
+							"value": "@dataset().DSServicePrincipalId",
+							"type": "Expression"
+						},
+						"ServicePrincipalKVSecretName": {
+							"value": "@dataset().DSServicePrincipalKVSecretName",
+							"type": "Expression"
+						}
 					}
 				},
 				"parameters": {
@@ -8515,6 +8533,12 @@
 						"type": "string"
 					},
 					"DSEntityName": {
+						"type": "string"
+					},
+					"DSServicePrincipalId": {
+						"type": "string"
+					},
+					"DSServicePrincipalKVSecretName": {
 						"type": "string"
 					}
 				},
@@ -8686,6 +8710,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "Ingest"
+				},
 				"annotations": [],
 				"type": "Json",
 				"typeProperties": {
@@ -8785,6 +8812,9 @@
 					"RelativeURL": {
 						"type": "String"
 					}
+				},
+				"folder": {
+					"name": "Ingest"
 				},
 				"annotations": [],
 				"type": "RestResource",
@@ -9174,6 +9204,12 @@
 				"parameters": {
 					"ServiceURI": {
 						"type": "string"
+					},
+					"ServicePrincipalId": {
+						"type": "string"
+					},
+					"ServicePrincipalKVSecretName": {
+						"type": "string"
 					}
 				},
 				"annotations": [
@@ -9188,13 +9224,22 @@
 					"authenticationType": "AADServicePrincipal",
 					"servicePrincipalId": "[parameters('Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId')]",
 					"servicePrincipalCredential": {
-						"type": "SecureString",
-						"value": "[parameters('Ingest_LS_Dynamics_UamiAuth_servicePrincipalCredential')]"
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().ServicePrincipalKVSecretName",
+							"type": "Expression"
+						}
 					},
 					"servicePrincipalCredentialType": "ServicePrincipalKey"
 				}
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Common_LS_cumuluskeys')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Ingest_LS_FileServer_VM02')]",

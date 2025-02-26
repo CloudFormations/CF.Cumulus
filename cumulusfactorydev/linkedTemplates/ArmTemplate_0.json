@@ -12,10 +12,6 @@
 			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
 		},
-		"Ingest_LS_Dynamics_UamiAuth_servicePrincipalCredential": {
-			"type": "secureString",
-			"metadata": "Secure string for 'servicePrincipalCredential' of 'Ingest_LS_Dynamics_UamiAuth'"
-		},
 		"Ingest_LS_SQLDB_MIAuth_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLDB_MIAuth'",
@@ -47,10 +43,6 @@
 		"Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
 			"type": "string",
 			"defaultValue": "@linkedService().ClusterId"
-		},
-		"Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId": {
-			"type": "string",
-			"defaultValue": "testprincipalid"
 		},
 		"Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url": {
 			"type": "string",
@@ -204,36 +196,6 @@
 					"newClusterVersion": "@linkedService().ClusterVersion",
 					"clusterOption": "Autoscaling",
 					"newClusterInitScripts": []
-				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Dynamics_UamiAuth')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"parameters": {
-					"ServiceURI": {
-						"type": "string"
-					}
-				},
-				"annotations": [
-					"CF.Cumulus",
-					"Cloud Formations",
-					"Ingest"
-				],
-				"type": "DynamicsCrm",
-				"typeProperties": {
-					"deploymentType": "Online",
-					"serviceUri": "@{linkedService().ServiceURI}",
-					"authenticationType": "AADServicePrincipal",
-					"servicePrincipalId": "[parameters('Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId')]",
-					"servicePrincipalCredential": {
-						"type": "SecureString",
-						"value": "[parameters('Ingest_LS_Dynamics_UamiAuth_servicePrincipalCredential')]"
-					},
-					"servicePrincipalCredentialType": "ServicePrincipalKey"
 				}
 			},
 			"dependsOn": []
@@ -523,6 +485,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "Ingest"
+				},
 				"annotations": [],
 				"type": "Json",
 				"typeProperties": {
@@ -607,43 +572,6 @@
 			]
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DynamicsCRM_UamiAuth')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "Ingest_LS_Dynamics_UamiAuth",
-					"type": "LinkedServiceReference",
-					"parameters": {
-						"ServiceURI": "testvalue"
-					}
-				},
-				"parameters": {
-					"DSServiceURI": {
-						"type": "string"
-					},
-					"DSEntityName": {
-						"type": "string"
-					}
-				},
-				"folder": {
-					"name": "Ingest"
-				},
-				"annotations": [],
-				"type": "DynamicsCrmEntity",
-				"schema": [],
-				"typeProperties": {
-					"entityName": {
-						"value": "@dataset().DSEntityName",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_Dynamics_UamiAuth')]"
-			]
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/Ingest_DS_JSON_HTTP_AnonAuth')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -666,6 +594,9 @@
 						"type": "string"
 					}
 				},
+				"folder": {
+					"name": "Ingest"
+				},
 				"annotations": [],
 				"type": "Json",
 				"typeProperties": {
@@ -681,6 +612,85 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_HTTP_AnonAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_REST')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_REST_AnonAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"BaseURL": {
+							"value": "@dataset().BaseURL",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"BaseURL": {
+						"type": "string"
+					},
+					"RelativeURL": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "@dataset().RelativeURL",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_REST_AnonAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_SQLDB_MIAuth')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_SQLDB_MIAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"LSHostName": {
+							"value": "@dataset().DSHostname",
+							"type": "Expression"
+						},
+						"LSDatabaseName": {
+							"value": "@dataset().DSDatabaseName",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DSHostname": {
+						"type": "string"
+					},
+					"DSDatabaseName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_SQLDB_MIAuth')]"
 			]
 		}
 	]

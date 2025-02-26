@@ -12,10 +12,6 @@
 			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
 			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
 		},
-		"Ingest_LS_Dynamics_UamiAuth_servicePrincipalCredential": {
-			"type": "secureString",
-			"metadata": "Secure string for 'servicePrincipalCredential' of 'Ingest_LS_Dynamics_UamiAuth'"
-		},
 		"Ingest_LS_Oracle_SIDAuth_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_Oracle_SIDAuth'",
@@ -59,7 +55,7 @@
 		},
 		"Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId": {
 			"type": "string",
-			"defaultValue": "testprincipalid"
+			"defaultValue": "@{linkedService().ServicePrincipalId}"
 		},
 		"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
 			"type": "string",
@@ -111,9 +107,6 @@
 					"Common_LS_cumulusdatabase_connectionString": {
 						"value": "[parameters('Common_LS_cumulusdatabase_connectionString')]"
 					},
-					"Ingest_LS_Dynamics_UamiAuth_servicePrincipalCredential": {
-						"value": "[parameters('Ingest_LS_Dynamics_UamiAuth_servicePrincipalCredential')]"
-					},
 					"Ingest_LS_SQLDB_MIAuth_connectionString": {
 						"value": "[parameters('Ingest_LS_SQLDB_MIAuth_connectionString')]"
 					},
@@ -134,9 +127,6 @@
 					},
 					"Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
 						"value": "[parameters('Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId')]"
-					},
-					"Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId": {
-						"value": "[parameters('Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId')]"
 					},
 					"Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url": {
 						"value": "[parameters('Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url')]"
@@ -170,6 +160,9 @@
 					},
 					"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
 						"value": "[parameters('Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl')]"
+					},
+					"Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId": {
+						"value": "[parameters('Ingest_LS_Dynamics_UamiAuth_properties_typeProperties_servicePrincipalId')]"
 					},
 					"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
 						"value": "[parameters('Ingest_LS_FileServer_VM02_properties_typeProperties_host')]"
