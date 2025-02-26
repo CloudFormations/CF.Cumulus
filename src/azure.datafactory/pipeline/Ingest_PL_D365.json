@@ -73,7 +73,7 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_DynamicsCRM_UamiAuth",
+											"referenceName": "Ingest_DS_DynamicsCRM_SPNAuth",
 											"type": "DatasetReference",
 											"parameters": {
 												"DSServiceURI": {
