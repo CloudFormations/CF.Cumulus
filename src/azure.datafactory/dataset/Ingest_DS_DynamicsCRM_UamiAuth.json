@@ -2,11 +2,19 @@
 	"name": "Ingest_DS_DynamicsCRM_UamiAuth",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Ingest_LS_DynamicsCRM_UamiAuth",
+			"referenceName": "Ingest_LS_Dynamics_UamiAuth",
 			"type": "LinkedServiceReference",
 			"parameters": {
 				"ServiceURI": {
 					"value": "@dataset().DSServiceURI",
+					"type": "Expression"
+				},
+				"ServicePrincipalId": {
+					"value": "@dataset().DSServicePrincipalId",
+					"type": "Expression"
+				},
+				"ServicePrincipalKVSecretName": {
+					"value": "@dataset().DSServicePrincipalKVSecretName",
 					"type": "Expression"
 				}
 			}
@@ -16,6 +24,12 @@
 				"type": "string"
 			},
 			"DSEntityName": {
+				"type": "string"
+			},
+			"DSServicePrincipalId": {
+				"type": "string"
+			},
+			"DSServicePrincipalKVSecretName": {
 				"type": "string"
 			}
 		},
