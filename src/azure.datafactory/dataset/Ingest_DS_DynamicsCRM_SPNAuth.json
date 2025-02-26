@@ -2,7 +2,7 @@
 	"name": "Ingest_DS_DynamicsCRM_SPNAuth",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Ingest_LS_Dynamics_UamiAuth",
+			"referenceName": "Ingest_LS_Dynamics_SPNAuth",
 			"type": "LinkedServiceReference",
 			"parameters": {
 				"ServiceURI": {
