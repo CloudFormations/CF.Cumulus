@@ -1,22 +1,41 @@
 {
 	"name": "Ingest_LS_Dynamics_SPNAuth",
 	"properties": {
-		"annotations": [],
+		"parameters": {
+			"ServiceURI": {
+				"type": "string"
+			},
+			"ServicePrincipalId": {
+				"type": "string"
+			},
+			"ServicePrincipalKVSecretName": {
+				"type": "string"
+			}
+		},
+		"annotations": [
+			"CF.Cumulus",
+			"Cloud Formations",
+			"Ingest"
+		],
 		"type": "DynamicsCrm",
 		"typeProperties": {
 			"deploymentType": "Online",
-			"serviceUri": "d",
+			"serviceUri": "@{linkedService().ServiceURI}",
 			"authenticationType": "AADServicePrincipal",
-			"servicePrincipalId": "1",
+			"servicePrincipalId": "@{linkedService().ServicePrincipalId}",
 			"servicePrincipalCredential": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
 					"referenceName": "Common_LS_cumuluskeys",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "1"
+				"secretName": {
+					"value": "@linkedService().ServicePrincipalKVSecretName",
+					"type": "Expression"
+				}
 			},
 			"servicePrincipalCredentialType": "ServicePrincipalKey"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
