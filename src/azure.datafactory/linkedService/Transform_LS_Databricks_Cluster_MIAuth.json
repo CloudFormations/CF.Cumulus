@@ -1,0 +1,17 @@
+{
+	"name": "Transform_LS_Databricks_Cluster_MIAuth",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-1425948275744470.10.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/1b2b1db2-3735-4a51-86a5-18fa41b8bb49/resourceGroups/cfcdemodevrguks01/providers/Microsoft.Databricks/workspaces/cfcdemodevdbwuks01",
+			"newClusterNodeType": "Standard_DS3_v2",
+			"newClusterNumOfWorker": "1",
+			"newClusterVersion": "10.4.x-scala2.12",
+			"clusterOption": "Fixed",
+			"newClusterInitScripts": []
+		}
+	}
+}
