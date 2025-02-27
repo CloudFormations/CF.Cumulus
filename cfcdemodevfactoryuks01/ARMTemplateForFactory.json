@@ -9282,14 +9282,9 @@
 						},
 						"secretName": "vmadminpassword"
 					}
-				},
-				"connectVia": {
-					"referenceName": "datasourceVM02",
-					"type": "IntegrationRuntimeReference"
 				}
 			},
 			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/datasourceVM02')]",
 				"[concat(variables('factoryId'), '/linkedServices/Common_LS_cumuluskeys')]"
 			]
 		},
@@ -9526,16 +9521,6 @@
 						"timeZone": "UTC"
 					}
 				}
-			},
-			"dependsOn": []
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/datasourceVM02')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "SelfHosted",
-				"typeProperties": {}
 			},
 			"dependsOn": []
 		}

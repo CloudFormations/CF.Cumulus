@@ -453,16 +453,6 @@
 			"dependsOn": []
 		},
 		{
-			"name": "[concat(parameters('factoryName'), '/datasourceVM02')]",
-			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"type": "SelfHosted",
-				"typeProperties": {}
-			},
-			"dependsOn": []
-		},
-		{
 			"name": "[concat(parameters('factoryName'), '/GetSetMetadata')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -697,6 +687,66 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_HTTP_AnonAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_Oracle_SIDAuth')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_Oracle_SIDAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"LSHostname": {
+							"value": "@dataset().DSHostname",
+							"type": "Expression"
+						},
+						"LSUsername": {
+							"value": "@dataset().DSUsername",
+							"type": "Expression"
+						},
+						"LSOracleSid": {
+							"value": "@dataset().DSOracleSid",
+							"type": "Expression"
+						},
+						"LSPortNumber": {
+							"value": "@dataset().DSPortNumber",
+							"type": "Expression"
+						},
+						"LSPassword": {
+							"value": "@dataset().DSPassword",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DSHostname": {
+						"type": "string"
+					},
+					"DSUsername": {
+						"type": "string"
+					},
+					"DSOracleSid": {
+						"type": "string"
+					},
+					"DSPortNumber": {
+						"type": "string"
+					},
+					"DSPassword": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "OracleTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_Oracle_SIDAuth')]"
 			]
 		}
 	]
