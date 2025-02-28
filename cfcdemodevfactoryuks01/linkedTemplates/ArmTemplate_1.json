@@ -9,7 +9,7 @@
 		},
 		"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
 			"type": "string",
-			"defaultValue": "https://cumulusfunctionappdev.azurewebsites.net"
+			"defaultValue": "https://cfcdemodevfuncuks01.azurewebsites.net"
 		},
 		"Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId": {
 			"type": "string",

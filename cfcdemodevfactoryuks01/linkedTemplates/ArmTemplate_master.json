@@ -34,7 +34,7 @@
 		},
 		"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
 			"type": "string",
-			"defaultValue": "https://cumulusfunctionappdev.azurewebsites.net"
+			"defaultValue": "https://cfcdemodevfuncuks01.azurewebsites.net"
 		},
 		"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
 			"type": "string",

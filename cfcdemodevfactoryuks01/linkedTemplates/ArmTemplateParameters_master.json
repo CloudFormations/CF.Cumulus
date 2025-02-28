@@ -21,7 +21,7 @@
 			"value": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
 		},
 		"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
-			"value": "https://cumulusfunctionappdev.azurewebsites.net"
+			"value": "https://cfcdemodevfuncuks01.azurewebsites.net"
 		},
 		"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
 			"value": "https://cfcdemodevkvuks01.vault.azure.net/"
