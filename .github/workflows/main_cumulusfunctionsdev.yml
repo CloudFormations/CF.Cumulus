@@ -4,10 +4,10 @@
 name: Build and deploy dotnet core app to Azure Function App - cumulusfunctionsdev
 
 on:
-  push:
-    branches:
-      - main
-#   workflow_dispatch:
+#   push:
+#     branches:
+#       - main
+  workflow_dispatch:
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: '.' # set this to the path to your web app project, defaults to the repository root
