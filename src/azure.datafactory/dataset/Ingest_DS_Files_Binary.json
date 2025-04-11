@@ -2,7 +2,7 @@
 	"name": "Ingest_DS_Files_Binary",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "Ingest_LS_FileServer_VM02",
+			"referenceName": "Ingest_LS_FileServer_UserAuth",
 			"type": "LinkedServiceReference",
 			"parameters": {
 				"LSHostName": {

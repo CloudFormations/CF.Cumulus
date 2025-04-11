@@ -1,7 +1,7 @@
 {
-	"name": "Ingest_LS_FileServer_VM02",
+	"name": "Ingest_LS_FileServer_UserAuth",
 	"properties": {
-		"description": "Files on DataSourceVM02, using SHIR of same name on this VM.",
+		"type": "FileServer",
 		"parameters": {
 			"LSHostName": {
 				"type": "string"
@@ -14,7 +14,6 @@
 			}
 		},
 		"annotations": [],
-		"type": "FileServer",
 		"typeProperties": {
 			"host": "@{linkedService().LSHostName}",
 			"userId": "@{linkedService().LSUserName}",
