@@ -1,0 +1,17 @@
+{
+	"name": "Ingest_LS_HTTP_Anonymous",
+	"properties": {
+		"parameters": {
+			"LSBaseUrl": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "HttpServer",
+		"typeProperties": {
+			"url": "@{linkedService().LSBaseUrl}",
+			"enableServerCertificateValidation": true,
+			"authenticationType": "Anonymous"
+		}
+	}
+}
