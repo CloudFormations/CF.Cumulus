@@ -1,0 +1,138 @@
+name: CF.Cumulus-Databricks-CICD
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #   - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@v4.1.0
+    # The following script preserves the globbing behavior of the CopyFiles task.
+    # Refer to this transformer's documentation for an alternative that will work in simple cases.
+    - uses: actions/github-script@v7.0.0
+      env:
+        TARGET_FOLDER: "${{ github.workspace }}/temp"
+        SOURCE_FOLDER: "${{ github.workspace }}/src/azure.databricks/python/notebooks/"
+        CONTENTS: "**"
+      with:
+        github-token: "${{ secrets.GITHUB_TOKEN }}"
+        script: |-
+          const fs = require('fs').promises
+          const path = require('path')
+          const target = path.resolve(process.env.TARGET_FOLDER)
+          process.chdir(process.env.SOURCE_FOLDER || '.')
+          if (process.env.CLEAN_TARGET_FOLDER === 'true') await io.rmRF(target)
+          const flattenFolders = process.env.FLATTEN_FOLDERS === 'true'
+          const options = {force: process.env.OVERWRITE === 'true'}
+          const globber = await glob.create(process.env.CONTENTS || '**')
+          for await (const file of globber.globGenerator()) {
+            if ((await fs.lstat(file)).isDirectory()) continue
+            const filename = flattenFolders ? path.basename(file) : file.substring(process.cwd().length)
+            const dest = path.join(target, filename)
+            await io.mkdirP(path.dirname(dest))
+            await io.cp(file, dest, options)
+          }
+    - uses: actions/upload-artifact@v4.1.0
+      with:
+        name: DatabricksArtifacts
+        path: "${{ github.workspace }}/temp"
+
+  deploy_dev:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: write-all
+    environment: dev
+    steps:
+    - name: Download Pipeline Artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: DatabricksArtifacts
+          path: "${{ github.workspace }}/temp/"
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9'
+
+    - name: Install Databricks CLI
+      run: pip install databricks-cli==0.18
+
+    - name: Delete folder
+      run: databricks workspace rm /Shared/Live --recursive || true
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    - name: Deploy
+      run: databricks workspace import_dir "${{ github.workspace }}/temp/" /Shared/Live --exclude-hidden-files -o
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+  deploy_test:
+    needs: deploy_dev
+    runs-on: ubuntu-latest
+    permissions: write-all
+    environment: test
+    steps:
+    - name: Download Pipeline Artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: DatabricksArtifacts
+          path: "${{ github.workspace }}/temp/"
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9'
+
+    - name: Install Databricks CLI
+      run: pip install databricks-cli==0.18
+
+    - name: Delete folder
+      run: databricks workspace rm /Shared/Live --recursive || true
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    - name: Deploy
+      run: databricks workspace import_dir "${{ github.workspace }}/temp/" /Shared/Live --exclude-hidden-files -o
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+  deploy_prod:
+    needs: deploy_test
+    runs-on: ubuntu-latest
+    permissions: write-all
+    environment: prod
+    steps:
+    - name: Download Pipeline Artifact
+      uses: actions/download-artifact@v4
+      with:
+          name: DatabricksArtifacts
+          path: "${{ github.workspace }}/temp/"
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9'
+
+    - name: Install Databricks CLI
+      run: pip install databricks-cli==0.18
+
+    - name: Delete folder
+      run: databricks workspace rm /Shared/Live --recursive || true
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+
+    - name: Deploy
+      run: databricks workspace import_dir "${{ github.workspace }}/temp/" /Shared/Live --exclude-hidden-files -o
+      env:
+        DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+        DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
