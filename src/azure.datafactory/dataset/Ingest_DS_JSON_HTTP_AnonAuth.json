@@ -19,6 +19,9 @@
 				"type": "string"
 			}
 		},
+		"folder": {
+			"name": "Ingest"
+		},
 		"annotations": [],
 		"type": "Json",
 		"typeProperties": {

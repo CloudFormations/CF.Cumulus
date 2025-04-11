@@ -19,6 +19,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "Ingest"
+		},
 		"annotations": [],
 		"type": "RestResource",
 		"typeProperties": {
