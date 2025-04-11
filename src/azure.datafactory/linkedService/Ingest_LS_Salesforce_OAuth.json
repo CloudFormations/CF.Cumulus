@@ -1,0 +1,38 @@
+{
+	"name": "Ingest_LS_Salesforce_OAuth",
+	"properties": {
+		"parameters": {
+			"LSClientId": {
+				"type": "string"
+			},
+			"LSAPIVersion": {
+				"type": "string"
+			},
+			"LSEnvironmentUrl": {
+				"type": "string"
+			},
+			"LSSecretName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "SalesforceV2",
+		"typeProperties": {
+			"environmentUrl": "@{linkedService().LSEnvironmentUrl}",
+			"clientId": "@{linkedService().LSClientId}",
+			"clientSecret": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().LSSecretName",
+					"type": "Expression"
+				}
+			},
+			"apiVersion": "@{linkedService().LSAPIVersion}",
+			"authenticationType": "OAuth2ClientCredential"
+		}
+	}
+}
