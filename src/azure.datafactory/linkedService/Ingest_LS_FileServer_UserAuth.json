@@ -1,0 +1,30 @@
+{
+	"name": "Ingest_LS_FileServer_UserAuth",
+	"properties": {
+		"type": "FileServer",
+		"parameters": {
+			"LSHostName": {
+				"type": "string"
+			},
+			"LSUserName": {
+				"type": "string"
+			},
+			"LSPassword": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"typeProperties": {
+			"host": "@{linkedService().LSHostName}",
+			"userId": "@{linkedService().LSUserName}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "vmadminpassword"
+			}
+		}
+	}
+}
