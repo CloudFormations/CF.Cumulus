@@ -21,7 +21,7 @@
 					},
 					"cases": [
 						{
-							"value": "DynamicsCRM_UamiAuth",
+							"value": "DynamicsCRM_SPAuth",
 							"activities": [
 								{
 									"name": "Dynamics CRM Copy",
@@ -73,22 +73,18 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_DynamicsCRM_SPNAuth",
+											"referenceName": "Ingest_DS_Dynamics_SPAuth",
 											"type": "DatasetReference",
 											"parameters": {
 												"DSServiceURI": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 													"type": "Expression"
 												},
-												"DSEntityName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
-													"type": "Expression"
-												},
 												"DSServicePrincipalId": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
 													"type": "Expression"
 												},
-												"DSServicePrincipalKVSecretName": {
+												"DSServicePrincipalKey": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
 													"type": "Expression"
 												}
