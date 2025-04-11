@@ -23,10 +23,6 @@
 		"type": "Oracle",
 		"typeProperties": {
 			"connectionString": "host=@{linkedService().LSHostname};port=@{linkedService().LSPortNumber};sid=@{linkedService().LSOracleSid};user id=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
-		},
-		"connectVia": {
-			"referenceName": "datasourceVM02",
-			"type": "IntegrationRuntimeReference"
 		}
 	}
 }

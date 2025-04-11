@@ -1,4 +1,4 @@
-//  Main infrastructure deployment template for data platform
+//  Main infrastructure deployment template for a CF.Cumulus data platform
 //  Deploys core services including:
 //  - Key Vault, Storage, Data Factory, Databricks, Function Apps, SQL Server
 //  - Configures role assignments and dependencies between services
@@ -7,31 +7,30 @@ targetScope = 'subscription'
 
 //Parameters for environment configuration
 // * These parameters control resource naming and deployment options
-// * Required for consistent resource naming across environments
-
+// * Recommended for consistent resource naming across environments
+param orgName string = 'cf'
+param domainName string = 'cumulus'
 param location string = 'uksouth'
-param envName string
-param domainName string = 'cfc'
-param orgName string = 'demo'
-param uniqueIdentifier string = '01'
+param envName string = 'demo'
+
+param uniqueIdentifier string = '05'
 param datalakeName string = 'dls' //Storage account name prefix
 param functionBlobName string = 'st' //Function app storage name prefix
 
-param deploymentTimestamp string = utcNow('yy-MM-dd-HHmm')
+param deploymentTimestamp string = utcNow('yy-MM-dd-HHmm') //used for activity deployment naming only
 
 //Parameters for optional settings
-param firstDeployment bool = true
+param firstDeployment bool = true     // controls initial RBAC setup with security group
 param deployADF bool = true
-param deployWorkers bool = false
-param deployVM bool = true
-param deploySQL bool = true
-param deployFunction bool = true
-param deployNetworking bool = true
-param deployADBWorkspace bool = true
-param deployADBCluster bool = false // Controls ADB Cluster creation - TODO
-param deployPAT bool = false // - TODO
+param deployWorkers bool = false      // if worker pipelines are to live in a separate data factory instance to the bootstrap pipelines
+param deployVM bool = false           // if self hosted IR is required for data factory
+param deploySQL bool = true           // assumes SQL database is required to house metadata
+param deployFunction bool = true      // exclude function app if already created or manual config is preferred later
+param deployNetworking bool = true    // if custom VNet and specific IP address space is to be used
+param deployADBWorkspace bool = true  // exclude databricks if already created or manual config is preferred later
+param deployADBCluster bool = false   // Controls ADB Cluster creation - TODO
+param deployPAT bool = false          // - TODO
 param setRoleAssignments bool = true
-
 
 
 // Mapping of Azure regions to short codes for naming conventions
@@ -59,41 +58,23 @@ var locationShortCodes = {
 var locationShortCode = locationShortCodes[location]
 
 // Resource naming convention variables
-var namePrefix = '${domainName}${orgName}${envName}'
+var namePrefix = '${orgName}${domainName}${envName}'
 var nameSuffix = '${locationShortCode}${uniqueIdentifier}'
 var rgName = '${namePrefix}rg${nameSuffix}'
 
 //var databaseName string = 'Metadata' //SQL Database name
 var databaseName = '${namePrefix}sqldb${nameSuffix}' //SQL Database name
 
-// Network configuration based on environment
-// Placeholder variables for now.
+// Network IP address space, assuming floating VNet per environment without peering.
+// This configuration is for demo purposes only, and should be adjusted for production.
 var networkConfig = {
-  dev: {
-    vnetAddressPrefix: '0.0.0.0/22'
+  default: {
+    vnetAddressPrefix: '10.210.8.0/21'
     subnetPrefixes: {
-      privateSubnetCIDR: '0.0.0.0/24'
-      publicSubnetCIDR: '0.0.0.0/24'
-      serviceEndpoint: '0.0.0.0/24'
-      privateEndpoint: '0.0.0.0/24'
-    }
-  }
-  tst: {
-    vnetAddressPrefix: '0.0.0.0/22'
-    subnetPrefixes: {
-      privateSubnetCIDR: '0.0.0.0/24'
-      publicSubnetCIDR: '0.0.0.0/24'
-      serviceEndpoint: '0.0.0.0/24'
-      privateEndpoint: '0.0.0.0/24'
-    }
-  }
-  prd: {
-    vnetAddressPrefix: '0.0.0.0/22'
-    subnetPrefixes: {
-      privateSubnetCIDR: '0.0.0.0/24'
-      publicSubnetCIDR: '0.0.0.0/24'
-      serviceEndpoint: '0.0.0.0/24'
-      privateEndpoint: '0.0.0.0/24'
+      privateSubnetCIDR: '10.210.8.0/23'
+      publicSubnetCIDR: '10.210.10.0/23'
+      serviceEndpoint: '10.210.12.0/23'
+      privateEndpoint: '10.210.14.0/23'
     }
   }
 }
@@ -110,17 +91,13 @@ resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
 }
 
 
-// // Create security group on first run
-// module securityGroupDeploy './modules/securitygroup.template.bicep' = if (firstDeployment) {
-//   scope: rg
-//   name: 'securitygroup${deploymentTimestamp}'
-//   params: {
-//     groupName : 'CF.CumulusAdmins'
-//   }
-// }
+// Create security group on first run
+module securityGroupDeploy './modules/securitygroup.template.bicep' = if (firstDeployment) {
+  scope: rg
+  name: 'CF.CumulusAdmins'
+}
 
 // Base resources
-
 module keyVaultDeploy './modules/keyvault.template.bicep' = {
   scope: rg
   name: 'keyvault${deploymentTimestamp}'
@@ -221,7 +198,6 @@ module networkingDeploy './modules/networking.template.bicep' = if (deployNetwor
   params: {
     namePrefix: namePrefix
     nameSuffix: nameSuffix
-    environment: envName
     networkConfig: networkConfig
   }
   dependsOn: [
@@ -345,7 +321,6 @@ module virtualMachineDeploy './modules/virtualmachine.template.bicep' = if (depl
  * Configures service-to-service permissions:
  * - Data Factory access to storage, functions, and other services
  * - Function App access to required resources
- * Note: firstDeployment parameter controls initial RBAC setup for function app
  */
 
 module dataFactoryOrchestratorRoleAssignmentsDeploy './modules/roleassignments/datafactory.template.bicep' = if (deployADF && setRoleAssignments) {
@@ -416,12 +391,8 @@ module dataBricksRoleAssignmentsDeploy './modules/roleassignments/databricks.tem
   scope: rg
   name: 'databricks-roleassignments${deploymentTimestamp}'
   params: {
-    adb_workspace_managed_identity: databricksWorkspaceDeploy.outputs.databricks_managed_identity
-    adb_workspace_name: databricksWorkspaceDeploy.name
-    dataFactoryName: dataFactoryDeployOrchestrator.name
-    // namePrefix: namePrefix
-    // nameSuffix: nameSuffix
-    // nameStorage: datalakeName
+    adbWorkspaceName: databricksWorkspaceDeploy.name
+    nameStorage: datalakeName
   }
   dependsOn: [
     storageAccountDeploy
