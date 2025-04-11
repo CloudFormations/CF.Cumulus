@@ -73,7 +73,7 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_DynamicsCRM_UamiAuth",
+											"referenceName": "Ingest_DS_DynamicsCRM_SPNAuth",
 											"type": "DatasetReference",
 											"parameters": {
 												"DSServiceURI": {
@@ -82,6 +82,14 @@
 												},
 												"DSEntityName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+													"type": "Expression"
+												},
+												"DSServicePrincipalId": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"type": "Expression"
+												},
+												"DSServicePrincipalKVSecretName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
 													"type": "Expression"
 												}
 											}

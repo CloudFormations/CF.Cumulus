@@ -4,5 +4,6 @@
     "azureFunctions.projectRuntime": "~4",
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.preDeployTask": "publish",
-    "azureFunctions.showTargetFrameworkWarning": false
+    "azureFunctions.showTargetFrameworkWarning": false,
+    "azureFunctions.projectSubpath": "src\\azure.functionapp"
 }

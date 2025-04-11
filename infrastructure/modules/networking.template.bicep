@@ -3,8 +3,6 @@ param location string = resourceGroup().location
 
 param namePrefix string
 param nameSuffix string
-param environment string
-
 param networkConfig object
 
 
@@ -24,7 +22,7 @@ var names = {
 
 
 // Select network configuration based on environment
-var selectedNetworkConfig = networkConfig[environment]
+var selectedNetworkConfig = networkConfig.default
 
 // Output variables for use in the rest of your Bicep template
 var vnetAddressPrefix = selectedNetworkConfig.vnetAddressPrefix

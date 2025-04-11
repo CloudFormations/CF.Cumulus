@@ -26,10 +26,6 @@
 				},
 				"secretName": "vmadminpassword"
 			}
-		},
-		"connectVia": {
-			"referenceName": "datasourceVM02",
-			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
