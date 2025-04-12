@@ -1,0 +1,145 @@
+{
+	"name": "Copy_Unpacked_File",
+	"properties": {
+		"activities": [
+			{
+				"name": "Target File Type",
+				"type": "Switch",
+				"dependsOn": [],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@json(string(pipeline().parameters.SourceQuery)).ExtensionType",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "csv",
+							"activities": [
+								{
+									"name": "Copy Excel Sheet to csv",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "ExcelSource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true,
+												"enablePartitionDiscovery": false
+											}
+										},
+										"sink": {
+											"type": "DelimitedTextSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "DelimitedTextWriteSettings",
+												"quoteAllText": true,
+												"fileExtension": ".txt"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Excel",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSSheetName": {
+													"value": "@json(string(pipeline().parameters.SourceQuery)).SheetName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@pipeline().parameters.DirectoryName",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@concat(json(string(pipeline().parameters.IngestPayload)).DatasetDisplayName,'.',json(string(pipeline().parameters.IngestPayload)).ExtensionType)",
+													"type": "Expression"
+												},
+												"DSStorageName": {
+													"value": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageName",
+													"type": "Expression"
+												},
+												"DSCellRange": {
+													"value": "@json(string(pipeline().parameters.SourceQuery)).CellRange",
+													"type": "Expression"
+												}
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Csv",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSFileName": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageName",
+												"DSDirectoryName": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageContainer",
+												"DSContainerName": "@concat(     json(string(pipeline().parameters.IngestPayload)).ConnectionDisplayName,     '\\staging\\',     json(string(pipeline().parameters.SourceQuery)).SheetName,     '\\'     )",
+												"DSStorageName": "@json(string(pipeline().parameters.SourceQuery)).SheetName"
+											}
+										}
+									]
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Supported File Type",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('The File type is not currently supported.')",
+									"type": "Expression"
+								},
+								"errorCode": "16"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"DirectoryName": {
+				"type": "string"
+			},
+			"SourceQuery": {
+				"type": "string"
+			},
+			"IngestPayload": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Utils"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-04-11T13:21:10Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

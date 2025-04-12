@@ -7,8 +7,8 @@ CREATE TABLE [common].[Connections](
 	[SourceLocation] [nvarchar](200) NOT NULL,
 	[ResourceName] [nvarchar](100) NULL,
 	[LinkedServiceName] [nvarchar](200) NOT NULL,
-	[Username] [nvarchar](100) NOT NULL,
-	[KeyVaultSecret] [nvarchar](100) NOT NULL,
+	[Username] [nvarchar](150) NOT NULL,
+	[KeyVaultSecret] [nvarchar](150) NOT NULL,
 	[Enabled] [bit] NOT NULL
 PRIMARY KEY CLUSTERED 
 (
