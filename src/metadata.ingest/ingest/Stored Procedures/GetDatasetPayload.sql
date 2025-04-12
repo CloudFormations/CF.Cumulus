@@ -1,5 +1,5 @@
 CREATE PROCEDURE [ingest].[GetDatasetPayload]
-(
+    (
     @DatasetId INT
 )
 AS
@@ -39,12 +39,21 @@ BEGIN
     -- Set LoadType conditions
     DECLARE @LoadType CHAR(1)
     DECLARE @LoadAction VARCHAR(12)
+    DECLARE @Unpack BIT
+
+    SELECT 
+        @Unpack = CASE 
+            WHEN LoadType = 'U' THEN 1 
+            ELSE 0 
+        END
+    FROM [ingest].[Datasets]
+    WHERE DatasetId = @DatasetId
 
     SET @LoadType = ingest.GetIngestLoadAction(@DatasetId, 'Raw')
 
 
     -- Set Source Language Type
-    DECLARE @SourceLanguageType VARCHAR(5)
+    DECLARE @SourceLanguageType VARCHAR(15)
     DECLARE @ConnectionType VARCHAR(50)
 
     SELECT 
@@ -146,6 +155,21 @@ BEGIN
     ELSE IF @SourceLanguageType = 'SQL'
     BEGIN
         SET @SourceQuery = @SourceQuery
+    END
+
+    ELSE IF @SourceLanguageType = 'WorkdayXML'
+    BEGIN
+        SELECT
+        @SourceQuery = ds.LoadClause -- Keeps XML for Workday in Here for Full load. IN Future replace full load with incremental filter
+        FROM
+        [ingest].[Datasets] AS ds
+            -- INNER JOIN [ingest].[Attributes] AS at
+                --   ON ds.[DatasetId] = at.[DatasetFK]
+            WHERE
+                ds.DatasetId = @DatasetId
+            AND 
+                ds.[Enabled] = 1
+    
     END
 
     ELSE IF @SourceLanguageType = 'XML'
@@ -272,10 +296,27 @@ BEGIN
 
     END
 
+    ELSE IF @Unpack = 1 AND  @SourceLanguageType = 'BIN'
+    BEGIN
+        SELECT
+            @SourceQuery = ds.LoadClause
+        FROM
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+    END
+
+    ELSE IF @Unpack = 0 AND  @SourceLanguageType = 'BIN'
+    BEGIN
+        SET @SourceQuery = ''
+    END
+
     ELSE
     BEGIN
-    RAISERROR('Connection Type / Language Type combination not supported.',16,1)
-    RETURN 0;
+        RAISERROR('Connection Type / Language Type combination not supported.',16,1)
+        RETURN 0;
     END
 
     IF (@LoadType = 'F')
@@ -326,7 +367,7 @@ BEGIN
     SELECT
         RIGHT('0000' + CAST(ds.[VersionNumber] AS VARCHAR),4) AS 'VersionNumber',
         ds.[SourceName],
-		ds.[SourcePath],
+        ds.[SourcePath],
         ds.[DatasetDisplayName],
         ds.[ExtensionType],
         cn1.*,
@@ -356,6 +397,3 @@ BEGIN
         cn3.[Enabled] = 1
 
 END
-GO
-
-
