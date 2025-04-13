@@ -242,13 +242,37 @@
 				"inputs": [
 					{
 						"referenceName": "Ingest_DS_DataLake_Csv",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"DSFileName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+								"type": "Expression"
+							},
+							"DSDirectoryName": {
+								"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '/',    \n    activity('Get Ingest Payload').output.firstRow.SourcePath,\n    '/',\n    activity('Get Ingest Payload').output.firstRow.SourceName)",
+								"type": "Expression"
+							},
+							"DSContainerName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+								"type": "Expression"
+							},
+							"DSStorageName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+								"type": "Expression"
+							}
+						}
 					}
 				],
 				"outputs": [
 					{
 						"referenceName": "Ingest_DS_DataLake_Csv",
-						"type": "DatasetReference"
+						"type": "DatasetReference",
+						"parameters": {
+							"DSFileName": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+							"DSDirectoryName": "@variables('DirectoryName')",
+							"DSContainerName": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+							"DSStorageName": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName"
+						}
 					}
 				]
 			}
