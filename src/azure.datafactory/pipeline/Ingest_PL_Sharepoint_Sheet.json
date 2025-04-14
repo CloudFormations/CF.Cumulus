@@ -189,6 +189,7 @@
 			},
 			{
 				"name": "Copy Excel Sheet to csv",
+				"description": " ",
 				"type": "Copy",
 				"dependsOn": [
 					{
