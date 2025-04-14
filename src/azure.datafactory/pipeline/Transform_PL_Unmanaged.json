@@ -66,7 +66,14 @@
 								{
 									"name": "Unmanaged Notebook - Interactive Cluster",
 									"type": "DatabricksNotebook",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Set Cluster Id Variable",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -112,13 +119,117 @@
 												"type": "Expression"
 											},
 											"ClusterId": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeClusterId",
+												"value": "@variables('ClusterId')",
 												"type": "Expression"
 											},
 											"SubscriptionId": {
 												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
 											}
+										}
+									}
+								},
+								{
+									"name": "Fetch Bearer Token from AKV",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:15:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Merge Payload').output.firstRow.KeyVaultAddress,'/secrets/databricks-adf-pat/','?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "Get Cluster Metadata",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "Fetch Bearer Token from AKV",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:15:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"headers": {
+											"Authorization": {
+												"value": "@concat('Bearer ',activity('Fetch Bearer Token from AKV').output.value)",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "@concat(activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL,'/api/2.1/clusters/list')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Filter Cluster",
+									"type": "Filter",
+									"dependsOn": [
+										{
+											"activity": "Get Cluster Metadata",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"userProperties": [],
+									"typeProperties": {
+										"items": {
+											"value": "@activity('Get Cluster Metadata').output.clusters",
+											"type": "Expression"
+										},
+										"condition": {
+											"value": "@equals(item().cluster_name,activity('Get Merge Payload').output.firstRow.ComputeName)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set Cluster Id Variable",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Filter Cluster",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "ClusterId",
+										"value": {
+											"value": "@activity('Filter Cluster').output.value[0].cluster_id",
+											"type": "Expression"
 										}
 									}
 								}
@@ -240,6 +351,9 @@
 		},
 		"variables": {
 			"PipelineRunDateTime": {
+				"type": "String"
+			},
+			"ClusterId": {
 				"type": "String"
 			}
 		},
