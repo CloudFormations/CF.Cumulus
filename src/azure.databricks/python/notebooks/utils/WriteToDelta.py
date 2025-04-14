@@ -67,7 +67,7 @@ def overwriteDelta(df: DataFrame, schemaName: str, tableName: str) -> None:
         tableName (str): Name of the target table for the dataset.
 
     """
-    df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{schemaName}.{tableName}")
+    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{schemaName}.{tableName}")
     
     return
 
@@ -85,7 +85,7 @@ def overwriteDeltaSurrogateKey(df: DataFrame, schemaName: str, tableName: str) -
         tableName (str): Name of the target table for the dataset.
 
     """
-    df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{schemaName}.{tableName}")
+    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{schemaName}.{tableName}")
     return
 
 # COMMAND ----------

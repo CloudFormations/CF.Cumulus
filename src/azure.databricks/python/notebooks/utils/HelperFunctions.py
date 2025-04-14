@@ -3,6 +3,35 @@ from delta.tables import *
 
 # COMMAND ----------
 
+def checkZeroBytes(loadAction: str, filePath: str) -> bool:
+    """
+    Summary:
+        Confirm that the Raw file being read is not 0 bytes (empty and no header).
+    
+    Args:
+        loadAction (str): Action to take on the file, either 'F' for full load or 'I' for incremental load.
+        filePath (str): File path to the Raw file in ADLS.
+
+    Returns:
+        state (bool): Boolean state of the check, True if file is not empty.
+    """
+    fileMetadata = dbutils.fs.ls(filePath)
+    fileSize = fileMetadata[0].size
+    print(fileMetadata)
+    print(fileSize)
+    if fileSize == 0 and loadAction == 'F':
+        raise Exception(f'File is empty, full load running. Please check the initial load which populated the file at {filePath}.')
+    elif fileSize == 0 and loadAction == 'I':
+        print("File is empty, incremental load running. No action required as this is valid activity.")
+        return False
+    elif fileSize > 0:
+        print("File is not empty. No action required.")
+        return True
+    else:
+        raise Exception("Unknown state. Raise error")
+
+# COMMAND ----------
+
 def checkDfSize(df: DataFrame) -> bool:
     """
     Summary:
