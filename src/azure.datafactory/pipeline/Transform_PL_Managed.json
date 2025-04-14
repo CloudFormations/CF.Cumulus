@@ -119,10 +119,7 @@
 												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
 												"type": "Expression"
 											},
-											"ClusterId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
-												"type": "Expression"
-											},
+											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
 											"SubscriptionId": {
 												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
@@ -183,10 +180,7 @@
 												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
 												"type": "Expression"
 											},
-											"ClusterId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
-												"type": "Expression"
-											},
+											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
 											"SubscriptionId": {
 												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
@@ -198,7 +192,14 @@
 									"name": "Validate Payload",
 									"description": "",
 									"type": "DatabricksNotebook",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Get Databricks Compute Id",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -241,11 +242,33 @@
 												"type": "Expression"
 											},
 											"ClusterId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeClusterId",
+												"value": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
 												"type": "Expression"
 											},
 											"SubscriptionId": {
 												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Get Databricks Compute Id",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Get_Databricks_Compute_ID",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Payload": {
+												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
 												"type": "Expression"
 											}
 										}
