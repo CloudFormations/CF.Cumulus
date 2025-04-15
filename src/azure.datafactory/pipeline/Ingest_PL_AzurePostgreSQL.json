@@ -49,7 +49,7 @@
 				"typeProperties": {
 					"variableName": "LocalRunDateTime",
 					"value": {
-						"value": "@if(equals(pipeline().parameters.RunDateTime,' '),string(utcnow()),pipeline().parameters.RunDateTime)",
+						"value": "@if(equals(pipeline().parameters.RunDateTime,' '),string(utcNow()),pipeline().parameters.RunDateTime)",
 						"type": "Expression"
 					}
 				}
@@ -134,7 +134,7 @@
 				}
 			},
 			{
-				"name": "Azure PostgreSQL Type",
+				"name": "MS SQL Type",
 				"type": "Switch",
 				"dependsOn": [
 					{
@@ -152,10 +152,10 @@
 					},
 					"cases": [
 						{
-							"value": "Oracle_SIDAuth",
+							"value": "AzurePostgreSQL_SQLAuth",
 							"activities": [
 								{
-									"name": "SQLDB SQLAuth Copy",
+									"name": "AzurePostgreSQL SQLAuth Copy",
 									"type": "Copy",
 									"dependsOn": [
 										{
@@ -181,7 +181,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "OracleSource",
+											"type": "AzurePostgreSqlSource",
 											"additionalColumns": [
 												{
 													"name": "PipelineRunId",
@@ -198,13 +198,8 @@
 													}
 												}
 											],
-											"oracleReaderQuery": {
-												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
-												"type": "Expression"
-											},
-											"partitionOption": "None",
-											"convertDecimalToInteger": false,
-											"queryTimeout": "02:00:00"
+											"query": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+											"partitionOption": "None"
 										},
 										"sink": {
 											"type": "ParquetSink",
@@ -227,29 +222,13 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_Oracle_SIDAuth",
+											"referenceName": "Ingest_DS_AzurePostgreSQL_SQLAuth",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSHostname": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
-													"type": "Expression"
-												},
-												"DSUsername": {
-													"value": "@activity('Fetch SQL Auth Username').output.value",
-													"type": "Expression"
-												},
-												"DSOracleSid": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
-													"type": "Expression"
-												},
-												"DSPortNumber": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
-													"type": "Expression"
-												},
-												"DSPassword": {
-													"value": "@activity('Fetch SQL Auth Password').output.value",
-													"type": "Expression"
-												}
+												"DSHostName": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+												"DSDatabaseName": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+												"DSUserName": "@activity('Fetch SQL Login Auth Username').output.value",
+												"DSPassword": "@activity('Fetch SQL Login Auth Password').output.value"
 											}
 										}
 									],
@@ -344,6 +323,60 @@
 							}
 						}
 					]
+				}
+			},
+			{
+				"name": "Update Metadata Load Status",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "MS SQL Type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[ingest].[SetIngestLoadStatus]",
+					"storedProcedureParameters": {
+						"DatasetId": {
+							"value": {
+								"value": "@pipeline().parameters.DatasetId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"IngestStage": {
+							"value": "Raw",
+							"type": "String"
+						},
+						"LoadType": {
+							"value": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.LoadType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FileLoadDateTime": {
+							"value": {
+								"value": "@variables('LocalRunDateTime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Common_LS_cumulusdatabase",
+					"type": "LinkedServiceReference"
 				}
 			}
 		],
