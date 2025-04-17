@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "Stage Executor",
+    "description": "CF.Cumulus pipeline used to execute Worker pipelines within a given execution stage. This pipeline will be called once for each stage, then execute all Workers in parallel."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "3c0250c8-61a9-8b5f-4511-7f2b28ee439b"
+  }
+}

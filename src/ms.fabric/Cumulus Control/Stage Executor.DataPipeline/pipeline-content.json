@@ -1,0 +1,127 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "isSequential": false,
+          "batchCount": 50,
+          "items": {
+            "value": "@activity('Get Pipelines').output.value",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "ExecutePipeline",
+              "typeProperties": {
+                "pipeline": {
+                  "referenceName": "9d24e712-2c41-b246-40af-a4ed44e45b2f",
+                  "type": "PipelineReference"
+                },
+                "parameters": {
+                  "executionId": {
+                    "value": "@pipeline().parameters.ExecutionId",
+                    "type": "Expression"
+                  },
+                  "stageId": {
+                    "value": "@pipeline().parameters.StageId",
+                    "type": "Expression"
+                  },
+                  "pipelineId": {
+                    "value": "@item().PipelineId",
+                    "type": "Expression"
+                  }
+                },
+                "waitOnCompletion": true
+              },
+              "policy": {
+                "secureInput": false
+              },
+              "name": "Call Pipeline Executor",
+              "description": "Run the required worker pipeline and wait for its completion. Update metadata once done.",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "Execute Pipelines",
+        "description": "Second level ForEach to run in parallel all pipelines within the stage. Items for iteration passed from the Get Pipelines lookup activity.",
+        "dependsOn": [
+          {
+            "activity": "Get Pipelines",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "FabricSqlDatabaseSource",
+            "sqlReaderStoredProcedureName": "[control].[GetPipelinesInStage]",
+            "storedProcedureParameters": {
+              "ExecutionId": {
+                "value": {
+                  "value": "@pipeline().parameters.ExecutionId",
+                  "type": "Expression"
+                },
+                "type": "Guid"
+              },
+              "StageId": {
+                "value": {
+                  "value": "@pipeline().parameters.StageId",
+                  "type": "Expression"
+                },
+                "type": "Int32"
+              }
+            },
+            "partitionOption": "None",
+            "queryTimeout": "02:00:00"
+          },
+          "datasetSettings": {
+            "type": "FabricSqlDatabaseTable",
+            "schema": [],
+            "connectionSettings": {
+              "name": "Metadata Database",
+              "properties": {
+                "type": "FabricSqlDatabase",
+                "typeProperties": {
+                  "artifactId": "8bc74d80-e72c-847a-4f62-e5c0bdd6042c",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000"
+                },
+                "externalReferences": {
+                  "connection": "12dda100-1cd7-45b2-b893-3d0a0d6300c9"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.00:10:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Get Pipelines",
+        "description": "Returns all pipelines from the metadata to be executed within a given processing stage.",
+        "dependsOn": []
+      }
+    ],
+    "parameters": {
+      "StageId": {
+        "type": "int"
+      },
+      "ExecutionId": {
+        "type": "string"
+      }
+    },
+    "folder": {
+      "name": "Cumulus.Control"
+    }
+  }
+}

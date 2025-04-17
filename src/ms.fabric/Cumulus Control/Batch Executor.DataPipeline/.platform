@@ -1,0 +1,12 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "DataPipeline",
+    "displayName": "Batch Executor",
+    "description": "CF.Cumulus pipeline used to bootstrap the orchestration framework in perform the first level ForEach calls in sequence for the metadata stages."
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "74f3661b-89ea-9bd5-488f-9d6334ee7d88"
+  }
+}
