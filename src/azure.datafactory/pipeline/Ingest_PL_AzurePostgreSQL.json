@@ -159,12 +159,6 @@
 									"type": "Copy",
 									"dependsOn": [
 										{
-											"activity": "Fetch SQL Auth Password",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
-										{
 											"activity": "Fetch SQL Auth Username",
 											"dependencyConditions": [
 												"Succeeded"
@@ -198,7 +192,10 @@
 													}
 												}
 											],
-											"query": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+											"query": {
+												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
 											"partitionOption": "None"
 										},
 										"sink": {
@@ -228,7 +225,10 @@
 												"DSHostName": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 												"DSDatabaseName": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
 												"DSUserName": "@activity('Fetch SQL Login Auth Username').output.value",
-												"DSPassword": "@activity('Fetch SQL Login Auth Password').output.value"
+												"DSPassword": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
+													"type": "Expression"
+												}
 											}
 										}
 									],
@@ -256,30 +256,6 @@
 											}
 										}
 									]
-								},
-								{
-									"name": "Fetch SQL Auth Password",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"url": {
-											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
-											"type": "Expression"
-										},
-										"authentication": {
-											"type": "MSI",
-											"resource": "https://vault.azure.net"
-										}
-									}
 								},
 								{
 									"name": "Fetch SQL Auth Username",
