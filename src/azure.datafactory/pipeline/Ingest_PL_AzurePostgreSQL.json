@@ -224,7 +224,10 @@
 											"parameters": {
 												"DSHostName": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 												"DSDatabaseName": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
-												"DSUserName": "@activity('Fetch SQL Login Auth Username').output.value",
+												"DSUserName": {
+													"value": "@activity('Fetch SQL Auth Username').output.value",
+													"type": "Expression"
+												},
 												"DSPassword": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
 													"type": "Expression"
