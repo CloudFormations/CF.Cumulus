@@ -1,5 +1,5 @@
 {
-	"name": "Ingest_PL_AzurePostgreSQL",
+	"name": "Ingest_PL_PostgreSQL",
 	"properties": {
 		"activities": [
 			{
@@ -169,7 +169,7 @@
 										"timeout": "0.12:00:00",
 										"retry": 0,
 										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
+										"secureOutput": false,
 										"secureInput": false
 									},
 									"userProperties": [],
@@ -364,7 +364,8 @@
 				"type": "int"
 			},
 			"RunDateTime": {
-				"type": "String"
+				"type": "String",
+				"defaultValue": " "
 			}
 		},
 		"variables": {
