@@ -28,6 +28,9 @@
 			},
 			"DSServicePrincipalKey": {
 				"type": "string"
+			},
+			"DSEntityName": {
+				"type": "string"
 			}
 		},
 		"folder": {
@@ -35,6 +38,12 @@
 		},
 		"annotations": [],
 		"type": "DynamicsCrmEntity",
-		"schema": []
+		"schema": [],
+		"typeProperties": {
+			"entityName": {
+				"value": "@dataset().DSEntityName",
+				"type": "Expression"
+			}
+		}
 	}
 }

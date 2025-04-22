@@ -26,7 +26,14 @@
 								{
 									"name": "Dynamics CRM Copy",
 									"type": "Copy",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Fetch User Auth Username",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.23:50:00",
 										"retry": 0,
@@ -81,11 +88,15 @@
 													"type": "Expression"
 												},
 												"DSServicePrincipalId": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"value": "@activity('Fetch User Auth Username').output.value",
 													"type": "Expression"
 												},
 												"DSServicePrincipalKey": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
+													"type": "Expression"
+												},
+												"DSEntityName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
 													"type": "Expression"
 												}
 											}
@@ -115,6 +126,30 @@
 											}
 										}
 									]
+								},
+								{
+									"name": "Fetch User Auth Username",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
 								}
 							]
 						}
