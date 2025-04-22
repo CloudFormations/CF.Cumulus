@@ -20,14 +20,14 @@ def checkLoadAction(loadAction: str) -> None:
     if loadAction in loadActionAllowedValues:
         print(f'Success, load type = {loadAction}')
     elif loadAction not in loadActionAllowedValues: 
-        raise Exception(f'Load Type of {loadAction} not yet supported in cleansed layer logic. Please review.')
+        raise ValueError(f'Load Type of {loadAction} not yet supported in cleansed layer logic. Please review.')
     else:
         raise Exception('Unexpected state.')
     
     return
 
 # For incremental loads we require primary keys to be used in the merge criteria.
-def checkMergeAndPKConditions(loadAction:str, pkList: list()) -> None:
+def checkMergeAndPKConditions(loadAction: str, pkList: list()) -> None:
     """
     Checks the combination of load type and primary key values providedprovided to prevent unsupported load types occurring.
     Currently supports Full ('F') and Incremental ('I') loads.
@@ -43,7 +43,7 @@ def checkMergeAndPKConditions(loadAction:str, pkList: list()) -> None:
     elif loadAction.upper() == "F" and len(pkList) == 0:
         print(f'Full loading configured with no primary/business keys. This is a valid combination, assuming no subsequent incremental loads are due to take place.')
     elif loadAction.upper() == "I" and len(pkList) == 0:
-        raise Exception(f'Incremental loading configured with no primary/business keys. This is not a valid combination and will result in merge failures as no merge criteria can be specified.')
+        raise ValueError(f'Incremental loading configured with no primary/business keys. This is not a valid combination and will result in merge failures as no merge criteria can be specified.')
     else:
         raise Exception('Unexpected state.')
 
@@ -57,7 +57,7 @@ def checkContainerName(containerName: str) -> None:
     if containerName in containers:
         print(f'container name {containerName} is supported.')
     elif containerName not in containers:
-        raise Exception(f"Container name '{containerName}' not supported.")
+        raise ValueError(f"Container name '{containerName}' not supported.")
     else:
         raise Exception('Unexpected state.')
 
@@ -100,10 +100,10 @@ def setTablePath(schemaName: str, tableName: str) -> str:
     """
 
     if '.' in schemaName:
-        raise Exception('Reserved character ''.'' found in the schemaName parameter: {schemaName}. Please review metadata value provided and correct as required' )
+        raise ValueError('Reserved character ''.'' found in the schemaName parameter: {schemaName}. Please review metadata value provided and correct as required' )
 
     if '.' in tableName:
-        raise Exception('Reserved character ''.'' found in the tableName parameter: {tableName}. Please review metadata value provided and correct as required' )
+        raise ValueError('Reserved character ''.'' found in the tableName parameter: {tableName}. Please review metadata value provided and correct as required' )
 
     return f'{schemaName}.{tableName}'
 
@@ -170,7 +170,7 @@ def compareRawLoadVsLastCleansedDate(rawLastLoadDate: datetime.date , cleansedLa
         elif (rawLastLoadDate < cleansedLastLoadDate) and (manualOverride is True):
             print('Raw file load date less than the cleansed last run date. Manual override is selected, and this load historic is intended.')
         elif (rawLastLoadDate < cleansedLastLoadDate) and (manualOverride is False):
-            raise Exception('Raw file load date less than the cleansed last run date. This is not supported behaviour and needs manual overriding if intended.')
+            raise ValueError('Raw file load date less than the cleansed last run date. This is not supported behaviour and needs manual overriding if intended.')
         else:
             raise Exception('Unexpected state.')
     else:
