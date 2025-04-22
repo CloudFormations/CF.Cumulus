@@ -1,141 +1,7 @@
 {
-	"name": "Ingest_PL_D365",
+	"name": "Ingest_PL_Sharepoint_Sheet",
 	"properties": {
 		"activities": [
-			{
-				"name": "File Type",
-				"type": "Switch",
-				"dependsOn": [
-					{
-						"activity": "Set Directory Path",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
-				"userProperties": [],
-				"typeProperties": {
-					"on": {
-						"value": "@replace(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'Ingest_LS_','')",
-						"type": "Expression"
-					},
-					"cases": [
-						{
-							"value": "DynamicsCRM_SPAuth",
-							"activities": [
-								{
-									"name": "Dynamics CRM Copy",
-									"type": "Copy",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.23:50:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"source": {
-											"type": "DynamicsCrmSource",
-											"additionalColumns": [
-												{
-													"name": "PipelineRunId",
-													"value": {
-														"value": "@pipeline().RunId",
-														"type": "Expression"
-													}
-												},
-												{
-													"name": "PipelineExecutionDateTime",
-													"value": {
-														"value": "@utcnow()",
-														"type": "Expression"
-													}
-												}
-											],
-											"query": {
-												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
-												"type": "Expression"
-											}
-										},
-										"sink": {
-											"type": "ParquetSink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "PreserveHierarchy"
-											},
-											"formatSettings": {
-												"type": "ParquetWriteSettings"
-											}
-										},
-										"enableStaging": false
-									},
-									"inputs": [
-										{
-											"referenceName": "Ingest_DS_Dynamics_SPAuth",
-											"type": "DatasetReference",
-											"parameters": {
-												"DSServiceURI": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
-													"type": "Expression"
-												},
-												"DSServicePrincipalId": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
-													"type": "Expression"
-												},
-												"DSServicePrincipalKey": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
-													"type": "Expression"
-												}
-											}
-										}
-									],
-									"outputs": [
-										{
-											"referenceName": "Ingest_DS_DataLake_Parquet",
-											"type": "DatasetReference",
-											"parameters": {
-												"DSStorageName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
-													"type": "Expression"
-												},
-												"DSContainerName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
-													"type": "Expression"
-												},
-												"DSDirectoryName": {
-													"value": "@variables('DirectoryName')",
-													"type": "Expression"
-												},
-												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
-													"type": "Expression"
-												}
-											}
-										}
-									]
-								}
-							]
-						}
-					],
-					"defaultActivities": [
-						{
-							"name": "Supported Linked Service Type",
-							"type": "Fail",
-							"dependsOn": [],
-							"userProperties": [],
-							"typeProperties": {
-								"message": {
-									"value": "@concat('The Linked Service type and authentication combination is not currently supported.')",
-									"type": "Expression"
-								},
-								"errorCode": "16"
-							}
-						}
-					]
-				}
-			},
 			{
 				"name": "Get Ingest Payload",
 				"type": "Lookup",
@@ -272,7 +138,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "File Type",
+						"activity": "Copy Excel Sheet to csv",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -320,6 +186,96 @@
 					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "Copy Excel Sheet to csv",
+				"description": " ",
+				"type": "Copy",
+				"dependsOn": [
+					{
+						"activity": "Set Directory Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "DelimitedTextSource",
+						"storeSettings": {
+							"type": "AzureBlobFSReadSettings",
+							"recursive": true,
+							"enablePartitionDiscovery": false
+						},
+						"formatSettings": {
+							"type": "DelimitedTextReadSettings"
+						}
+					},
+					"sink": {
+						"type": "DelimitedTextSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "DelimitedTextWriteSettings",
+							"quoteAllText": true,
+							"fileExtension": ".txt"
+						}
+					},
+					"enableStaging": false,
+					"translator": {
+						"type": "TabularTranslator",
+						"typeConversion": true,
+						"typeConversionSettings": {
+							"allowDataTruncation": true,
+							"treatBooleanAsNumber": false
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "Ingest_DS_DataLake_Csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"DSFileName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+								"type": "Expression"
+							},
+							"DSDirectoryName": {
+								"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '/',    \n    activity('Get Ingest Payload').output.firstRow.SourcePath,\n    '/',\n    activity('Get Ingest Payload').output.firstRow.SourceName)",
+								"type": "Expression"
+							},
+							"DSContainerName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+								"type": "Expression"
+							},
+							"DSStorageName": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "Ingest_DS_DataLake_Csv",
+						"type": "DatasetReference",
+						"parameters": {
+							"DSFileName": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+							"DSDirectoryName": "@variables('DirectoryName')",
+							"DSContainerName": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+							"DSStorageName": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName"
+						}
+					}
+				]
 			}
 		],
 		"parameters": {
@@ -352,6 +308,8 @@
 			"Cloud Formations",
 			"CF.Cumulus",
 			"Ingest"
-		]
-	}
+		],
+		"lastPublishTime": "2025-04-11T13:21:10Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }

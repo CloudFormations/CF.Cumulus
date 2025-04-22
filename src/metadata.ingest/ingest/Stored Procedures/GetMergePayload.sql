@@ -1,3 +1,4 @@
+
 CREATE PROCEDURE [ingest].[GetMergePayload]
     (
     @DatasetId INT
@@ -21,7 +22,7 @@ BEGIN
     ON 
         ds.MergeComputeConnectionFK = cn2.ComputeConnectionId
     INNER JOIN
-        ingest.Connections AS cn3
+        common.Connections AS cn3
     ON 
         cn3.ConnectionDisplayName = 'PrimaryResourceGroup'
     INNER JOIN
@@ -180,6 +181,7 @@ BEGIN
 
     SELECT 
         [cn].[ConnectionDisplayName] AS 'RawSchemaName',
+        [cn2].[ConnectionDisplayName] AS 'ComputeName',
         [cn2].[ConnectionLocation] AS 'ComputeWorkspaceURL',
         [cn2].[ComputeLocation] AS 'ComputeClusterId',
         [cn2].[ComputeSize] AS 'ComputeSize',
@@ -195,8 +197,10 @@ BEGIN
         [cn6].[SourceLocation] AS 'CleansedContainerName',
         [cn5].[Username] AS 'RawStorageAccessKey',
         [cn6].[Username] AS 'CleansedStorageAccessKey',
+        [cn7].[ConnectionLocation] AS 'KeyVaultAddress',
 
         ds.DatasetDisplayName,
+        ds.SourcePath,
         ds.SourceName,
         ds.ExtensionType AS 'RawFileType',
         ds.VersionNumber,
@@ -239,6 +243,9 @@ BEGIN
         [common].Connections AS cn6
     ON 
         cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation IN ('cleansed','silver')
+    INNER JOIN 
+        [common].Connections AS cn7
+    ON cn7.ConnectionDisplayName = 'PrimaryKeyVault'
     WHERE
         ds.DatasetId = @DatasetId
     AND
@@ -258,5 +265,3 @@ BEGIN
 
 
 END
-GO
-

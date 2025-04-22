@@ -19,7 +19,13 @@
 		"annotations": [],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
+			"server": "@{linkedService().LSHostName}",
+			"database": "@{linkedService().LSDatabaseName}",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "@{linkedService().LSUsername}",
+			"password": "@{linkedService().LSPassword}"
 		}
 	}
 }

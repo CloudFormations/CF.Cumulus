@@ -1,9 +1,9 @@
 {
-	"name": "Ingest_PL_D365",
+	"name": "Ingest_PL_Salesforce",
 	"properties": {
 		"activities": [
 			{
-				"name": "File Type",
+				"name": "Salesforce Type",
 				"type": "Switch",
 				"dependsOn": [
 					{
@@ -21,23 +21,30 @@
 					},
 					"cases": [
 						{
-							"value": "DynamicsCRM_SPAuth",
+							"value": "Salesforce_OAuth",
 							"activities": [
 								{
-									"name": "Dynamics CRM Copy",
+									"name": "Salesforce OAuth Copy",
 									"type": "Copy",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Fetch Salesforce Client Id",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
-										"timeout": "0.23:50:00",
+										"timeout": "0.12:00:00",
 										"retry": 0,
 										"retryIntervalInSeconds": 30,
-										"secureOutput": false,
+										"secureOutput": true,
 										"secureInput": false
 									},
 									"userProperties": [],
 									"typeProperties": {
 										"source": {
-											"type": "DynamicsCrmSource",
+											"type": "SalesforceV2Source",
 											"additionalColumns": [
 												{
 													"name": "PipelineRunId",
@@ -57,34 +64,43 @@
 											"query": {
 												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 												"type": "Expression"
-											}
+											},
+											"includeDeletedObjects": false
 										},
 										"sink": {
 											"type": "ParquetSink",
 											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "PreserveHierarchy"
+												"type": "AzureBlobFSWriteSettings"
 											},
 											"formatSettings": {
 												"type": "ParquetWriteSettings"
 											}
 										},
-										"enableStaging": false
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_Dynamics_SPAuth",
+											"referenceName": "Ingest_DS_Salesforce_OAuth",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSServiceURI": {
+												"DSClientId": {
+													"value": "@activity('Fetch Salesforce Client Id').output.value",
+													"type": "Expression"
+												},
+												"DSAPIVersion": "62.0",
+												"DSEnvironmentUrl": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 													"type": "Expression"
 												},
-												"DSServicePrincipalId": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
-													"type": "Expression"
-												},
-												"DSServicePrincipalKey": {
+												"DSSecretName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
 													"type": "Expression"
 												}
@@ -115,6 +131,30 @@
 											}
 										}
 									]
+								},
+								{
+									"name": "Fetch Salesforce Client Id",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.Username,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
 								}
 							]
 						}
@@ -272,7 +312,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "File Type",
+						"activity": "Salesforce Type",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -352,6 +392,8 @@
 			"Cloud Formations",
 			"CF.Cumulus",
 			"Ingest"
-		]
-	}
+		],
+		"lastPublishTime": "2025-04-11T13:21:11Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }

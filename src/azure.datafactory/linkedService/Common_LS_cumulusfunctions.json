@@ -9,7 +9,8 @@
 		],
 		"type": "AzureFunction",
 		"typeProperties": {
-			"functionAppUrl": "https://cumulusfunctionappdev.azurewebsites.net",
+			"functionAppUrl": "https://cfcdemodevfuncuks01.azurewebsites.net",
+			"authentication": "Anonymous",
 			"functionKey": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
@@ -17,8 +18,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"secretName": "cumulusfunctionsKey"
-			},
-			"authentication": "Anonymous"
+			}
 		}
 	}
 }

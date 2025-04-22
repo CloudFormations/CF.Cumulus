@@ -96,7 +96,7 @@ resource storageAccountRoleAssignment 'Microsoft.Authorization/roleAssignments@2
   name: guid(dataFactory.id, storageAccount.id, 'StorageBlobDataContributor')
   scope: storageAccount
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Reader role
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe') // Storage Blob Data Contributor role
     principalId: dataFactory.identity.principalId
   }
 }

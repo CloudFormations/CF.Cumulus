@@ -1,0 +1,132 @@
+name: CF.Cumulus-Data-Factory-CICD
+
+on:
+  # push:
+  #   branches:
+  #   - main
+  workflow_dispatch:
+
+permissions:
+      id-token: write
+      contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+
+    - uses: actions/checkout@v3
+# Installs Node and the npm packages saved in your package.json file in the build
+    - name: Setup Node.js environment
+      uses: actions/setup-node@v3.4.1
+      with:
+        node-version: 18.x
+        
+    - name: install ADF Utilities package
+      run: npm install
+      working-directory: ${{github.workspace}}/src/azure.datafactory/  # (1) provide the folder location of the package.json file
+            
+# Validates all of the Data Factory resources in the repository. You'll get the same validation errors as when "Validate All" is selected.
+    - name: Validate
+      run: npm run build validate ${{github.workspace}}/src/azure.datafactory /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RGNAME }}/providers/Microsoft.DataFactory/factories/${{ secrets.ADFNAME }} # (2) The validate command needs the root folder location of your repository where all the objects are stored. And the 2nd parameter is the resourceID of the ADF instance 
+      working-directory: ${{github.workspace}}/src/azure.datafactory/
+ 
+
+    - name: Validate and Generate ARM template
+      run: npm run build export ${{github.workspace}}/src/azure.datafactory /subscriptions/${{ secrets.AZURE_SUBSCRIPTION_ID }}/resourceGroups/${{ secrets.RGNAME }}/providers/Microsoft.DataFactory/factories/${{ secrets.ADFNAME }} "ExportedArmTemplate"  # (3) The build command, as validate, needs the root folder location of your repository where all the objects are stored. And the 2nd parameter is the resourceID of the ADF instance. The 3rd parameter is the exported ARM template artifact name 
+      working-directory: ${{github.workspace}}/src/azure.datafactory/
+ 
+# In order to leverage the artifact in another job, we need to upload it with the upload action 
+    - name: upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ExportedArmTemplate # (4) use the same artifact name you used in the previous export step
+        path: ${{github.workspace}}/src/azure.datafactory/ExportedArmTemplate
+
+  deploy_dev:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+    
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ExportedArmTemplate # (5) Artifact name
+
+
+      - name: Login via Az module
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true 
+
+      - name: data-factory-deploy
+        uses: Azure/data-factory-deploy-action@v1.2.0
+        with:
+          resourceGroupName: ${{ secrets.RGNAME }}
+          dataFactoryName: ${{ secrets.ADFNAME }}
+          armTemplateFile: ARMTemplateForFactory.json
+          armTemplateParametersFile: ARMTemplateParametersForFactory.json
+
+  deploy_test:
+    needs: deploy_dev
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+    
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ExportedArmTemplate # (5) Artifact name
+
+
+      - name: Login via Az module
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true 
+
+      - name: data-factory-deploy
+        uses: Azure/data-factory-deploy-action@v1.2.0
+        with:
+          resourceGroupName: ${{ secrets.RGNAME }}
+          dataFactoryName: ${{ secrets.ADFNAME }}
+          armTemplateFile: ARMTemplateForFactory.json
+          armTemplateParametersFile: ARMTemplateParametersForFactory.json
+          # additionalParameters: key1=value1
+
+
+  deploy_prod:
+    needs: deploy_test
+    runs-on: ubuntu-latest
+    environment: prod
+    steps:
+    
+      - name: Download a Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ExportedArmTemplate # (5) Artifact name
+
+
+      - name: Login via Az module
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          enable-AzPSSession: true 
+
+      - name: data-factory-deploy
+        uses: Azure/data-factory-deploy-action@v1.2.0
+        with:
+          resourceGroupName: ${{ secrets.RGNAME }}
+          dataFactoryName: ${{ secrets.ADFNAME }}
+          armTemplateFile: ARMTemplateForFactory.json
+          armTemplateParametersFile: ARMTemplateParametersForFactory.json
+          # additionalParameters: key1=value1

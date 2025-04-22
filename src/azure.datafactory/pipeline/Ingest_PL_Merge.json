@@ -66,7 +66,14 @@
 								{
 									"name": "Check Payload Validity Small Databricks Compute",
 									"type": "DatabricksNotebook",
-									"dependsOn": [],
+									"dependsOn": [
+										{
+											"activity": "Get Databricks Compute Id",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
 									"policy": {
 										"timeout": "0.12:00:00",
 										"retry": 0,
@@ -108,10 +115,7 @@
 												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
 												"type": "Expression"
 											},
-											"ClusterId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeClusterId",
-												"type": "Expression"
-											},
+											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
 											"SubscriptionId": {
 												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
@@ -171,12 +175,31 @@
 												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
 												"type": "Expression"
 											},
-											"ClusterId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeClusterId",
-												"type": "Expression"
-											},
+											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
 											"SubscriptionId": {
 												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
+										}
+									}
+								},
+								{
+									"name": "Get Databricks Compute Id",
+									"type": "ExecutePipeline",
+									"dependsOn": [],
+									"policy": {
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"pipeline": {
+											"referenceName": "Get_Databricks_Compute_ID",
+											"type": "PipelineReference"
+										},
+										"waitOnCompletion": true,
+										"parameters": {
+											"Payload": {
+												"value": "@string(activity('Get Merge Payload').output.firstRow)",
 												"type": "Expression"
 											}
 										}
@@ -424,6 +447,9 @@
 		"variables": {
 			"PipelineRunDateTime": {
 				"type": "String"
+			},
+			"Clusters": {
+				"type": "Array"
 			}
 		},
 		"folder": {

@@ -1,21 +1,21 @@
 {
-	"name": "Ingest_DS_JSON_HTTP_AnonAuth",
+	"name": "Ingest_DS_Binary_HTTP_AnonAuth",
 	"properties": {
 		"linkedServiceName": {
 			"referenceName": "Ingest_LS_HTTP_AnonAuth",
 			"type": "LinkedServiceReference",
 			"parameters": {
 				"BaseURL": {
-					"value": "@dataset().BaseURL",
+					"value": "@dataset().DSBaseUrl",
 					"type": "Expression"
 				}
 			}
 		},
 		"parameters": {
-			"RelativeURL": {
+			"DSBaseUrl": {
 				"type": "string"
 			},
-			"BaseURL": {
+			"DSRelativeUrl": {
 				"type": "string"
 			}
 		},
@@ -23,16 +23,15 @@
 			"name": "Ingest"
 		},
 		"annotations": [],
-		"type": "Json",
+		"type": "Binary",
 		"typeProperties": {
 			"location": {
 				"type": "HttpServerLocation",
 				"relativeUrl": {
-					"value": "@dataset().RelativeURL",
+					"value": "@dataset().DSRelativeUrl",
 					"type": "Expression"
 				}
 			}
-		},
-		"schema": {}
+		}
 	}
 }

@@ -4,8 +4,8 @@ CREATE TABLE [ingest].[Attributes](
 	[AttributeName] [nvarchar](50) NOT NULL,
 	[AttributeSourceDataType] [nvarchar](50) NULL,
 	[AttributeTargetDataType] [nvarchar](50) NULL,
-	[AttributeTargetDataFormat] [varchar](100) NULL,
-	[AttributeDescription] [nvarchar](200) NULL,
+	[AttributeTargetDataFormat] [varchar](500) NULL,
+	[AttributeDescription] [nvarchar](500) NULL,
 	[PkAttribute] [bit] NOT NULL,
 	[PartitionByAttribute] [bit] NOT NULL,
 	[Enabled] [bit] NOT NULL

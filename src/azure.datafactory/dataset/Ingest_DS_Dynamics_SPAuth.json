@@ -1,0 +1,40 @@
+{
+	"name": "Ingest_DS_Dynamics_SPAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_Dynamics_SPAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"ServiceURI": {
+					"value": "@dataset().DSServiceURI",
+					"type": "Expression"
+				},
+				"ServicePrincipalId": {
+					"value": "@dataset().DSServicePrincipalId",
+					"type": "Expression"
+				},
+				"ServicePrincipalKey": {
+					"value": "@dataset().DSServicePrincipalKey",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSServiceURI": {
+				"type": "string"
+			},
+			"DSServicePrincipalId": {
+				"type": "string"
+			},
+			"DSServicePrincipalKey": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "DynamicsCrmEntity",
+		"schema": []
+	}
+}
