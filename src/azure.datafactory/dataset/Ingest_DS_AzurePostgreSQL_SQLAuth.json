@@ -20,6 +20,10 @@
 				"LSPassword": {
 					"value": "@dataset().DSPassword",
 					"type": "Expression"
+				},
+				"LSPortNumber": {
+					"value": "@dataset().DSPortNumber",
+					"type": "Expression"
 				}
 			}
 		},
@@ -35,6 +39,9 @@
 			},
 			"DSPassword": {
 				"type": "String"
+			},
+			"DSPortNumber": {
+				"type": "string"
 			}
 		},
 		"folder": {
