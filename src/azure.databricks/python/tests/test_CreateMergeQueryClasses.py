@@ -1,4 +1,4 @@
-from notebooks.ingest.utils.CreateMergeQueryClasses import format_column_name_allow_num_char_only, format_column_name_remove_spark_forbidden_characters, format_column_name_all_characters, format_exploded_column, FormatColumn, DecimalFormatColumn, DateFormatColumn, TimestampFormatColumn
+from notebooks.ingest.utils.CreateMergeQueryClasses import *
 
 import pytest
 
@@ -24,11 +24,80 @@ class TestFormatColumnNameAllCharacters():
         expected = "NoProblems"
         assert actual == expected
 
+class TestFormatNestedColumnName():
+    def test_format_nested_column_name_none(self):
+        column_name = "NoProblems"
+        column_format = ""
+        actual = format_nested_column_name(column_name,column_format)
+        expected = "NoProblems"
+        assert actual == expected
+
+    def test_format_nested_column_name_nested_only(self):
+        column_name = "NoProblems"
+        column_format = "NESTED:(column)"
+        actual = format_nested_column_name(column_name,column_format)
+        expected = "column"
+        assert actual == expected
+
+    def test_format_nested_column_name_nested_dot(self):
+        column_name = "NoProblems"
+        column_format = "NESTED:(column.subcolumn)"
+        actual = format_nested_column_name(column_name,column_format)
+        expected = "column`.`subcolumn"
+        assert actual == expected
+
+    def test_format_nested_column_name_nested_multi_dot(self):
+        column_name = "NoProblems"
+        column_format = "NESTED:(column.subcolumn.subsubcolumn)"
+        actual = format_nested_column_name(column_name,column_format)
+        expected = "column`.`subcolumn`.`subsubcolumn"
+        assert actual == expected
+
+class TestFormatNestedColumnFormat():
+    def test_format_nested_column_format_none(self):
+        column_format = ""
+        actual = format_nested_column_format(column_format)
+        expected = ""
+        assert actual == expected
+
+    def test_format_nested_column_format_nested_only(self):
+        column_format = "NESTED:(column)"
+        actual = format_nested_column_format(column_format)
+        expected = ""
+        assert actual == expected
+
+    def test_format_nested_column_format_nested_dot(self):
+        column_format = "NESTED:(column.subcolumn)"
+        actual = format_nested_column_format(column_format)
+        expected = ""
+        assert actual == expected
+
+    def test_format_nested_column_format_other(self):
+        column_format = "YYYY-mm-DD"
+        actual = format_nested_column_format(column_format)
+        expected = "YYYY-mm-DD"
+        assert actual == expected
+
 class TestFormatExplodeColumn():
-    def test_format_exploded_column(self):
+    def test_format_exploded_column_name_none(self):
+        column_name = 'NoProblems'
         column_format = ''
-        actual = format_exploded_column(column_format)
-        expected = None
+        actual = format_exploded_column_name(column_name, column_format)
+        expected = 'NoProblems'
+        assert actual == expected
+
+    def test_format_exploded_column_name_explode(self):
+        column_name = 'NoProblems'
+        column_format = 'EXPLODE:(column)'
+        actual = format_exploded_column_name(column_name, column_format)
+        expected = 'column'
+        assert actual == expected
+
+    def test_format_exploded_column_name_explode_nested(self):
+        column_name = 'NoProblems'
+        column_format = 'EXPLODE:(column.subcolumn)'
+        actual = format_exploded_column_name(column_name, column_format)
+        expected = 'column`.`subcolumn'
         assert actual == expected
 
 class TestFormatColumnTrueColumnName():
@@ -128,6 +197,15 @@ class TestFormatColumnFormatString():
         format_column = FormatColumn(column_name, column_type, column_format)
         actual = format_column.column_format_string(true_column_name= "NoProblem")
         expected = "cast(`NoProblems` as STRING) as `NoProblem`"
+        assert actual == expected
+    
+    def test_column_format_string_nested(self):
+        column_name="NoProblems"
+        column_type = "STRING"
+        column_format = "NESTED:(column.subcolumn)"
+        format_column = FormatColumn(column_name, column_type, column_format)
+        actual = format_column.column_format_string(true_column_name= "NoProblem")
+        expected = "cast(`column`.`subcolumn` as STRING) as `NoProblem`"
         assert actual == expected
 
 class TestDecimalFormatColumnFixDecimalType():
@@ -343,6 +421,3 @@ class TestTimestampFormatColumnFormatString():
         expected2 = "to_timestamp(`NoProblems`,'ddMMyy HH:mm:ss') as `NoProblem`"
         assert actual2 == expected2
 
-class TestNestedFormatColumnString():
-    def test_1(self):
-        pass
