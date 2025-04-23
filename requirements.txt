@@ -1,0 +1,4 @@
+pytest==7.2.2
+pytest-cov==4.0.0
+ruff==v0.0.260
+coverage-badge~=1.1.0
