@@ -229,10 +229,7 @@
 													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
 													"type": "Expression"
 												},
-												"DSPortNumber": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
-													"type": "Expression"
-												}
+												"DSPortNumber": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort"
 											}
 										}
 									],
