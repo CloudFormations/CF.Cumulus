@@ -151,10 +151,30 @@ BEGIN
             ds.[Enabled] = 1    
     END
 
-    -- Logic not required/built yet.
     ELSE IF @SourceLanguageType = 'SQL'
     BEGIN
-        SET @SourceQuery = @SourceQuery
+    SELECT
+        @SourceQuery += ',' + [AttributeName]
+    FROM
+        [ingest].[Datasets] AS ds
+        INNER JOIN [ingest].[Attributes] AS at
+            ON ds.[DatasetId] = at.[DatasetFK]
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+    AND 
+    at.Enabled = 1
+
+    SELECT 
+            @SourceQuery = 'SELECT ' + STUFF(@SourceQuery,1,1,'') + ' FROM ' + ds.[SourcePath]+ '.' + ds.[SourceName]
+        FROM 
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId 
+        AND 
+            ds.[Enabled] = 1
+    
     END
 
     ELSE IF @SourceLanguageType = 'WorkdayXML'
