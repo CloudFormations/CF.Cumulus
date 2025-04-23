@@ -21,7 +21,10 @@
 					"value": "@dataset().DSPassword",
 					"type": "Expression"
 				},
-				"LSPortNumber": " "
+				"LSPortNumber": {
+					"value": "@dataset().DSPortNumber",
+					"type": "Expression"
+				}
 			}
 		},
 		"parameters": {
