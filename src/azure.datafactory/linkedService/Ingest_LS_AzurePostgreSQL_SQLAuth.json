@@ -13,6 +13,9 @@
 			},
 			"LSPassword": {
 				"type": "String"
+			},
+			"LSPortNumber": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
@@ -20,7 +23,7 @@
 		"version": "2.0",
 		"typeProperties": {
 			"server": "@{linkedService().LSHostName}",
-			"port": 5432,
+			"port": "@{linkedService().LSPortNumber}",
 			"database": "@{linkedService().LSDatabaseName}",
 			"sslMode": 2,
 			"username": "@{linkedService().LSUserName}",
