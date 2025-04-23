@@ -134,7 +134,7 @@
 				}
 			},
 			{
-				"name": "MS SQL Type",
+				"name": "PostgreSQL Type",
 				"type": "Switch",
 				"dependsOn": [
 					{
@@ -310,7 +310,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "MS SQL Type",
+						"activity": "PostgreSQL Type",
 						"dependencyConditions": [
 							"Succeeded"
 						]
