@@ -20,7 +20,7 @@
 			"LSTenant": {
 				"type": "String"
 			},
-			"ServicePrinciplalID": {
+			"LSServicePrincipalID": {
 				"type": "String"
 			}
 		},
@@ -35,7 +35,7 @@
 			"username": "@{linkedService().LSServicePrincipalName}",
 			"authenticationType": "ServicePrincipal",
 			"tenant": "@{linkedService().LSTenant}",
-			"servicePrincipalId": "@{linkedService().ServicePrinciplalID}",
+			"servicePrincipalId": "@{linkedService().LSServicePrincipalID}",
 			"servicePrincipalCredentialType": "ServicePrincipalKey",
 			"servicePrincipalKey": {
 				"type": "AzureKeyVaultSecret",
