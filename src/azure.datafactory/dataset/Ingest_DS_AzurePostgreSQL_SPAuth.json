@@ -9,10 +9,6 @@
 					"value": "@dataset().DSServicePrincipalKey",
 					"type": "Expression"
 				},
-				"LSServicePrincipalId": {
-					"value": "@dataset().DSServicePrincipalId",
-					"type": "Expression"
-				},
 				"LSHostName": {
 					"value": "@dataset().DSHostName",
 					"type": "Expression"
@@ -27,10 +23,6 @@
 				},
 				"LSServicePrincipalName": {
 					"value": "@dataset().DSServicePrincipalName",
-					"type": "Expression"
-				},
-				"LSTenant": {
-					"value": "@dataset().DSTenant",
 					"type": "Expression"
 				}
 			}
