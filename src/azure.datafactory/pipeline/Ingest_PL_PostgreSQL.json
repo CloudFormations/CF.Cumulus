@@ -343,7 +343,18 @@
 												"DSHostName": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
 												"DSPortNumber": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
 												"DSDatabaseName": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
-												"DSServicePrincipalName": "@activity('Get Ingest Payload').output.firstRow.Username"
+												"DSServicePrincipalName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
+													"type": "Expression"
+												},
+												"DSTenant": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ResourceName",
+													"type": "Expression"
+												},
+												"DSServicePrincipalID": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.Username",
+													"type": "Expression"
+												}
 											}
 										}
 									],
