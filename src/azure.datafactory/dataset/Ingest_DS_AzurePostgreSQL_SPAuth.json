@@ -24,6 +24,14 @@
 				"LSServicePrincipalName": {
 					"value": "@dataset().DSServicePrincipalName",
 					"type": "Expression"
+				},
+				"LSTenant": {
+					"value": "@dataset().DSTenant",
+					"type": "Expression"
+				},
+				"LSServicePrincipalID": {
+					"value": "@dataset().DSServicePrincipalID",
+					"type": "Expression"
 				}
 			}
 		},
@@ -41,6 +49,12 @@
 				"type": "String"
 			},
 			"DSServicePrincipalName": {
+				"type": "String"
+			},
+			"DSTenant": {
+				"type": "String"
+			},
+			"DSServicePrincipalID": {
 				"type": "String"
 			}
 		},
