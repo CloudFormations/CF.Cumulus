@@ -31,9 +31,6 @@
 			"DSServicePrincipalKey": {
 				"type": "String"
 			},
-			"DSServicePrincipalId": {
-				"type": "String"
-			},
 			"DSHostName": {
 				"type": "String"
 			},
@@ -44,9 +41,6 @@
 				"type": "String"
 			},
 			"DSServicePrincipalName": {
-				"type": "String"
-			},
-			"DSTenant": {
 				"type": "String"
 			}
 		},
