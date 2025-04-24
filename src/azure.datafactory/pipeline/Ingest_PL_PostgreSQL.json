@@ -308,6 +308,22 @@
 									"typeProperties": {
 										"source": {
 											"type": "AzurePostgreSqlSource",
+											"additionalColumns": [
+												{
+													"name": "PipelineRunId",
+													"value": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													}
+												},
+												{
+													"name": "PipelineExecutionDateTime",
+													"value": {
+														"value": "@utcNow()",
+														"type": "Expression"
+													}
+												}
+											],
 											"query": {
 												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
 												"type": "Expression"
