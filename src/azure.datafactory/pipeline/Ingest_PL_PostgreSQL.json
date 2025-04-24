@@ -289,6 +289,78 @@
 									}
 								}
 							]
+						},
+						{
+							"value": "AzurePostgreSQL_SPAuth",
+							"activities": [
+								{
+									"name": "AzurePostgreSQL SPAuth Copy",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "AzurePostgreSqlSource",
+											"query": {
+												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"type": "Expression"
+											},
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_AzurePostgreSQL_SPAuth",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSServicePrincipalKey": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
+												"DSHostName": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+												"DSPortNumber": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
+												"DSDatabaseName": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+												"DSServicePrincipalName": "@activity('Get Ingest Payload').output.firstRow.Username"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Parquet",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSStorageName": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+												"DSContainerName": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+												"DSDirectoryName": "@variables('DirectoryName')",
+												"DSFileName": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName"
+											}
+										}
+									]
+								}
+							]
 						}
 					],
 					"defaultActivities": [
