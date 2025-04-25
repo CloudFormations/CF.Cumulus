@@ -1,7 +1,6 @@
 {
 	"name": "Ingest_LS_FileServer_UserAuth",
 	"properties": {
-		"type": "FileServer",
 		"parameters": {
 			"LSHostName": {
 				"type": "string"
@@ -14,6 +13,7 @@
 			}
 		},
 		"annotations": [],
+		"type": "FileServer",
 		"typeProperties": {
 			"host": "@{linkedService().LSHostName}",
 			"userId": "@{linkedService().LSUserName}",
@@ -23,8 +23,12 @@
 					"referenceName": "Common_LS_cumuluskeys",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "vmadminpassword"
+				"secretName": "SHIRdevvmuks01-adminpassword"
 			}
+		},
+		"connectVia": {
+			"referenceName": "SHIR",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
