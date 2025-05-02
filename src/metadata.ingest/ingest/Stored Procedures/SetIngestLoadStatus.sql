@@ -27,7 +27,7 @@ AND
 IF @ResultRowCount = 0
 BEGIN
     RAISERROR('No results returned for the provided Dataset Id. Confirm Dataset is enabled, and related Connections are enabled.',16,1)
-    RETURN 0;
+	RETURN 0;
 END
 
 IF @LoadType NOT IN ('F', 'I')
@@ -39,7 +39,7 @@ END
 IF @IngestStage NOT IN ('Raw','Cleansed')
 BEGIN
     RAISERROR('Ingest Stage specified not supported. Please specify either ''Raw'' or ''Cleansed''',16,1)
-    RETURN 0;
+	RETURN 0;
 END
 
 DECLARE @LoadStatus INT
