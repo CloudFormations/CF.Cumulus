@@ -25,7 +25,7 @@ AND
 IF @ResultRowCount = 0
 BEGIN
     RAISERROR('No results returned for the provided Dataset Id. Confirm Dataset is enabled, and related Connections are enabled.',16,1)
-RETURN 0;
+	RETURN 0;
 END
 
 UPDATE [transform].[Datasets]
