@@ -32,13 +32,13 @@ END
 
 IF @LoadType NOT IN ('F', 'I')
 BEGIN
-    RAISERROR('Load Type specified not supported. Please specify either I or F',16,1)
+    RAISERROR('Load Type specified not supported. Please specify either ''I'' or ''F''',16,1)
 	RETURN 0;
 END
 
 IF @IngestStage NOT IN ('Raw','Cleansed')
 BEGIN
-    RAISERROR('Ingest Stage specified not supported. Please specify either Raw or Cleansed',16,1)
+    RAISERROR('Ingest Stage specified not supported. Please specify either ''Raw'' or ''Cleansed''',16,1)
     RETURN 0;
 END
 

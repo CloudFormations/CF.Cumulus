@@ -353,7 +353,7 @@ BEGIN
  
 	ELSE IF (@LoadType = 'I') AND (@ConnectionType = 'Files')
     BEGIN
-        RAISERROR('The Files Connection type does not support incremental loading. Please change the load type in Ingest.datasets.',16,1)
+        RAISERROR('The Files Connection type does not support incremental loading. Please change the load type in ingest.Datasets.',16,1)
         RETURN 0;
     END
 
