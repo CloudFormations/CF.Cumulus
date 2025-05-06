@@ -350,6 +350,12 @@ BEGIN
         SET @SourceQuery = @SourceQuery
         SET @LoadAction = 'incremental'
     END
+ 
+    ELSE IF (@LoadType = 'I') AND (@ConnectionType = 'Files')
+    BEGIN
+        RAISERROR('The Files Connection type does not support incremental loading. Please change the load type in ingest.Datasets.',16,1)
+        RETURN 0;
+    END
 
     ELSE IF (@LoadType = 'I') AND (@SourceLanguageType <> 'XML') AND (@ConnectionType <> 'REST API')
     BEGIN
