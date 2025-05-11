@@ -1,13 +1,12 @@
 // extension microsoftGraph
 
-// @description('The display name for the security group')
+// Currently unused functionality
+
+// @description('The security group name')
 // param groupName string
 
-// @description('Security group members (optional)')
+// @description('Optional security group members')
 // param members array = []
-
-
-//Currently only Azure CLI and Azure PowerShell are supported for interactive deployments using a signed-in user.
 
 // resource securityGroup 'Microsoft.Graph/groups@v1.0' = {
 //   displayName: groupName

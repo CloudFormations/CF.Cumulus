@@ -1,5 +1,6 @@
 @description('Key Vault Name for the Key Vault to be created')
 param keyVaultName string
+
 @description('Array of secrets to be created in the Key Vault')
 param secrets array
 

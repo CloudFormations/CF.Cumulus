@@ -5,5 +5,7 @@
     "debug.internalConsoleOptions": "neverOpen",
     "azureFunctions.preDeployTask": "publish",
     "azureFunctions.showTargetFrameworkWarning": false,
-    "azureFunctions.projectSubpath": "src\\azure.functionapp"
+    "azureFunctions.projectSubpath": "src\\azure.functionapp",
+    "jupyter.interactiveWindow.cellMarker.codeRegex": "^# COMMAND ----------|^# Databricks notebook source|^(#\\s*%%|#\\s*\\<codecell\\>|#\\s*In\\[\\d*?\\]|#\\s*In\\[ \\])",
+    "jupyter.interactiveWindow.cellMarker.default": "# COMMAND ----------"
 }

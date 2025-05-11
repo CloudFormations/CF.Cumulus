@@ -1,0 +1,4 @@
+type,name,path,value
+linkedService,Common_LS_cumulusdatabase,typeProperties.connectionString,"Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=$Env:SQLSERVER.database.windows.net;Initial Catalog=$Env:SQLDATABASE"
+linkedService,Common_LS_cumulusfunctions,typeProperties.functionAppUrl, "https://$Env:FUNCTIONAPP.azurewebsites.net"
+linkedService,Common_LS_cumuluskeys,typeProperties.baseUrl, "https://$Env:KEYVAULT.vault.azure.net/"
