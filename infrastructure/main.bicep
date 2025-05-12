@@ -10,11 +10,9 @@ targetScope = 'subscription'
 // * Recommended for consistent resource naming across environments
 param orgName string = 'cfc'
 param domainName string = 'demo'
-param location string = 'uksouth'
 param envName string = 'dev'
-param uniqueIdentifier string = '07'
-param datalakeName string = 'dls' //Storage account name prefix
-param functionStorageName string = 'st' //Function app storage name prefix
+param location string = 'uksouth'
+param uniqueIdentifier string = '01'
 
 //Parameters for optional deployments
 param deployADF bool = true
@@ -22,8 +20,6 @@ param deployWorkers bool = false      // if worker pipelines are to live in a se
 param deploySQL bool = true           // assumes SQL database is required to house metadata
 param deployFunction bool = true      // exclude function app if already created or manual config is preferred later
 param deployADBWorkspace bool = true  // exclude databricks if already created or manual config is preferred later
-param deployADBCluster bool = false   // Controls ADB Cluster creation - TODO
-param deployPAT bool = false          // - TODO
 param setRoleAssignments bool = true
 
 // Resoure Group Level: Optional Settings
@@ -44,6 +40,9 @@ param databricksSKU string = 'Premium'   // Databricks Workspace SKU
 param myIPAddress string // For SQL Server Firewall rule
 param allowAzureServices bool // For allowing Azure services access to Azure SQL Server
 
+// Storage: Optional naming configurations
+param datalakeName string = 'dls' //Storage account name prefix
+param functionStorageName string = 'st' //Function app storage name prefix
 
 //Parameter to add timestamp to activity deployment
 param deploymentTimestamp string = utcNow('yy-MM-dd-HHmm')

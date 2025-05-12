@@ -5,11 +5,9 @@ using '../../main.bicep'
 // * Recommended for consistent resource naming across environments
 param orgName = 'cf'
 param domainName = 'cumulus'
-param location = 'uksouth'
 param envName = 'dev'
+param location = 'uksouth'
 param uniqueIdentifier = '01'
-param datalakeName = 'dls' //Storage account name prefix
-param functionStorageName = 'st' //Function app storage name prefix
 
 //Parameters for optional deployments
 param deployADF = true
@@ -30,3 +28,7 @@ param configureGitHub = false    // if GitHub repo configuration is required for
 // SQL Server: Optional Parameters
 param myIPAddress = '1.1.1.1' // For SQL Server Firewall rule
 param allowAzureServices = true // For allowing Azure services access to Azure SQL Server
+
+// Storage: Optional naming configurations
+param datalakeName = 'dls' //Storage account name prefix
+param functionStorageName = 'st' //Function app storage name prefix
