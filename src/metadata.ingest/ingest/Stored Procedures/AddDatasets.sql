@@ -83,6 +83,8 @@ BEGIN
 	MERGE INTO ingest.Datasets AS Target
 	USING @Datasets AS Source
 	ON Source.DatasetDisplayName = Target.DatasetDisplayName
+	AND Source.ConnectionFK = Target.ConnectionFK
+
 
 	WHEN NOT MATCHED THEN
 		INSERT (ConnectionFK, 
@@ -125,7 +127,6 @@ BEGIN
 				Source.Enabled)
 
 	WHEN MATCHED THEN UPDATE SET
-		Target.ConnectionFK = Source.ConnectionFK,
 		Target.MergeComputeConnectionFK = Source.MergeComputeConnectionFK,
 		Target.SourcePath = Source.SourcePath,
 		Target.SourceName = Source.SourceName,
