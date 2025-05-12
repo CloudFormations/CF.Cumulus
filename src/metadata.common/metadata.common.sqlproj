@@ -82,17 +82,17 @@
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <SqlCmdVariable Include="DBName">
+    <SqlCmdVariable Include="DatabricksWSName">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__14)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="DBURL">
+    <SqlCmdVariable Include="DatabricksWSURL">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__13)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="DemoConnLocation">
+    <SqlCmdVariable Include="DemoConnectionLocation">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__7)</Value>
@@ -102,7 +102,7 @@
       </DefaultValue>
       <Value>$(SqlCmdVar__12)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="DemoLinkedServ">
+    <SqlCmdVariable Include="DemoLinkedService">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__10)</Value>
@@ -122,22 +122,12 @@
       </DefaultValue>
       <Value>$(SqlCmdVar__11)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="DLS">
+    <SqlCmdVariable Include="DLSName">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__1)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="DLSCleansedKey">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__3)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="DLSRawKey">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__2)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="IngestCompute">
+    <SqlCmdVariable Include="EnvironmentName">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__15)</Value>
@@ -147,20 +137,15 @@
       </DefaultValue>
       <Value>$(SqlCmdVar__4)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="RG">
+    <SqlCmdVariable Include="RGName">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__5)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="SubID">
+    <SqlCmdVariable Include="SubscriptionID">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__6)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="TransformCompute">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__16)</Value>
     </SqlCmdVariable>
   </ItemGroup>
 </Project>
