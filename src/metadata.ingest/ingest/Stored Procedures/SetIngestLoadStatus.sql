@@ -7,6 +7,41 @@ CREATE PROCEDURE [ingest].[SetIngestLoadStatus]
 )
 AS
 BEGIN
+
+-- Defensive checks for input parameters
+DECLARE @ResultRowCount INT
+
+SELECT 
+    @ResultRowCount = COUNT(*)
+FROM
+[ingest].[Datasets] ds
+INNER JOIN [common].[Connections] cn
+    ON ds.[ConnectionFK] = cn.[ConnectionId]
+WHERE
+ds.[DatasetId] = @DatasetId
+AND 
+    ds.[Enabled] = 1
+AND 
+    cn.[Enabled] = 1
+
+IF @ResultRowCount = 0
+BEGIN
+    RAISERROR('No results returned for the provided Dataset Id. Confirm Dataset is enabled, and related Connections are enabled.',16,1)
+	RETURN 0;
+END
+
+IF @LoadType NOT IN ('F', 'I')
+BEGIN
+    RAISERROR('Load Type specified not supported. Please specify either ''I'' or ''F''',16,1)
+	RETURN 0;
+END
+
+IF @IngestStage NOT IN ('Raw','Cleansed')
+BEGIN
+    RAISERROR('Ingest Stage specified not supported. Please specify either ''Raw'' or ''Cleansed''',16,1)
+	RETURN 0;
+END
+
 DECLARE @LoadStatus INT
 
 SELECT 

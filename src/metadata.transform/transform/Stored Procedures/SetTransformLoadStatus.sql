@@ -6,6 +6,28 @@ CREATE PROCEDURE [transform].[SetTransformLoadStatus]
 AS
 BEGIN
 
+-- Defensive check for DatasetId parameter
+DECLARE @ResultRowCount INT
+
+SELECT 
+    @ResultRowCount = COUNT(*)
+FROM
+[ingest].[Datasets] ds
+INNER JOIN [common].[Connections] cn
+    ON ds.[ConnectionFK] = cn.[ConnectionId]
+WHERE
+ds.[DatasetId] = @DatasetId
+AND 
+    ds.[Enabled] = 1
+AND 
+    cn.[Enabled] = 1
+
+IF @ResultRowCount = 0
+BEGIN
+    RAISERROR('No results returned for the provided Dataset Id. Confirm Dataset is enabled, and related Connections are enabled.',16,1)
+	RETURN 0;
+END
+
 UPDATE [transform].[Datasets]
 SET LoadStatus = 1,
     LastLoadDate = @FileLoadDateTime

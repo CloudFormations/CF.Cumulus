@@ -66,16 +66,86 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="common\Stored Procedures\AddConnectionType.sql" />
+    <Build Include="common\Stored Procedures\AddComputeConnections.sql" />
+    <Build Include="common\Stored Procedures\AddConnections.sql" />
     <Build Include="common\Tables\ComputeConnections.sql" />
     <Build Include="common\Tables\Connections.sql" />
     <Build Include="common\Tables\ConnectionTypes.sql" />
     <Build Include="Security\common.sql" />
     <None Include="Scripts\DefaultConnectionTypes.sql" />
+    <None Include="Scripts\MetadataAsCodeCommon.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="DatabricksWSName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__14)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DatabricksWSURL">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__13)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DemoConnectionLocation">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__7)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DemoKVSecret">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__12)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DemoLinkedService">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__10)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DemoResourceName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__9)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DemoSourceLocation">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__8)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DemoUsername">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__11)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DLSName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="EnvironmentName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__15)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="KeyVaultName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__4)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="RGName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__5)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="SubscriptionID">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__6)</Value>
+    </SqlCmdVariable>
   </ItemGroup>
 </Project>
