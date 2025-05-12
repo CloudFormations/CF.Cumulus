@@ -51,7 +51,6 @@ BEGIN
 	USING @ComputeConnections AS Source
 	ON Source.ConnectionDisplayName = Target.ConnectionDisplayName
 	AND Source.ConnectionLocation = Target.ConnectionLocation
-	AND Source.ComputeLocation = Target.ComputeLocation
 
 	WHEN NOT MATCHED THEN
 		INSERT (ConnectionTypeFK, ConnectionDisplayName, ConnectionLocation, ComputeLocation, ComputeSize, ComputeVersion, CountNodes, ResourceName, LinkedServiceName, EnvironmentName, Enabled)
@@ -59,6 +58,7 @@ BEGIN
 
 	WHEN MATCHED THEN UPDATE SET
 		Target.ConnectionTypeFK = Source.ConnectionTypeFK,
+		Target.ComputeLocation = Source.ComputeLocation,
 		Target.ComputeSize = Source.ComputeSize,
 		Target.ComputeVersion = Source.ComputeVersion,
 		Target.CountNodes = Source.CountNodes,

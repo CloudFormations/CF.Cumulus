@@ -43,11 +43,12 @@ BEGIN
 		RAISERROR('ConnectionTypeFK not updated as the ConnectionTypeDisplayName does not exist within common.ConnectionTypes.',16,1)
 		RETURN 0;
 	END
- 
+
 	MERGE INTO common.Connections AS Target
 	USING @Connections AS Source
 	ON Source.ConnectionDisplayName = Target.ConnectionDisplayName
 	AND Source.ConnectionLocation = Target.ConnectionLocation
+	AND Source.LinkedServiceName = Target.LinkedServiceName
 	AND Source.SourceLocation = Target.SourceLocation
 
 	WHEN NOT MATCHED THEN
@@ -58,7 +59,6 @@ BEGIN
 		Target.ConnectionTypeFK = Source.ConnectionTypeFK,
 		Target.ConnectionPort = Source.ConnectionPort,
 		Target.ResourceName = Source.ResourceName,
-		Target.LinkedServiceName = Source.LinkedServiceName,
 		Target.Username = Source.Username,
 		Target.KeyVaultSecret = Source.KeyVaultSecret,
 		Target.Enabled = Source.Enabled

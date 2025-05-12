@@ -5,8 +5,8 @@ EXEC ##AddConnections 'Azure Data Lake Gen2', 'PrimaryDataLake', '$(DLSName)', N
 EXEC ##AddConnections 'Azure Data Lake Gen2', 'PrimaryDataLake', '$(DLSName)', NULL, 'cleansed', 'NA', 'Ingest_LS_DataLake_MIAuth', '$(DLSName)cleansedaccesskey', 'NA', 1;
 EXEC ##AddConnections 'Azure Data Lake Gen2', 'PrimaryDataLake', '$(DLSName)', NULL, 'curated', 'NA', 'Ingest_LS_DataLake_MIAuth', '$(DLSName)curatedaccesskey', 'NA', 1;
 EXEC ##AddConnections 'Azure Key Vault', 'PrimaryKeyVault', 'https://$(KeyVaultName).vault.azure.net/', NULL, '$(KeyVaultName)', '$(KeyVaultName)', 'Common_LS_cumuluskeys', 'NA', 'NA', 1;
-EXEC ##AddConnections 'Azure Resource Group', 'PrimaryResourceGroup', NULL, NULL, '$(RGName)', '$(RGName)', 'NA', 'NA', 'NA', 1;
-EXEC ##AddConnections 'Azure Subscription', 'PrimarySubscription', NULL, NULL, '$(SubscriptionID)', '$(SubscriptionID)', 'NA', 'NA', 'NA', 1;
+EXEC ##AddConnections 'Azure Resource Group', 'PrimaryResourceGroup', 'NA', NULL, '$(RGName)', '$(RGName)', 'NA', 'NA', 'NA', 1;
+EXEC ##AddConnections 'Azure Subscription', 'PrimarySubscription', 'NA', NULL, '$(SubscriptionID)', '$(SubscriptionID)', 'NA', 'NA', 'NA', 1;
 EXEC ##AddConnections 'Azure SQL Database', 'AdventureWorksDemo', '$(DemoConnectionLocation)', NULL, '$(DemoSourceLocation)', '$(DemoResourceName)', '$(DemoLinkedService)', '$(DemoUsername)', '$(DemoKVSecret)', 1;
 
 --ComputeConnections
