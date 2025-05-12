@@ -75,9 +75,14 @@
     <Build Include="transform\Stored Procedures\GetNotebookPayload.sql" />
     <Build Include="transform\Stored Procedures\SetTransformLoadStatus.sql" />
     <Build Include="transform\Stored Procedures\GetUnmanagedNotebookPayload.sql" />
+	<Build Include="transform\Stored Procedures\AddAttributes.sql" />
+	<Build Include="transform\Stored Procedures\AddDatasets.sql" />
+	<Build Include="transform\Stored Procedures\AddNotebooks.sql" />
+	<Build Include="transform\Stored Procedures\AddNotebookTypes.sql" />
     <Build Include="Synonyms\ComputeConnections.sql" />
     <Build Include="Synonyms\Connections.sql" />
     <Build Include="Synonyms\ConnectionTypes.sql" />
+	<None Include="Scripts\MetadataAsCodeTransform.sql" />
   </ItemGroup>
   <ItemGroup>
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
