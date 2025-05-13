@@ -10,5 +10,5 @@ EXEC ##AddConnections 'Azure Subscription', 'PrimarySubscription', 'NA', NULL, '
 EXEC ##AddConnections 'Azure SQL Database', 'AdventureWorksDemo', '$(DemoConnectionLocation)', NULL, '$(DemoSourceLocation)', '$(DemoResourceName)', '$(DemoLinkedService)', '$(DemoUsername)', '$(DemoKVSecret)', 1;
 
 --ComputeConnections
-EXEC ##AddComputeConnections 'Azure Databricks', 'CF.Cumulus.Ingest.Compute', '$(DatabricksWSURL)', '', 'Standard_D4ds_v5', '15.4.x-scala2.12', 1, '$(DatabricksWSName)', 'Ingest_LS_Databricks_Cluster_MIAuth', '$(EnvironmentName)', 1;
-EXEC ##AddComputeConnections 'Azure Databricks', 'CF.Cumulus.Transform.Compute', '$(DatabricksWSURL)', '', 'Standard_E8_v3', '15.4.x-scala2.12', 2, '$(DatabricksWSName)', 'Ingest_LS_Databricks_JobCluster_MIAuth', '$(EnvironmentName)', 1;
+EXEC ##AddComputeConnections 'Azure Databricks', 'CF.Cumulus.Ingest.Compute', '$(DatabricksWSURL)', '', 'Standard_D4ds_v5', '15.4.x-scala2.12', 1, '$(DatabricksWSName)', 'Common_LS_Databricks_Cluster_MIAuth', '$(EnvironmentName)', 1;
+EXEC ##AddComputeConnections 'Azure Databricks', 'CF.Cumulus.Transform.Compute', '$(DatabricksWSURL)', '', 'Standard_E8_v3', '15.4.x-scala2.12', 2, '$(DatabricksWSName)', 'Common_LS_Databricks_JobCluster_MIAuth', '$(EnvironmentName)', 1;
