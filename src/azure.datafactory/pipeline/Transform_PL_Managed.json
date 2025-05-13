@@ -56,7 +56,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@replace(activity('Get Notebook Payload').output.firstRow.ComputeLinkedServiceName,'Transform_LS_','')",
+						"value": "@replace(activity('Get Notebook Payload').output.firstRow.ComputeLinkedServiceName,'Common_LS_','')",
 						"type": "Expression"
 					},
 					"cases": [
