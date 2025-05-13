@@ -1,5 +1,6 @@
 #Assigining the parameters for the environment
 param(
+    [Parameter(Mandatory=$true)]
     [string] $parametersFile
 )
 

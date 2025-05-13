@@ -12,8 +12,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string] $databricksWorkspaceURL,
 
-    [Parameter(Mandatory=$false)]
-    [string] $storageAccountName = "cfcdemodevdlsuks07"
+    [Parameter(Mandatory=$true)]
+    [string] $storageAccountName
 )
 
 # Get Databricks Access Token

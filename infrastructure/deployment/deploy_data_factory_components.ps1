@@ -1,8 +1,15 @@
 #Assigining the parameters for the environment
 param(
+    [Parameter(Mandatory=$true)]
     [string] $tenantId,
+
+    [Parameter(Mandatory=$true)]
     [string] $location,
+    
+    [Parameter(Mandatory=$true)]
     [string] $resourceGroupName,
+    
+    [Parameter(Mandatory=$true)]
     [string] $dataFactoryName
 )
 # Modules

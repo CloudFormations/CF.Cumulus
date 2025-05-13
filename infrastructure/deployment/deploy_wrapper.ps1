@@ -9,11 +9,11 @@ param(
     [Parameter(Mandatory=$true)]
     [string] $location,
     
-    [Parameter(Mandatory=$true)]
-    [string] $templateFile,
+    [Parameter(Mandatory=$false)]
+    [string] $templateFile = "infrastructure/main.bicep",
     
-    [Parameter(Mandatory=$true)]
-    [string] $parametersFile
+    [Parameter(Mandatory=$false)]
+    [string] $parametersFile = "infrastructure/configuration/_installation/main.bicepparam"
 )
 
 # Login to the Azure Tenant
@@ -40,11 +40,22 @@ $dataFactoryName = $bicepDeployment.properties.outputs.dataFactoryName.value
 $sqlServerName = $bicepDeployment.properties.outputs.sqlServerName.value
 $sqlDatabaseName = $bicepDeployment.properties.outputs.sqlDatabaseName.value
 
-# # Read resource names from configuration/_installation/main.bicepparam file for confirmation on naming convention
-# $deployedResourceScript = $currentLocation + '\get_deployed_resources.ps1'
-# & $deployedResourceScript -resourceGroupName $resourceGroupName
 
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+# Grant User Key Vault Secret Administrator RBAC to save Function App Key to KV
+$userDetails = az ad signed-in-user show | ConvertFrom-Json
+$userId = $userDetails.id
+az role assignment create --role "Key Vault Secrets Officer" --assignee-id $userId --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+
+# Grant Databricks Key Vault Secrets User RBAC to read secrets from KV
+# Get Subscription Id from Name
+$subscriptionDetails = az account subscription list | ConvertFrom-Json 
+$subscriptionIdValue = $subscriptionDetails.subscriptionId
+
+# Get Databricks Object Id
+$databricksDetails = az ad sp list --query "[?displayName=='AzureDatabricks']" | ConvertFrom-Json
+
+az role assignment create --assignee-object-id $databricksDetails.id --role "Key Vault Secrets User" --scope "/subscriptions/$subscriptionIdValue/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
 
 # Deploy the C# Functions to the Function App
 $deployAzureFunctionsScript = $currentLocation + '\deploy_azure_functions.ps1'
@@ -70,7 +81,6 @@ $deployDataFactoryComponentsScript = $currentLocation + '\deploy_data_factory_co
     -resourceGroupName $resourceGroupName `
     -dataFactoryName $dataFactoryName
 
-
 # Deploy Databricks Resources
     # Includes: Create PAT
     # Includes: Create Secret Scope
@@ -82,7 +92,6 @@ $deployDatabricksResourcesScript = $currentLocation + '\deploy_databricks_resour
     -keyVaultUri $keyVaultUri `
     -databricksWorkspaceURL $databricksWorkspaceURL `
     -storageAccountName $storageAccountName
-
 
 # Deploy the SQL Server Metadata objects
     # Child script: Create control Schema Objects
