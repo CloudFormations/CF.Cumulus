@@ -1,7 +1,6 @@
 {
 	"name": "Common_LS_Databricks_JobCluster_MIAuth",
 	"properties": {
-		"type": "AzureDatabricks",
 		"parameters": {
 			"WorkspaceURL": {
 				"type": "string"
@@ -29,7 +28,10 @@
 				"type": "string"
 			}
 		},
-		"annotations": [],
+		"annotations": [
+			"JobCluster"
+		],
+		"type": "AzureDatabricks",
 		"typeProperties": {
 			"domain": "@linkedService().WorkspaceURL",
 			"authentication": "MSI",
@@ -40,7 +42,7 @@
 				"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
 			},
 			"newClusterVersion": "@linkedService().ClusterVersion",
-			"clusterOption": "Autoscaling",
+			"clusterOption": "Fixed",
 			"newClusterInitScripts": []
 		}
 	}
