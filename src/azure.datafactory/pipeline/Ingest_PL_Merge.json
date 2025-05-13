@@ -56,7 +56,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@replace(activity('Get Merge Payload').output.firstRow.ComputeLinkedServiceName,'Ingest_LS_','')",
+						"value": "@replace(activity('Get Merge Payload').output.firstRow.ComputeLinkedServiceName,'Common_LS_','')",
 						"type": "Expression"
 					},
 					"cases": [
@@ -100,26 +100,14 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
+											"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+											"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+											"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
 											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
-											"SubscriptionId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											}
+											"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId"
 										}
 									}
 								},
@@ -160,26 +148,14 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceUrl",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
+											"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+											"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+											"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
 											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
-											"SubscriptionId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											}
+											"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId"
 										}
 									}
 								},
