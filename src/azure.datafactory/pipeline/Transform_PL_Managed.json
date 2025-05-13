@@ -281,38 +281,17 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_JobCluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
-												"type": "Expression"
-											},
-											"ClusterVersion": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
-												"type": "Expression"
-											},
-											"NodeType": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
-												"type": "Expression"
-											},
+											"WorkspaceURL": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+											"ClusterVersion": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
+											"NodeType": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
 											"PythonVersion": "3",
-											"NumWorkers": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
-												"type": "Expression"
-											},
-											"SubscriptionId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											}
+											"NumWorkers": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
+											"SubscriptionId": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+											"ResourceName": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+											"ResourceGroupName": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName"
 										}
 									}
 								},
@@ -354,38 +333,17 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_JobCluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
-												"type": "Expression"
-											},
-											"ClusterVersion": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
-												"type": "Expression"
-											},
-											"NodeType": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
-												"type": "Expression"
-											},
+											"WorkspaceURL": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+											"ClusterVersion": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
+											"NodeType": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
 											"PythonVersion": "3",
-											"NumWorkers": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
-												"type": "Expression"
-											},
-											"SubscriptionId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											}
+											"NumWorkers": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
+											"SubscriptionId": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+											"ResourceName": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+											"ResourceGroupName": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName"
 										}
 									}
 								},
@@ -423,38 +381,17 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_JobCluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
-												"type": "Expression"
-											},
-											"ClusterVersion": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
-												"type": "Expression"
-											},
-											"NodeType": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
-												"type": "Expression"
-											},
+											"WorkspaceURL": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+											"ClusterVersion": "@activity('Get Notebook Payload').output.firstRow.ComputeVersion",
+											"NodeType": "@activity('Get Notebook Payload').output.firstRow.ComputeSize",
 											"PythonVersion": "3",
-											"NumWorkers": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
-												"type": "Expression"
-											},
-											"SubscriptionId": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											}
+											"NumWorkers": "@activity('Get Notebook Payload').output.firstRow.CountNodes",
+											"SubscriptionId": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+											"ResourceName": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+											"ResourceGroupName": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName"
 										}
 									}
 								}
