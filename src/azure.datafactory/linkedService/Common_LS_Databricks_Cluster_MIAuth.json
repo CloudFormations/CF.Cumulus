@@ -1,7 +1,6 @@
 {
 	"name": "Common_LS_Databricks_Cluster_MIAuth",
 	"properties": {
-		"type": "AzureDatabricks",
 		"parameters": {
 			"WorkspaceURL": {
 				"type": "string"
@@ -20,6 +19,7 @@
 			}
 		},
 		"annotations": [],
+		"type": "AzureDatabricks",
 		"typeProperties": {
 			"domain": "@linkedService().WorkspaceURL",
 			"authentication": "MSI",
