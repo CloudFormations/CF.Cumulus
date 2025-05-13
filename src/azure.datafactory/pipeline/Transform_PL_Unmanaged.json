@@ -103,29 +103,14 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
-											"ClusterId": {
-												"value": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
-												"type": "Expression"
-											},
-											"SubscriptionId": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											}
+											"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+											"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+											"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
+											"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId"
 										}
 									}
 								},
