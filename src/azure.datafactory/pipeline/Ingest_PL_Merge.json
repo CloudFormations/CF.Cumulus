@@ -216,38 +216,17 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_JobCluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
-												"type": "Expression"
-											},
-											"ClusterVersion": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeVersion",
-												"type": "Expression"
-											},
-											"NodeType": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeSize",
-												"type": "Expression"
-											},
+											"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+											"ClusterVersion": "@activity('Get Merge Payload').output.firstRow.ComputeVersion",
+											"NodeType": "@activity('Get Merge Payload').output.firstRow.ComputeSize",
 											"PythonVersion": "3",
-											"NumWorkers": {
-												"value": "@activity('Get Merge Payload').output.firstRow.CountNodes",
-												"type": "Expression"
-											},
-											"SubscriptionId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											}
+											"NumWorkers": "@activity('Get Merge Payload').output.firstRow.CountNodes",
+											"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+											"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+											"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName"
 										}
 									}
 								},
@@ -288,38 +267,17 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_JobCluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
-												"type": "Expression"
-											},
-											"ClusterVersion": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeVersion",
-												"type": "Expression"
-											},
-											"NodeType": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeSize",
-												"type": "Expression"
-											},
+											"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+											"ClusterVersion": "@activity('Get Merge Payload').output.firstRow.ComputeVersion",
+											"NodeType": "@activity('Get Merge Payload').output.firstRow.ComputeSize",
 											"PythonVersion": "3",
-											"NumWorkers": {
-												"value": "@activity('Get Merge Payload').output.firstRow.CountNodes",
-												"type": "Expression"
-											},
-											"SubscriptionId": {
-												"value": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											}
+											"NumWorkers": "@activity('Get Merge Payload').output.firstRow.CountNodes",
+											"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+											"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+											"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName"
 										}
 									}
 								}
