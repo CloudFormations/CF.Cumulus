@@ -107,11 +107,23 @@
 										"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
-											"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
-											"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
 											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
-											"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId"
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
 										}
 									}
 								},
@@ -156,11 +168,23 @@
 										"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
-											"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
-											"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
 											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
-											"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId"
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
 										}
 									}
 								},
@@ -205,11 +229,23 @@
 										"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
-											"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
-											"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+											"WorkspaceURL": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+												"type": "Expression"
+											},
+											"ResourceGroupName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ResourceGroupName",
+												"type": "Expression"
+											},
+											"ResourceName": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.ComputeResourceName",
+												"type": "Expression"
+											},
 											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
-											"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId"
+											"SubscriptionId": {
+												"value": "@activity('Get Notebook Payload').output.firstRow.SubscriptionId",
+												"type": "Expression"
+											}
 										}
 									}
 								},
