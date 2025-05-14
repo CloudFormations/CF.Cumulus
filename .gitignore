@@ -257,3 +257,5 @@ paket-files/
 .databricks
 databricks.yml
 .coverage
+
+src/azure.functionapp/Properties/
