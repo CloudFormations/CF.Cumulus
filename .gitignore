@@ -258,4 +258,4 @@ paket-files/
 databricks.yml
 .coverage
 
-src/azure.functionapp/Properties/ServiceDependencies/
+src/azure.functionapp/Properties/
