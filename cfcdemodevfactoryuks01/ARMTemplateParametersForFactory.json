@@ -26,19 +26,46 @@
 		"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
 			"value": "https://cfcdemodevkvuks01.vault.azure.net/"
 		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_server": {
+			"value": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_database": {
+			"value": "@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_username": {
+			"value": "@{linkedService().LSServicePrincipalName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_tenant": {
+			"value": "@{linkedService().LSTenant}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_servicePrincipalId": {
+			"value": "@{linkedService().LSServicePrincipalID}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_server": {
+			"value": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_database": {
+			"value": "@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_username": {
+			"value": "@{linkedService().LSUserName}"
+		},
 		"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
 			"value": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}"
 		},
 		"Ingest_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
 			"value": "@linkedService().ClusterId"
 		},
+		"Ingest_LS_Dynamics_SPAuth_properties_typeProperties_servicePrincipalId": {
+			"value": "@{linkedService().ServicePrincipalId}"
+		},
 		"Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId": {
 			"value": "@{linkedService().ServicePrincipalId}"
 		},
-		"Ingest_LS_FileServer_VM02_properties_typeProperties_host": {
+		"Ingest_LS_FileServer_UserAuth_properties_typeProperties_host": {
 			"value": "@{linkedService().LSHostName}"
 		},
-		"Ingest_LS_FileServer_VM02_properties_typeProperties_userId": {
+		"Ingest_LS_FileServer_UserAuth_properties_typeProperties_userId": {
 			"value": "@{linkedService().LSUserName}"
 		},
 		"Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url": {
@@ -58,6 +85,12 @@
 		},
 		"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
 			"value": "@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_Salesforce_OAuth_properties_typeProperties_environmentUrl": {
+			"value": "@{linkedService().LSEnvironmentUrl}"
+		},
+		"Ingest_LS_Salesforce_OAuth_properties_typeProperties_clientId": {
+			"value": "@{linkedService().LSClientId}"
 		},
 		"Transform_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
 			"value": "@linkedService().ClusterId"
