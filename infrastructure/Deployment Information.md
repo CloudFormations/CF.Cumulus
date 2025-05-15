@@ -2,9 +2,13 @@
 
 This project contains the necessary files to deploy an Azure Marketplace offering using Bicep and Azure Resource Manager (ARM) templates.
 
-[![Deploy To Azure](./resources/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCloudFormations%2FCF.Cumulus%2Frefs%2Fheads%2Fdevelop_marketplace%2Finfrastructure%2Fazuredeploy.json)
+[![Deploy To Azure](./resources/deploytoazure.svg?sanitize=true)](https://portal.azure.com/#create/)
 
+### ARM
 https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCloudFormations%2FCF.Cumulus%2Frefs%2Fheads%2Fdevelop_marketplace%2Finfrastructure%2Fazuredeploy.json
+
+### Compiled BiCep
+https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCloudFormations%2FCF.Cumulus%2Frefs%2Fheads%2Fdevelop_marketplace%2Finfrastructure%2Fmain.json
 
 
 ## Project Structure
