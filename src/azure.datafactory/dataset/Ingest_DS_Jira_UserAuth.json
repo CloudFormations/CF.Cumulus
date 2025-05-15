@@ -1,0 +1,44 @@
+{
+	"name": "Ingest_DS_Jira_UserAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_Jira_UserAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSHostName": {
+					"value": "@dataset().DSHostName",
+					"type": "Expression"
+				},
+				"LSUserName": {
+					"value": "@dataset().DSUserName",
+					"type": "Expression"
+				},
+				"LSPassword": {
+					"value": "@dataset().DSPassword",
+					"type": "Expression"
+				},
+				"LSPortNumber": {
+					"value": "@dataset().DSPortNumber",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSHostName": {
+				"type": "String"
+			},
+			"DSUserName": {
+				"type": "String"
+			},
+			"DSPassword": {
+				"type": "String"
+			},
+			"DSPortNumber": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "JiraObject",
+		"schema": []
+	}
+}
