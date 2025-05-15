@@ -28,10 +28,7 @@
 					"type": "LinkedServiceReference"
 				},
 				"secretName": "@{linkedService().LSPassword}"
-			},
-			"useEncryptedEndpoints": true,
-			"useHostVerification": true,
-			"usePeerVerification": true
+			}
 		}
 	}
 }
