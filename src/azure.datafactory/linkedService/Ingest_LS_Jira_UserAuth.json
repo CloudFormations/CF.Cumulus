@@ -1,6 +1,7 @@
 {
 	"name": "Ingest_LS_Jira_UserAuth",
 	"properties": {
+		"type": "Jira",
 		"parameters": {
 			"LSHostName": {
 				"type": "string"
@@ -16,7 +17,6 @@
 			}
 		},
 		"annotations": [],
-		"type": "Jira",
 		"typeProperties": {
 			"host": "@{LinkedService().LSHostName}",
 			"port": "@{LinkedService().LSPortNumber}",
