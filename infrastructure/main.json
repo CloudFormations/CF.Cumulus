@@ -1,0 +1,2351 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.35.1.17967",
+      "templateHash": "610395472578082250"
+    }
+  },
+  "parameters": {
+    "orgName": {
+      "type": "string",
+      "defaultValue": "cfc"
+    },
+    "domainName": {
+      "type": "string",
+      "defaultValue": "demo"
+    },
+    "envName": {
+      "type": "string",
+      "defaultValue": "dev"
+    },
+    "location": {
+      "type": "string",
+      "defaultValue": "uksouth"
+    },
+    "uniqueIdentifier": {
+      "type": "string",
+      "defaultValue": "01"
+    },
+    "deployADF": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "deployWorkers": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "deploySQL": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "deployFunction": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "deployADBWorkspace": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "setRoleAssignments": {
+      "type": "bool",
+      "defaultValue": true
+    },
+    "deployNetworking": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "deployVM": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "aspSKU": {
+      "type": "string",
+      "defaultValue": "consumption",
+      "allowedValues": [
+        "premium",
+        "consumption"
+      ]
+    },
+    "configureGitHub": {
+      "type": "bool",
+      "defaultValue": false
+    },
+    "databricksSKU": {
+      "type": "string",
+      "defaultValue": "Premium",
+      "allowedValues": [
+        "Premium",
+        "Standard"
+      ]
+    },
+    "myIPAddress": {
+      "type": "string"
+    },
+    "allowAzureServices": {
+      "type": "bool"
+    },
+    "datalakeName": {
+      "type": "string",
+      "defaultValue": "dls"
+    },
+    "functionStorageName": {
+      "type": "string",
+      "defaultValue": "st"
+    },
+    "deploymentTimestamp": {
+      "type": "string",
+      "defaultValue": "[utcNow('yy-MM-dd-HHmm')]"
+    }
+  },
+  "variables": {
+    "locationShortCodes": {
+      "uksouth": "uks",
+      "ukwest": "ukw",
+      "eastus": "eus",
+      "westus": "wus",
+      "westus2": "wus2",
+      "centralus": "cus",
+      "northcentralus": "ncus",
+      "southcentralus": "scus",
+      "eastus2": "eus2",
+      "westeurope": "weu",
+      "northeurope": "neu",
+      "francecentral": "frc",
+      "germanywestcentral": "gwc",
+      "switzerlandnorth": "swn",
+      "norwayeast": "noe",
+      "brazilsouth": "brs",
+      "canadacentral": "cac",
+      "canadaeast": "cae"
+    },
+    "locationShortCode": "[variables('locationShortCodes')[parameters('location')]]",
+    "namePrefix": "[format('{0}{1}{2}', parameters('orgName'), parameters('domainName'), parameters('envName'))]",
+    "nameSuffix": "[format('{0}{1}', variables('locationShortCode'), parameters('uniqueIdentifier'))]",
+    "rgName": "[format('{0}rg{1}', variables('namePrefix'), variables('nameSuffix'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2024-03-01",
+      "name": "[variables('rgName')]",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('log-analytics{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "envName": {
+            "value": "[parameters('envName')]"
+          },
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "6750731203463629049"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 1,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            },
+            "envName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name such as dev, test, prod."
+              }
+            }
+          },
+          "variables": {
+            "name": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.OperationalInsights/workspaces",
+              "apiVersion": "2023-09-01",
+              "name": "[variables('name')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "sku": {
+                  "name": "pergb2018"
+                },
+                "retentionInDays": "[if(equals(parameters('envName'), 'dev'), 30, 90)]"
+              }
+            }
+          ],
+          "outputs": {
+            "primarySharedKey": {
+              "type": "string",
+              "value": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', variables('name')), '2020-10-01').primarySharedKey]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('name'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('app-insights{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "envName": {
+            "value": "[parameters('envName')]"
+          },
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "6056070810749056934"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "envName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name, such as dev, test, prod."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 3,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            }
+          },
+          "variables": {
+            "name": "[format('{0}appi{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Insights/components",
+              "apiVersion": "2020-02-02",
+              "name": "[variables('name')]",
+              "location": "[parameters('location')]",
+              "kind": "web",
+              "properties": {
+                "Application_Type": "web",
+                "Flow_Type": "Redfield",
+                "Request_Source": "IbizaAIExtension",
+                "WorkspaceResourceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                "IngestionMode": "LogAnalytics",
+                "RetentionInDays": "[if(equals(parameters('envName'), 'dev'), 30, 90)]"
+              }
+            }
+          ],
+          "outputs": {
+            "location": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('name')]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Insights/components', variables('name'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('log-analytics{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('keyvault{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "5283611931696179939"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 3,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            },
+            "tenantId": {
+              "type": "string",
+              "defaultValue": "[subscription().tenantId]",
+              "metadata": {
+                "description": "Tenant Id value."
+              }
+            }
+          },
+          "variables": {
+            "name": "[format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.KeyVault/vaults",
+              "apiVersion": "2023-07-01",
+              "name": "[variables('name')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "enableRbacAuthorization": true,
+                "sku": {
+                  "name": "standard",
+                  "family": "A"
+                },
+                "tenantId": "[parameters('tenantId')]",
+                "accessPolicies": []
+              }
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.KeyVault/vaults/{0}', variables('name'))]",
+              "name": "keyVaultDiagnostics",
+              "properties": {
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                "logs": [
+                  {
+                    "category": "AuditEvent",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "AllMetrics",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.KeyVault/vaults', variables('name'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "location": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('name')]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "keyVaultId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.KeyVault/vaults', variables('name'))]"
+            },
+            "keyVaultUri": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.KeyVault/vaults', variables('name')), '2023-07-01').vaultUri]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('log-analytics{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployADF')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('datafactory-orchestrator{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "nameFactory": "[if(parameters('deployWorkers'), createObject('value', 'factory'), createObject('value', 'adf'))]",
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "configureGitHub": {
+            "value": "[parameters('configureGitHub')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "1837150561329528591"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 3,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            },
+            "nameFactory": {
+              "type": "string",
+              "metadata": {
+                "description": "Data Factory resource name."
+              }
+            },
+            "configureGitHub": {
+              "type": "bool",
+              "metadata": {
+                "description": "Option to configure Data Factory linked to GitHub."
+              }
+            }
+          },
+          "variables": {
+            "name": "[format('{0}{1}{2}', parameters('namePrefix'), parameters('nameFactory'), parameters('nameSuffix'))]",
+            "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "repoConfig": {
+              "accountName": "cfsource",
+              "repositoryName": "CF.Cumulus",
+              "collaborationBranch": "main",
+              "rootFolder": "/src/azure.datafactory",
+              "type": "FactoryGitHubConfiguration"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DataFactory/factories",
+              "apiVersion": "2018-06-01",
+              "name": "[variables('name')]",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "repoConfiguration": "[if(equals(parameters('configureGitHub'), true()), variables('repoConfig'), createObject())]",
+                "globalParameters": {
+                  "envName": {
+                    "type": "String",
+                    "value": "Dev"
+                  }
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.DataFactory/factories/{0}', variables('name'))]",
+              "name": "[format('logs-{0}', variables('name'))]",
+              "properties": {
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                "logAnalyticsDestinationType": "Dedicated",
+                "logs": [
+                  {
+                    "category": "ActivityRuns",
+                    "enabled": true
+                  },
+                  {
+                    "category": "PipelineRuns",
+                    "enabled": true
+                  },
+                  {
+                    "category": "TriggerRuns",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "AllMetrics",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DataFactory/factories', variables('name'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "location": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('name')]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.DataFactory/factories', variables('name'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('log-analytics{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "condition": "[and(parameters('deployADF'), parameters('deployWorkers'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('datafactory-workers{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "nameFactory": {
+            "value": "workers"
+          },
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "configureGitHub": {
+            "value": "[parameters('configureGitHub')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "1837150561329528591"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 3,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            },
+            "nameFactory": {
+              "type": "string",
+              "metadata": {
+                "description": "Data Factory resource name."
+              }
+            },
+            "configureGitHub": {
+              "type": "bool",
+              "metadata": {
+                "description": "Option to configure Data Factory linked to GitHub."
+              }
+            }
+          },
+          "variables": {
+            "name": "[format('{0}{1}{2}', parameters('namePrefix'), parameters('nameFactory'), parameters('nameSuffix'))]",
+            "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "repoConfig": {
+              "accountName": "cfsource",
+              "repositoryName": "CF.Cumulus",
+              "collaborationBranch": "main",
+              "rootFolder": "/src/azure.datafactory",
+              "type": "FactoryGitHubConfiguration"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.DataFactory/factories",
+              "apiVersion": "2018-06-01",
+              "name": "[variables('name')]",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "repoConfiguration": "[if(equals(parameters('configureGitHub'), true()), variables('repoConfig'), createObject())]",
+                "globalParameters": {
+                  "envName": {
+                    "type": "String",
+                    "value": "Dev"
+                  }
+                }
+              }
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.DataFactory/factories/{0}', variables('name'))]",
+              "name": "[format('logs-{0}', variables('name'))]",
+              "properties": {
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                "logAnalyticsDestinationType": "Dedicated",
+                "logs": [
+                  {
+                    "category": "ActivityRuns",
+                    "enabled": true
+                  },
+                  {
+                    "category": "PipelineRuns",
+                    "enabled": true
+                  },
+                  {
+                    "category": "TriggerRuns",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "AllMetrics",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.DataFactory/factories', variables('name'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "location": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('name')]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.DataFactory/factories', variables('name'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('log-analytics{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('storageaccount{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "isHnsEnabled": {
+            "value": true
+          },
+          "isSftpEnabled": {
+            "value": false
+          },
+          "accessTier": {
+            "value": "Hot"
+          },
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "nameStorage": {
+            "value": "[parameters('datalakeName')]"
+          },
+          "storageKind": {
+            "value": "StorageV2"
+          },
+          "containers": {
+            "value": {
+              "bronze": {
+                "name": "raw"
+              },
+              "silver": {
+                "name": "cleansed"
+              },
+              "gold": {
+                "name": "curated"
+              }
+            }
+          },
+          "envName": {
+            "value": "[parameters('envName')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "13558264646926549318"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 1,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            },
+            "envName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name such as dev, test, prod."
+              }
+            },
+            "nameStorage": {
+              "type": "string",
+              "allowedValues": [
+                "dls",
+                "st"
+              ],
+              "metadata": {
+                "description": "Name of the storage account. Currently allowed values (dls, st) for the purpose of CF.Cumulus"
+              }
+            },
+            "storageKind": {
+              "type": "string",
+              "allowedValues": [
+                "StorageV2"
+              ],
+              "metadata": {
+                "description": "Kind of the storage account. Currently allowed value (StorageV2) for the purpose of CF.Cumulus"
+              }
+            },
+            "containers": {
+              "type": "object",
+              "metadata": {
+                "description": "Container configuration for the storage account"
+              }
+            },
+            "isHnsEnabled": {
+              "type": "bool",
+              "metadata": {
+                "description": "Hierarchical Namespace (HNS) support for Data Lake Storage Gen2"
+              }
+            },
+            "isSftpEnabled": {
+              "type": "bool",
+              "metadata": {
+                "description": "SFTP support configuration"
+              }
+            },
+            "accessTier": {
+              "type": "string",
+              "defaultValue": "Hot",
+              "allowedValues": [
+                "Hot",
+                "Cold"
+              ],
+              "metadata": {
+                "description": "Kind of the storage account. Currently allowed value (StorageV2) for the purpose of CF.Cumulus"
+              }
+            }
+          },
+          "variables": {
+            "name": "[format('{0}{1}{2}', parameters('namePrefix'), parameters('nameStorage'), parameters('nameSuffix'))]",
+            "keyVaultName": "[format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-05-01",
+              "name": "[variables('name')]",
+              "location": "[parameters('location')]",
+              "kind": "[parameters('storageKind')]",
+              "sku": {
+                "name": "Standard_GRS"
+              },
+              "properties": {
+                "isHnsEnabled": "[if(equals(parameters('storageKind'), 'StorageV2'), parameters('isHnsEnabled'), false())]",
+                "isSftpEnabled": "[if(equals(parameters('storageKind'), 'StorageV2'), parameters('isSftpEnabled'), false())]",
+                "accessTier": "[if(equals(parameters('storageKind'), 'StorageV2'), parameters('accessTier'), null())]",
+                "minimumTlsVersion": "TLS1_2"
+              },
+              "identity": {
+                "type": "SystemAssigned"
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}', variables('name'), 'default')]",
+              "properties": {
+                "containerDeleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": "[if(equals(parameters('envName'), 'dev'), 15, 30)]"
+                },
+                "deleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": "[if(equals(parameters('envName'), 'dev'), 15, 30)]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('name'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "storageAccountContainers",
+                "count": "[length(items(parameters('containers')))]"
+              },
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', variables('name'), 'default', items(parameters('containers'))[copyIndex()].value.name)]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('name'), 'default')]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "storageAccountSecretInVault",
+                "count": "[length(items(parameters('containers')))]"
+              },
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}-{1}-kv-secrets', variables('name'), items(parameters('containers'))[copyIndex()].value.name)]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "keyVaultName": {
+                    "value": "[variables('keyVaultName')]"
+                  },
+                  "secrets": {
+                    "value": [
+                      {
+                        "name": "[format('{0}{1}accesskey', variables('name'), items(parameters('containers'))[copyIndex()].value.name)]",
+                        "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('name')), '2023-05-01').keys[0].value]"
+                      }
+                    ]
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.35.1.17967",
+                      "templateHash": "12000331985783352041"
+                    }
+                  },
+                  "parameters": {
+                    "keyVaultName": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Key Vault Name for the Key Vault to be created"
+                      }
+                    },
+                    "secrets": {
+                      "type": "array",
+                      "metadata": {
+                        "description": "Array of secrets to be created in the Key Vault"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "copy": {
+                        "name": "keyVaultSecrets",
+                        "count": "[length(parameters('secrets'))]"
+                      },
+                      "type": "Microsoft.KeyVault/vaults/secrets",
+                      "apiVersion": "2019-09-01",
+                      "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('secrets')[copyIndex()].name)]",
+                      "properties": {
+                        "value": "[parameters('secrets')[copyIndex()].value]"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('name'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "location": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('name')]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', variables('name'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('log-analytics{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployFunction')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('functionStorage{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "containers": {
+            "value": {}
+          },
+          "envName": {
+            "value": "[parameters('envName')]"
+          },
+          "isHnsEnabled": {
+            "value": false
+          },
+          "isSftpEnabled": {
+            "value": false
+          },
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameStorage": {
+            "value": "[parameters('functionStorageName')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "storageKind": {
+            "value": "StorageV2"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "13558264646926549318"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 1,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            },
+            "envName": {
+              "type": "string",
+              "metadata": {
+                "description": "Environment name such as dev, test, prod."
+              }
+            },
+            "nameStorage": {
+              "type": "string",
+              "allowedValues": [
+                "dls",
+                "st"
+              ],
+              "metadata": {
+                "description": "Name of the storage account. Currently allowed values (dls, st) for the purpose of CF.Cumulus"
+              }
+            },
+            "storageKind": {
+              "type": "string",
+              "allowedValues": [
+                "StorageV2"
+              ],
+              "metadata": {
+                "description": "Kind of the storage account. Currently allowed value (StorageV2) for the purpose of CF.Cumulus"
+              }
+            },
+            "containers": {
+              "type": "object",
+              "metadata": {
+                "description": "Container configuration for the storage account"
+              }
+            },
+            "isHnsEnabled": {
+              "type": "bool",
+              "metadata": {
+                "description": "Hierarchical Namespace (HNS) support for Data Lake Storage Gen2"
+              }
+            },
+            "isSftpEnabled": {
+              "type": "bool",
+              "metadata": {
+                "description": "SFTP support configuration"
+              }
+            },
+            "accessTier": {
+              "type": "string",
+              "defaultValue": "Hot",
+              "allowedValues": [
+                "Hot",
+                "Cold"
+              ],
+              "metadata": {
+                "description": "Kind of the storage account. Currently allowed value (StorageV2) for the purpose of CF.Cumulus"
+              }
+            }
+          },
+          "variables": {
+            "name": "[format('{0}{1}{2}', parameters('namePrefix'), parameters('nameStorage'), parameters('nameSuffix'))]",
+            "keyVaultName": "[format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2023-05-01",
+              "name": "[variables('name')]",
+              "location": "[parameters('location')]",
+              "kind": "[parameters('storageKind')]",
+              "sku": {
+                "name": "Standard_GRS"
+              },
+              "properties": {
+                "isHnsEnabled": "[if(equals(parameters('storageKind'), 'StorageV2'), parameters('isHnsEnabled'), false())]",
+                "isSftpEnabled": "[if(equals(parameters('storageKind'), 'StorageV2'), parameters('isSftpEnabled'), false())]",
+                "accessTier": "[if(equals(parameters('storageKind'), 'StorageV2'), parameters('accessTier'), null())]",
+                "minimumTlsVersion": "TLS1_2"
+              },
+              "identity": {
+                "type": "SystemAssigned"
+              }
+            },
+            {
+              "type": "Microsoft.Storage/storageAccounts/blobServices",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}', variables('name'), 'default')]",
+              "properties": {
+                "containerDeleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": "[if(equals(parameters('envName'), 'dev'), 15, 30)]"
+                },
+                "deleteRetentionPolicy": {
+                  "enabled": true,
+                  "days": "[if(equals(parameters('envName'), 'dev'), 15, 30)]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('name'))]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "storageAccountContainers",
+                "count": "[length(items(parameters('containers')))]"
+              },
+              "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+              "apiVersion": "2023-05-01",
+              "name": "[format('{0}/{1}/{2}', variables('name'), 'default', items(parameters('containers'))[copyIndex()].value.name)]",
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('name'), 'default')]"
+              ]
+            },
+            {
+              "copy": {
+                "name": "storageAccountSecretInVault",
+                "count": "[length(items(parameters('containers')))]"
+              },
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}-{1}-kv-secrets', variables('name'), items(parameters('containers'))[copyIndex()].value.name)]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "keyVaultName": {
+                    "value": "[variables('keyVaultName')]"
+                  },
+                  "secrets": {
+                    "value": [
+                      {
+                        "name": "[format('{0}{1}accesskey', variables('name'), items(parameters('containers'))[copyIndex()].value.name)]",
+                        "value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('name')), '2023-05-01').keys[0].value]"
+                      }
+                    ]
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.35.1.17967",
+                      "templateHash": "12000331985783352041"
+                    }
+                  },
+                  "parameters": {
+                    "keyVaultName": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Key Vault Name for the Key Vault to be created"
+                      }
+                    },
+                    "secrets": {
+                      "type": "array",
+                      "metadata": {
+                        "description": "Array of secrets to be created in the Key Vault"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "copy": {
+                        "name": "keyVaultSecrets",
+                        "count": "[length(parameters('secrets'))]"
+                      },
+                      "type": "Microsoft.KeyVault/vaults/secrets",
+                      "apiVersion": "2019-09-01",
+                      "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('secrets')[copyIndex()].name)]",
+                      "properties": {
+                        "value": "[parameters('secrets')[copyIndex()].value]"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('name'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "location": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('name')]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', variables('name'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('app-insights{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('log-analytics{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployFunction')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('functionApp{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "nameStorage": {
+            "value": "[parameters('functionStorageName')]"
+          },
+          "aspSKU": {
+            "value": "[parameters('aspSKU')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "15211679682263290714"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 3,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            },
+            "nameStorage": {
+              "type": "string",
+              "metadata": {
+                "description": "Supporting storage account resource name."
+              }
+            },
+            "aspSKU": {
+              "type": "string",
+              "metadata": {
+                "description": "App service plan SKU."
+              }
+            }
+          },
+          "variables": {
+            "functionAppName": "[format('{0}func{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "hostingPlanName": "[format('{0}asp{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "storageAccountName": "[format('{0}{1}{2}', parameters('namePrefix'), parameters('nameStorage'), parameters('nameSuffix'))]",
+            "applicationInsightsName": "[format('{0}appi{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "contentShare": "[format('{0}bb6a', variables('functionAppName'))]"
+          },
+          "resources": [
+            {
+              "condition": "[equals(parameters('aspSKU'), 'premium')]",
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2023-12-01",
+              "name": "[variables('hostingPlanName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "EP1",
+                "tier": "ElasticPremium",
+                "size": "EP1",
+                "family": "EP",
+                "capacity": 1
+              },
+              "kind": "elastic"
+            },
+            {
+              "condition": "[equals(parameters('aspSKU'), 'consumption')]",
+              "type": "Microsoft.Web/serverfarms",
+              "apiVersion": "2024-04-01",
+              "name": "[variables('hostingPlanName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+              },
+              "kind": "functionapp"
+            },
+            {
+              "type": "Microsoft.Web/sites",
+              "apiVersion": "2022-03-01",
+              "name": "[variables('functionAppName')]",
+              "kind": "functionapp",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "SystemAssigned"
+              },
+              "properties": {
+                "name": "[variables('functionAppName')]",
+                "siteConfig": {
+                  "appSettings": [
+                    {
+                      "name": "FUNCTIONS_EXTENSION_VERSION",
+                      "value": "~4"
+                    },
+                    {
+                      "name": "FUNCTIONS_WORKER_RUNTIME",
+                      "value": "dotnet-isolated"
+                    },
+                    {
+                      "name": "WEBSITE_USE_PLACEHOLDER_DOTNETISOLATED",
+                      "value": "1"
+                    },
+                    {
+                      "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                      "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').ConnectionString]"
+                    },
+                    {
+                      "name": "APPLICATIONINSIGHTS_INSTRUMENTATIONKEY",
+                      "value": "[reference(resourceId('Microsoft.Insights/components', variables('applicationInsightsName')), '2020-02-02').InstrumentationKey]"
+                    },
+                    {
+                      "name": "AzureWebJobsStorage",
+                      "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};BlobEndpoint=https://{2}.blob.core.windows.net/;FileEndpoint=https://{3}.file.core.windows.net/;TableEndpoint=https://{4}.table.core.windows.net/;QueueEndpoint=https://{5}.queue.core.windows.net/', variables('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2023-05-01').keys[0].value, variables('storageAccountName'), variables('storageAccountName'), variables('storageAccountName'), variables('storageAccountName'))]"
+                    },
+                    {
+                      "name": "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING",
+                      "value": "[format('DefaultEndpointsProtocol=https;AccountName={0};AccountKey={1};EndpointSuffix=core.windows.net', variables('storageAccountName'), listKeys(resourceId('Microsoft.Storage/storageAccounts', variables('storageAccountName')), '2023-05-01').keys[0].value)]"
+                    },
+                    {
+                      "name": "WEBSITE_CONTENTSHARE",
+                      "value": "[variables('contentShare')]"
+                    },
+                    {
+                      "name": "WEBSITE_RUN_FROM_PACKAGE",
+                      "value": "1"
+                    }
+                  ],
+                  "cors": {
+                    "allowedOrigins": [
+                      "https://portal.azure.com"
+                    ]
+                  },
+                  "use32BitWorkerProcess": false,
+                  "ftpsState": "FtpsOnly",
+                  "netFrameworkVersion": "v8.0"
+                },
+                "clientAffinityEnabled": false,
+                "virtualNetworkSubnetId": null,
+                "functionsRuntimeAdminIsolationEnabled": true,
+                "publicNetworkAccess": "Enabled",
+                "httpsOnly": true,
+                "serverFarmId": "[format('/subscriptions/{0}/resourcegroups/{1}/providers/Microsoft.Web/serverfarms/{2}', subscription().subscriptionId, resourceGroup().name, variables('hostingPlanName'))]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]",
+                "[resourceId('Microsoft.Web/serverfarms', variables('hostingPlanName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}', variables('functionAppName'), 'scm')]",
+              "properties": {
+                "allow": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Web/sites/basicPublishingCredentialsPolicies",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}/{1}', variables('functionAppName'), 'ftp')]",
+              "properties": {
+                "allow": true
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('functionAppName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "functionAppName": {
+              "type": "string",
+              "value": "[variables('functionAppName')]"
+            },
+            "functionAppIdentityPrincipalId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Web/sites', variables('functionAppName')), '2022-03-01', 'full').identity.principalId]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('app-insights{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('functionStorage{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('log-analytics{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deploySQL')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('sql-server{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "myIPAddress": {
+            "value": "[parameters('myIPAddress')]"
+          },
+          "allowAzureServices": {
+            "value": "[parameters('allowAzureServices')]"
+          },
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "16108231763668200012"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Resource group location."
+              }
+            },
+            "namePrefix": {
+              "type": "string",
+              "minLength": 3,
+              "metadata": {
+                "description": "Resource name prefix as per template naming concatenated in the main file."
+              }
+            },
+            "nameSuffix": {
+              "type": "string",
+              "metadata": {
+                "description": "Resource name suffix as per template naming concatenated in the main file."
+              }
+            },
+            "myIPAddress": {
+              "type": "securestring",
+              "defaultValue": "",
+              "metadata": {
+                "description": "Add firewall rule for user's local IP Address."
+              }
+            },
+            "allowAzureServices": {
+              "type": "bool",
+              "defaultValue": false,
+              "metadata": {
+                "description": "Add firewall rule for Azure Resources."
+              }
+            },
+            "randomGuid": {
+              "type": "string",
+              "defaultValue": "[newGuid()]",
+              "metadata": {
+                "description": "Random GUID used to create a SQL Server admin password."
+              }
+            }
+          },
+          "variables": {
+            "serverName": "[format('{0}sql{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "databaseName": "[format('{0}sqldb{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "specialChars": "!@#$%^&*",
+            "sqlPassword": "[format('{0}{1}1A', take(parameters('randomGuid'), 16), take(variables('specialChars'), 2))]",
+            "keyVaultName": "[format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Sql/servers",
+              "apiVersion": "2023-05-01-preview",
+              "name": "[variables('serverName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "administratorLogin": "sqladmin",
+                "administratorLoginPassword": "[variables('sqlPassword')]",
+                "version": "12.0",
+                "publicNetworkAccess": "Enabled",
+                "primaryUserAssignedIdentityId": null
+              }
+            },
+            {
+              "type": "Microsoft.Sql/servers/firewallRules",
+              "apiVersion": "2024-05-01-preview",
+              "name": "[format('{0}/{1}', variables('serverName'), 'AllowAzureServices')]",
+              "properties": {
+                "startIpAddress": "[parameters('myIPAddress')]",
+                "endIpAddress": "[parameters('myIPAddress')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('serverName'))]"
+              ]
+            },
+            {
+              "condition": "[not(equals(parameters('myIPAddress'), ''))]",
+              "type": "Microsoft.Sql/servers/firewallRules",
+              "apiVersion": "2024-05-01-preview",
+              "name": "[format('{0}/{1}', variables('serverName'), 'AllowMyIP')]",
+              "properties": {
+                "startIpAddress": "[parameters('myIPAddress')]",
+                "endIpAddress": "[parameters('myIPAddress')]"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('serverName'))]"
+              ]
+            },
+            {
+              "condition": "[parameters('allowAzureServices')]",
+              "type": "Microsoft.Sql/servers/firewallRules",
+              "apiVersion": "2024-05-01-preview",
+              "name": "[format('{0}/{1}', variables('serverName'), 'AllowAzureResources')]",
+              "properties": {
+                "startIpAddress": "0.0.0.0",
+                "endIpAddress": "0.0.0.0"
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('serverName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Sql/servers/databases",
+              "apiVersion": "2023-05-01-preview",
+              "name": "[format('{0}/{1}', variables('serverName'), variables('databaseName'))]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "collation": "SQL_Latin1_General_CP1_CI_AS",
+                "maxSizeBytes": 2147483648
+              },
+              "sku": {
+                "name": "Basic",
+                "tier": "Basic",
+                "capacity": 5
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('serverName'))]"
+              ]
+            },
+            {
+              "type": "Microsoft.Insights/diagnosticSettings",
+              "apiVersion": "2021-05-01-preview",
+              "scope": "[format('Microsoft.Sql/servers/{0}/databases/{1}', variables('serverName'), variables('databaseName'))]",
+              "name": "sqlServerDiagnostics",
+              "properties": {
+                "workspaceId": "[resourceId('Microsoft.OperationalInsights/workspaces', variables('logAnalyticsWorkspaceName'))]",
+                "logs": [
+                  {
+                    "category": "SQLSecurityAuditEvents",
+                    "enabled": true
+                  },
+                  {
+                    "category": "SQLInsights",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Errors",
+                    "enabled": true
+                  },
+                  {
+                    "category": "Timeouts",
+                    "enabled": true
+                  }
+                ],
+                "metrics": [
+                  {
+                    "category": "AllMetrics",
+                    "enabled": true
+                  }
+                ]
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers/databases', variables('serverName'), variables('databaseName'))]"
+              ]
+            },
+            {
+              "condition": "[not(equals(variables('keyVaultName'), null()))]",
+              "type": "Microsoft.Resources/deployments",
+              "apiVersion": "2022-09-01",
+              "name": "[format('{0}-kv-secrets', variables('serverName'))]",
+              "properties": {
+                "expressionEvaluationOptions": {
+                  "scope": "inner"
+                },
+                "mode": "Incremental",
+                "parameters": {
+                  "keyVaultName": {
+                    "value": "[variables('keyVaultName')]"
+                  },
+                  "secrets": {
+                    "value": [
+                      {
+                        "name": "[format('{0}-adminusername', variables('serverName'))]",
+                        "value": "sqladmin"
+                      },
+                      {
+                        "name": "[format('{0}-adminpassword', variables('serverName'))]",
+                        "value": "[variables('sqlPassword')]"
+                      }
+                    ]
+                  }
+                },
+                "template": {
+                  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+                  "contentVersion": "1.0.0.0",
+                  "metadata": {
+                    "_generator": {
+                      "name": "bicep",
+                      "version": "0.35.1.17967",
+                      "templateHash": "12000331985783352041"
+                    }
+                  },
+                  "parameters": {
+                    "keyVaultName": {
+                      "type": "string",
+                      "metadata": {
+                        "description": "Key Vault Name for the Key Vault to be created"
+                      }
+                    },
+                    "secrets": {
+                      "type": "array",
+                      "metadata": {
+                        "description": "Array of secrets to be created in the Key Vault"
+                      }
+                    }
+                  },
+                  "resources": [
+                    {
+                      "copy": {
+                        "name": "keyVaultSecrets",
+                        "count": "[length(parameters('secrets'))]"
+                      },
+                      "type": "Microsoft.KeyVault/vaults/secrets",
+                      "apiVersion": "2019-09-01",
+                      "name": "[format('{0}/{1}', parameters('keyVaultName'), parameters('secrets')[copyIndex()].name)]",
+                      "properties": {
+                        "value": "[parameters('secrets')[copyIndex()].value]"
+                      }
+                    }
+                  ]
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Sql/servers', variables('serverName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "sqlServerName": {
+              "type": "string",
+              "value": "[variables('serverName')]"
+            },
+            "databaseName": {
+              "type": "string",
+              "value": "[variables('databaseName')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('log-analytics{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "condition": "[parameters('deployADBWorkspace')]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('databricks{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "skuTier": {
+            "value": "[parameters('databricksSKU')]"
+          },
+          "deployVnet": {
+            "value": "[parameters('deployNetworking')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "743344290924913781"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "namePrefix": {
+              "type": "string"
+            },
+            "nameSuffix": {
+              "type": "string"
+            },
+            "skuTier": {
+              "type": "string"
+            },
+            "deployVnet": {
+              "type": "bool"
+            },
+            "vnetId": {
+              "type": "string",
+              "defaultValue": ""
+            },
+            "allowPublicAccess": {
+              "type": "bool",
+              "defaultValue": true
+            }
+          },
+          "variables": {
+            "workspaceName": "[format('{0}dbw{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "managedResourceGroupName": "[format('{0}rgm{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+            "subnets": {
+              "controlPlane": "[format('{0}snet-control{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
+              "workerNodes": "[format('{0}snet-worker{1}', parameters('namePrefix'), parameters('nameSuffix'))]"
+            },
+            "workspaceParameters": {
+              "enableNoPublicIp": {
+                "value": false
+              },
+              "customVirtualNetworkId": {
+                "value": "[parameters('vnetId')]"
+              },
+              "customPublicSubnetName": {
+                "value": "[variables('subnets').controlPlane]"
+              },
+              "customPrivateSubnetName": {
+                "value": "[variables('subnets').workerNodes]"
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Databricks/workspaces",
+              "apiVersion": "2024-05-01",
+              "name": "[variables('workspaceName')]",
+              "location": "[parameters('location')]",
+              "sku": {
+                "name": "[parameters('skuTier')]"
+              },
+              "properties": {
+                "managedResourceGroupId": "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('managedResourceGroupName'))]",
+                "publicNetworkAccess": "[if(parameters('allowPublicAccess'), 'Enabled', 'Disabled')]",
+                "parameters": "[if(parameters('deployVnet'), variables('workspaceParameters'), createObject())]"
+              }
+            }
+          ],
+          "outputs": {
+            "databricks_workspace": {
+              "type": "object",
+              "value": "[reference(resourceId('Microsoft.Databricks/workspaces', variables('workspaceName')), '2024-05-01', 'full')]"
+            },
+            "databricksID": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Databricks/workspaces', variables('workspaceName')), '2024-05-01').authorizations[0].principalId]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('workspaceName')]"
+            },
+            "workspaceID": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Databricks/workspaces', variables('workspaceName'))]"
+            },
+            "workspaceURL": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Databricks/workspaces', variables('workspaceName')), '2024-05-01').workspaceUrl]"
+            },
+            "workspaceProperties": {
+              "type": "object",
+              "value": "[reference(resourceId('Microsoft.Databricks/workspaces', variables('workspaceName')), '2024-05-01')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('storageaccount{0}', parameters('deploymentTimestamp')))]"
+      ]
+    },
+    {
+      "condition": "[and(parameters('deployADF'), parameters('setRoleAssignments'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('adf-orchestration-roleassignments{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "nameFactory": "[if(parameters('deployWorkers'), createObject('value', 'factory'), createObject('value', 'adf'))]",
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "nameStorage": {
+            "value": "[parameters('datalakeName')]"
+          },
+          "statusADB": {
+            "value": "[parameters('deployADBWorkspace')]"
+          },
+          "statusFunction": {
+            "value": "[parameters('deployFunction')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "8100845990599391905"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "namePrefix": {
+              "type": "string"
+            },
+            "nameSuffix": {
+              "type": "string"
+            },
+            "nameFactory": {
+              "type": "string"
+            },
+            "nameStorage": {
+              "type": "string"
+            },
+            "statusADB": {
+              "type": "bool"
+            },
+            "statusFunction": {
+              "type": "bool"
+            }
+          },
+          "variables": {
+            "name": "[format('{0}{1}{2}', parameters('namePrefix'), parameters('nameFactory'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "condition": "[or(equals(parameters('nameFactory'), 'factory'), equals(parameters('nameFactory'), 'adf'))]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.DataFactory/factories/{0}', variables('name'))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.DataFactory/factories', variables('name')), 'Contributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '673868aa-7521-48a0-acc6-0f60742d39f5')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.KeyVault/vaults/{0}', format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.KeyVault/vaults', format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix'))), 'Reader')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Sql/servers/{0}', format('{0}sql{1}', parameters('namePrefix'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.Sql/servers', format('{0}sql{1}', parameters('namePrefix'), parameters('nameSuffix'))), 'Reader')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "condition": "[parameters('statusADB')]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Databricks/workspaces/{0}', format('{0}dbw{1}', parameters('namePrefix'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.Databricks/workspaces', format('{0}dbw{1}', parameters('namePrefix'), parameters('nameSuffix'))), 'Contributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "condition": "[parameters('statusFunction')]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Web/sites/{0}', format('{0}func{1}', parameters('namePrefix'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.Web/sites', format('{0}func{1}', parameters('namePrefix'), parameters('nameSuffix'))), 'Contributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', format('{0}{1}{2}', parameters('namePrefix'), parameters('nameStorage'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.Storage/storageAccounts', format('{0}{1}{2}', parameters('namePrefix'), parameters('nameStorage'), parameters('nameSuffix'))), 'StorageBlobDataContributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            }
+          ],
+          "outputs": {
+            "location": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('name')]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.DataFactory/factories', variables('name'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('databricks{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('datafactory-orchestrator{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('functionApp{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('sql-server{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('storageaccount{0}', parameters('deploymentTimestamp')))]"
+      ]
+    },
+    {
+      "condition": "[and(parameters('deployWorkers'), parameters('setRoleAssignments'))]",
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('adf-workers-roleassignments{0}', parameters('deploymentTimestamp'))]",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "nameFactory": {
+            "value": "workers"
+          },
+          "namePrefix": {
+            "value": "[variables('namePrefix')]"
+          },
+          "nameSuffix": {
+            "value": "[variables('nameSuffix')]"
+          },
+          "nameStorage": {
+            "value": "[parameters('datalakeName')]"
+          },
+          "statusADB": {
+            "value": "[parameters('deployADBWorkspace')]"
+          },
+          "statusFunction": {
+            "value": "[parameters('deployFunction')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.35.1.17967",
+              "templateHash": "8100845990599391905"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            },
+            "namePrefix": {
+              "type": "string"
+            },
+            "nameSuffix": {
+              "type": "string"
+            },
+            "nameFactory": {
+              "type": "string"
+            },
+            "nameStorage": {
+              "type": "string"
+            },
+            "statusADB": {
+              "type": "bool"
+            },
+            "statusFunction": {
+              "type": "bool"
+            }
+          },
+          "variables": {
+            "name": "[format('{0}{1}{2}', parameters('namePrefix'), parameters('nameFactory'), parameters('nameSuffix'))]"
+          },
+          "resources": [
+            {
+              "condition": "[or(equals(parameters('nameFactory'), 'factory'), equals(parameters('nameFactory'), 'adf'))]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.DataFactory/factories/{0}', variables('name'))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.DataFactory/factories', variables('name')), 'Contributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '673868aa-7521-48a0-acc6-0f60742d39f5')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.KeyVault/vaults/{0}', format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.KeyVault/vaults', format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix'))), 'Reader')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Sql/servers/{0}', format('{0}sql{1}', parameters('namePrefix'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.Sql/servers', format('{0}sql{1}', parameters('namePrefix'), parameters('nameSuffix'))), 'Reader')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "condition": "[parameters('statusADB')]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Databricks/workspaces/{0}', format('{0}dbw{1}', parameters('namePrefix'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.Databricks/workspaces', format('{0}dbw{1}', parameters('namePrefix'), parameters('nameSuffix'))), 'Contributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "condition": "[parameters('statusFunction')]",
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Web/sites/{0}', format('{0}func{1}', parameters('namePrefix'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.Web/sites', format('{0}func{1}', parameters('namePrefix'), parameters('nameSuffix'))), 'Contributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            },
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "scope": "[format('Microsoft.Storage/storageAccounts/{0}', format('{0}{1}{2}', parameters('namePrefix'), parameters('nameStorage'), parameters('nameSuffix')))]",
+              "name": "[guid(resourceId('Microsoft.DataFactory/factories', variables('name')), resourceId('Microsoft.Storage/storageAccounts', format('{0}{1}{2}', parameters('namePrefix'), parameters('nameStorage'), parameters('nameSuffix'))), 'StorageBlobDataContributor')]",
+              "properties": {
+                "roleDefinitionId": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')]",
+                "principalId": "[reference(resourceId('Microsoft.DataFactory/factories', variables('name')), '2018-06-01', 'full').identity.principalId]"
+              }
+            }
+          ],
+          "outputs": {
+            "location": {
+              "type": "string",
+              "value": "[parameters('location')]"
+            },
+            "name": {
+              "type": "string",
+              "value": "[variables('name')]"
+            },
+            "resourceGroupName": {
+              "type": "string",
+              "value": "[resourceGroup().name]"
+            },
+            "resourceId": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.DataFactory/factories', variables('name'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('databricks{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('datafactory-workers{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('functionApp{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp')))]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('sql-server{0}', parameters('deploymentTimestamp')))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('storageaccount{0}', parameters('deploymentTimestamp')))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "rgName": {
+      "type": "string",
+      "value": "[variables('rgName')]"
+    },
+    "databricksWorkspaceURL": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('databricks{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.workspaceURL.value]"
+    },
+    "databricksWorkspaceId": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('databricks{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.workspaceID.value]"
+    },
+    "keyVaultName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.name.value]"
+    },
+    "keyVaultUri": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.keyVaultUri.value]"
+    },
+    "keyVaultId": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('keyvault{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.keyVaultId.value]"
+    },
+    "storageAccountName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('storageaccount{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.name.value]"
+    },
+    "functionAppName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('functionApp{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.functionAppName.value]"
+    },
+    "dataFactoryName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('datafactory-orchestrator{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.name.value]"
+    },
+    "sqlServerName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('sql-server{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.sqlServerName.value]"
+    },
+    "sqlDatabaseName": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', format('sql-server{0}', parameters('deploymentTimestamp'))), '2022-09-01').outputs.databaseName.value]"
+    }
+  }
+}
