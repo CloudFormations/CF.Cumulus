@@ -8,43 +8,75 @@ targetScope = 'subscription'
 //Parameters for environment configuration
 // * These parameters control resource naming and deployment options
 // * Recommended for consistent resource naming across environments
+
+@description('The name of the organization.')
 param orgName string = 'cfc'
+
+@description('The domain name used for the deployment.')
 param domainName string = 'demo'
+
+@description('The environment name abbreviation used for the deployment.')
 param envName string = 'dev'
+
+@description('The Azure region where resources will be deployed.')
 param location string = 'uksouth'
+
+@description('The unique identifier for the deployment, used to differentiate between instances of Resources.')
 param uniqueIdentifier string = '01'
 
 //Parameters for optional deployments
+@description('Optionally deploy Azure Data Factory.')
 param deployADF bool = true
-param deployWorkers bool = false      // if worker pipelines are to live in a separate data factory instance to the bootstrap pipelines
-param deploySQL bool = true           // assumes SQL database is required to house metadata
-param deployFunction bool = true      // exclude function app if already created or manual config is preferred later
-param deployADBWorkspace bool = true  // exclude databricks if already created or manual config is preferred later
+
+@description('Optionally deploy a separate Azure Data Factory instance for Worker pipelines.')
+param deployWorkers bool = false
+
+@description('optionally deploy an Azure SQL Database to house all metadata.')
+param deploySQL bool = true           
+
+@description('Optionally deploy an Azure Function App.')
+param deployFunction bool = true
+
+@description('Optional naming for the Azure Storage account used to support the Azure Functions App.')
+param functionStorageName string = 'st'
+
+@description('Optionally deploy an Azure Databricks workspace.')
+param deployADBWorkspace bool = true
+
+@description('Optionally setup role assignments as part of the deployment.')
 param setRoleAssignments bool = true
 
-// Resoure Group Level: Optional Settings
-param deployNetworking bool = false    // if custom VNet and specific IP address space is to be used
-param deployVM bool = false           // if self hosted IR is required for data factory
+@description('Optionally deploy a custom VNet for the Azure Databricks workspace.')
+param deployNetworking bool = false
 
-//Parameters for configuration settings
-@allowed(['premium','consumption'])
-param aspSKU string = 'consumption'   // ASP SKU for function app
-
-param configureGitHub bool = false    // if GitHub repo configuration is required for ADF deployment
-
+@description('The SKU for the Azure Databricks workspace.')
 @allowed(['Premium','Standard'])
-param databricksSKU string = 'Premium'   // Databricks Workspace SKU
+param databricksSKU string = 'Premium'
 
+@description('Optionally deploy a Virtual Machine to house self-hosted Integration Runtime (IR) for Azure Data Factory.')
+param deployVM bool = false  
+
+@description('The SKU for the App Service Plan (ASP) used by the Function App.')
+@allowed(['premium','consumption'])
+param aspSKU string = 'consumption'   
+
+@description('Optionally configure GitHub repository for Azure Data Factory.')
+param configureGitHub bool = false    
 
 // SQL Server: Optional Parameters
+@description('An external IP address that is allowed access to the Azure SQL Database, as part of the logical instance Firewall Rules.')
 param myIPAddress string // For SQL Server Firewall rule
+
+@description('Allow Azure services to access the Azure SQL Database, as part of the logical instance Firewall Rules.')
 param allowAzureServices bool // For allowing Azure services access to Azure SQL Server
 
 // Storage: Optional naming configurations
-param datalakeName string = 'dls' //Storage account name prefix
-param functionStorageName string = 'st' //Function app storage name prefix
+@description('Optional naming for the Azure Data Lake Storage account.')
+param datalakeName string = 'dls'
+
 
 //Parameter to add timestamp to activity deployment
+@description('The timestamp for the deployment, used to differentiate between instances of resources deployed.')
 param deploymentTimestamp string = utcNow('yy-MM-dd-HHmm')
 
 

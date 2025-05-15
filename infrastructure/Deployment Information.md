@@ -8,6 +8,11 @@ This project contains the necessary files to deploy an Azure Marketplace offerin
 https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCloudFormations%2FCF.Cumulus%2Frefs%2Fheads%2Fdevelop_marketplace%2Finfrastructure%2Fazuredeploy.json
 
 ### Compiled BiCep
+
+```
+bicep build ".\CumulusFramework\infrastructure\main.bicep"
+```
+
 https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCloudFormations%2FCF.Cumulus%2Frefs%2Fheads%2Fdevelop_marketplace%2Finfrastructure%2Fmain.json
 
 
