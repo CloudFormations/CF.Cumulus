@@ -1,6 +1,17 @@
 {
 	"name": "Ingest_LS_Jira_UserAuth",
 	"properties": {
+		"parameters": {
+			"LSHostName": {
+				"type": "string"
+			},
+			"LSUserName": {
+				"type": "string"
+			},
+			"LSPassword": {
+				"type": "string"
+			}
+		},
 		"annotations": [],
 		"type": "Jira",
 		"typeProperties": {
