@@ -8,6 +8,8 @@ This project contains the necessary files to deploy an Azure Marketplace offerin
 https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCloudFormations%2FCF.Cumulus%2Frefs%2Fheads%2Fdevelop_marketplace%2Finfrastructure%2FcreateUiDefinition.json
 
 
+https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FCloudFormations%2FCF.Cumulus%2Frefs%2Fheads%2Fdevelop_marketplace%2Finfrastructure%2Fazuredeploy.json/createUIDefinitionUri/https%3A%2F%2Fraw.githubusercontent.com%2FCloudFormations%2FCF.Cumulus%2Frefs%2Fheads%2Fdevelop_marketplace%2Finfrastructure%2FcreateUiDefinition.json
+
 ## Project Structure
 
 - **main.bicep**: Contains the main infrastructure deployment logic for the Azure Marketplace offering. It defines parameters, variables, and modules for deploying various Azure resources such as Key Vault, Storage, Data Factory, and more.
