@@ -31,7 +31,7 @@
           },
           {
             "name": "location",
-            "type": "Microsoft.Common.Location",
+            "type": "Microsoft.Common.DropDown",
             "label": "Location",
             "defaultValue": "uksouth",
             "toolTip": "The Azure region for deployment."
