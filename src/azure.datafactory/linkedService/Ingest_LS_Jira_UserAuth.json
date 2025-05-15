@@ -18,16 +18,16 @@
 		},
 		"annotations": [],
 		"typeProperties": {
-			"host": "@{LinkedService().LSHostName}",
-			"port": "@{LinkedService().LSPortNumber}",
-			"username": "@{LinkedService().LSUserName}",
+			"host": "@{linkedService().LSHostName}",
+			"port": "@{linkedService().LSPortNumber}",
+			"username": "@{linkedService().LSUserName}",
 			"password": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
 					"referenceName": "Common_LS_cumuluskeys",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "@{LinkedService().LSPassword}"
+				"secretName": "@{linkedService().LSPassword}"
 			},
 			"useEncryptedEndpoints": true,
 			"useHostVerification": true,
