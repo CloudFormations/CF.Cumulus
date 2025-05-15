@@ -10,21 +10,24 @@
 			},
 			"LSPassword": {
 				"type": "string"
+			},
+			"LSPortNumber": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
 		"type": "Jira",
 		"typeProperties": {
-			"host": "host",
-			"port": "000",
-			"username": "username",
+			"host": "@{LinkedService().LSHostName}",
+			"port": "@{LinkedService().LSPortNumber}",
+			"username": "@{LinkedService().LSUserName}",
 			"password": {
 				"type": "AzureKeyVaultSecret",
 				"store": {
 					"referenceName": "Common_LS_cumuluskeys",
 					"type": "LinkedServiceReference"
 				},
-				"secretName": "secretname"
+				"secretName": "@{LinkedService().LSPassword}"
 			},
 			"useEncryptedEndpoints": true,
 			"useHostVerification": true,
