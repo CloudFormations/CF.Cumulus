@@ -19,6 +19,9 @@ param(
 # Login to the Azure Tenant
 az login --tenant $tenantId
 
+# DEMO: Start a timer
+$processTimerStart = [System.Diagnostics.Stopwatch]::StartNew()
+
 # Run the *main*.bicep file to deploy your resources to Azure as per your configuration file
 $bicepDeployment = az deployment sub create `
     --subscription $subscriptionId `
@@ -42,16 +45,17 @@ $sqlDatabaseName = $bicepDeployment.properties.outputs.sqlDatabaseName.value
 
 
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
-# Grant User Key Vault Secret Administrator RBAC to save Function App Key to KV
-$userDetails = az ad signed-in-user show | ConvertFrom-Json
-$userId = $userDetails.id
-az role assignment create --role "Key Vault Secrets Officer" --assignee-id $userId --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
 
-# Grant Databricks Key Vault Secrets User RBAC to read secrets from KV
 # Get Subscription Id from Name
 $subscriptionDetails = az account subscription list | ConvertFrom-Json 
 $subscriptionIdValue = $subscriptionDetails.subscriptionId
 
+# Grant User Key Vault Secret Administrator RBAC to save Function App Key to KV
+$userDetails = az ad signed-in-user show | ConvertFrom-Json
+$userId = $userDetails.id
+az role assignment create --role "Key Vault Secrets Officer" --assignee $userId --scope "/subscriptions/$subscriptionIdValue/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+
+# Grant Databricks Key Vault Secrets User RBAC to read secrets from KV
 # Get Databricks Object Id
 $databricksDetails = az ad sp list --query "[?displayName=='AzureDatabricks']" | ConvertFrom-Json
 
@@ -95,21 +99,43 @@ $deployDatabricksResourcesScript = $currentLocation + '\deploy_databricks_resour
 
 # Deploy the SQL Server Metadata objects
     # Child script: Create control Schema Objects
-    # Child script: Create common Schema Objects
+# Child script: Create common Schema Objects
     # Child script: Create ingest Schema Objects
     # Child script: Create transform Schema Objects
     # Child script: Query Databricks Workspace URL
     # Child script: Populate Default values for control, common
     # Child script: Create user for ADF, create role, add user to role
+
+# Optional: Deploy AdventureWorks SQL Database
+    # If $OptionalDataSource = true:
+        # Create Azure SQL DB with AdventureWorks DB
+        # Create user for ADF on AdventureWorks DB
+        # Populate Metadata with AdventureWorks Connection/Dataset info 
     
-# Cleanup Actions:
 
-# Remove unrequired environment variables
-# Set environment variables up for other PS script executions
-$Env:SQLSERVER = '' 
-$Env:SQLDATABASE = '' 
-$Env:DATAFACTORY = '' 
-$Env:FUNCTIONAPP = '' 
-$Env:KEYVAULT = '' 
+# Tests
+# ADF
 
-# Remove Databricks Profile Config file
+# Databricks
+# Test exection of the databricks notebook which runs dbutils to check secret scope configured correctly
+
+# Functions
+# Postman
+
+
+# Demo duration logging + surfacing
+$processTimerEnd = $processTimerStart.Elapsed
+$elapsedTime = "{0:00}:{1:00}:{2:00}.{3:00}" -f $processTimerEnd.Hours, $processTimerEnd.Minutes, $tprocessTimerEnd.Seconds, ($processTimerEnd.Milliseconds / 10)
+Write-Host "Deployment Complete! Elapsed Time $elapsedTime `r`n"
+
+# # Cleanup Actions:
+
+# # Remove unrequired environment variables
+# # Set environment variables up for other PS script executions
+# $Env:SQLSERVER = '' 
+# $Env:SQLDATABASE = '' 
+# $Env:DATAFACTORY = '' 
+# $Env:FUNCTIONAPP = '' 
+# $Env:KEYVAULT = '' 
+
+# # Remove Databricks Profile Config file
