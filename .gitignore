@@ -254,8 +254,21 @@ paket-files/
 /Functions/local.settings.json
 /docs
 
+#  Databricks files
 .databricks
 databricks.yml
+
+# PyTest coverage report
 .coverage
 
+# Function App Local Publish files
+publishFunctions
+funcapp.zip
+
+# Function App ServiceDependency and Publish Profile related files
 src/azure.functionapp/Properties/
+
+# Infrastructure Dev, Test, Prod folders
+configuration/dev
+configuration/test
+configuration/prod
