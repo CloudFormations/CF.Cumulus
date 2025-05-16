@@ -15,6 +15,8 @@ param myIPAddress string = ''
 @description('Add firewall rule for Azure Resources.')
 param allowAzureServices bool = false // For allowing Azure services access to Azure SQL Server
 
+@description('Whether to deploy the DACPAC')
+param deployDacpac bool
 
 @description('Random GUID used to create a SQL Server admin password.')
 param randomGuid string = newGuid()
@@ -68,7 +70,6 @@ resource allowAzureResourcesFirewallRule 'Microsoft.Sql/servers/firewallRules@20
     endIpAddress: '0.0.0.0'
   }
 }
-
 
 var keyVaultName = '${namePrefix}kv${nameSuffix}'
 var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
@@ -151,6 +152,32 @@ resource sqlServerDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
       }
     ]
   }
+}
+
+var dacpacSasUrl = 'https://marketplaceleads01.blob.core.windows.net/dacpac?sp=r&st=2025-05-16T09:36:19Z&se=2026-05-16T17:36:19Z&spr=https&sv=2024-11-04&sr=c&sig=1CibOui9KYpZjdhwph5zEK6Hj6B%2BHI2b7R5%2BaX8cUXk%3D'
+
+resource dacpacDeploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (deployDacpac && dacpacSasUrl != '') {
+  name: 'dacpac-deployment-${databaseName}'
+  location: location
+  kind: 'AzurePowerShell'
+  properties: {
+    azPowerShellVersion: '10.4'
+    scriptContent: '''
+      $dacpacPath = "$env:TEMP\db.dacpac"
+      Invoke-WebRequest -Uri "${dacpacSasUrl}" -OutFile $dacpacPath
+      Install-Module -Name SqlServer -Force -Scope CurrentUser
+      $securePassword = ConvertTo-SecureString "${sqlPassword}" -AsPlainText -Force
+      $creds = New-Object System.Management.Automation.PSCredential ("sqladmin", $securePassword)
+      Publish-DacPac -ServerName "${serverName}.database.windows.net" -DatabaseName "${databaseName}" -DacPacPath $dacpacPath -SqlCredential $creds -AuthenticationType SqlPassword
+    '''
+    timeout: 'PT30M'
+    cleanupPreference: 'OnSuccess'
+    retentionInterval: 'P1D'
+  }
+  dependsOn: [
+    sqlServer
+    database
+  ]
 }
 
 // Output key properties for reference by other resources

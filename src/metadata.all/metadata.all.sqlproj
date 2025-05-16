@@ -3,16 +3,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>metadata.transform</Name>
+    <Name>metadata.all</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{7248f9c8-f270-48ff-9bbe-7bd82c3d7280}</ProjectGuid>
+    <ProjectGuid>{7ee10feb-f151-46a3-870d-fce55ff7cc7d}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>metadata.transform</RootNamespace>
-    <AssemblyName>metadata.transform</AssemblyName>
+    <RootNamespace>metadata.all</RootNamespace>
+    <AssemblyName>metadata.all</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
@@ -22,7 +22,6 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
-    <DefaultSchema>cumulus.transform</DefaultSchema>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -57,38 +56,29 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="transform" />
-    <Folder Include="Scripts" />
-    <Folder Include="Security" />
-    <Folder Include="transform\Stored Procedures" />
-    <Folder Include="transform\Tables" />
-    <Folder Include="transform\Views" />
-    <Folder Include="Synonyms" />
-  </ItemGroup>
-  <ItemGroup>
-    <Build Include="Security\transform.sql" />
-    <Build Include="transform\Tables\Notebooks.sql" />
-    <Build Include="transform\Tables\NotebookTypes.sql" />
-    <None Include="Security\db_cumulususer.sql" />
-    <Build Include="transform\Tables\Datasets.sql" />
-    <Build Include="transform\Tables\Attributes.sql" />
-    <Build Include="transform\Stored Procedures\GetNotebookPayload.sql" />
-    <Build Include="transform\Stored Procedures\SetTransformLoadStatus.sql" />
-    <Build Include="transform\Stored Procedures\GetUnmanagedNotebookPayload.sql" />
-    <Build Include="Synonyms\ComputeConnections.sql" />
-    <Build Include="Synonyms\Connections.sql" />
-    <Build Include="Synonyms\ConnectionTypes.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\metadata.common\metadata.common.sqlproj">
       <Name>metadata.common</Name>
       <Project>{dc651660-66ad-4c01-8b25-0b86b98ca405}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
+    <ProjectReference Include="..\metadata.control\metadata.control.sqlproj">
+      <Name>metadata.control</Name>
+      <Project>{202ebf84-a56b-4999-92a3-10f7ffe4ef25}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
+    <ProjectReference Include="..\metadata.ingest\metadata.ingest.sqlproj">
+      <Name>metadata.ingest</Name>
+      <Project>{882d4321-8587-45d2-8db3-a88efb3fcb7a}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
+    <ProjectReference Include="..\metadata.transform\metadata.transform.sqlproj">
+      <Name>metadata.transform</Name>
+      <Project>{7248f9c8-f270-48ff-9bbe-7bd82c3d7280}</Project>
       <Private>True</Private>
       <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
     </ProjectReference>

@@ -94,4 +94,12 @@
   <ItemGroup>
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\metadata.common\metadata.common.sqlproj">
+      <Name>metadata.common</Name>
+      <Project>{dc651660-66ad-4c01-8b25-0b86b98ca405}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

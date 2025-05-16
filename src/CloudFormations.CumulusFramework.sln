@@ -75,6 +75,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "framework.reporting", "fram
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "metadata.common", "metadata.common\metadata.common.sqlproj", "{DC651660-66AD-4C01-8B25-0B86B98CA405}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "metadata.all", "metadata.all\metadata.all.sqlproj", "{7EE10FEB-F151-46A3-870D-FCE55FF7CC7D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -131,6 +133,12 @@ Global
 		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DC651660-66AD-4C01-8B25-0B86B98CA405}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{7EE10FEB-F151-46A3-870D-FCE55FF7CC7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EE10FEB-F151-46A3-870D-FCE55FF7CC7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EE10FEB-F151-46A3-870D-FCE55FF7CC7D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{7EE10FEB-F151-46A3-870D-FCE55FF7CC7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EE10FEB-F151-46A3-870D-FCE55FF7CC7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EE10FEB-F151-46A3-870D-FCE55FF7CC7D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

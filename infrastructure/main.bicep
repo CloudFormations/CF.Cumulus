@@ -9,38 +9,69 @@ targetScope = 'subscription'
 // * These parameters control resource naming and deployment options
 // * Recommended for consistent resource naming across environments
 
-@description('The name of the organization.')
-param orgName string = 'cfc'
+//Naming convention parameters
+//**************************************************************************************************************
+@description('The naming prefix for all resources to be deployed.')
+param orgName string = 'cfc' 
 
-@description('The domain name used for the deployment.')
+@description('The optional middle part naming for all resources to be deployment. Suggested as the business unit, project or domain.')
 param domainName string = 'demo'
 
 @description('The environment name abbreviation used for the deployment.')
-param envName string = 'dev'
+param envName string = 'dev, tst, prd'
 
-@description('The Azure region where resources will be deployed.')
+@description('The Azure region where all resources will be deployed.')
 param location string = 'uksouth'
 
-@description('The unique identifier for the deployment, used to differentiate between instances of Resources.')
-param uniqueIdentifier string = '01'
+@description('Optional naming abbreviation for the Azure Data Lake Storage account.')
+param datalakeName string = 'dls'
 
-//Parameters for optional deployments
-@description('Optionally deploy Azure Data Factory.')
-param deployADF bool = true
-
-@description('Optionally deploy a separate Azure Data Factory instance for Worker pipelines.')
-param deployWorkers bool = false
-
-@description('optionally deploy an Azure SQL Database to house all metadata.')
-param deploySQL bool = true           
-
-@description('Optionally deploy an Azure Function App.')
-param deployFunction bool = true
-
-@description('Optional naming for the Azure Storage account used to support the Azure Functions App.')
+@description('Optional naming abbreviation for the Azure Storage account used to support the Azure Functions App.')
 param functionStorageName string = 'st'
 
-@description('Optionally deploy an Azure Databricks workspace.')
+@description('The numeric identifier for all resources as a naming suffix, used to differentiate between instances of resources.')
+param uniqueIdentifier string = '01'
+
+
+//Parameters to support resource configuration
+//**************************************************************************************************************
+
+@description('The product SKU for the Azure Databricks workspace.')
+@allowed(['Premium','Standard'])
+param databricksSKU string = 'Premium'
+
+@description('The product SKU for the App Service Plan used by the Azure Function App.')
+@allowed(['premium','consumption'])
+param aspSKU string = 'consumption'   
+
+@description('Deploy the SQL DACPAC required for the metadata database objects.')
+param deploySQLDacpac bool = true
+
+@description('An external IP address that is allowed access to the Azure SQL Database, as part of the logical SQL instance Firewall Rules.')
+param myIPAddress string 
+
+@description('Allow Azure services to access the Azure SQL Database, as part of the logical SQL instance Firewall Rules. Required for Azure Data Factory MI authentication.')
+param allowAzureServices bool = true 
+
+@description('A timestamp format used for the deployment execution naming only. Used to differentiate between instances of resources deployed.')
+param deploymentTimestamp string = utcNow('yy-MM-dd-HHmm')
+
+
+//Parameters for optional resource deployments considering new vs existing instances
+//**************************************************************************************************************
+@description('Optionally deploy Azure Data Factory, if it already exists.')
+param deployADF bool = true
+
+@description('Optionally deploy a separate Azure Data Factory instance to house Worker and Bootstrap pipelines separately.')
+param deployWorkers bool = false
+
+@description('Optionally deploy an Azure SQL Database to house all metadata, if it already exists.')
+param deploySQL bool = true           
+
+@description('Optionally deploy an Azure Function App, if it already exists.')
+param deployFunction bool = true
+
+@description('Optionally deploy an Azure Databricks workspace, if it already exists.')
 param deployADBWorkspace bool = true
 
 @description('Optionally setup role assignments as part of the deployment.')
@@ -49,36 +80,17 @@ param setRoleAssignments bool = true
 @description('Optionally deploy a custom VNet for the Azure Databricks workspace.')
 param deployNetworking bool = false
 
-@description('The SKU for the Azure Databricks workspace.')
-@allowed(['Premium','Standard'])
-param databricksSKU string = 'Premium'
-
 @description('Optionally deploy a Virtual Machine to house self-hosted Integration Runtime (IR) for Azure Data Factory.')
 param deployVM bool = false  
-
-@description('The SKU for the App Service Plan (ASP) used by the Function App.')
-@allowed(['premium','consumption'])
-param aspSKU string = 'consumption'   
 
 @description('Optionally configure GitHub repository for Azure Data Factory.')
 param configureGitHub bool = false    
 
-// SQL Server: Optional Parameters
-@description('An external IP address that is allowed access to the Azure SQL Database, as part of the logical instance Firewall Rules.')
-param myIPAddress string // For SQL Server Firewall rule
 
-@description('Allow Azure services to access the Azure SQL Database, as part of the logical instance Firewall Rules.')
-param allowAzureServices bool // For allowing Azure services access to Azure SQL Server
-
-// Storage: Optional naming configurations
-@description('Optional naming for the Azure Data Lake Storage account.')
-param datalakeName string = 'dls'
-
-
-//Parameter to add timestamp to activity deployment
-@description('The timestamp for the deployment, used to differentiate between instances of resources deployed.')
-param deploymentTimestamp string = utcNow('yy-MM-dd-HHmm')
-
+//End of parameters - no need to change anything below
+//**************************************************************************************************************
+//**************************************************************************************************************
+//**************************************************************************************************************
 
 // Mapping of Azure regions to short codes for naming conventions
 var locationShortCodes = {
@@ -264,6 +276,7 @@ module sqlServerDeploy './modules/sqlserver.template.bicep' = if (deploySQL) {
     allowAzureServices: allowAzureServices
     namePrefix: namePrefix
     nameSuffix: nameSuffix
+    deployDacpac: deploySQLDacpac
   }
   dependsOn: [
     keyVaultDeploy
