@@ -154,7 +154,7 @@ resource sqlServerDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
   }
 }
 
-var dacpacSasUrl = 'https://marketplaceleads01.blob.core.windows.net/dacpac?sp=r&st=2025-05-16T09:36:19Z&se=2026-05-16T17:36:19Z&spr=https&sv=2024-11-04&sr=c&sig=1CibOui9KYpZjdhwph5zEK6Hj6B%2BHI2b7R5%2BaX8cUXk%3D'
+var dacpacSasUrl = ''
 
 resource dacpacDeploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (deployDacpac && dacpacSasUrl != '') {
   name: 'dacpac-deployment-${databaseName}'
