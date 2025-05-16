@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.35.1.17967",
-      "templateHash": "14975621123315801821"
+      "templateHash": "4290616420179140920"
     }
   },
   "parameters": {
@@ -1668,7 +1668,7 @@
             "_generator": {
               "name": "bicep",
               "version": "0.35.1.17967",
-              "templateHash": "9326325477801412738"
+              "templateHash": "1300950122443732891"
             }
           },
           "parameters": {
@@ -1727,7 +1727,7 @@
             "sqlPassword": "[format('{0}{1}1A', take(parameters('randomGuid'), 16), take(variables('specialChars'), 2))]",
             "keyVaultName": "[format('{0}kv{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
             "logAnalyticsWorkspaceName": "[format('{0}log{1}', parameters('namePrefix'), parameters('nameSuffix'))]",
-            "dacpacSasUrl": "https://marketplaceleads01.blob.core.windows.net/dacpac?sp=r&st=2025-05-16T09:36:19Z&se=2026-05-16T17:36:19Z&spr=https&sv=2024-11-04&sr=c&sig=1CibOui9KYpZjdhwph5zEK6Hj6B%2BHI2b7R5%2BaX8cUXk%3D"
+            "dacpacUrl": "https://raw.githubusercontent.com/CloudFormations/CF.Cumulus/refs/heads/develop_marketplace/infrastructure/marketplace/db.dacpac"
           },
           "resources": [
             {
@@ -1836,7 +1836,7 @@
               ]
             },
             {
-              "condition": "[and(parameters('deployDacpac'), not(equals(variables('dacpacSasUrl'), '')))]",
+              "condition": "[and(parameters('deployDacpac'), not(equals(variables('dacpacUrl'), '')))]",
               "type": "Microsoft.Resources/deploymentScripts",
               "apiVersion": "2020-10-01",
               "name": "[format('dacpac-deployment-{0}', variables('databaseName'))]",
@@ -1844,7 +1844,7 @@
               "kind": "AzurePowerShell",
               "properties": {
                 "azPowerShellVersion": "10.4",
-                "scriptContent": "      $dacpacPath = \"$env:TEMP\\db.dacpac\"\r\n      Invoke-WebRequest -Uri \"${dacpacSasUrl}\" -OutFile $dacpacPath\r\n      Install-Module -Name SqlServer -Force -Scope CurrentUser\r\n      $securePassword = ConvertTo-SecureString \"${sqlPassword}\" -AsPlainText -Force\r\n      $creds = New-Object System.Management.Automation.PSCredential (\"sqladmin\", $securePassword)\r\n      Publish-DacPac -ServerName \"${serverName}.database.windows.net\" -DatabaseName \"${databaseName}\" -DacPacPath $dacpacPath -SqlCredential $creds -AuthenticationType SqlPassword\r\n    ",
+                "scriptContent": "      $dacpacPath = \"$env:TEMP\\db.dacpac\"\r\n      Invoke-WebRequest -Uri \"${dacpacUrl}\" -OutFile $dacpacPath\r\n      Install-Module -Name SqlServer -Force -Scope CurrentUser\r\n      $securePassword = ConvertTo-SecureString \"${sqlPassword}\" -AsPlainText -Force\r\n      $creds = New-Object System.Management.Automation.PSCredential (\"sqladmin\", $securePassword)\r\n      Publish-DacPac -ServerName \"${serverName}.database.windows.net\" -DatabaseName \"${databaseName}\" -DacPacPath $dacpacPath -SqlCredential $creds -AuthenticationType SqlPassword\r\n    ",
                 "timeout": "PT30M",
                 "cleanupPreference": "OnSuccess",
                 "retentionInterval": "P1D"

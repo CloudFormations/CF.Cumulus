@@ -35,7 +35,6 @@ param uniqueIdentifier string = '01'
 
 //Parameters to support resource configuration
 //**************************************************************************************************************
-
 @description('The product SKU for the Azure Databricks workspace.')
 @allowed(['Premium','Standard'])
 param databricksSKU string = 'Premium'
@@ -51,7 +50,7 @@ param deploySQLDacpac bool = true
 param myIPAddress string 
 
 @description('Allow Azure services to access the Azure SQL Database, as part of the logical SQL instance Firewall Rules. Required for Azure Data Factory MI authentication.')
-param allowAzureServices bool = true 
+param allowAzureServices bool = true
 
 @description('A timestamp format used for the deployment execution naming only. Used to differentiate between instances of resources deployed.')
 param deploymentTimestamp string = utcNow('yy-MM-dd-HHmm')

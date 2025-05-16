@@ -154,9 +154,9 @@ resource sqlServerDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
   }
 }
 
-var dacpacSasUrl = ''
+var dacpacUrl = 'https://raw.githubusercontent.com/CloudFormations/CF.Cumulus/refs/heads/develop_marketplace/infrastructure/marketplace/db.dacpac'
 
-resource dacpacDeploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (deployDacpac && dacpacSasUrl != '') {
+resource dacpacDeploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-01' = if (deployDacpac && dacpacUrl != '') {
   name: 'dacpac-deployment-${databaseName}'
   location: location
   kind: 'AzurePowerShell'
@@ -164,7 +164,7 @@ resource dacpacDeploymentScript 'Microsoft.Resources/deploymentScripts@2020-10-0
     azPowerShellVersion: '10.4'
     scriptContent: '''
       $dacpacPath = "$env:TEMP\db.dacpac"
-      Invoke-WebRequest -Uri "${dacpacSasUrl}" -OutFile $dacpacPath
+      Invoke-WebRequest -Uri "${dacpacUrl}" -OutFile $dacpacPath
       Install-Module -Name SqlServer -Force -Scope CurrentUser
       $securePassword = ConvertTo-SecureString "${sqlPassword}" -AsPlainText -Force
       $creds = New-Object System.Management.Automation.PSCredential ("sqladmin", $securePassword)
