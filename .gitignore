@@ -265,6 +265,9 @@ databricks.yml
 publishFunctions
 funcapp.zip
 
+# Function App ServiceDependency and Publish Profile related files
+src/azure.functionapp/Properties/
+
 # Infrastructure Dev, Test, Prod folders
 configuration/dev
 configuration/test
