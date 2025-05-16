@@ -37,6 +37,9 @@
 				"type": "String"
 			}
 		},
+		"folder": {
+			"name": "Ingest"
+		},
 		"annotations": [],
 		"type": "JiraObject",
 		"schema": []
