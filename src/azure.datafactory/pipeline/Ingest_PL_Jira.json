@@ -305,6 +305,60 @@
 						}
 					]
 				}
+			},
+			{
+				"name": "Update Metadata Load Status",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "File Type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[ingest].[SetIngestLoadStatus]",
+					"storedProcedureParameters": {
+						"DatasetId": {
+							"value": {
+								"value": "@pipeline().parameters.DatasetId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"IngestStage": {
+							"value": "Raw",
+							"type": "String"
+						},
+						"LoadType": {
+							"value": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.LoadType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FileLoadDateTime": {
+							"value": {
+								"value": "@variables('LocalRunDateTime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Common_LS_cumulusdatabase",
+					"type": "LinkedServiceReference"
+				}
 			}
 		],
 		"parameters": {
