@@ -155,15 +155,33 @@
 							"value": "Jira_UserAuth",
 							"activities": [
 								{
-									"name": "Binary Files VM02 Copy",
+									"name": "Fetch Jira Auth Username",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.Username,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "Jira UserAuth Copy",
 									"type": "Copy",
 									"dependsOn": [
-										{
-											"activity": "Fetch Jira Auth Password",
-											"dependencyConditions": [
-												"Succeeded"
-											]
-										},
 										{
 											"activity": "Fetch Jira Auth Username",
 											"dependencyConditions": [
@@ -197,16 +215,30 @@
 														"type": "Expression"
 													}
 												}
-											]
-										},
-										"sink": {
-											"type": "BinarySink",
-											"storeSettings": {
-												"type": "AzureBlobFSWriteSettings",
-												"copyBehavior": "PreserveHierarchy"
+											],
+											"query": {
+												"value": "@activity('Get Ingest Payload').output.firstRow.SourceQuery",
+												"type": "Expression"
 											}
 										},
-										"enableStaging": false
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											},
+											"formatSettings": {
+												"type": "ParquetWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
 									},
 									"inputs": [
 										{
@@ -219,26 +251,21 @@
 													"type": "Expression"
 												},
 												"DSPassword": {
-													"value": "@activity('Fetch Jira Auth Password').output.value",
+													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
 													"type": "Expression"
 												},
-												"DSPortNumber": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort"
+												"DSPortNumber": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
+													"type": "Expression"
+												}
 											}
 										}
 									],
 									"outputs": [
 										{
-											"referenceName": "Ingest_DS_DataLake_Binary",
+											"referenceName": "Ingest_DS_DataLake_Parquet",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSDirectory": {
-													"value": "@variables('DirectoryName')",
-													"type": "Expression"
-												},
-												"DSFileName": {
-													"value": "@concat(activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'.',activity('Get Ingest Payload').output.firstRow.ExtensionType)",
-													"type": "Expression"
-												},
 												"DSStorageName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
 													"type": "Expression"
@@ -246,58 +273,18 @@
 												"DSContainerName": {
 													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
 													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@variables('DirectoryName')",
+													"type": "Expression"
+												},
+												"DSFileName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.DatasetDisplayName",
+													"type": "Expression"
 												}
 											}
 										}
 									]
-								},
-								{
-									"name": "Fetch Jira Auth Password",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"url": {
-											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
-											"type": "Expression"
-										},
-										"authentication": {
-											"type": "MSI",
-											"resource": "https://vault.azure.net"
-										}
-									}
-								},
-								{
-									"name": "Fetch Jira Auth Username",
-									"type": "WebActivity",
-									"dependsOn": [],
-									"policy": {
-										"timeout": "0.12:00:00",
-										"retry": 0,
-										"retryIntervalInSeconds": 30,
-										"secureOutput": true,
-										"secureInput": false
-									},
-									"userProperties": [],
-									"typeProperties": {
-										"method": "GET",
-										"url": {
-											"value": "@concat(activity('Get Ingest Payload').output.firstRow.Username,'?api-version=7.0')",
-											"type": "Expression"
-										},
-										"authentication": {
-											"type": "MSI",
-											"resource": "https://vault.azure.net"
-										}
-									}
 								}
 							]
 						}
