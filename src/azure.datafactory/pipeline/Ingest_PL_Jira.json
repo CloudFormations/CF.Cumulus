@@ -134,7 +134,7 @@
 				}
 			},
 			{
-				"name": "File Type",
+				"name": "Jira Type",
 				"type": "Switch",
 				"dependsOn": [
 					{
@@ -311,7 +311,7 @@
 				"type": "SqlServerStoredProcedure",
 				"dependsOn": [
 					{
-						"activity": "File Type",
+						"activity": "Jira Type",
 						"dependencyConditions": [
 							"Succeeded"
 						]
