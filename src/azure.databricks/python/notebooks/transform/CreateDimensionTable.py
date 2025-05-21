@@ -7,11 +7,11 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/HelperFunctions
+from utils.HelperFunctions import *
 
 # COMMAND ----------
 
-# MAGIC %run ./utils/ConfigurePayloadVariables
+from utils.ConfigurePayloadVariables import *
 
 # COMMAND ----------
 

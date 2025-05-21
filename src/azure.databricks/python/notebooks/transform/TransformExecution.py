@@ -3,7 +3,16 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/HelperFunctions
+import sys, os
+from pprint import pprint
+
+current_directory = os.getcwd()
+parent_directory = os.path.abspath(os.path.join(current_directory, '..','..','utils'))
+sys.path.append(parent_directory)
+
+# COMMAND ----------
+
+from utils.HelperFunctions import *
 
 # COMMAND ----------
 
@@ -19,7 +28,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ./utils/ConfigurePayloadVariables
+from utils.ConfigurePayloadVariables import *
 
 # COMMAND ----------
 

@@ -1,7 +1,4 @@
-# Databricks notebook source
 from delta.tables import *
-
-# COMMAND ----------
 
 def checkZeroBytes(loadAction: str, filePath: str) -> bool:
     """
@@ -30,8 +27,6 @@ def checkZeroBytes(loadAction: str, filePath: str) -> bool:
     else:
         raise Exception("Unknown state. Raise error")
 
-# COMMAND ----------
-
 def checkDfSize(df: DataFrame) -> bool:
     """
     Summary:
@@ -52,8 +47,6 @@ def checkDfSize(df: DataFrame) -> bool:
         raise Exception(f'Invalid rowcount returned from DataFrame. Value {df.count()}.')
 
 
-# COMMAND ----------
-
 def createPartitionFieldsSQL(partitionFields: list() = []) -> str:
     """
     Summary:
@@ -69,8 +62,6 @@ def createPartitionFieldsSQL(partitionFields: list() = []) -> str:
     if len(partitionFields) > 0:
         partitionFieldsSQL = "\nPARTITIONED BY (" + ",".join(f"{pf}" for pf in partitionFields) + ")\n"
     return partitionFieldsSQL
-
-# COMMAND ----------
 
 # For incremental loads or depending on source file format, columns may not be loaded to bronze, despite being specified in the schema. Example - reading entirely NULL columns from Dynamics 365 excludes these from the Parquet which is written.
 def getColumnsNotInSchema(columnsList: list(), df: DataFrame) -> list():

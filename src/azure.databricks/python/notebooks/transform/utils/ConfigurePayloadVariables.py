@@ -1,4 +1,3 @@
-# Databricks notebook source
 def getTransformPayloadVariables(payload: dict()) -> list():
     # create variables for each payload item
     cleansedSecret = payload["CleansedStorageAccessKey"]

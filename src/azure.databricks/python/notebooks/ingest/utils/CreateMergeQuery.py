@@ -1,4 +1,3 @@
-# Databricks notebook source
 def selectSqlColumnsFormatString(totalColumnList:list,totalColumnTypeList:list, totalColumnFormatList:list) -> list:
     """
     Format strings with required schema enforcement for SQL.
@@ -49,7 +48,6 @@ def pythonColumnsFormatString(totalColumnList:list, totalColumnTypeList:list, to
 def splitStringToList(listAsString:str) -> list:
     return listAsString.split(",")
 
-# COMMAND ----------
 
 def selectSqlExplodedOptionString(totalColumnList:list,totalColumnTypeList:list, totalColumnFormatList:list) -> list:
 

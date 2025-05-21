@@ -21,7 +21,7 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/ConfigurePayloadVariables
+from utils.ConfigurePayloadVariables import *
 
 # COMMAND ----------
 

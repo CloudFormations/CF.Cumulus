@@ -10,35 +10,34 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../../utils/Initialise
+import sys, os
+from pprint import pprint
+
+current_directory = os.getcwd()
+parent_directory = os.path.abspath(os.path.join(current_directory, '..','..','utils'))
+sys.path.append(parent_directory)
 
 # COMMAND ----------
 
-# MAGIC %run ../../utils/HelperFunctions
+# Import Base utility functions
+from utils.Initialise import *
+from utils.CheckPayloadFunctions import *
+from utils.HelperFunctions import *
+from utils.OperationalMetrics import *
+from utils.CreateDeltaObjects import *
+from utils.WriteToDelta import *
+
+# Import Ingest utility functions]
+from utils.ConfigurePayloadVariables import *
+from utils.CreateMergeQuery import *
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/ConfigurePayloadVariables
-
-# COMMAND ----------
-
-# MAGIC %run ../../utils/CheckPayloadFunctions
-
-# COMMAND ----------
-
-# MAGIC %run ../../utils/OperationalMetrics
-
-# COMMAND ----------
-
-# MAGIC %run ../utils/CreateMergeQuery
-
-# COMMAND ----------
-
-# MAGIC %run ../../utils/CreateDeltaObjects
-
-# COMMAND ----------
-
-# MAGIC %run ../../utils/WriteToDelta
+import json
+import dbutils
+import datetime
+from pyspark.sql.functions import *
+import pandas as pd
 
 # COMMAND ----------
 
@@ -48,13 +47,6 @@ dbutils.widgets.text("Pipeline Run DateTime","")
 #Remove Widgets
 #dbutils.widgets.remove("<widget name>")
 #dbutils.widgets.removeAll()
-
-# COMMAND ----------
-
-import json
-import datetime
-from pyspark.sql.functions import *
-import pandas as pd
 
 # COMMAND ----------
 

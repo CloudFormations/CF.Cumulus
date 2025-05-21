@@ -1,4 +1,3 @@
-# Databricks notebook source
 def getMergePayloadVariables(payload: dict()) -> list():
     # create variables for each payload item
     tableName = payload["DatasetDisplayName"] 

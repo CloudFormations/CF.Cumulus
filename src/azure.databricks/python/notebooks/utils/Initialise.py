@@ -1,9 +1,6 @@
-# Databricks notebook source
 # Set abfss initialisation
 # Set abfss paths
 # Check abfss exists
-
-# COMMAND ----------
 
 def setAbfssSparkConfig(accountKeySecretName:str, storageName: str) -> None:
     """
@@ -20,8 +17,6 @@ def setAbfssSparkConfig(accountKeySecretName:str, storageName: str) -> None:
     )
     return
 
-# COMMAND ----------
-
 def setAbfssPath(storageName: str, containerName: str) -> str:
     """
     Set the ABFSS path of the container as a string.
@@ -32,8 +27,6 @@ def setAbfssPath(storageName: str, containerName: str) -> str:
  
     """
     return f"abfss://{containerName}@{storageName}.dfs.core.windows.net/"
-
-# COMMAND ----------
 
 # abfss check path exists in dbutils
 def checkAbfss(abfssPath:str) -> None:
