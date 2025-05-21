@@ -20,16 +20,16 @@ sys.path.append(parent_directory)
 # COMMAND ----------
 
 # Import Base utility functions
-from utils.Initialise import *
-from utils.CheckPayloadFunctions import *
-from utils.HelperFunctions import *
-from utils.OperationalMetrics import *
-from utils.CreateDeltaObjects import *
-from utils.WriteToDelta import *
+from Initialise import *
+from CheckPayloadFunctions import *
+from HelperFunctions import *
+from OperationalMetrics import *
+from CreateDeltaObjects import *
+from WriteToDelta import *
 
 # Import Ingest utility functions]
-from utils.ConfigurePayloadVariables import *
-from utils.CreateMergeQuery import *
+from ConfigurePayloadVariables import *
+from CreateMergeQuery import *
 
 # COMMAND ----------
 
