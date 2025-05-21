@@ -1,15 +1,12 @@
-# Databricks notebook source
 from delta.tables import *
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
-# COMMAND ----------
 
 def setColumnsListAsDict(columnsList: list()) -> dict:
     columnsDict = {column: col(f"src.{column}") for column in columnsList}
     return columnsDict
 
-# COMMAND ----------
 
 # Implementations of the base classes above, providing variations on the create statements required to create schema and table objects for different environments.
 
@@ -71,7 +68,6 @@ def overwriteDelta(df: DataFrame, schemaName: str, tableName: str) -> None:
     
     return
 
-# COMMAND ----------
 
 # Below are Curated-level operations to account for merging into tables with Identity generated surrogate key columns.
 def overwriteDeltaSurrogateKey(df: DataFrame, schemaName: str, tableName: str) -> None:
@@ -88,7 +84,6 @@ def overwriteDeltaSurrogateKey(df: DataFrame, schemaName: str, tableName: str) -
     df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{schemaName}.{tableName}")
     return
 
-# COMMAND ----------
 
 from functools import partial
 
@@ -119,7 +114,6 @@ def setOperationParameters(targetDf: DataFrame, df: DataFrame, schemaName: str, 
     }
     return operationParameters
 
-# COMMAND ----------
 
 def writeToDeltaExecutor(writeMode: str, targetDf: DataFrame, df: DataFrame, schemaName: str, tableName: str, pkFields: dict, columnsList: list(), partitionFields: dict = []) -> None:
     operationParameters = setOperationParameters(targetDf, df, schemaName, tableName, pkFields, columnsList, partitionFields)
@@ -132,7 +126,6 @@ def writeToDeltaExecutor(writeMode: str, targetDf: DataFrame, df: DataFrame, sch
     writeToDeltaFunction()
     return
 
-# COMMAND ----------
 
 def getTargetDeltaTable(schemaName: str, tableName: str, spark: SparkSession = spark) -> DataFrame:
     """

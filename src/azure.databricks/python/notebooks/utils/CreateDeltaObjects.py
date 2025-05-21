@@ -1,9 +1,8 @@
-# Databricks notebook source
+
 from delta.tables import *
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 
-# COMMAND ----------
 
 # Variations of required the create statements required to create schema and table objects for different environments.
 def createGenericSchemaSQL(schemaName: str) -> str:
@@ -11,9 +10,6 @@ def createGenericSchemaSQL(schemaName: str) -> str:
     CREATE SCHEMA {schemaName}
     """
     return createSQL
-
-# COMMAND ----------
-
 
 
 def createTableAsSelectSQL(schemaName: str,
@@ -51,9 +47,6 @@ def createGenericTableSQL(schemaName: str, tableName:str, location:str, partitio
 
     return createSQL
 
-
-# COMMAND ----------
-
 # Supported Schema mappings
 SCHEMAS = {
     "cleansed": createGenericSchemaSQL,
@@ -67,19 +60,14 @@ TABLES = {
     # Unity Catalog variations
 }
 
-# COMMAND ----------
-
 def createObject(createSQL: str) -> None:
     """Create the Delta object being processed."""
     spark.sql(createSQL)
     return
 
-# COMMAND ----------
-
 def setDeltaTableLocation(schemaName: str, tableName: str, abfssPath: str) -> str:
     return f'{abfssPath}{schemaName}/{tableName}'
 
-# COMMAND ----------
 
 def formatColumnsSQL(columnsList: list(), typeList: list()) -> str:
     columnsString = ""
@@ -89,8 +77,6 @@ def formatColumnsSQL(columnsList: list(), typeList: list()) -> str:
 
     return columnsString[:-2]
 
-
-# COMMAND ----------
 
 # def setTableParametersRestore(schemaName:str, tableName: str, location: str, partitionFieldsSQL:str, tempViewName: str, columnsString:str, surrogateKey: str, replace: bool) -> dict:
 #     """
@@ -123,8 +109,6 @@ def formatColumnsSQL(columnsList: list(), typeList: list()) -> str:
 #     }
 #     return tableParameters
 
-# COMMAND ----------
-
 def setTableParameters(schemaName:str, tableName: str, location: str, partitionFieldsSQL:str, columnsString:str, surrogateKey: str, replace: bool) -> dict:
     """
     Summary:
@@ -149,7 +133,6 @@ def setTableParameters(schemaName:str, tableName: str, location: str, partitionF
     }
     return tableParameters
 
-# COMMAND ----------
 
 def createSchema(containerName: str, schemaName: str) -> None:
     # create the schema based on the container

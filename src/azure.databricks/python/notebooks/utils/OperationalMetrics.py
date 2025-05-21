@@ -1,4 +1,3 @@
-# Databricks notebook source
 def getOperationMetrics(schemaName: str, tableName: str, output: dict) -> dict:
     """
     Summary:
