@@ -78,3 +78,8 @@
 		@ConnectionTypeDisplayName = N'Salesforce',
 		@SourceLanguageType = 'SOQL',
 		@Enabled = 1;
+
+	EXEC [common].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Jira', 
+		@SourceLanguageType = 'SQL',
+		@Enabled = 1;
