@@ -1,7 +1,7 @@
 from delta.tables import *
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
-
+from databricks.sdk.runtime import spark
 
 def setColumnsListAsDict(columnsList: list()) -> dict:
     columnsDict = {column: col(f"src.{column}") for column in columnsList}

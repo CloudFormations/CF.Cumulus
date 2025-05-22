@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from databricks.sdk.runtime import spark
 
 
 # check load type in 'F' or 'I' currently supported

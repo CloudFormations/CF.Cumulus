@@ -1,3 +1,6 @@
+from databricks.sdk.runtime import spark
+from pyspark.sql.functions import col
+
 def getOperationMetrics(schemaName: str, tableName: str, output: dict) -> dict:
     """
     Summary:

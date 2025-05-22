@@ -14,8 +14,10 @@ import sys, os
 from pprint import pprint
 
 current_directory = os.getcwd()
-parent_directory = os.path.abspath(os.path.join(current_directory, '..','..','utils'))
+parent_directory = os.path.abspath(os.path.join(current_directory, '..'))
 sys.path.append(parent_directory)
+utils_directory = os.path.abspath(os.path.join(current_directory, '..','..','utils'))
+sys.path.append(utils_directory)
 
 # COMMAND ----------
 
@@ -28,13 +30,12 @@ from CreateDeltaObjects import *
 from WriteToDelta import *
 
 # Import Ingest utility functions]
-from ConfigurePayloadVariables import *
-from CreateMergeQuery import *
+from utils.ConfigurePayloadVariables import *
+from utils.CreateMergeQuery import *
 
 # COMMAND ----------
 
 import json
-import dbutils
 import datetime
 from pyspark.sql.functions import *
 import pandas as pd
