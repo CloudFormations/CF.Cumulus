@@ -270,7 +270,10 @@
 											"type": "DatasetReference",
 											"parameters": {
 												"DSHostname": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
-												"DSUsername": "@activity('Fetch SQL Auth Username').output.value",
+												"DSUsername": {
+													"value": "@activity('Fetch SQL Auth V2 Username').output.value",
+													"type": "Expression"
+												},
 												"DSOracleSid": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
 												"DSPortNumber": "@activity('Get Ingest Payload').output.firstRow.ConnectionPort",
 												"DSPassword": {
