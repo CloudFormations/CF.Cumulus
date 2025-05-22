@@ -110,7 +110,7 @@ def set_operation_parameters(target_df: DataFrame, df: DataFrame, schema_name: s
         # "insert": partial(insert_delta, df=df, schema_name=schema_name, table_name=table_name), # not currently supported
         "overwrite": partial(overwrite_delta, df=df, schema_name=schema_name, table_name=table_name),
         # "mergesurrogate_key": partial(merge_deltasurrogate_key, target_df=target_df, df=df, pk_fields=pk_fields, columns_list=columns_list, partition_fields=partition_fields),
-        "overwritesurrogate_key": partial(overwrite_delta_surrogate_key, df=df, schema_name=schema_name, table_name=table_name),
+        "overwrite_surrogate_key": partial(overwrite_delta_surrogate_key, df=df, schema_name=schema_name, table_name=table_name),
     }
     return operation_parameters
 
@@ -121,7 +121,7 @@ def write_to_delta_executor(write_mode: str, target_df: DataFrame, df: DataFrame
     try:
         write_to_delta_function = operation_parameters[write_mode]
     except KeyError:
-        print(f"Invalid write mode '{write_mode}' specified.")
+        raise KeyError(f"Invalid write mode '{write_mode}' specified.")
 
     write_to_delta_function()
     return

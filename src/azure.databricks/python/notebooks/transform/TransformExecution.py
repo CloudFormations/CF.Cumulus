@@ -67,12 +67,12 @@ location = set_delta_table_location(schema_name=curated_schema_name, table_name=
 # COMMAND ----------
 
 # CALL BUSINESS LOGIC NOTEBOOK
-strSQL = dbutils.notebook.run(businessLogicNotebookPath, 60 ,{})
+str_sql = dbutils.notebook.run(business_logic_notebook_path, 60 ,{})
 
 # COMMAND ----------
 
-sourceDf = spark.sql(strSQL)
-# display(sourceDf)
+source_df = spark.sql(str_sql)
+# display(source_df)
 
 # COMMAND ----------
 
@@ -85,9 +85,9 @@ output = {}
 # COMMAND ----------
 
 # check DF size 
-isDfNonZero = check_df_size(df=sourceDf)
+is_df_non_zero = check_df_size(df=source_df)
 
-if isDfNonZero is False:
+if is_df_non_zero is False:
     output = {"message": "No New Rows to Process"}
         
     # break out of notebook
@@ -95,20 +95,20 @@ if isDfNonZero is False:
 
 # COMMAND ----------
 
-if loadType.upper() == "F":
+if load_type.upper() == "F":
     print('Write mode set to overwrite')
-    write_mode = "overwritesurrogate_key"
-elif loadType.upper() == "I":
+    write_mode = "overwrite_surrogate_key"
+elif load_type.upper() == "I":
     print('Write mode set to merge')
     write_mode = "merge"
 else: 
-    raise Exception("LoadType not supported.")
+    raise ValueError("Load type not supported.")
 
 # COMMAND ----------
 
-targetDelta = get_target_delta_table(schema_name = curated_schema_name, table_name=curated_dataset_name)
+target_delta = get_target_delta_table(schema_name = curated_schema_name, table_name=curated_dataset_name)
 
-write_to_delta_executor(write_mode=write_mode, target_df=targetDelta, df=sourceDf, schema_name=curated_schema_name, table_name=curated_dataset_name, pk_fields=bk_list, columns_list=columns_list, partition_fields=partition_list)
+write_to_delta_executor(write_mode=write_mode, target_df=target_delta, df=source_df, schema_name=curated_schema_name, table_name=curated_dataset_name, pk_fields=bk_list, columns_list=columns_list, partition_fields=partition_list)
 
 # COMMAND ----------
 

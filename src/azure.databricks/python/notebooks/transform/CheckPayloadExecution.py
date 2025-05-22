@@ -5,9 +5,6 @@
 # MAGIC - Confirm storage is accessible
 # MAGIC - Create Delta Table, if required
 # MAGIC
-# MAGIC #TODO items:
-# MAGIC - Unit tests
-# MAGIC
 
 # COMMAND ----------
 

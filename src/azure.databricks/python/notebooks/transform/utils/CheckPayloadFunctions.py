@@ -45,12 +45,12 @@ def compare_delta_table_size_vs_partition_threshold(delta_table_size_in_bytes:in
 # COMMAND ----------
 
 # Advisory check partitionby not used for small tables (may have RLS use case)
-def check_empty_partition_by_fields(partition_list:list()) -> bool:
+def check_empty_partition_by_fields(partition_list: list()) -> bool:
     if partition_list == []:
         print('Empty list passed to partition fields value. No action required.')
         return True
     elif partition_list is None: 
-        raise Exception('PartitionBy fields input as None value. Please review.')
+        raise ValueError('PartitionBy fields input as None value. Please review.')
     elif partition_list != []:
         print('Non-empty list passed to partition fields value. Please confirm partitioning is required based on Delta table size and RLS requirements.')
         return False

@@ -154,7 +154,7 @@ def create_table(container_name: str, schema_name: str, table_name: str, locatio
         # create_table_sql_function = TABLES[container_name]
         create_table_sql_function = table_parameters[container_name]
     except KeyError:
-        print(f"Invalid container name '{container_name}' specified.")
+        raise KeyError(f"Invalid container name '{container_name}' specified.")
         
     create_table_sql = create_table_sql_function
     print()
