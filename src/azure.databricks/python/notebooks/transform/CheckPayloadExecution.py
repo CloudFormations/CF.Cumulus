@@ -8,20 +8,23 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/Initialise
+import sys, os
+from pprint import pprint
+
+current_directory = os.getcwd()
+parent_directory = os.path.abspath(os.path.join(current_directory, '..'))
+sys.path.append(parent_directory)
+utils_directory = os.path.abspath(os.path.join(current_directory, '..','utils'))
+sys.path.append(utils_directory)
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/CheckPayloadFunctions
+# Import Base utility functions
+from CheckPayloadFunctions import *
 
-# COMMAND ----------
-
-# MAGIC %run ./utils/CheckPayloadFunctions
-# MAGIC
-
-# COMMAND ----------
-
+# Import Ingest utility functions
 from utils.ConfigurePayloadVariables import *
+from utils.CheckPayloadFunctions import *
 
 # COMMAND ----------
 

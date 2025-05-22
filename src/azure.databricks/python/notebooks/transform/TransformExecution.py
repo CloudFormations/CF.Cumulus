@@ -1,34 +1,26 @@
 # Databricks notebook source
-# MAGIC %run ../utils/Initialise
-
-# COMMAND ----------
-
 import sys, os
 from pprint import pprint
 
 current_directory = os.getcwd()
-parent_directory = os.path.abspath(os.path.join(current_directory, '..','..','utils'))
+parent_directory = os.path.abspath(os.path.join(current_directory, '..'))
 sys.path.append(parent_directory)
+utils_directory = os.path.abspath(os.path.join(current_directory, '..','utils'))
+sys.path.append(utils_directory)
 
 # COMMAND ----------
 
-from utils.HelperFunctions import *
+# Import Base utility functions
+from Initialise import *
+from HelperFunctions import *
+from CheckPayloadFunctions import *
+from CreateDeltaObjects import *
+from WriteToDelta import *
+from OperationalMetrics import *
 
-# COMMAND ----------
-
-# MAGIC %run ../utils/CreateDeltaObjects
-
-# COMMAND ----------
-
-# MAGIC %run ../utils/WriteToDelta
-
-# COMMAND ----------
-
-# MAGIC %run ../utils/OperationalMetrics
-
-# COMMAND ----------
-
+# Import Ingest utility functions
 from utils.ConfigurePayloadVariables import *
+from utils.CheckPayloadFunctions import *
 
 # COMMAND ----------
 
