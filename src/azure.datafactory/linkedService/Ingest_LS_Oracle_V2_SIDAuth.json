@@ -2,7 +2,6 @@
 	"name": "Ingest_LS_Oracle_V2_SIDAuth",
 	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
-		"type": "Oracle",
 		"parameters": {
 			"LSHostname": {
 				"type": "string"
@@ -21,8 +20,20 @@
 			}
 		},
 		"annotations": [],
+		"type": "Oracle",
+		"version": "2.0",
 		"typeProperties": {
-			"connectionString": "host=@{linkedService().LSHostname};port=@{linkedService().LSPortNumber};sid=@{linkedService().LSOracleSid};user id=@{linkedService().LSUsername};Password=@{linkedService().LSPassword}"
+			"server": "@{concat(\n    '(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=',\n    linkedService().LSHostname,\n    ')(PORT=',\n    linkedService().LSPortNumber,\n    '))(CONNECT_DATA=(SID=',\n    linkedService().LSOracleSid,')))'\n    )}",
+			"authenticationType": "Basic",
+			"username": "@{linkedService().LSUsername}",
+			"password": {
+				"type": "SecureString",
+				"value": "**********"
+			}
+		},
+		"connectVia": {
+			"referenceName": "integrationRuntimeCumulusDataSources02",
+			"type": "IntegrationRuntimeReference"
 		}
 	}
 }
