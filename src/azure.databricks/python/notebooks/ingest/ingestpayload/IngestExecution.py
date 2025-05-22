@@ -136,9 +136,9 @@ df.createOrReplaceTempView(temp_view_name)
 
 # COMMAND ----------
 
-additional_config = selectSqlExplodedOptionString(total_column_list, total_column_type_list, total_column_format_list)
+additional_config = select_sql_exploded_option_string(total_column_list, total_column_type_list, total_column_format_list)
 
-format_total_column_format_list = formatAttributeTargetDataFormatList(total_column_format_list)
+format_total_column_format_list = format_attribute_target_data_format_list(total_column_format_list)
 
 total_column_str = select_sql_columns_format_string(total_column_list, total_column_type_list, format_total_column_format_list)
 
