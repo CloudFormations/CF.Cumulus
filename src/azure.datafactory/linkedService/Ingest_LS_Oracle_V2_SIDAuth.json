@@ -1,6 +1,5 @@
 {
 	"name": "Ingest_LS_Oracle_V2_SIDAuth",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
 			"LSHostname": {
@@ -27,13 +26,21 @@
 			"authenticationType": "Basic",
 			"username": "@{linkedService().LSUsername}",
 			"password": {
-				"type": "SecureString",
-				"value": "**********"
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().LSPassword",
+					"type": "Expression"
+				}
 			}
 		},
 		"connectVia": {
 			"referenceName": "integrationRuntimeCumulusDataSources02",
 			"type": "IntegrationRuntimeReference"
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
