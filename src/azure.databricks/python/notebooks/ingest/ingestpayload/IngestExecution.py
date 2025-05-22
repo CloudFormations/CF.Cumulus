@@ -29,8 +29,8 @@ from OperationalMetrics import *
 from CreateDeltaObjects import *
 from WriteToDelta import *
 
-# Import Ingest utility functions]
-from utils.ConfigurePayloadVariables import *
+# Import Ingest utility functions
+from utils.ConfigurePayloadVariables import get_merge_payload_variables
 from utils.CreateMergeQuery import *
 
 # COMMAND ----------
@@ -94,7 +94,7 @@ options = {
     }
 
 #different options for specifying, based on how we save abfss folder hierarchy.
-file_full_path = f"{raw_abfss_path}/{rawschema_name}/{table_name}/version={version_number}/{load_action_text}/{datetime_folder_hierarchy}/{table_name}.{raw_file_type}"
+file_full_path = f"{raw_abfss_path}/{raw_schema_name}/{table_name}/version={version_number}/{load_action_text}/{datetime_folder_hierarchy}/{table_name}.{raw_file_type}"
 print(file_full_path)
 
 # assuming json,csv, parquet
@@ -191,7 +191,7 @@ location = set_delta_table_location(schema_name=cleansed_schema_name, table_name
 
 # check Delta table exists
 cleansed_table_path = set_table_path(schema_name =cleansed_schema_name, table_name =table_name)
-table_exists = check_exists_delta_table(tablePath = cleansed_table_path, load_action = load_action, loadType = loadType)
+table_exists = check_exists_delta_table(table_path = cleansed_table_path, load_action = load_action, load_type = load_type)
 
 # Create Delta table, if required
 table_created = False
@@ -218,7 +218,7 @@ else:
 
 target_delta = get_target_delta_table(schema_name = cleansed_schema_name, table_name=table_name)
 
-write_to_delta_executor(write_mode=write_mode, target_df=target_delta, df=df, schema_name=cleansed_schema_name, table_name=table_name, pk_fields=pkList, columns_list=total_column_list, partition_fields=partition_list)
+write_to_delta_executor(write_mode=write_mode, target_df=target_delta, df=df, schema_name=cleansed_schema_name, table_name=table_name, pk_fields=pk_list, columns_list=total_column_list, partition_fields=partition_list)
 
 # COMMAND ----------
 
