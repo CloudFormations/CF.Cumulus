@@ -216,13 +216,13 @@ elif load_action.upper() == "I":
 else: 
     raise Exception("load_action not supported.")
 
-targetDelta = get_target_delta_table(schema_name = cleansedschema_name, table_name=table_name)
+target_delta = get_target_delta_table(schema_name = cleansed_schema_name, table_name=table_name)
 
-write_to_delta_executor(write_mode=write_mode, target_df=targetDelta, df=df, schema_name=cleansedschema_name, table_name=table_name, pk_fields=pkList, columns_list=total_column_list, partition_fields=partition_list)
+write_to_delta_executor(write_mode=write_mode, target_df=target_delta, df=df, schema_name=cleansed_schema_name, table_name=table_name, pk_fields=pkList, columns_list=total_column_list, partition_fields=partition_list)
 
 # COMMAND ----------
 
-output = get_operation_metrics(schema_name=cleansedschema_name, table_name=table_name, output=output)
+output = get_operation_metrics(schema_name=cleansed_schema_name, table_name=table_name, output=output)
 print(output)
 
 # COMMAND ----------
