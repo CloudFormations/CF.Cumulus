@@ -52,32 +52,33 @@ dbutils.widgets.text("Pipeline Run DateTime","")
 # COMMAND ----------
 
 payload = json.loads(dbutils.widgets.get("Merge Payload"))
-pipelineRunId = dbutils.widgets.get("Pipeline Run Id")
-pipelineExecutionDateTimeString = dbutils.widgets.get("Pipeline Run DateTime")
+pipeline_run_id = dbutils.widgets.get("Pipeline Run Id")
+pipeline_execution_datetime = dbutils.widgets.get("Pipeline Run DateTime")
 
 # COMMAND ----------
 
-pipelineExecutionDateTime = pd.to_datetime(pipelineExecutionDateTimeString, format='%Y-%m-%dT%H:%M:%S.%fZ')
+pipeline_execution_datetime = pd.to_datetime(pipeline_execution_datetime, format='%Y-%m-%dT%H:%M:%S.%fZ')
 
 # COMMAND ----------
 
-[tableName, loadType, loadAction, loadActionText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList] = getMergePayloadVariables(payload)
+[table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list] = get_merge_payload_variables(payload)
+
 
 # COMMAND ----------
 
 print("Setting raw ABFSS config...")
-setAbfssSparkConfig(rawSecret, rawStorageName)
+set_abfss_spark_config(raw_secret, raw_storage_name)
 
 print("Setting cleansed ABFSS config...")
-setAbfssSparkConfig(cleansedSecret, cleansedStorageName)
+set_abfss_spark_config(cleansed_secret, cleansed_storage_name)
 
 # COMMAND ----------
 
 print("Setting raw ABFSS path...")
-rawAbfssPath = setAbfssPath(rawStorageName, rawContainerName)
+raw_abfss_path = set_abfss_path(raw_storage_name, raw_container_name)
 
 print("Setting cleansed ABFSS path...")
-cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
+cleansed_abfss_path = set_abfss_path(cleansed_storage_name, cleansed_container_name)
 
 # COMMAND ----------
 
@@ -93,31 +94,31 @@ options = {
     }
 
 #different options for specifying, based on how we save abfss folder hierarchy.
-fileFullPath = f"{rawAbfssPath}/{rawSchemaName}/{tableName}/version={versionNumber}/{loadActionText}/{dateTimeFolderHierarchy}/{tableName}.{rawFileType}"
-print(fileFullPath)
+file_full_path = f"{raw_abfss_path}/{rawschema_name}/{table_name}/version={version_number}/{load_action_text}/{datetime_folder_hierarchy}/{table_name}.{raw_file_type}"
+print(file_full_path)
 
 # assuming json,csv, parquet
 df = spark.read \
     .options(**options) \
-    .format(rawFileType) \
-    .load(fileFullPath)
+    .format(raw_file_type) \
+    .load(file_full_path)
 
 # display(df)
 
 # COMMAND ----------
 
-df = df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(pipelineExecutionDateTime)))
-df = df.withColumn('PipelineRunId', lit(pipelineRunId))
+df = df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(pipeline_execution_datetime)))
+df = df.withColumn('PipelineRunId', lit(pipeline_run_id))
 # display(df)
 
 # COMMAND ----------
 
 # For incremental loads or depending on source file format, columns may not be loaded to bronze, despite being specified in the schema. Example - reading entirely NULL columns from Dynamics 365 excludes these from the Parquet which is written.
 
-columnsNotInSchema = getColumnsNotInSchema(columnsList, df)
+columns_not_in_schema = get_columns_not_in_schema(columns_list, df)
 
-for column in columnsNotInSchema:
-    df = setNullColumn(df, column)
+for column in columns_not_in_schema:
+    df = set_null_column(df, column)
 
 # display(df)
 
@@ -129,24 +130,24 @@ df = df.dropDuplicates()
 # COMMAND ----------
 
 # Create temporary table for SELECT statements
-pipelineRunIdViewExtension = pipelineRunId.replace('-', '_')
-tempViewName = f"{tableName}_{pipelineRunIdViewExtension}"
-df.createOrReplaceTempView(tempViewName)
+pipeline_run_id_view_extension = pipeline_run_id.replace('-', '_')
+temp_view_name = f"{table_name}_{pipeline_run_id_view_extension}"
+df.createOrReplaceTempView(temp_view_name)
 
 # COMMAND ----------
 
-additionalConfig = selectSqlExplodedOptionString(totalColumnList, totalColumnTypeList, totalColumnFormatList)
+additional_config = selectSqlExplodedOptionString(total_column_list, total_column_type_list, total_column_format_list)
 
-formatTotalColumnFormatList = formatAttributeTargetDataFormatList(totalColumnFormatList)
+format_total_column_format_list = formatAttributeTargetDataFormatList(total_column_format_list)
 
-totalColumnStr = selectSqlColumnsFormatString(totalColumnList, totalColumnTypeList, formatTotalColumnFormatList)
+total_column_str = select_sql_columns_format_string(total_column_list, total_column_type_list, format_total_column_format_list)
 
-selectSQLFullString = f"SELECT {totalColumnStr} FROM {tempViewName} {additionalConfig}"
-print(selectSQLFullString)
+select_sql_full_string = f"SELECT {total_column_str} FROM {temp_view_name} {additional_config}"
+print(select_sql_full_string)
 
 # COMMAND ----------
 
-df = spark.sql(selectSQLFullString)
+df = spark.sql(select_sql_full_string)
 
 # COMMAND ----------
 
@@ -156,75 +157,75 @@ output = {}
 # COMMAND ----------
 
 # check DF size 
-isDfNonZero = checkDfSize(df=df)
+is_df_non_zero = check_df_size(df=df)
 
-if isDfNonZero is False:
+if is_df_non_zero is False:
     output = {"message": "No New Rows to Process"}
     
     # explicitly drop the temporary view
-    spark.catalog.dropTempView(tempViewName)
+    spark.catalog.dropTempView(temp_view_name)
     
     # break out of notebook
     dbutils.notebook.exit(output)
 
 # COMMAND ----------
 
-# build partitionFieldsSQL statement
-partitionFieldsSQL = createPartitionFieldsSQL(partitionFields=partitionList)
+# build partition_fields_sql statement
+partition_fields_sql = create_partition_fields_sql(partition_fields=partition_list)
 
 # COMMAND ----------
 
 # check Delta Objects exist (import check functions)
 # check schema exists
-schemaExists = checkExistsDeltaSchema(schemaName=cleansedSchemaName)
+schema_exists = check_exists_delta_schema(schema_name=cleansed_schema_name)
 
 # create schema, if required
-if schemaExists == False:
-    createSchema(containerName=cleansedContainerName, schemaName=cleansedSchemaName)
+if schema_exists == False:
+    create_schema(container_name=cleansed_container_name, schema_name=cleansed_schema_name)
 
 # COMMAND ----------
 
 # check Delta Objects exist (import check functions)
 # set Delta Table file path
-location = setDeltaTableLocation(schemaName=cleansedSchemaName, tableName=tableName, abfssPath=cleansedAbfssPath)
+location = set_delta_table_location(schema_name=cleansed_schema_name, table_name=table_name, abfss_path=cleansed_abfss_path)
 
 # check Delta table exists
-cleansedTablePath = setTablePath(schemaName =cleansedSchemaName, tableName =tableName)
-tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadAction = loadAction, loadType = loadType)
+cleansed_table_path = set_table_path(schema_name =cleansed_schema_name, table_name =table_name)
+table_exists = check_exists_delta_table(tablePath = cleansed_table_path, load_action = load_action, loadType = loadType)
 
 # Create Delta table, if required
-tableCreated = False
+table_created = False
 
-if tableExists == False:
-    columnsString = formatColumnsSQL(totalColumnList, totalColumnTypeList)
-    createTable(containerName=cleansedContainerName, schemaName=cleansedSchemaName, tableName=tableName,location=location, partitionFieldsSQL=partitionFieldsSQL, columnsString=columnsString)
-    tableCreated = True
+if table_exists == False:
+    columns_string = format_columns_sql(total_column_list, total_column_type_list)
+    create_table(container_name=cleansed_container_name, schema_name=cleansed_schema_name, table_name=table_name,location=location, partition_fields_sql=partition_fields_sql, columns_string=columns_string)
+    table_created = True
     
     # get operations metrics 
-    output = getOperationMetrics(schemaName=cleansedSchemaName, tableName=tableName, output=output)
+    output = get_operation_metrics(schema_name=cleansed_schema_name, table_name=table_name, output=output)
 
 
 # COMMAND ----------
 
-if loadAction.upper() == "F":
+if load_action.upper() == "F":
     print('Write mode set to overwrite')
-    writeMode = "overwrite"
-elif loadAction.upper() == "I":
+    write_mode = "overwrite"
+elif load_action.upper() == "I":
     print('Write mode set to merge')
-    writeMode = "merge"
+    write_mode = "merge"
 else: 
-    raise Exception("LoadAction not supported.")
+    raise Exception("load_action not supported.")
 
-targetDelta = getTargetDeltaTable(schemaName = cleansedSchemaName, tableName=tableName)
+targetDelta = get_target_delta_table(schema_name = cleansedschema_name, table_name=table_name)
 
-writeToDeltaExecutor(writeMode=writeMode, targetDf=targetDelta, df=df, schemaName=cleansedSchemaName, tableName=tableName, pkFields=pkList, columnsList=totalColumnList, partitionFields=partitionList)
+write_to_delta_executor(write_mode=write_mode, target_df=targetDelta, df=df, schema_name=cleansedschema_name, table_name=table_name, pk_fields=pkList, columns_list=total_column_list, partition_fields=partition_list)
 
 # COMMAND ----------
 
-output = getOperationMetrics(schemaName=cleansedSchemaName, tableName=tableName, output=output)
+output = get_operation_metrics(schema_name=cleansedschema_name, table_name=table_name, output=output)
 print(output)
 
 # COMMAND ----------
 
 # explicitly drop the temporary view
-spark.catalog.dropTempView(tempViewName)
+spark.catalog.dropTempView(temp_view_name)

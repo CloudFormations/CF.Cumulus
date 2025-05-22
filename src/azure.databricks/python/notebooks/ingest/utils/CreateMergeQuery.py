@@ -1,4 +1,4 @@
-def selectSqlColumnsFormatString(totalColumnList:list,totalColumnTypeList:list, totalColumnFormatList:list) -> list:
+def select_sql_columns_format_string(totalColumnList:list,totalColumnTypeList:list, totalColumnFormatList:list) -> list:
     """
     Format strings with required schema enforcement for SQL.
     """
