@@ -77,4 +77,10 @@ param myIPAddress = '1.1.1.1' // For SQL Server Firewall rule
 8. Copy and Paste your command into a PowerShell terminal (such as the integrated terminal in VSCode) and execute.
 9. Follow the process on screen and in 5-10 minutes you will have a deployment of Cumulus ready to explore.
 
-https://github.com/CloudFormations/CF.Cumulus/releases
+
+## Try It For Yourself
+Want to get hands on? Try our optional Samples deployment!
+
+Our Samples deployment lets you get to grips with the Lakehouse in an interactive experience by deploying a standalone Azure SQL Database containing AdventureWorks data, all hooked up to your CF.Cumulus Lakehouse. Permissions and metadata is deployed for you, so you can inspect the configurations and just hit run in Data Factory. With an operational data source and functioning Ingest and Transform pipelines, you'll have example data flowing through the system to get a feel for what goes on in each step of the process.
+
+Whether deploying CF.Cumulus from scratch or as an additional deployment to an existing CF.Cumulus Lakehouse, it is easy to get started by following our blog linked here.
