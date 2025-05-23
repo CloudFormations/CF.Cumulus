@@ -36,10 +36,6 @@
 					"type": "Expression"
 				}
 			}
-		},
-		"connectVia": {
-			"referenceName": "integrationRuntimeCumulusDataSources02",
-			"type": "IntegrationRuntimeReference"
 		}
 	},
 	"type": "Microsoft.DataFactory/factories/linkedservices"
