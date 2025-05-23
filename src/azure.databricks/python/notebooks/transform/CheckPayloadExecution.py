@@ -20,6 +20,7 @@ sys.path.append(utils_directory)
 # COMMAND ----------
 
 # Import Base utility functions
+from Initialise import *
 from CheckPayloadFunctions import *
 
 # Import Ingest utility functions
@@ -78,7 +79,7 @@ check_load_action(load_action = load_type)
 
 # COMMAND ----------
 
-check_merge_and_pk_conditions(load_action = load_type, pkList=bk_list)
+check_merge_and_pk_conditions(load_action = load_type, pk_list=bk_list)
 
 # COMMAND ----------
 

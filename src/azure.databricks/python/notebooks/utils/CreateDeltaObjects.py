@@ -1,7 +1,7 @@
 
 from delta.tables import *
-from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
+from databricks.sdk.runtime import spark
 
 
 # Variations of required the create statements required to create schema and table objects for different environments.
