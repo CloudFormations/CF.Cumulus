@@ -73,7 +73,7 @@ def check_exists_delta_schema(schema_name: str) -> bool:
     try:
         schema_exists = spark.catalog.databaseExists(schema_name)
     except Exception:
-        raise Exception('Syntax error in schema name provided. Please review no erroneous characters, such as " " are included.')
+        raise SyntaxError('Syntax error in schema name provided. Please review no erroneous characters, such as " " are included.')
 
     if (schema_exists == True):
         print('Schema exists. No action required.')
@@ -97,10 +97,10 @@ def set_table_path(schema_name: str, table_name: str) -> str:
     """
 
     if '.' in schema_name:
-        raise Exception('Reserved character ''.'' found in the schema_name parameter: {schema_name}. Please review metadata value provided and correct as required' )
+        raise ValueError('Reserved character ''.'' found in the schema_name parameter: {schema_name}. Please review metadata value provided and correct as required' )
 
     if '.' in table_name:
-        raise Exception('Reserved character ''.'' found in the table_name parameter: {table_name}. Please review metadata value provided and correct as required' )
+        raise ValueError('Reserved character ''.'' found in the table_name parameter: {table_name}. Please review metadata value provided and correct as required' )
 
     return f'{schema_name}.{table_name}'
 
@@ -113,24 +113,24 @@ def check_exists_delta_table(table_path: str, load_action: str, load_type: str) 
  
     Args:
         table_path (str): The path for the Delta table for the Dataset. This only requires the schema_name.table_name information, and is separate from the full ADLS path. 
-        load_action (str): The load Action being run. Different load ctions will determine if an error will occur if no (cleansed) Dataset Delta table is found.
+        load_action (str): The load Action being run. Different load actions will determine if an error will occur if no (cleansed) Dataset Delta table is found.
     """
 
     try:
         table_exists = spark.catalog.tableExists(table_path)
     except Exception:
-        raise Exception('Syntax error in table name provided. Please review no erroneous characters, such as " " are included.')
+        raise SyntaxError('Syntax error in table name provided. Please review no erroneous characters, such as " " are included.')
 
     if (table_exists == True) and (load_action == 'I'):
         print('Table exists. No action required.')
     elif (table_exists == True) and (load_action == 'F') and (load_type == 'I'):
-        raise Exception('Table found but running full load for Dataset which supports incremental load. Please confirm that this is expected.')
+        raise ValueError('Table found but running full load for Dataset which supports incremental load. Please confirm that this is expected.')
     elif (table_exists == True) and (load_action == 'F') and (load_type == 'F'):
         print('Table found but running full load for Dataset which only supports full loads. This will be overwritten, as expected.')
     elif (table_exists == False) and (load_action == 'F'):
         print('Table not found. Full load being run, table will be created by default as part of this process.')
     elif (table_exists == False) and (load_action == 'I'):
-        raise Exception('Table not found, raise error.')
+        raise ValueError('Table not found, raise error.')
     else:
         raise Exception('Unexpected state.')
 
