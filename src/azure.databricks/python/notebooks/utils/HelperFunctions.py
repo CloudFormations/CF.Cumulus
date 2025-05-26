@@ -1,4 +1,6 @@
 from delta.tables import *
+from pyspark.sql.functions import lit
+from pyspark.sql.types import StringType
 
 def check_zero_bytes(load_action: str, file_path: str) -> bool:
     """
@@ -69,4 +71,4 @@ def get_columns_not_in_schema(columns_list: list(), df: DataFrame) -> list():
 
 # Add to DataFrame as NULL columns
 def set_null_column(df: DataFrame, column: str) -> DataFrame:
-    return df.withColumn(column, lit(None))
+    return df.withColumn(column, lit(None).cast(StringType()))
