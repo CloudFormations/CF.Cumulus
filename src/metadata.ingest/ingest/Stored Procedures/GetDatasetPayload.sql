@@ -385,7 +385,7 @@ BEGIN
     RETURN 0;
     END
 
-    IF @SourceLanguageType IN ('T-SQL', 'PSQL', 'SQL')
+    IF @SourceLanguageType IN ('T-SQL', 'SQL')
     BEGIN
     SET @SourceQuery = @SourceQuery + ';'
     END
