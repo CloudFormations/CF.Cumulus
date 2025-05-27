@@ -35,4 +35,4 @@ jobs:
                 "permission_level": "CAN_VIEW"
               }
             ]
-          run-name: "EDA transforms helper module unit tests"
+          run-name: "Python functions unit test suite"
