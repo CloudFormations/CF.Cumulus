@@ -1,14 +1,13 @@
-# Databricks notebook source
-def selectSqlColumnsFormatString(totalColumnList:list,totalColumnTypeList:list, totalColumnFormatList:list) -> list:
+def select_sql_columns_format_string(total_column_list:list,total_column_type_list:list, total_column_format_list:list) -> list:
     """
     Format strings with required schema enforcement for SQL.
     """
     
-    totalColumnListLowercase = [x.lower() for x in totalColumnList]
-    totalColumnTypeListLowercase = [x.lower() for x in totalColumnTypeList]
-    # Note we do not want totalColumnFormatList in lowercase
+    total_column_list_lowercase = [x.lower() for x in total_column_list]
+    total_column_type_list_lowercase = [x.lower() for x in total_column_type_list]
+    # Note we do not want total_column_format_list in lowercase
 
-    sqlFormat = [
+    sql_format = [
         # timestamp handling
         f"to_timestamp({str(col)},'{_format}') as {str(col)}" if _type == "timestamp" and _format != 'yyyy-MM-ddTHH:mm:ss.SSSSSSSZ'
         else f"to_timestamp({str(col)}) as {str(col)}" if (_type == "timestamp" and _format == 'yyyy-MM-ddTHH:mm:ss.SSSSSSSZ')
@@ -23,62 +22,61 @@ def selectSqlColumnsFormatString(totalColumnList:list,totalColumnTypeList:list, 
         # else
         else f"cast({str(col)} as {_type}) as {str(col)}"
 
-        for col,_type,_format in zip(totalColumnListLowercase,totalColumnTypeListLowercase, totalColumnFormatList)
+        for col,_type,_format in zip(total_column_list_lowercase,total_column_type_list_lowercase, total_column_format_list)
         ]
         
-    totalColumnStr = ", ".join(sqlFormat)
-    return totalColumnStr
+    total_column_str = ", ".join(sql_format)
+    return total_column_str
 
 # Further editing required for timestamp and date when specific formats required.
 # Worth reviewing, as this saves us from creating a temp table for the select statement and creating another pyspark dataframe.
 
-def pythonColumnsFormatString(totalColumnList:list, totalColumnTypeList:list, totalColumnFormatList:list) -> list:
+def python_columns_format_string(total_column_list:list, total_column_type_list:list, total_column_format_list:list) -> list:
 
-    pythonFormat = [
+    python_format = [
         f"{str(col)} timestamp '{_format}'" if _type == "timestamp" 
         else f"{str(col)} date '{_format}'" if _type == "date" 
         else f"{str(col)} {_type}"
-        for col,_type,_format in zip(totalColumnList,totalColumnTypeList, totalColumnFormatList)
+        for col,_type,_format in zip(total_column_list,total_column_type_list, total_column_format_list)
         ]
         
-    totalColumnStr = ", ".join(pythonFormat)
+    total_column_str = ", ".join(python_format)
 
-    return totalColumnStr
+    return total_column_str
 
 # Not used, can be used for defensive programming and error handling tests
-def splitStringToList(listAsString:str) -> list:
-    return listAsString.split(",")
+def split_string_to_list(list_as_string:str) -> list:
+    return list_as_string.split(",")
 
-# COMMAND ----------
 
-def selectSqlExplodedOptionString(totalColumnList:list,totalColumnTypeList:list, totalColumnFormatList:list) -> list:
+def select_sql_exploded_option_string(total_column_list:list,total_column_type_list:list, total_column_format_list:list) -> list:
 
-    totalColumnListLowercase = [x.lower() for x in totalColumnList]
-    totalColumnTypeListLowercase = [x.lower() for x in totalColumnTypeList]
-    totalColumnFormatListLowercase = [x.lower() for x in totalColumnFormatList]
+    total_column_list_lowercase = [x.lower() for x in total_column_list]
+    total_column_type_list_lowercase = [x.lower() for x in total_column_type_list]
+    total_column_format_listLowercase = [x.lower() for x in total_column_format_list]
 
-    unstructuredFormat = [
+    unstructured_format = [
         f'lateral view explode({_format.replace("explode:(","").split(")")[0]}) as {_format.replace("explode:(","").split(")")[0].split(".")[-1]}_exploded' if ("explode:" in _format)
         else f'lateral view explode({_format.replace("explode:","")}) as {_format.replace("explode:","")}_exploded' if ("explode:" in _format and not "." in _format)
         # else f"cast({str(col)} as {_type}) as {str(col)}"
         else ''
-        for col,_type,_format in zip(totalColumnListLowercase,totalColumnTypeListLowercase, totalColumnFormatListLowercase)
+        for col,_type,_format in zip(total_column_list_lowercase,total_column_type_list_lowercase, total_column_format_listLowercase)
         ]
         
     # deduplicate
-    unstructuredFormatUnique =  list(dict.fromkeys(unstructuredFormat)) 
+    unstructured_format_unique =  list(dict.fromkeys(unstructured_format)) 
 
     # to string
-    unstructuredFormatStr = (" ".join(unstructuredFormatUnique)).strip()
-    return unstructuredFormatStr
+    unstructured_format_str = (" ".join(unstructured_format_unique)).strip()
+    return unstructured_format_str
 
-def formatAttributeTargetDataFormatList(AttributeTargetDataFormat:list) -> list:
+def format_attribute_target_data_format_list(attribute_target_data_format:list) -> list:
 
-    AttributeTargetDataFormatLowercase = [x.lower() for x in AttributeTargetDataFormat]
+    attribute_target_data_format_lowercase = [x.lower() for x in attribute_target_data_format]
     
-    formatAttributeTargetDataFormat = [
+    format_attribute_target_data_format = [
         f'{_str.replace("explode:(","").split(")")[0].split(".")[-1]}_exploded{_str.replace("explode:(","").split(")")[1]}'if ("explode:" in _str)
         else ''
-        for _str in AttributeTargetDataFormatLowercase]
+        for _str in attribute_target_data_format_lowercase]
 
-    return formatAttributeTargetDataFormat
+    return format_attribute_target_data_format

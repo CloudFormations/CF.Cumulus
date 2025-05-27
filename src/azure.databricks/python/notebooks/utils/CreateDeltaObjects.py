@@ -1,180 +1,163 @@
-# Databricks notebook source
-from delta.tables import *
-from pyspark.sql import SparkSession
-from pyspark.sql.functions import col
 
-# COMMAND ----------
+from delta.tables import *
+from pyspark.sql.functions import col
+from databricks.sdk.runtime import spark
+
 
 # Variations of required the create statements required to create schema and table objects for different environments.
-def createGenericSchemaSQL(schemaName: str) -> str:
-    createSQL = f"""
-    CREATE SCHEMA {schemaName}
+def create_generic_schema_sql(schema_name: str) -> str:
+    create_sql = f"""
+    CREATE SCHEMA {schema_name}
     """
-    return createSQL
-
-# COMMAND ----------
+    return create_sql
 
 
-
-def createTableAsSelectSQL(schemaName: str,
-                    tableName: str,
+def create_table_as_select_sql(schema_name: str,
+                    table_name: str,
                     location: str, 
-                    partitionFieldsSQL: str,
-                    tempViewName: str) -> str:
+                    partition_fields_sql: str,
+                    temp_view_name: str) -> str:
 
-    createSQL = f"""
-        CREATE TABLE {schemaName}.{tableName} 
+    create_sql = f"""
+        CREATE TABLE {schema_name}.{table_name} 
         LOCATION '{location}'
-        {partitionFieldsSQL}AS SELECT * FROM {tempViewName}
+        {partition_fields_sql}AS SELECT * FROM {temp_view_name}
         """
-    return createSQL
+    return create_sql
 
-def createGenericTableSQL(schemaName: str, tableName:str, location:str, partitionFieldsSQL: str, columnsString: str, surrogateKey: str, replace: bool) -> str:
+def create_generic_table_sql(schema_name: str, table_name:str, location:str, partition_fields_sql: str, columns_string: str, surrogate_key: str, replace: bool) -> str:
 
     createStatement = "CREATE TABLE IF NOT EXISTS"
     if replace:
         createStatement = "CREATE OR REPLACE TABLE"
     
-    surrogateKeyStatement = ""
-    if surrogateKey != "":
-        surrogateKeyStatement = f"{surrogateKey} BIGINT GENERATED ALWAYS AS IDENTITY,"
+    surrogate_keyStatement = ""
+    if surrogate_key != "":
+        surrogate_keyStatement = f"{surrogate_key} BIGINT GENERATED ALWAYS AS IDENTITY,"
 
-    createSQL = f"""
-    {createStatement} {schemaName}.{tableName} (
-        {surrogateKeyStatement}
-        {columnsString}
+    create_sql = f"""
+    {createStatement} {schema_name}.{table_name} (
+        {surrogate_keyStatement}
+        {columns_string}
     )
     USING DELTA
     LOCATION '{location}'
-    {partitionFieldsSQL}
+    {partition_fields_sql}
     """
 
-    return createSQL
-
-
-# COMMAND ----------
+    return create_sql
 
 # Supported Schema mappings
 SCHEMAS = {
-    "cleansed": createGenericSchemaSQL,
-    "curated": createGenericSchemaSQL,
+    "cleansed": create_generic_schema_sql,
+    "curated": create_generic_schema_sql,
     # Unity Catalog variations
 }
 # Supported Table mappings
 TABLES = {
-    "cleansed": createTableAsSelectSQL,
-    "curated": createGenericTableSQL,
+    "cleansed": create_table_as_select_sql,
+    "curated": create_generic_table_sql,
     # Unity Catalog variations
 }
 
-# COMMAND ----------
-
-def createObject(createSQL: str) -> None:
+def create_object(create_sql: str) -> None:
     """Create the Delta object being processed."""
-    spark.sql(createSQL)
+    spark.sql(create_sql)
     return
 
-# COMMAND ----------
+def set_delta_table_location(schema_name: str, table_name: str, abfss_path: str) -> str:
+    return f'{abfss_path}{schema_name}/{table_name}'
 
-def setDeltaTableLocation(schemaName: str, tableName: str, abfssPath: str) -> str:
-    return f'{abfssPath}{schemaName}/{tableName}'
 
-# COMMAND ----------
-
-def formatColumnsSQL(columnsList: list(), typeList: list()) -> str:
-    columnsString = ""
-    for colName, colType in zip(columnsList, typeList): 
-        columnsString += f"`{colName}` {colType}, "
+def format_columns_sql(columns_list: list(), typeList: list()) -> str:
+    columns_string = ""
+    for colName, colType in zip(columns_list, typeList): 
+        columns_string += f"`{colName}` {colType}, "
         # print(colName, colType)
 
-    return columnsString[:-2]
+    return columns_string[:-2]
 
 
-# COMMAND ----------
-
-# def setTableParametersRestore(schemaName:str, tableName: str, location: str, partitionFieldsSQL:str, tempViewName: str, columnsString:str, surrogateKey: str, replace: bool) -> dict:
+# def set_table_parameters_restore(schema_name:str, table_name: str, location: str, partition_fields_sql:str, temp_view_name: str, columns_string:str, surrogate_key: str, replace: bool) -> dict:
 #     """
 #     Summary:
 #         Create the parameters for each table creation statement based on the payload values.
     
 #     Args:
-#         schemaName (str): Name of the schema the dataset belongs to.
-#         tableName (str): Name of the target table for the dataset.
+#         schema_name (str): Name of the schema the dataset belongs to.
+#         table_name (str): Name of the target table for the dataset.
 #         location (str): Path to the target Delta Table.
-#         pkFields (dict): Dictionary of the primary key fields.
-#         partitionFields (dict): Dictionary of the partition by fields.
+#         pk_fields (dict): Dictionary of the primary key fields.
+#         partition_fields (dict): Dictionary of the partition by fields.
         
 #     Cleansed Args:
-#         tempViewName (str): Temporary view as source dataset.
+#         temp_view_name (str): Temporary view as source dataset.
 
 #     Curated Args:
-#         partitionFieldsSQL (str): String of the partition fields SQL statement.
-#         columnsString (str): String of the formatted columns for table creation.
-#         surrogateKey (str): String name of the surrogate key to be used in table.
+#         partition_fields_sql (str): String of the partition fields SQL statement.
+#         columns_string (str): String of the formatted columns for table creation.
+#         surrogate_key (str): String name of the surrogate key to be used in table.
 #         replace (bool): Boolean value to determine type of CREATE statement.
 
 #     Returns:
-#         tableParameters (dict): Dictionary mapping operation types to the parameter values used.
+#         table_parameters (dict): Dictionary mapping operation types to the parameter values used.
 #     """
 
-#     tableParameters = {
-#         "cleansed": createTableAsSelectSQL(schemaName, tableName, location, partitionFieldsSQL, tempViewName),
-#         "curated": createGenericTableSQL(schemaName, tableName, location, partitionFieldsSQL, columnsString, surrogateKey, replace)
+#     table_parameters = {
+#         "cleansed": create_table_as_select_sql(schema_name, table_name, location, partition_fields_sql, temp_view_name),
+#         "curated": create_generic_table_sql(schema_name, table_name, location, partition_fields_sql, columns_string, surrogate_key, replace)
 #     }
-#     return tableParameters
+#     return table_parameters
 
-# COMMAND ----------
-
-def setTableParameters(schemaName:str, tableName: str, location: str, partitionFieldsSQL:str, columnsString:str, surrogateKey: str, replace: bool) -> dict:
+def set_table_parameters(schema_name:str, table_name: str, location: str, partition_fields_sql:str, columns_string:str, surrogate_key: str, replace: bool) -> dict:
     """
     Summary:
         Create the parameters for each table creation statement based on the payload values.
     
     Args:
-        schemaName (str): Name of the schema the dataset belongs to.
-        tableName (str): Name of the target table for the dataset.
+        schema_name (str): Name of the schema the dataset belongs to.
+        table_name (str): Name of the target table for the dataset.
         location (str): Path to the target Delta Table.
-        partitionFieldsSQL (str): String of the partition fields SQL statement.
-        columnsString (str): String of the formatted columns for table creation.
-        surrogateKey (str): String name of the surrogate key to be used in table.
+        partition_fields_sql (str): String of the partition fields SQL statement.
+        columns_string (str): String of the formatted columns for table creation.
+        surrogate_key (str): String name of the surrogate key to be used in table.
         replace (bool): Boolean value to determine type of CREATE statement.
 
     Returns:
-        tableParameters (dict): Dictionary mapping operation types to the parameter values used.
+        table_parameters (dict): Dictionary mapping operation types to the parameter values used.
     """
 
-    tableParameters = {
-        "cleansed": createGenericTableSQL(schemaName, tableName, location, partitionFieldsSQL, columnsString, surrogateKey, replace),
-        "curated": createGenericTableSQL(schemaName, tableName, location, partitionFieldsSQL, columnsString, surrogateKey, replace),
+    table_parameters = {
+        "cleansed": create_generic_table_sql(schema_name, table_name, location, partition_fields_sql, columns_string, surrogate_key, replace),
+        "curated": create_generic_table_sql(schema_name, table_name, location, partition_fields_sql, columns_string, surrogate_key, replace),
     }
-    return tableParameters
+    return table_parameters
 
-# COMMAND ----------
 
-def createSchema(containerName: str, schemaName: str) -> None:
+def create_schema(container_name: str, schema_name: str) -> None:
     # create the schema based on the container
     try:
-        createSchemaSQLFunction = SCHEMAS[containerName]
+        create_schema_sql_function = SCHEMAS[container_name]
     except KeyError:
-        print(f"Invalid container name '{containerName}' specified.")
-    createSchemaSQL = createSchemaSQLFunction(schemaName=schemaName)
-    createObject(createSchemaSQL)
+        print(f"Invalid container name '{container_name}' specified.")
+    create_schema_sql = create_schema_sql_function(schema_name=schema_name)
+    create_object(create_schema_sql)
     print('Schema created.')
     return
 
-def createTable(containerName: str, schemaName: str, tableName: str, location: str, partitionFieldsSQL: str, columnsString: str = None, surrogateKey: str = "", replace: bool = None) -> None:
+def create_table(container_name: str, schema_name: str, table_name: str, location: str, partition_fields_sql: str, columns_string: str = None, surrogate_key: str = "", replace: bool = None) -> None:
 
-    tableParameters = setTableParameters(schemaName, tableName, location, partitionFieldsSQL, columnsString, surrogateKey, replace)
+    table_parameters = set_table_parameters(schema_name, table_name, location, partition_fields_sql, columns_string, surrogate_key, replace)
 
     # create the table based on the parameters
     try:
-        # createTableSQLFunction = TABLES[containerName]
-        createTableSQLFunction = tableParameters[containerName]
+        # create_table_sql_function = TABLES[container_name]
+        create_table_sql_function = table_parameters[container_name]
     except KeyError:
-        print(f"Invalid container name '{containerName}' specified.")
+        raise KeyError(f"Invalid container name '{container_name}' specified.")
         
-    createTableSQL = createTableSQLFunction
+    create_table_sql = create_table_sql_function
     print()
-    createObject(createTableSQL)
+    create_object(create_table_sql)
     print('Table Created')
     return

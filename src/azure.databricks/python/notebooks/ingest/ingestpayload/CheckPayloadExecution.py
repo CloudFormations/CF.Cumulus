@@ -13,15 +13,23 @@
 
 # COMMAND ----------
 
-# MAGIC %run ../../utils/Initialise
+import sys, os
+from pprint import pprint
+
+current_directory = os.getcwd()
+parent_directory = os.path.abspath(os.path.join(current_directory, '..'))
+sys.path.append(parent_directory)
+utils_directory = os.path.abspath(os.path.join(current_directory, '..','..','utils'))
+sys.path.append(utils_directory)
 
 # COMMAND ----------
 
-# MAGIC %run ../../utils/CheckPayloadFunctions
+# Import Base utility functions
+from Initialise import *
+from CheckPayloadFunctions import *
 
-# COMMAND ----------
-
-# MAGIC %run ../utils/ConfigurePayloadVariables
+# Import Ingest utility functions]
+from utils.ConfigurePayloadVariables import *
 
 # COMMAND ----------
 
@@ -40,7 +48,7 @@ payload = json.loads(dbutils.widgets.get("Merge Payload"))
 
 # COMMAND ----------
 
-[tableName, loadType, loadAction, loadActionText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList] = getMergePayloadVariables(payload)
+[table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list] = get_merge_payload_variables(payload)
 
 # COMMAND ----------
 
@@ -50,18 +58,18 @@ payload = json.loads(dbutils.widgets.get("Merge Payload"))
 # COMMAND ----------
 
 print("Setting raw ABFSS config...")
-setAbfssSparkConfig(rawSecret, rawStorageName)
+set_abfss_spark_config(raw_secret, raw_storage_name)
 
 print("Setting cleansed ABFSS config...")
-setAbfssSparkConfig(cleansedSecret, cleansedStorageName)
+set_abfss_spark_config(cleansed_secret, cleansed_storage_name)
 
 # COMMAND ----------
 
 print("Setting raw ABFSS path...")
-rawAbfssPath = setAbfssPath(rawStorageName, rawContainerName)
+raw_abfss_path = set_abfss_path(raw_storage_name, raw_container_name)
 
 print("Setting cleansed ABFSS path...")
-cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
+cleansed_abfss_path = set_abfss_path(cleansed_storage_name, cleansed_container_name)
 
 # COMMAND ----------
 
@@ -71,19 +79,19 @@ cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
 # COMMAND ----------
 
 # Check data types and nullability of each dictionary element
-checkLoadAction(loadAction = loadAction)
+check_load_action(load_action = load_action)
 
 # COMMAND ----------
 
-checkMergeAndPKConditions(loadAction = loadAction, pkList=pkList)
+check_merge_and_pk_conditions(load_action = load_action, pk_list=pk_list)
 
 # COMMAND ----------
 
-checkContainerName(containerName = rawContainerName)
+check_container_name(container_name = raw_container_name)
 
 # COMMAND ----------
 
-checkContainerName(containerName = cleansedContainerName)
+check_container_name(container_name = cleansed_container_name)
 
 # COMMAND ----------
 
@@ -93,10 +101,10 @@ checkContainerName(containerName = cleansedContainerName)
 # COMMAND ----------
 
 # Check Raw storage account exists and is accessible.
-checkAbfss(abfssPath=rawAbfssPath)
+check_abfss(abfss_path=raw_abfss_path)
 
 # Check cleansed storage account exists and is accessible.
-checkAbfss(abfssPath=cleansedAbfssPath)
+check_abfss(abfss_path=cleansed_abfss_path)
 
 # COMMAND ----------
 
@@ -105,7 +113,7 @@ checkAbfss(abfssPath=cleansedAbfssPath)
 
 # COMMAND ----------
 
-schemaExists = checkExistsDeltaSchema(schemaName = cleansedSchemaName)
+schema_exists = check_exists_delta_schema(schema_name = cleansed_schema_name)
 
 # COMMAND ----------
 
@@ -114,12 +122,12 @@ schemaExists = checkExistsDeltaSchema(schemaName = cleansedSchemaName)
 
 # COMMAND ----------
 
-cleansedTablePath = setTablePath(schemaName =cleansedSchemaName, tableName =tableName)
-print(cleansedTablePath)
+cleansed_table_path = set_table_path(schema_name =cleansed_schema_name, table_name =table_name)
+print(cleansed_table_path)
 
 # COMMAND ----------
 
-tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadAction = loadAction, loadType = loadType)
+table_exists = check_exists_delta_table(table_path = cleansed_table_path, load_action = load_action, load_type = load_type)
 
 # COMMAND ----------
 
@@ -128,8 +136,4 @@ tableExists = checkExistsDeltaTable(tablePath = cleansedTablePath, loadAction = 
 
 # COMMAND ----------
 
-compareRawLoadVsLastCleansedDate(rawLastLoadDate = rawLastLoadDate, cleansedLastLoadDate = cleansedLastLoadDate)
-
-# COMMAND ----------
-
-
+compare_raw_load_vs_last_cleansed_date(raw_last_load_date = raw_last_load_date,cleansed_last_load_date =cleansed_last_load_date)

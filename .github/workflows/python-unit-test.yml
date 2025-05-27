@@ -1,32 +1,38 @@
-name: Run Unit Test via Pytest
+name: Run Python Unit Testing on Cluster
   
 on: 
+  pull_request:
   workflow_dispatch:
+
+env:
+  DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
   
 jobs:  
-  build:  
-    runs-on: ubuntu-latest  
-    strategy:  
-      matrix:  
-        python-version: ["3.11"]
-    steps:  
-      - uses: actions/checkout@v3  
-      - name: Set up Python ${{ matrix.python-version }}  
-        uses: actions/setup-python@v4  
-        with:  
-          python-version: ${{ matrix.python-version }}  
-      - name: Install dependencies  
-        run: |  
-          python -m pip install --upgrade pip  
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi  
-      # - name: Lint with Ruff  
-      #   run: |  
-      #     pip install ruff  
-      #     ruff --format=github --target-version=py310 .  
-      #   continue-on-error: true  
-      - name: Test with pytest  
-        run: |  
-          coverage run -m pytest  -v -s  
-      - name: Generate Coverage Report  
-        run: |  
-          coverage report -m
+  run-python-unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:        
+      - name: Checkout repo
+        uses: actions/checkout@v4 
+      - name: Unit tests for PySpark Notebooks on Databricks
+        uses: databricks/run-notebook@main
+        with:
+          databricks-token: ${{ secrets.DATABRICKS_TOKEN }}
+
+          local-notebook-path: src/azure.databricks/python/tests/pytest_databricks.py
+
+          existing-cluster-id: ${{ secrets.DATABRICKS_CLUSTER_ID}}
+
+          git-commit: "${{ github.event.pull_request.head.sha }}"
+
+          # Grant all users view permission on the notebook's results, so that they can
+          # see the result of the notebook, if they have related access permissions.
+          access-control-list-json: >
+            [
+              {
+                "group_name": "users",
+                "permission_level": "CAN_VIEW"
+              }
+            ]
+          run-name: "Python functions unit test suite"
