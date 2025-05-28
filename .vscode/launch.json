@@ -11,7 +11,7 @@
             "type": "databricks",
             "request": "launch",
             "name": "Unit Tests (on Databricks)",
-            "program": "${workspaceFolder}/src/azure.databricks/python/tests/pytest_databricks.py",
+            "program": "${workspaceFolder}/src/azure.databricks/python/tests/pytest_databricks_ide.py",
             "args": ["."],
             "env": {}
           }
