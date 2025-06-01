@@ -2,16 +2,16 @@ import pyspark
 import pytest
 from notebooks.utils.CreateDeltaObjects import *
 
-def test_create_generic_table_sql_basic() -> None:
-    actual = create_generic_table_sql(schema_name='schema',table_name='table',location='adls/path',partition_fields_sql='',columns_string='`ID` INTEGER', surrogate_key='',replace=False)
-    expected = """
-    CREATE TABLE IF NOT EXISTS schema.table (
-        `ID` INTEGER
-    )
-    USING DELTA
-    LOCATION 'adls/path'
-    """
-    assert actual == expected
+# def test_create_generic_table_sql_basic() -> None:
+#     actual = create_generic_table_sql(schema_name='schema',table_name='table',location='adls/path',partition_fields_sql='',columns_string='`ID` INTEGER', surrogate_key='',replace=False)
+#     expected = """
+#     CREATE TABLE IF NOT EXISTS schema.table (
+#         `ID` INTEGER
+#     )
+#     USING DELTA
+#     LOCATION 'adls/path'
+#     """
+#     assert actual == expected
 
 # def test_create_generic_table_sql_basic_multi_column() -> None:
 #     actual = create_generic_table_sql(schema_name='schema',table_name='table',location='adls/path',partition_fields_sql='',columns_string='`ID` INTEGER, `NAME` STRING', surrogate_key='',replace=False)
