@@ -1,5 +1,5 @@
 {
-	"name": "Transform_LS_Databricks_Cluster_MIAuth",
+	"name": "Common_LS_Databricks_Cluster_MIAuth",
 	"properties": {
 		"parameters": {
 			"WorkspaceURL": {

@@ -1,5 +1,5 @@
 {
-	"name": "Ingest_LS_Databricks_JobCluster_MIAuth",
+	"name": "Common_LS_Databricks_JobCluster_MIAuth",
 	"properties": {
 		"parameters": {
 			"WorkspaceURL": {
@@ -42,7 +42,7 @@
 				"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
 			},
 			"newClusterVersion": "@linkedService().ClusterVersion",
-			"clusterOption": "Autoscaling",
+			"clusterOption": "Fixed",
 			"newClusterInitScripts": []
 		}
 	}
