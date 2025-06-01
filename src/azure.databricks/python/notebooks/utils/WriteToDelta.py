@@ -69,22 +69,6 @@ def overwrite_delta(df: DataFrame, schema_name: str, table_name: str) -> None:
     return
 
 
-# Below are Curated-level operations to account for merging into tables with Identity generated surrogate key columns.
-def overwrite_delta_surrogate_key(df: DataFrame, schema_name: str, table_name: str) -> None:
-    """
-    Summary:
-        Perform an Overwrite query for the Dataset to replace data in an target Delta table.
-    
-    Args:
-        df (DataFrame): PySpark DataFrame of the data to be loaded.
-        schema_name (str): Name of the schema the dataset belongs to.
-        table_name (str): Name of the target table for the dataset.
-
-    """
-    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{schema_name}.{table_name}")
-    return
-
-
 from functools import partial
 
 def set_operation_parameters(target_df: DataFrame, df: DataFrame, schema_name: str, table_name: str, pk_fields: dict,columns_list: list(), partition_fields: dict) -> dict:
@@ -109,8 +93,6 @@ def set_operation_parameters(target_df: DataFrame, df: DataFrame, schema_name: s
         "merge": partial(merge_delta, target_df=target_df, df=df, pk_fields=pk_fields, columns_list=columns_list, partition_fields=partition_fields),
         # "insert": partial(insert_delta, df=df, schema_name=schema_name, table_name=table_name), # not currently supported
         "overwrite": partial(overwrite_delta, df=df, schema_name=schema_name, table_name=table_name),
-        # "mergesurrogate_key": partial(merge_deltasurrogate_key, target_df=target_df, df=df, pk_fields=pk_fields, columns_list=columns_list, partition_fields=partition_fields),
-        "overwrite_surrogate_key": partial(overwrite_delta_surrogate_key, df=df, schema_name=schema_name, table_name=table_name),
     }
     return operation_parameters
 
@@ -141,6 +123,9 @@ def get_target_delta_table(schema_name: str, table_name: str, spark: SparkSessio
         target_df (DeltaTable): Target Delta Table to be updated.
     """
     # dfSchema = df.schema.jsonValue()["fields"]
+    try:
+        return DeltaTable.forName(spark, f"{schema_name}.{table_name}")
+    except Exception as e:
+        print(e)
+        raise Exception(f'Exception {e} occurred.')
 
-    target_df = DeltaTable.forName(spark, f"{schema_name}.{table_name}")
-    return target_df
