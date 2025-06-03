@@ -1,6 +1,5 @@
 {
 	"name": "Ingest_LS_SQLDB_SQLAuth",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
 			"LSHostName": {
@@ -25,7 +24,18 @@
 			"trustServerCertificate": false,
 			"authenticationType": "SQL",
 			"userName": "@{linkedService().LSUsername}",
-			"password": "@{linkedService().LSPassword}"
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().LSPassword",
+					"type": "Expression"
+				}
+			}
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
