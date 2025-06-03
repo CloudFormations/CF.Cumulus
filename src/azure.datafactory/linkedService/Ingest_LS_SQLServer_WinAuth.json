@@ -1,6 +1,5 @@
 {
 	"name": "Ingest_LS_SQLServer_WinAuth",
-	"type": "Microsoft.DataFactory/factories/linkedservices",
 	"properties": {
 		"parameters": {
 			"LSHostName": {
@@ -21,7 +20,18 @@
 		"typeProperties": {
 			"connectionString": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}",
 			"userName": "@{linkedService().LSUsername}",
-			"password": "@{linkedService().LSPassword}"
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().LSPassword",
+					"type": "Expression"
+				}
+			}
 		}
-	}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
 }
