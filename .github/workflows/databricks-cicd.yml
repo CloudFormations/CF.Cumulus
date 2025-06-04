@@ -7,7 +7,7 @@ on:
 
 
 jobs:
-  deploy:
+  deploy_dev:
     name: "Deploy dev"
     runs-on: ubuntu-latest
     environment: dev
@@ -40,3 +40,74 @@ jobs:
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: dev
+
+  deploy_test:
+    needs: deploy_dev
+    name: "Deploy test"
+    runs-on: ubuntu-latest
+    environment: test
+    defaults:
+      run:
+        working-directory: ./src/azure.databricks/python/notebooks
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: python -m pip install --upgrade pip
+      - run: pip install wheel
+      - run: pip3 install wheel
+      - run: pip install -r requirements.txt
+      - run: |
+            pip install databricks-cli 
+            echo "[test]" >> ~/.databrickscfg
+            echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
+            echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
+
+
+      - name: Deploy DAB
+        uses: databricks/setup-cli@main
+
+      - run: databricks bundle deploy --target test
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: test
+
+
+  deploy_prod:
+    needs: deploy_test
+    name: "Deploy prod"
+    runs-on: ubuntu-latest
+    environment: prod
+    defaults:
+      run:
+        working-directory: ./src/azure.databricks/python/notebooks
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: python -m pip install --upgrade pip
+      - run: pip install wheel
+      - run: pip3 install wheel
+      - run: pip install -r requirements.txt
+      - run: |
+            pip install databricks-cli 
+            echo "[prod]" >> ~/.databrickscfg
+            echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
+            echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
+
+
+      - name: Deploy DAB
+        uses: databricks/setup-cli@main
+
+      - run: databricks bundle deploy --target prod
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: prod
