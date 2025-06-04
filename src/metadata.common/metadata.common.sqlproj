@@ -87,7 +87,7 @@
       </DefaultValue>
       <Value>$(SqlCmdVar__14)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="DatabricksWSURL">
+    <SqlCmdVariable Include="DatabricksHost">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__13)</Value>
@@ -127,7 +127,7 @@
       </DefaultValue>
       <Value>$(SqlCmdVar__1)</Value>
     </SqlCmdVariable>
-    <SqlCmdVariable Include="EnvironmentName">
+    <SqlCmdVariable Include="Environment">
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__15)</Value>
