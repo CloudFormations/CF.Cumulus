@@ -28,11 +28,10 @@ jobs:
       - run: pip install -r requirements.txt
       - run: |
             pip install databricks-cli 
-            cat > ~/.databrickscfg << EOF 
-            [DEFAULT] 
-            host = ${{ secrets.DATABRICKS_HOST }} 
-            token = ${{ secrets.DATABRICKS_TOKEN }} 
-            EOF 
+            echo "[dev]" >> ~/.databrickscfg
+            echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
+            echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
+
 
       - name: Deploy DAB
         uses: databricks/setup-cli@main
