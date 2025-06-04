@@ -46,7 +46,7 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.common/bin/Release/metadata.common.dacpac
           action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '
+          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:DemoConnectionLocation="${{ secrets.DEMO_CONNECTION }}" /v:DemoSourceLocation="${{ secrets.DEMO_SOURCE }}" /v:DemoResourceName="${{ secrets.DEMO_RESOURCE_NAME }}" /v:DemoLinkedService="${{ secrets.DEMO_LINKED_SERVICE }}" /v:DemoUsername="${{ secrets.DEMO_USERNAME }}" /v:DemoKVSecret="${{ secrets.DEMO_KEYVAULTSECRET }}" '
 
 # Deploy dacpac job
   deploy_test:
@@ -71,7 +71,7 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.common/bin/Release/metadata.common.dacpac
           action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '
+          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:DemoConnectionLocation="${{ secrets.DEMO_CONNECTION }}" /v:DemoSourceLocation="${{ secrets.DEMO_SOURCE }}" /v:DemoResourceName="${{ secrets.DEMO_RESOURCE_NAME }}" /v:DemoLinkedService="${{ secrets.DEMO_LINKED_SERVICE }}" /v:DemoUsername="${{ secrets.DEMO_USERNAME }}" /v:DemoKVSecret="${{ secrets.DEMO_KEYVAULTSECRET }}" '
 
 
 # Deploy dacpac job
@@ -97,4 +97,4 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.common/bin/Release/metadata.common.dacpac
           action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '
+          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:DemoConnectionLocation="${{ secrets.DEMO_CONNECTION }}" /v:DemoSourceLocation="${{ secrets.DEMO_SOURCE }}" /v:DemoResourceName="${{ secrets.DEMO_RESOURCE_NAME }}" /v:DemoLinkedService="${{ secrets.DEMO_LINKED_SERVICE }}" /v:DemoUsername="${{ secrets.DEMO_USERNAME }}" /v:DemoKVSecret="${{ secrets.DEMO_KEYVAULTSECRET }}" '
