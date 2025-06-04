@@ -30,12 +30,12 @@ jobs:
             pip install databricks-cli 
             cat > ~/.databrickscfg << EOF 
             [DEFAULT] 
-            host = ${{ secrets.DATABRICKS_HOST_URL }} 
+            host = ${{ secrets.DATABRICKS_HOST }} 
             token = ${{ secrets.DATABRICKS_TOKEN }} 
             EOF 
 
       - name: Deploy DAB
-      - uses: databricks/setup-cli@main
+        uses: databricks/setup-cli@main
 
       - run: databricks bundle deploy --target dev
         env:
