@@ -46,7 +46,7 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.control/bin/Release/metadata.control.dacpac
           action: 'publish'
-          arguments: '/v:TenantId="${{ secrets.TENANTID }}"  /v:Environment="Dev"  /v:ADFName="${{ secrets.ADFNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionId="${{ secrets.SUBSCRIPTIONID }}" '
+          arguments: '/v:TenantID="${{ secrets.AZURE_TENANT_ID }}"  /v:Environment="Dev"  /v:ADFName="${{ secrets.ADFNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '
 
 # Deploy dacpac job
   deploy_test:
@@ -71,7 +71,7 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.control/bin/Release/metadata.control.dacpac
           action: 'publish'
-          arguments: '/v:TenantId="${{ secrets.TENANTID }}"  /v:Environment="Test"  /v:ADFName="${{ secrets.ADFNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionId="${{ secrets.SUBSCRIPTIONID }}" '
+          arguments: '/v:TenantID="${{ secrets.AZURE_TENANT_ID }}"  /v:Environment="Test"  /v:ADFName="${{ secrets.ADFNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '
 
 
 # Deploy dacpac job
@@ -97,4 +97,4 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.control/bin/Release/metadata.control.dacpac
           action: 'publish'
-          arguments: '/v:TenantId="${{ secrets.TENANTID }}"  /v:Environment="Prod"  /v:ADFName="${{ secrets.ADFNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionId="${{ secrets.SUBSCRIPTIONID }}" '
+          arguments: '/v:TenantID="${{ secrets.AZURE_TENANT_ID }}"  /v:Environment="Prod"  /v:ADFName="${{ secrets.ADFNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '

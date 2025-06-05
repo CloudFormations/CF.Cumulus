@@ -128,12 +128,12 @@
     <Build Include="control\Stored Procedures\GetFrameworkOrchestratorDetails.sql" />
     <Build Include="control\Stored Procedures\AddProperty.sql" />
     <Build Include="control\Stored Procedures\GetWorkerPipelineDetailsv2.sql" />
-	<Build Include="control\Stored Procedures\AddBatches.sql" />
-	<Build Include="control\Stored Procedures\AddBatchStageLink.sql" />
-	<Build Include="control\Stored Procedures\AddOrchestrators.sql" />
-	<Build Include="control\Stored Procedures\AddStages.sql" />
-	<Build Include="control\Stored Procedures\AddSubscriptions.sql" />
-	<Build Include="control\Stored Procedures\AddTenants.sql" />
+    <Build Include="control\Stored Procedures\AddBatches.sql" />
+    <Build Include="control\Stored Procedures\AddBatchStageLink.sql" />
+    <Build Include="control\Stored Procedures\AddOrchestrators.sql" />
+    <Build Include="control\Stored Procedures\AddStages.sql" />
+    <Build Include="control\Stored Procedures\AddSubscriptions.sql" />
+    <Build Include="control\Stored Procedures\AddTenants.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
@@ -141,7 +141,7 @@
   <ItemGroup>
     <None Include="metadata.control.publish.xml" />
     <None Include="Scripts\DefaultProperties.sql" />
-	<None Include="Scripts\MetadataAsCodeControl.sql" />
+    <None Include="Scripts\MetadataAsCodeControl.sql" />
     <None Include="Security\db_cumulususer.sql" />
   </ItemGroup>
   <ItemGroup>
@@ -153,5 +153,32 @@
       <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
       <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
     </ArtifactReference>
+  </ItemGroup>
+  <ItemGroup>
+    <SqlCmdVariable Include="ADFName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__4)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="Environment">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__2)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="RGName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__5)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="SubscriptionID">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__3)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="TenantID">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
   </ItemGroup>
 </Project>
