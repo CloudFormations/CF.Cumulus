@@ -1,0 +1,31 @@
+# This is a Databricks asset bundle definition for CF.Cumulus.
+# The Databricks extension requires databricks.yml configuration file.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+
+bundle:
+  name: CF.Cumulus
+
+targets:
+  DEFAULT:
+    mode: production
+    workspace:
+      profile: DEFAULT
+      root_path: /Workspace/Shared/Live/
+
+  dev:
+    mode: production
+    workspace:
+      profile: dev
+      root_path: /Workspace/Shared/Live/
+
+  test:
+    mode: production
+    workspace:
+      profile: test
+      root_path: /Workspace/Shared/Live/
+
+  prod:
+    mode: production
+    workspace:
+      profile: prod
+      root_path: /Workspace/Shared/Live/
