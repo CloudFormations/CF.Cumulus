@@ -6,6 +6,12 @@ bundle:
   name: CF.Cumulus
 
 targets:
+  DEFAULT:
+    mode: production
+    workspace:
+      profile: DEFAULT
+      root_path: /Workspace/Shared/Live/
+
   dev:
     mode: production
     workspace:

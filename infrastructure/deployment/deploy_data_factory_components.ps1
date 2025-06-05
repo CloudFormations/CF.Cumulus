@@ -28,8 +28,6 @@ $scriptPath = (Join-Path -Path (Get-Location) -ChildPath "src/azure.datafactory"
 $scriptPath = (Get-Location).Path -replace 'infrastructure\\deployment',''
 $scriptPath += "\src\azure.datafactory"
 
-Write-Host $scriptPath
-
 $options = New-AdfPublishOption
 $options.CreateNewInstance = $false # New ADF workspace deployment not required.
 $options.Excludes.Add("trigger.*","")

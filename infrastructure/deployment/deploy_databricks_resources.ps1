@@ -16,6 +16,7 @@ param(
     [string] $storageAccountName
 )
 
+
 # Get Databricks Access Token
 $DATABRICKS_AAD_TOKEN = az account get-access-token --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d --query accessToken --output tsv
 
@@ -24,7 +25,6 @@ $databrickscfgPath = "$($env:USERPROFILE)\.databrickscfg"
 Write-Output "[DEFAULT]" | Out-File $databrickscfgPath -Encoding ASCII
 Write-Output "host = https://$($databricksWorkspaceURL)" | Out-File $databrickscfgPath -Encoding ASCII -Append
 Write-Output "token = $($DATABRICKS_AAD_TOKEN)" | Out-File $databrickscfgPath -Encoding ASCII -Append
-
 
 $json = @"
 {
@@ -39,7 +39,7 @@ $json = @"
 
 # Create Databricks Secret Scope
 # TODO: Make command idempotent in event that the scope already exists
-databricks secrets create-scope --json $json
+databricks secrets create-scope --json $json --profile DEFAULT
 
 # Create Databricks Cluster
 $sparkConfig = @"
@@ -70,16 +70,19 @@ $clusterJSON = @"
 }
 "@
 
-databricks clusters create --json $clusterJSON
+databricks clusters create --json $clusterJSON --profile DEFAULT
 
 
 # Programmatically find databricks folder path in Repo
 $scriptPath = (Join-Path -Path (Get-Location) -ChildPath "src/azure.databricks") 
 $scriptPath = (Get-Location).Path -replace 'infrastructure\\deployment',''
 $scriptPath += "\src\azure.databricks"
+$revertPath = Get-Location
 
 # Deploy Notebooks to Workspace 
 $sourcePath = $scriptPath + '\python\notebooks'
-$targetPath = '/Shared/Live/'
-Write-Output $sourcePath
-databricks workspace import-dir $sourcePath $targetPath
+Set-Location -Path $sourcePath
+databricks bundle deploy --target DEFAULT
+Set-Location -Path $revertPath
+
+
