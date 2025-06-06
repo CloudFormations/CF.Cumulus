@@ -1,5 +1,5 @@
 name: Help & Support Request
-about: Tell me about the problem or error you are facing when using CF.Cumulus
+description: Tell me about the problem or error you are facing when using CF.Cumulus
 labels: ["enhancement"]
 assignees: ["CloudFormations"]
 body:
