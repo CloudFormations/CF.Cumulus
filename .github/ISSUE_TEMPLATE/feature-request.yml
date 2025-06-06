@@ -1,9 +1,8 @@
 name: Feature Request
-about: Tell me about your idea to enhance the procfwk please
+description: Tell me about your idea to enhance the procfwk please
 title: ''
 labels: ["enhancement"]
-assignees: CloudFormations
-
+assignees: ["CloudFormations"]
 body:
   - type: markdown
     attributes:
