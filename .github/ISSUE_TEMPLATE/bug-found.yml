@@ -8,16 +8,15 @@ body:
       value: |
         Please fill out the sections below to help everyone identify and fix the bug
   - type: checkboxes
-      id: terms
-      attributes:
-        label: Which resource within the processing framework does this affect?
-        options:
-        - label: Data Factory/Synapse
-        - label: SQL Database
-        - label: Functions
-        - label: All of them
-        - label: Other    
-  
+    id: terms
+    attributes:
+      label: Which resource within the processing framework does this affect?
+      options:
+      - label: Data Factory/Synapse
+      - label: SQL Database
+      - label: Functions
+      - label: All of them
+      - label: Other    
   - type: textarea
     id: description
     attributes:
