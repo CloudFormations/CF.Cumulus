@@ -6,7 +6,7 @@ assignees: ["CloudFormations"]
 body:
   - type: markdown
     attributes:
-      value: |
+      value:
         Please fill out the sections below to help everyone identify and fix the bug
    - type: checkboxes
        id: terms
