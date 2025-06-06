@@ -25,7 +25,7 @@ body:
     validations:
       required: true
   - type: textarea
-    id: Error Messages
+    id: Error-messages
     attributes:
       label: Provide an output of the error message presented.
       placeholder: When I click here this happens
