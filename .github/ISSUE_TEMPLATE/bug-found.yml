@@ -1,5 +1,5 @@
 name: Bug Report
-description: Tell me about the bug you've found in the CF.Cumulus
+description: Tell me about the bug you've found in CF.Cumulus
 labels: ["bug"]
 assignees: ["CloudFormations"]
 body:
