@@ -26,7 +26,7 @@ body:
       label: Additional context
       placeholder: |
         Add any other context or screenshots about the feature request here.
-- type: markdown
+  - type: markdown
     attributes:
       value: |
         Thanks for your suggestion! Let's see together if it can be implemented.
