@@ -3,16 +3,16 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <Name>metadata.ingest</Name>
+    <Name>metadata.core</Name>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{882d4321-8587-45d2-8db3-a88efb3fcb7a}</ProjectGuid>
+    <ProjectGuid>{7a4cc7d5-18a8-4b06-b83f-63b5d3b53bad}</ProjectGuid>
     <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>metadata.ingest</RootNamespace>
-    <AssemblyName>metadata.ingest</AssemblyName>
+    <RootNamespace>metadata.core</RootNamespace>
+    <AssemblyName>metadata.core</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
@@ -22,7 +22,6 @@
     <SqlServerVerification>False</SqlServerVerification>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
     <TargetDatabaseSet>True</TargetDatabaseSet>
-    <DefaultSchema>cumulus.ingest</DefaultSchema>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -57,43 +56,82 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="Security" />
-    <Folder Include="ingest" />
-    <Folder Include="ingest\Tables" />
-    <Folder Include="ingest\Views" />
-    <Folder Include="ingest\Stored Procedures" />
     <Folder Include="Scripts" />
-    <Folder Include="ingest\Functions" />
-    <Folder Include="Synonyms" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="ingest\Tables\Attributes.sql" />
-    <Build Include="ingest\Tables\Datasets.sql" />
-    <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
-    <Build Include="ingest\Stored Procedures\GetMergePayload.sql" />
-    <Build Include="ingest\Stored Procedures\SetIngestLoadStatus.sql" />
-    <Build Include="ingest\Stored Procedures\AddDatasets.sql" />
-    <Build Include="ingest\Stored Procedures\AddAttributes.sql" />
-    <Build Include="ingest\Functions\GetIngestLoadAction.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Build>
-    <Build Include="Scripts\DynamicsGetAttributeMetadata.sql" />
-    <Build Include="Scripts\OracleGetAttributeMetadata.sql" />
-    <Build Include="Scripts\SqlGetAttributeMetadata.sql" />
-    <Build Include="Security\db_cumulususer.sql" />
-    <Build Include="Security\ingest.sql" />
-    <Build Include="ingest\Stored Procedures\AddIngestPayloadPipelineDependencies.sql" />
-    <Build Include="Synonyms\ComputeConnections.sql" />
-    <Build Include="Synonyms\Connections.sql" />
-    <Build Include="Synonyms\ConnectionTypes.sql" />
-    <Build Include="ingest\Stored Procedures\GetLatestRefreshToken.sql" />
-    <Build Include="ingest\Tables\APITokens.sql" />
-    <Build Include="ingest\Stored Procedures\SetLatestRefreshToken.sql" />
+    <ProjectReference Include="..\metadata.common\metadata.common.sqlproj">
+      <Name>metadata.common</Name>
+      <Project>{dc651660-66ad-4c01-8b25-0b86b98ca405}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
+    <ProjectReference Include="..\metadata.control\metadata.control.sqlproj">
+      <Name>metadata.control</Name>
+      <Project>{202ebf84-a56b-4999-92a3-10f7ffe4ef25}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
+    <ProjectReference Include="..\metadata.ingest\metadata.ingest.sqlproj">
+      <Name>metadata.ingest</Name>
+      <Project>{882d4321-8587-45d2-8db3-a88efb3fcb7a}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
+    <ProjectReference Include="..\metadata.transform\metadata.transform.sqlproj">
+      <Name>metadata.transform</Name>
+      <Project>{7248f9c8-f270-48ff-9bbe-7bd82c3d7280}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
-    <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
+    <SqlCmdVariable Include="ADFName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__17)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DatabricksWSName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__14)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DatabricksHost">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__13)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="DLSName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__1)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="Environment">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__15)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="KeyVaultName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__4)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="RGName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__5)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="SubscriptionID">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__6)</Value>
+    </SqlCmdVariable>
+    <SqlCmdVariable Include="TenantID">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__16)</Value>
+    </SqlCmdVariable>
   </ItemGroup>
 </Project>

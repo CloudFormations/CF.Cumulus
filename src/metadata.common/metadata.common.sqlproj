@@ -74,6 +74,7 @@
     <Build Include="Security\common.sql" />
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <None Include="Scripts\MetadataAsCodeCommon.sql" />
+    <Build Include="common\Stored Procedures\AddIngestOrTransformPayloadPipeline.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
@@ -91,36 +92,6 @@
       <DefaultValue>
       </DefaultValue>
       <Value>$(SqlCmdVar__13)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="DemoConnectionLocation">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__7)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="DemoKVSecret">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__12)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="DemoLinkedService">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__10)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="DemoResourceName">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__9)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="DemoSourceLocation">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__8)</Value>
-    </SqlCmdVariable>
-    <SqlCmdVariable Include="DemoUsername">
-      <DefaultValue>
-      </DefaultValue>
-      <Value>$(SqlCmdVar__11)</Value>
     </SqlCmdVariable>
     <SqlCmdVariable Include="DLSName">
       <DefaultValue>
