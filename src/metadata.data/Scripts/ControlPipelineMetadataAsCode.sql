@@ -12,3 +12,11 @@ EXEC [common].[AddIngestOrTransformPayloadPipeline] @StageName='Dimension', @Pip
 EXEC [common].[AddIngestOrTransformPayloadPipeline] @StageName='Fact', @PipelineName='Transform_PL_Unmanaged', @DatasetDisplayName='FactSales', @OrchestratorName='$(ADFName)', @ComponentName = 'Transform';
 
 --Pipeline Dependencies
+EXEC [common].[AddGenericPayloadPipelineDependencies] @DatasetDisplayName='SalesOrderHeader', @StageName='Raw', @DependantDatasetDisplayName='SalesOrderHeader', @DependantStageName='Cleansed';
+EXEC [common].[AddGenericPayloadPipelineDependencies] @DatasetDisplayName='SalesOrderDetail', @StageName='Raw', @DependantDatasetDisplayName='SalesOrderDetail', @DependantStageName='Cleansed';
+EXEC [common].[AddGenericPayloadPipelineDependencies] @DatasetDisplayName='Product', @StageName='Raw', @DependantDatasetDisplayName='Product', @DependantStageName='Cleansed';
+EXEC [common].[AddGenericPayloadPipelineDependencies] @DatasetDisplayName='product', @StageName='Cleansed', @DependantDatasetDisplayName='DimProducts', @DependantStageName='Dimension';
+EXEC [common].[AddGenericPayloadPipelineDependencies] @DatasetDisplayName='DimProducts', @StageName='Dimension', @DependantDatasetDisplayName='FactSales', @DependantStageName='Fact';
+EXEC [common].[AddGenericPayloadPipelineDependencies] @DatasetDisplayName='DimDate', @StageName='Dimension', @DependantDatasetDisplayName='FactSales', @DependantStageName='Fact';
+
+

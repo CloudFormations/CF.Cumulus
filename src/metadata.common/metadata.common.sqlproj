@@ -75,6 +75,7 @@
     <None Include="Scripts\DefaultConnectionTypes.sql" />
     <None Include="Scripts\MetadataAsCodeCommon.sql" />
     <Build Include="common\Stored Procedures\AddIngestOrTransformPayloadPipeline.sql" />
+	<Build Include="common\Stored Procedures\AddGenericPayloadPipelineDependencies.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
