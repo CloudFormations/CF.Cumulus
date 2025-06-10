@@ -67,6 +67,11 @@
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
   <ItemGroup>
+    <SqlCmdVariable Include="ADFName">
+      <DefaultValue>
+      </DefaultValue>
+      <Value>$(SqlCmdVar__7)</Value>
+    </SqlCmdVariable>
     <SqlCmdVariable Include="DemoConnectionLocation">
       <DefaultValue>
       </DefaultValue>
