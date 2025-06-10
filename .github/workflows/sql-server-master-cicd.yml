@@ -6,11 +6,10 @@ on:
 jobs:
 # Execute core yml cicd
   exec_core:
-    # Set the dependency for the build job
-    uses: ${{ github.workspace }}/.github/workflows/sql-server-core-cicd.yml
+    uses: ./.github/workflows/sql-server-core-cicd.yml
 
 # Execute core yml cicd
   exec_data:
-    # Set the dependency for the build job
+    # Set the dependency on core
     needs: exec_core
-    uses: ${{ github.workspace }}/.github/workflows/sql-server-data-cicd.yml
+    uses: ./.github/workflows/sql-server-data-cicd.yml
