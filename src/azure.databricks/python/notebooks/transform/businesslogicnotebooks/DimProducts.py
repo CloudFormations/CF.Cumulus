@@ -1,33 +1,12 @@
 # Databricks notebook source
 str_sql = """
     SELECT 
-        soh.SalesOrderID AS SalesOrderKey,
-        sod.SalesOrderDetailID AS SalesOrderDetailKey,
-        od.DateSK AS OrderDateSK,
-        dd.DateSK AS DueDateSK,
-        sd.DateSK AS ShipDateSK,
-        pr.ProductSK,
-        sod.OrderQty AS ProductOrderQuantity,
-        sod.UnitPrice,
-        sod.LineTotal,
-        -- Calculate SaleLineTotalAmount
-        sod.LineTotal AS SaleLineTotalAmount,
-        -- Calculate SaleOrderTotalAmount
-        soh.SubTotal + soh.TaxAmt + soh.Freight AS SaleOrderTotalAmount,
-        -- Calculate SaleOrderShippingTotalAmount
-        soh.Freight AS SaleOrderShippingTotalAmount
+        p.ProductID AS ProductKey,
+        p.Name AS ProductName,
+        p.Color AS ProductColour,
+        p.Size AS ProductSize
     FROM 
-        hive_metastore.adventureworksdemo.SalesOrderHeader soh
-    INNER JOIN 
-        hive_metastore.adventureworksdemo.SalesOrderDetail sod ON soh.SalesOrderID = sod.SalesOrderID
-    LEFT JOIN 
-        hive_metastore.curated.dimproducts pr ON sod.ProductID = pr.ProductKey
-    LEFT JOIN 
-        hive_metastore.curated.dimdate od ON soh.OrderDate = od.Date
-    LEFT JOIN 
-        hive_metastore.curated.dimdate dd ON soh.DueDate = dd.Date
-    LEFT JOIN 
-        hive_metastore.curated.dimdate sd ON soh.ShipDate = sd.Date
+        hive_metastore.adventureworksdemo.Product p
 """
 
 # COMMAND ----------
