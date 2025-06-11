@@ -89,7 +89,7 @@ if is_df_non_zero is False:
 
 if load_type.upper() == "F":
     print('Write mode set to overwrite')
-    write_mode = "overwrite"
+    write_mode = "overwriteSurrogateKey"
 elif load_type.upper() == "I":
     print('Write mode set to merge')
     write_mode = "merge"
