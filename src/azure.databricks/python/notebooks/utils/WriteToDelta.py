@@ -68,6 +68,20 @@ def overwrite_delta(df: DataFrame, schema_name: str, table_name: str) -> None:
     
     return
 
+# Below are Curated-level operations to account for merging into tables with Identity generated surrogate key columns.
+def overwrite_delta_surrogate_key(df: DataFrame, schema_name: str, table_name: str) -> None:
+    """
+    Summary:
+        Perform an Overwrite query for the Dataset to replace data in an target Delta table.
+    
+    Args:
+        df (DataFrame): PySpark DataFrame of the data to be loaded.
+        schema_name (str): Name of the schema the dataset belongs to.
+        table_name (str): Name of the target table for the dataset.
+
+    """
+    df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{schema_name}.{table_name}")
+    return
 
 from functools import partial
 
@@ -93,6 +107,7 @@ def set_operation_parameters(target_df: DataFrame, df: DataFrame, schema_name: s
         "merge": partial(merge_delta, target_df=target_df, df=df, pk_fields=pk_fields, columns_list=columns_list, partition_fields=partition_fields),
         # "insert": partial(insert_delta, df=df, schema_name=schema_name, table_name=table_name), # not currently supported
         "overwrite": partial(overwrite_delta, df=df, schema_name=schema_name, table_name=table_name),
+        "overwriteSurrogateKey": partial(overwrite_delta_surrogate_key, df=df, schema_name=schema_name, table_name=table_name),
     }
     return operation_parameters
 
