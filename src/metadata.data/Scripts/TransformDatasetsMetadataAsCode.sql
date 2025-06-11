@@ -2,8 +2,8 @@
 
 -- Notebooks
 EXEC ##AddNotebooks 'Managed', 'DimDate', '/Workspace/Shared/Live/files/transform/businesslogicnotebooks/DimDate', 1;
-EXEC ##AddNotebooks 'Managed', 'DimProducts', '/Workspace/Shared/files/Live/transform/businesslogicnotebooks/DimProducts', 1;
-EXEC ##AddNotebooks 'Managed', 'FactSales', '/Workspace/Shared/files/Live/transform/businesslogicnotebooks/FactSales', 1;
+EXEC ##AddNotebooks 'Managed', 'DimProducts', '/Workspace/Shared/Live/files/transform/businesslogicnotebooks/DimProducts', 1;
+EXEC ##AddNotebooks 'Managed', 'FactSales', '/Workspace/Shared/Live/files/transform/businesslogicnotebooks/FactSales', 1;
 
 -- Datasets;
 EXEC ##AddTransformDatasets 'CF.Cumulus.Transform.Compute', 'CreateDim', 'DimDate', 'Curated', 'DimDate', 1, NULL, NULL, 'F', 0, NULL, 1;
