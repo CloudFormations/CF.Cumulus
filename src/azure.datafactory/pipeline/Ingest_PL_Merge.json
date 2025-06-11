@@ -83,7 +83,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Shared/Live/ingest/ingestpayload/CheckPayloadExecution",
+										"notebookPath": "/Workspace/Shared/Live/files/ingest/ingestpayload/CheckPayloadExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",
@@ -131,7 +131,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Shared/Live/ingest/ingestpayload/IngestExecution",
+										"notebookPath": "/Workspace/Shared/Live/files/ingest/ingestpayload/IngestExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",
@@ -199,7 +199,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Shared/Live/ingest/ingestpayload/CheckPayloadExecution",
+										"notebookPath": "/Workspace/Shared/Live/files/ingest/ingestpayload/CheckPayloadExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",
@@ -250,7 +250,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Shared/Live/ingest/ingestpayload/IngestExecution",
+										"notebookPath": "/Workspace/Shared/Live/files/ingest/ingestpayload/IngestExecution",
 										"baseParameters": {
 											"Merge Payload": {
 												"value": "@string(activity('Get Merge Payload').output.firstRow)",

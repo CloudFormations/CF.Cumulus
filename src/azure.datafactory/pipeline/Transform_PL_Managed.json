@@ -148,7 +148,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Shared/Live/transform/TransformExecution",
+										"notebookPath": "/Workspace/Shared/Live/files/transform/TransformExecution",
 										"baseParameters": {
 											"Notebook Payload": {
 												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
@@ -209,7 +209,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Shared/Live/transform/CheckPayloadExecution",
+										"notebookPath": "/Workspace/Shared/Live/files/transform/CheckPayloadExecution",
 										"baseParameters": {
 											"Notebook Payload": {
 												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
@@ -352,7 +352,7 @@
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"notebookPath": "/Workspace/Shared/Live/transform/TransformExecution",
+										"notebookPath": "/Workspace/Shared/Live/files/transform/TransformExecution",
 										"baseParameters": {
 											"Notebook Payload": {
 												"value": "@string(activity('Get Notebook Payload').output.firstRow)",
@@ -398,7 +398,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"notebookPath": {
-											"value": "/Workspace/Shared/Live/transform/CheckPayloadExecution",
+											"value": "/Workspace/Shared/Live/files/transform/CheckPayloadExecution",
 											"type": "Expression"
 										},
 										"baseParameters": {

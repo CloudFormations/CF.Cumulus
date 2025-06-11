@@ -255,8 +255,7 @@ paket-files/
 /docs
 
 #  Databricks files
-.databricks
-databricks.yml
+/databricks.yml
 
 # PyTest coverage report
 .coverage
@@ -275,4 +274,4 @@ configuration/prod
 
 # Data Factory Integration Runtime files
 src/azure.datafactory/integrationRuntime/
-.databricks
+
