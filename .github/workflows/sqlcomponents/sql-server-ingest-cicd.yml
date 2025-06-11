@@ -47,7 +47,6 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.ingest/bin/Release/metadata.ingest.dacpac
           action: 'publish'
-          arguments: '/v:ADFName="${{ secrets.ADFNAME }}" '
 
 # Deploy dacpac job
   deploy_test:
@@ -72,7 +71,6 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.ingest/bin/Release/metadata.ingest.dacpac
           action: 'publish'
-          arguments: '/v:ADFName="${{ secrets.ADFNAME }}" '
 
 
 # Deploy dacpac job
@@ -98,4 +96,3 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.ingest/bin/Release/metadata.ingest.dacpac
           action: 'publish'
-          arguments: '/v:ADFName="${{ secrets.ADFNAME }}" '

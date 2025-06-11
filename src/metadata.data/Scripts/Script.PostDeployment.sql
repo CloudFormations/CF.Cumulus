@@ -1,4 +1,4 @@
-/*
+﻿/*
 Post-Deployment Script Template							
 --------------------------------------------------------------------------------------
  This file contains SQL statements that will be appended to the build script.		
@@ -9,3 +9,7 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
+:r .\ConnectionsMetadataAsCode.sql
+:r .\IngestDatasetsMetadataAsCode.sql
+:r .\TransformDatasetsMetadataAsCode.sql
+:r .\ControlPipelineMetadataAsCode.sql

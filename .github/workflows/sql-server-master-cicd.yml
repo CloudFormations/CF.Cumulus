@@ -1,0 +1,15 @@
+# Job to build and publish the dacpac
+name: CF.Cumulus-Sql-Server-Master-CICD
+on:
+  workflow_dispatch:
+
+jobs:
+# Execute core yml cicd
+  exec_core:
+    uses: ./.github/workflows/sql-server-core-cicd.yml
+
+# Execute core yml cicd
+  exec_data:
+    # Set the dependency on core
+    needs: exec_core
+    uses: ./.github/workflows/sql-server-data-cicd.yml
