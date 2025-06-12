@@ -37,6 +37,7 @@ jobs:
 
       - name: Cleanup old code
         run: databricks workspace delete /Workspace/Shared/Live --recursive
+        continue-on-error: true
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: dev
@@ -54,7 +55,7 @@ jobs:
     environment: test
     defaults:
       run:
-        working-directory: ./src/azure.databricks/python/notebooks || echo "Path doesn't exist, continuing..."
+        working-directory: ./src/azure.databricks/python/notebooks 
 
     steps:
       - uses: actions/checkout@v3
@@ -77,7 +78,8 @@ jobs:
         uses: databricks/setup-cli@main
 
       - name: Cleanup old code
-        run: databricks workspace delete /Workspace/Shared/Live --recursive || echo "Path doesn't exist, continuing..."
+        run: databricks workspace delete /Workspace/Shared/Live --recursive
+        continue-on-error: true
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: test
@@ -121,6 +123,7 @@ jobs:
 
       - name: Cleanup old code
         run: databricks workspace delete /Workspace/Shared/Live --recursive || echo "Path doesn't exist, continuing..."
+        continue-on-error: true
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: prod
