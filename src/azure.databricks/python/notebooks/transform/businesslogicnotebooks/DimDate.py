@@ -2,7 +2,7 @@
 str_sql = """
     SELECT 
         Date,
-        DATE_FORMAT(Date, 'yyyyMMdd') AS DateKey,
+        CAST(DATE_FORMAT(Date, 'yyyyMMdd') AS INTEGER) AS DateKey,
         DATE_FORMAT(Date, 'EEEE') AS DayName,
         DAY(Date) AS DayOfMonth,
         MONTH(Date) AS Month,
