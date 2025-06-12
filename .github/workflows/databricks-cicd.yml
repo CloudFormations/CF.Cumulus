@@ -32,6 +32,13 @@ jobs:
             echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
             echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
 
+      - name: Cleanup old code
+        uses: databricks/setup-cli@main
+
+      - run: databricks workspace delete /Workspace/Live/ --force
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: dev
 
       - name: Deploy DAB
         uses: databricks/setup-cli@main
@@ -67,6 +74,13 @@ jobs:
             echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
             echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
 
+      - name: Cleanup old code
+        uses: databricks/setup-cli@main
+
+      - run: databricks workspace delete /Workspace/Live/ --force
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: test
 
       - name: Deploy DAB
         uses: databricks/setup-cli@main
@@ -103,6 +117,13 @@ jobs:
             echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
             echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
 
+      - name: Cleanup old code
+        uses: databricks/setup-cli@main
+
+      - run: databricks workspace delete /Workspace/Live/ --force
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: prod
 
       - name: Deploy DAB
         uses: databricks/setup-cli@main
