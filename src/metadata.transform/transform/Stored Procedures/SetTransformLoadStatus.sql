@@ -13,14 +13,10 @@ SELECT
     @ResultRowCount = COUNT(*)
 FROM
 [transform].[Datasets] ds
-INNER JOIN [common].[Connections] cn
-    ON ds.[ConnectionFK] = cn.[ConnectionId]
 WHERE
 ds.[DatasetId] = @DatasetId
 AND 
     ds.[Enabled] = 1
-AND 
-    cn.[Enabled] = 1
 
 IF @ResultRowCount = 0
 BEGIN
