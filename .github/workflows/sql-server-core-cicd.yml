@@ -66,14 +66,6 @@ jobs:
           path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.Transform.dacpac
           action: 'publish'
 
-      - name: Azure SQL Deploy Core
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.core.dacpac
-          action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
-
 # Deploy dacpac job
   deploy_test:
     # Set the dependency for the build job
@@ -105,7 +97,7 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.control.dacpac
           action: 'publish'
-          arguments: '/v:Environment="Dev" /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
+          arguments: '/v:Environment="Test" /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
           
       - name: Azure SQL Deploy Ingest
         uses: Azure/sql-action@v2.3
@@ -120,14 +112,6 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.transform.dacpac
           action: 'publish'
-
-      - name: Azure SQL Deploy Core
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.core.dacpac
-          action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Test"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
 
 # Deploy dacpac job
   deploy_prod:
@@ -160,7 +144,7 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.control.dacpac
           action: 'publish'
-          arguments: '/v:Environment="Dev" /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
+          arguments: '/v:Environment="Prod" /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
           
       - name: Azure SQL Deploy Ingest
         uses: Azure/sql-action@v2.3
@@ -175,11 +159,3 @@ jobs:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
           path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.transform.dacpac
           action: 'publish'
-
-      - name: Azure SQL Deploy Core
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.core.dacpac
-          action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Prod"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
