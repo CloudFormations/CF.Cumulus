@@ -12,7 +12,7 @@ DECLARE @ResultRowCount INT
 SELECT 
     @ResultRowCount = COUNT(*)
 FROM
-[ingest].[Datasets] ds
+[transform].[Datasets] ds
 INNER JOIN [common].[Connections] cn
     ON ds.[ConnectionFK] = cn.[ConnectionId]
 WHERE
