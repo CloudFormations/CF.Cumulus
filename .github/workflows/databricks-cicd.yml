@@ -35,7 +35,7 @@ jobs:
       - name: Cleanup old code
         uses: databricks/setup-cli@main
 
-      - run: databricks workspace delete /Workspace/Live --recursive
+      - run: databricks workspace delete /Workspace/Shared/Live --recursive
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: dev
@@ -77,7 +77,7 @@ jobs:
       - name: Cleanup old code
         uses: databricks/setup-cli@main
 
-      - run: databricks workspace delete /Workspace/Live --recursive
+      - run: databricks workspace delete /Workspace/Shared/Live --recursive
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: test
@@ -120,7 +120,7 @@ jobs:
       - name: Cleanup old code
         uses: databricks/setup-cli@main
 
-      - run: databricks workspace delete /Workspace/Live --recursive
+      - run: databricks workspace delete /Workspace/Shared/Live --recursive
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: prod
