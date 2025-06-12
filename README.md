@@ -10,13 +10,19 @@ CF.Cumulus is an Open-Source Metadata-driven Lakehouse Accelerator designed for 
 
 ## Release Details
 ### Latest Release Notes
-V25.0.4.0
+V25.1.0.0
 
 https://github.com/CloudFormations/CF.Cumulus/releases
 
+## Choosing the Right Plan for You
+[![](https://static.wixstatic.com/media/bacfcb_023ca9a26e8341f897c0f5be2ce4f861~mv2.png)](https://static.wixstatic.com/media/bacfcb_023ca9a26e8341f897c0f5be2ce4f861~mv2.png)
 
-## Getting Started
-For further information on how to get started using the Community Edition of CF.Cumulus can be found in the members area of our website [here](https://www.cloudformations.org/cf-cumulus-deployment-guide/). It's free to become a member and gives you access to a whole load of other great stuff from Cloud Formations. 
+We offer a variety of different ways to get started with CF.Cumulus, which can be accessed through the Azure MarketPlace [here](https://azuremarketplace.microsoft.com/en-gb/marketplace/apps?search=cf.cumulus&page=1). This includes a variety of deployment and support options for you to use as per your organisation's requirements.
+
+We also have the Community Edition for Developers who want to run with Cumulus for themselves, available here on our Open-Source Repo!
+
+## Getting Started with the Community Edition of CF.Cumulus
+For further information on how to get started using the Community Edition of CF.Cumulus can be found in the members area of our website [here](https://www.cloudformations.org/cf-cumulus-deployment-guide/). It's free to become a member and gives you access to other great content from Cloud Formations. 
 
 Below is our Getting Started guide for installing CF.Cumulus in your Azure Subscription. The installation gives you a complete deployment of the Azure Resources required for a Lakehouse, with resource dependencies and objects all included at the click of a button.
 
@@ -31,7 +37,7 @@ The deployment demonstrated in this guide includes the following:
 * Spark Compute Clusters
 * Spark Notebooks
 * Core Metadata Configurations in your Azure SQL Metadata Database
-* **Optional:** Sample Metadata
+* **Coming Soon!** Sample Metadata 
 
 
 ### Pre-Requisites
@@ -76,5 +82,3 @@ param myIPAddress = '1.1.1.1' // For SQL Server Firewall rule
 
 8. Copy and Paste your command into a PowerShell terminal (such as the integrated terminal in VSCode) and execute.
 9. Follow the process on screen and in 5-10 minutes you will have a deployment of Cumulus ready to explore.
-
-https://github.com/CloudFormations/CF.Cumulus/releases
