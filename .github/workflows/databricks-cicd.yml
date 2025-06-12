@@ -32,18 +32,17 @@ jobs:
             echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
             echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
 
-      - name: Cleanup old code
+      - name: Set up Databricks CLI
         uses: databricks/setup-cli@main
 
-      - run: databricks workspace delete /Workspace/Shared/Live --recursive
+      - name: Cleanup old code
+        run: databricks workspace delete /Workspace/Shared/Live --recursive
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: dev
 
       - name: Deploy DAB
-        uses: databricks/setup-cli@main
-
-      - run: databricks bundle deploy --target dev
+        run: databricks bundle deploy --target dev
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: dev
@@ -74,21 +73,21 @@ jobs:
             echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
             echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
 
-      - name: Cleanup old code
+      - name: Set up Databricks CLI
         uses: databricks/setup-cli@main
 
-      - run: databricks workspace delete /Workspace/Shared/Live --recursive
+      - name: Cleanup old code
+        run: databricks workspace delete /Workspace/Shared/Live --recursive
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: test
 
       - name: Deploy DAB
-        uses: databricks/setup-cli@main
-
-      - run: databricks bundle deploy --target test
+        run: databricks bundle deploy --target test
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: test
+
 
 
   deploy_prod:
@@ -117,18 +116,17 @@ jobs:
             echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
             echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
 
-      - name: Cleanup old code
+      - name: Set up Databricks CLI
         uses: databricks/setup-cli@main
 
-      - run: databricks workspace delete /Workspace/Shared/Live --recursive
+      - name: Cleanup old code
+        run: databricks workspace delete /Workspace/Shared/Live --recursive
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: prod
 
       - name: Deploy DAB
-        uses: databricks/setup-cli@main
-
-      - run: databricks bundle deploy --target prod
+        run: databricks bundle deploy --target prod
         env:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
           DATABRICKS_BUNDLE_ENV: prod
