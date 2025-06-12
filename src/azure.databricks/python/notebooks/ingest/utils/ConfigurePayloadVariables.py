@@ -1,51 +1,50 @@
-# Databricks notebook source
-def getMergePayloadVariables(payload: dict()) -> list():
+def get_merge_payload_variables(payload: dict()) -> list():
     # create variables for each payload item
-    tableName = payload["DatasetDisplayName"] 
-    loadType = payload["LoadType"]
-    loadAction = payload["LoadAction"]
-    loadActionText = "full" if loadAction == "F" else "incremental"
-    versionNumber = f"{int(payload['VersionNumber']):04d}"
+    table_name = payload["DatasetDisplayName"] 
+    load_type = payload["LoadType"]
+    load_action = payload["LoadAction"]
+    load_action_text = "full" if load_action == "F" else "incremental"
+    version_number = f"{int(payload['VersionNumber']):04d}"
 
-    rawStorageName = payload["RawStorageName"]
-    rawContainerName = payload["RawContainerName"]
-    rawSecret = payload["RawStorageAccessKey"]
-    rawLastLoadDate = payload["RawLastLoadDate"]
+    raw_storage_name = payload["RawStorageName"]
+    raw_container_name = payload["RawContainerName"]
+    raw_secret = payload["RawStorageAccessKey"]
+    raw_last_load_date = payload["RawLastLoadDate"]
 
-    rawSchemaName = payload["RawSchemaName"]
-    rawFileType = payload["RawFileType"]
-    dateTimeFolderHierarchy = payload["DateTimeFolderHierarchy"]
+    raw_schema_name = payload["RawSchemaName"]
+    raw_file_type = payload["RawFileType"]
+    datetime_folder_hierarchy = payload["DateTimeFolderHierarchy"]
 
-    cleansedStorageName = payload["CleansedStorageName"]
-    cleansedContainerName = payload["CleansedContainerName"]
-    cleansedSecret = payload["CleansedStorageAccessKey"]
-    cleansedLastLoadDate = payload["CleansedLastLoadDate"]
+    cleansed_storage_name = payload["CleansedStorageName"]
+    cleansed_container_name = payload["CleansedContainerName"]
+    cleansed_secret = payload["CleansedStorageAccessKey"]
+    cleansed_last_load_date = payload["CleansedLastLoadDate"]
 
-    cleansedSchemaName = payload["CleansedSchemaName"] 
+    cleansed_schema_name = payload["CleansedSchemaName"] 
 
     # Semantic checks for these required in the IngestChecks notebook?
-    pkList =  payload["CleansedPkList"].split(",")
-    partitionList =  payload["CleansedPartitionFields"].split(",") if  payload["CleansedPartitionFields"] != "" else []
+    pk_list =  payload["CleansedPkList"].split(",")
+    partition_list =  payload["CleansedPartitionFields"].split(",") if  payload["CleansedPartitionFields"] != "" else []
 
-    columnsList = payload["CleansedColumnsList"].split(",")
-    columnsTypeList = payload["CleansedColumnsTypeList"].split(",")
-    columnsFormatList = payload["CleansedColumnsFormatList"].split(",")
-    metadataColumnList = ["PipelineRunId","PipelineExecutionDateTime"]
-    metadataColumnTypeList = ["STRING","TIMESTAMP"]
-    metadataColumnFormatList = ["","yyyy-MM-dd HH:mm:ss"]
+    columns_list = payload["CleansedColumnsList"].split(",")
+    columns_type_list = payload["CleansedColumnsTypeList"].split(",")
+    columns_format_list = payload["CleansedColumnsFormatList"].split(",")
+    metadata_column_list = ["PipelineRunId","PipelineExecutionDateTime"]
+    metadata_column_type_list = ["STRING","TIMESTAMP"]
+    metadata_column_format_list = ["","yyyy-MM-dd HH:mm:ss"]
 
-    # metadataColumnList = payload["cleansedMetadataColumnList"].split(",")
-    # metadataColumnTypeList = payload["cleansedMetadataColumnTypeList"].split(",")
-    # metadataColumnFormatList = payload["cleansedMetadataColumnFormatList"].split(",")
+    # metadata_column_list = payload["cleansedMetadataColumnList"].split(",")
+    # metadata_column_type_list = payload["cleansedMetadataColumnTypeList"].split(",")
+    # metadata_column_format_list = payload["cleansedMetadataColumnFormatList"].split(",")
 
-    totalColumnList = columnsList + metadataColumnList
-    totalColumnTypeList = columnsTypeList + metadataColumnTypeList
-    totalColumnFormatList = columnsFormatList + metadataColumnFormatList
+    total_column_list = columns_list + metadata_column_list
+    total_column_type_list = columns_type_list + metadata_column_type_list
+    total_column_format_list = columns_format_list + metadata_column_format_list
 
-    # totalColumnList = columnsList
+    # totalColumnList = columns_list
     # totalColumnTypeList = columnsTypeList
     # totalColumnFormatList = columnsFormatList
 
-    output = [tableName, loadType, loadAction, loadActionText, versionNumber, rawStorageName, rawContainerName, rawSecret, rawLastLoadDate, rawSchemaName, rawFileType, dateTimeFolderHierarchy, cleansedStorageName, cleansedContainerName, cleansedSecret, cleansedLastLoadDate, cleansedSchemaName, pkList, partitionList, columnsList, columnsTypeList, columnsFormatList, metadataColumnList, metadataColumnTypeList, metadataColumnFormatList, totalColumnList, totalColumnTypeList, totalColumnFormatList]
+    output = [table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list]
 
     return output

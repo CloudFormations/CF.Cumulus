@@ -56,7 +56,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"on": {
-						"value": "@replace(activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeLinkedServiceName,'Transform_LS_','')",
+						"value": "@replace(activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeLinkedServiceName,'Common_LS_','')",
 						"type": "Expression"
 					},
 					"cases": [
@@ -103,11 +103,11 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_Cluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
 											"WorkspaceURL": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeWorkspaceUrl",
+												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeWorkspaceURL",
 												"type": "Expression"
 											},
 											"ResourceGroupName": {
@@ -118,10 +118,7 @@
 												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeResourceName",
 												"type": "Expression"
 											},
-											"ClusterId": {
-												"value": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
-												"type": "Expression"
-											},
+											"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
 											"SubscriptionId": {
 												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.SubscriptionId",
 												"type": "Expression"
@@ -189,38 +186,17 @@
 										}
 									},
 									"linkedServiceName": {
-										"referenceName": "Ingest_LS_Databricks_JobCluster_MIAuth",
+										"referenceName": "Common_LS_Databricks_JobCluster_MIAuth",
 										"type": "LinkedServiceReference",
 										"parameters": {
-											"WorkspaceURL": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeWorkspaceURL",
-												"type": "Expression"
-											},
-											"ClusterVersion": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeVersion",
-												"type": "Expression"
-											},
-											"NodeType": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeSize",
-												"type": "Expression"
-											},
+											"WorkspaceURL": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeWorkspaceURL",
+											"ClusterVersion": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeVersion",
+											"NodeType": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeSize",
 											"PythonVersion": "3",
-											"NumWorkers": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.CountNodes",
-												"type": "Expression"
-											},
-											"SubscriptionId": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.SubscriptionId",
-												"type": "Expression"
-											},
-											"ResourceName": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeResourceName",
-												"type": "Expression"
-											},
-											"ResourceGroupName": {
-												"value": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ResourceGroupName",
-												"type": "Expression"
-											}
+											"NumWorkers": "@activity('Get Unmanaged Notebook Payload').output.firstRow.CountNodes",
+											"SubscriptionId": "@activity('Get Unmanaged Notebook Payload').output.firstRow.SubscriptionId",
+											"ResourceName": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ComputeResourceName",
+											"ResourceGroupName": "@activity('Get Unmanaged Notebook Payload').output.firstRow.ResourceGroupName"
 										}
 									}
 								}

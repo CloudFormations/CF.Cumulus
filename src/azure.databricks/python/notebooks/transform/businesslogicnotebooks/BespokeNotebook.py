@@ -1,8 +1,8 @@
 # Databricks notebook source
-strSQL = """
+str_sql = """
     SELECT 1 AS Dummy
 """
 
 # COMMAND ----------
 
-dbutils.notebook.exit(strSQL)
+dbutils.notebook.exit(str_sql)

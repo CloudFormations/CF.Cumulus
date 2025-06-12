@@ -5,26 +5,27 @@
 # MAGIC - Confirm storage is accessible
 # MAGIC - Create Delta Table, if required
 # MAGIC
-# MAGIC #TODO items:
-# MAGIC - Unit tests
-# MAGIC
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/Initialise
+import sys, os
+from pprint import pprint
+
+current_directory = os.getcwd()
+parent_directory = os.path.abspath(os.path.join(current_directory, '..'))
+sys.path.append(parent_directory)
+utils_directory = os.path.abspath(os.path.join(current_directory, '..','utils'))
+sys.path.append(utils_directory)
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/CheckPayloadFunctions
+# Import Base utility functions
+from Initialise import *
+from CheckPayloadFunctions import *
 
-# COMMAND ----------
-
-# MAGIC %run ./utils/CheckPayloadFunctions
-# MAGIC
-
-# COMMAND ----------
-
-# MAGIC %run ./utils/ConfigurePayloadVariables
+# Import Ingest utility functions
+from utils.ConfigurePayloadVariables import *
+from utils.CheckPayloadFunctions import *
 
 # COMMAND ----------
 
@@ -42,7 +43,8 @@ payload = json.loads(dbutils.widgets.get("Notebook Payload"))
 
 # COMMAND ----------
 
-[cleansedSecret, cleansedStorageName, cleansedContainerName, curatedSecret, curatedStorageName, curatedContainerName, curatedSchemaName, curatedDatasetName, columnsList, columnTypeList, bkList, partitionList, surrogateKey, loadType, businessLogicNotebookPath]= getTransformPayloadVariables(payload)
+cleansed_secret, cleansed_storage_name, cleansed_container_name, curated_secret, curated_storage_name, curated_container_name, curated_schema_name, curated_dataset_name, columns_list, column_type_list, bk_list, partition_list, surrogate_key, load_type, business_logic_notebook_path = get_transform_payload_variables(payload)
+
 
 # COMMAND ----------
 
@@ -52,18 +54,18 @@ payload = json.loads(dbutils.widgets.get("Notebook Payload"))
 # COMMAND ----------
 
 print("Setting cleansed ABFSS config...")
-setAbfssSparkConfig(cleansedSecret, cleansedStorageName)
+set_abfss_spark_config(cleansed_secret, cleansed_storage_name)
 
 print("Setting curated ABFSS config...")
-setAbfssSparkConfig(curatedSecret, curatedStorageName)
+set_abfss_spark_config(curated_secret, curated_storage_name)
 
 # COMMAND ----------
 
 print("Setting cleansed ABFSS path...")
-cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
+cleansed_abfss_path = set_abfss_path(cleansed_storage_name, cleansed_container_name)
 
 print("Setting curated ABFSS path...")
-curatedAbfssPath = setAbfssPath(curatedStorageName, curatedContainerName)
+curated_abfss_path = set_abfss_path(curated_storage_name, curated_container_name)
 
 # COMMAND ----------
 
@@ -73,27 +75,27 @@ curatedAbfssPath = setAbfssPath(curatedStorageName, curatedContainerName)
 # COMMAND ----------
 
 # Check data types and nullability of each dictionary element
-checkLoadAction(loadAction = loadType)
+check_load_action(load_action = load_type)
 
 # COMMAND ----------
 
-checkMergeAndPKConditions(loadAction = loadType, pkList=bkList)
+check_merge_and_pk_conditions(load_action = load_type, pk_list=bk_list)
 
 # COMMAND ----------
 
-checkContainerName(containerName = cleansedContainerName)
+check_container_name(container_name = cleansed_container_name)
 
 # COMMAND ----------
 
-checkContainerName(containerName = curatedContainerName)
+check_container_name(container_name = curated_container_name)
 
 # COMMAND ----------
 
-checkSurrogateKey(surrogateKey=surrogateKey)
+check_surrogate_key(surrogate_key=surrogate_key)
 
 # COMMAND ----------
 
-checkEmptyPartitionByFields(partitionList)
+check_empty_partition_by_fields(partition_list)
 
 # COMMAND ----------
 
@@ -103,10 +105,10 @@ checkEmptyPartitionByFields(partitionList)
 # COMMAND ----------
 
 # Check cleansed storage account exists and is accessible.
-checkAbfss(abfssPath=cleansedAbfssPath)
+check_abfss(abfss_path=cleansed_abfss_path)
 
 # Check curated storage account exists and is accessible.
-checkAbfss(abfssPath=curatedAbfssPath)
+check_abfss(abfss_path=curated_abfss_path)
 
 # COMMAND ----------
 
@@ -115,7 +117,7 @@ checkAbfss(abfssPath=curatedAbfssPath)
 
 # COMMAND ----------
 
-schemaExists = checkExistsDeltaSchema(schemaName = curatedSchemaName)
+schema_exists = check_exists_delta_schema(schema_name = curated_schema_name)
 
 # COMMAND ----------
 
@@ -124,11 +126,11 @@ schemaExists = checkExistsDeltaSchema(schemaName = curatedSchemaName)
 
 # COMMAND ----------
 
-curatedTablePath = setTablePath(schemaName =curatedSchemaName, tableName =curatedDatasetName)
-print(curatedTablePath)
+curated_table_path = set_table_path(schema_name =curated_schema_name, table_name =curated_dataset_name)
+print(curated_table_path)
 
 # COMMAND ----------
 
-# add loadtype to sp results + variables
-# rename existing loadType to loadAction in the prevtests 
-tableExists = checkExistsDeltaTable(tablePath = curatedTablePath, loadAction = loadType, loadType = loadType)
+# add load_type to sp results + variables
+# rename existing load_type to load_action in the prevtests 
+table_exists = check_exists_delta_table(table_path = curated_table_path, load_action = load_type, load_type = load_type)

@@ -1,153 +1,146 @@
-# Databricks notebook source
 from delta.tables import *
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
+from databricks.sdk.runtime import spark
 
-# COMMAND ----------
+def set_columns_list_as_dict(columns_list: list()) -> dict:
+    columns_dict = {column: col(f"src.{column}") for column in columns_list}
+    return columns_dict
 
-def setColumnsListAsDict(columnsList: list()) -> dict:
-    columnsDict = {column: col(f"src.{column}") for column in columnsList}
-    return columnsDict
-
-# COMMAND ----------
 
 # Implementations of the base classes above, providing variations on the create statements required to create schema and table objects for different environments.
 
 # Below are Cleansed-level standard operations
 
-def mergeDelta(targetDf: DataFrame, df: DataFrame, pkFields: dict, columnsList: list(), partitionFields: dict = []) -> None:
+def merge_delta(target_df: DataFrame, df: DataFrame, pk_fields: dict, columns_list: list(), partition_fields: dict = []) -> None:
     """
     Summary:
         Perform a Merge query for Incremental loading into the target Delta table for the Dataset.
 
     Args:
-        targetDf (DataFrame): Target PySpark DataFrame of the data to be merged into.
+        target_df (DataFrame): Target PySpark DataFrame of the data to be merged into.
         df (DataFrame): PySpark DataFrame of the data to be loaded.
-        pkFields (dict): Dictionary of the primary key fields.
-        columnsList (list): list of columns in source DataFrame.
-        partitionFields (dict): Dictionary of the partition by fields.
+        pk_fields (dict): Dictionary of the primary key fields.
+        columns_list (list): list of columns in source DataFrame.
+        partition_fields (dict): Dictionary of the partition by fields.
 
     """
-    columnsDict = setColumnsListAsDict(columnsList)
+    columns_dict = set_columns_list_as_dict(columns_list)
 
     (
-        targetDf.alias("targetDf")
+        target_df.alias("target_df")
         .merge(
             source=df.alias("src"),
-            condition="\nAND ".join(f"src.{pk} = targetDf.{pk}" for pk in pkFields + partitionFields),
+            condition="\nAND ".join(f"src.{pk} = target_df.{pk}" for pk in pk_fields + partition_fields),
         )
-        .whenNotMatchedInsert(values=columnsDict)
-        .whenMatchedUpdate(set=columnsDict)
+        .whenNotMatchedInsert(values=columns_dict)
+        .whenMatchedUpdate(set=columns_dict)
         .execute()
     )
     return
 
-def insertDelta(df: DataFrame, schemaName: str, tableName: str) -> None:
+def insert_delta(df: DataFrame, schema_name: str, table_name: str) -> None:
     """
     Summary:
         Perform an Insert query for appending data to the existing target Delta table for the Dataset.
     
     Args:
         df (DataFrame): PySpark DataFrame of the data to be loaded.
-        schemaName (str): Name of the schema the dataset belongs to.
-        tableName (str): Name of the target table for the dataset.
+        schema_name (str): Name of the schema the dataset belongs to.
+        table_name (str): Name of the target table for the dataset.
 
     """
-    df.write.format("delta").mode("append").insertInto(f"{schemaName}.{tableName}")
+    df.write.format("delta").mode("append").insertInto(f"{schema_name}.{table_name}")
     return
 
-def overwriteDelta(df: DataFrame, schemaName: str, tableName: str) -> None:
+def overwrite_delta(df: DataFrame, schema_name: str, table_name: str) -> None:
     """
     Summary:
         Perform an Overwrite query for the Dataset to replace data in an target Delta table.
     
     Args:
         df (DataFrame): PySpark DataFrame of the data to be loaded.
-        schemaName (str): Name of the schema the dataset belongs to.
-        tableName (str): Name of the target table for the dataset.
+        schema_name (str): Name of the schema the dataset belongs to.
+        table_name (str): Name of the target table for the dataset.
 
     """
-    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{schemaName}.{tableName}")
+    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{schema_name}.{table_name}")
     
     return
-
-# COMMAND ----------
 
 # Below are Curated-level operations to account for merging into tables with Identity generated surrogate key columns.
-def overwriteDeltaSurrogateKey(df: DataFrame, schemaName: str, tableName: str) -> None:
+def overwrite_delta_surrogate_key(df: DataFrame, schema_name: str, table_name: str) -> None:
     """
     Summary:
         Perform an Overwrite query for the Dataset to replace data in an target Delta table.
     
     Args:
         df (DataFrame): PySpark DataFrame of the data to be loaded.
-        schemaName (str): Name of the schema the dataset belongs to.
-        tableName (str): Name of the target table for the dataset.
+        schema_name (str): Name of the schema the dataset belongs to.
+        table_name (str): Name of the target table for the dataset.
 
     """
-    df.write.format("delta").mode("overwrite").option("overwriteSchema", "true").saveAsTable(f"{schemaName}.{tableName}")
+    df.write.format("delta").mode("overwrite").option("mergeSchema", "true").saveAsTable(f"{schema_name}.{table_name}")
     return
-
-# COMMAND ----------
 
 from functools import partial
 
-def setOperationParameters(targetDf: DataFrame, df: DataFrame, schemaName: str, tableName: str, pkFields: dict,columnsList: list(), partitionFields: dict) -> dict:
+def set_operation_parameters(target_df: DataFrame, df: DataFrame, schema_name: str, table_name: str, pk_fields: dict,columns_list: list(), partition_fields: dict) -> dict:
     """
     Summary:
         Create the parameters for each operation based on the payload values.
     
     Args:
-        targetDf (DataFrame): Target PySpark DataFrame of the data to be merged into.
+        target_df (DataFrame): Target PySpark DataFrame of the data to be merged into.
         df (DataFrame): PySpark DataFrame of the data to be loaded.
-        schemaName (str): Name of the schema the dataset belongs to.
-        tableName (str): Name of the target table for the dataset.
-        pkFields (dict): Dictionary of the primary key fields.
-        partitionFields (dict): Dictionary of the partition by fields.
-        columnsList (list): list of columns in source DataFrame.
+        schema_name (str): Name of the schema the dataset belongs to.
+        table_name (str): Name of the target table for the dataset.
+        pk_fields (dict): Dictionary of the primary key fields.
+        partition_fields (dict): Dictionary of the partition by fields.
+        columns_list (list): list of columns in source DataFrame.
     
     Returns:
-        OperationParameters (dict): Dictionary mapping operation types to the parameter values used.
+        operation_parameters (dict): Dictionary mapping operation types to the parameter values used.
     """
     
-    operationParameters = {
-        "merge": partial(mergeDelta, targetDf=targetDf, df=df, pkFields=pkFields, columnsList=columnsList, partitionFields=partitionFields),
-        # "insert": partial(insertDelta, df=df, schemaName=schemaName, tableName=tableName), # not currently supported
-        "overwrite": partial(overwriteDelta, df=df, schemaName=schemaName, tableName=tableName),
-        # "mergeSurrogateKey": partial(mergeDeltaSurrogateKey, targetDf=targetDf, df=df, pkFields=pkFields, columnsList=columnsList, partitionFields=partitionFields),
-        "overwriteSurrogateKey": partial(overwriteDeltaSurrogateKey, df=df, schemaName=schemaName, tableName=tableName),
+    operation_parameters = {
+        "merge": partial(merge_delta, target_df=target_df, df=df, pk_fields=pk_fields, columns_list=columns_list, partition_fields=partition_fields),
+        # "insert": partial(insert_delta, df=df, schema_name=schema_name, table_name=table_name), # not currently supported
+        "overwrite": partial(overwrite_delta, df=df, schema_name=schema_name, table_name=table_name),
+        "overwriteSurrogateKey": partial(overwrite_delta_surrogate_key, df=df, schema_name=schema_name, table_name=table_name),
     }
-    return operationParameters
+    return operation_parameters
 
-# COMMAND ----------
 
-def writeToDeltaExecutor(writeMode: str, targetDf: DataFrame, df: DataFrame, schemaName: str, tableName: str, pkFields: dict, columnsList: list(), partitionFields: dict = []) -> None:
-    operationParameters = setOperationParameters(targetDf, df, schemaName, tableName, pkFields, columnsList, partitionFields)
-    # perform the update statement based on the writeMode.
+def write_to_delta_executor(write_mode: str, target_df: DataFrame, df: DataFrame, schema_name: str, table_name: str, pk_fields: dict, columns_list: list(), partition_fields: dict = []) -> None:
+    operation_parameters = set_operation_parameters(target_df, df, schema_name, table_name, pk_fields, columns_list, partition_fields)
+    # perform the update statement based on the write_mode.
     try:
-        writeToDeltaFunction = operationParameters[writeMode]
+        write_to_delta_function = operation_parameters[write_mode]
     except KeyError:
-        print(f"Invalid write mode '{writeMode}' specified.")
+        raise KeyError(f"Invalid write mode '{write_mode}' specified.")
 
-    writeToDeltaFunction()
+    write_to_delta_function()
     return
 
-# COMMAND ----------
 
-def getTargetDeltaTable(schemaName: str, tableName: str, spark: SparkSession = spark) -> DataFrame:
+def get_target_delta_table(schema_name: str, table_name: str, spark: SparkSession = spark) -> DataFrame:
     """
     Summary:
         Get the target Delta table as a PySpark DataFrame
     
     Args:
-        schemaName (str): Name of the schema the dataset belongs to.
-        tableName (str): Name of the target table for the dataset.
+        schema_name (str): Name of the schema the dataset belongs to.
+        table_name (str): Name of the target table for the dataset.
         spark (SparkSession): Spark object to interact and retrieve Delta Table.
     
     Returns:
-        targetDf (DeltaTable): Target Delta Table to be updated.
+        target_df (DeltaTable): Target Delta Table to be updated.
     """
     # dfSchema = df.schema.jsonValue()["fields"]
+    try:
+        return DeltaTable.forName(spark, f"{schema_name}.{table_name}")
+    except Exception as e:
+        print(e)
+        raise Exception(f'Exception {e} occurred.')
 
-    targetDf = DeltaTable.forName(spark, f"{schemaName}.{tableName}")
-    return targetDf

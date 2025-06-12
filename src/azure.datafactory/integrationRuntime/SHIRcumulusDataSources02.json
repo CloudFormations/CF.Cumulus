@@ -1,0 +1,6 @@
+{
+	"name": "SHIRcumulusDataSources02",
+	"properties": {
+		"type": "SelfHosted"
+	}
+}

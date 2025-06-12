@@ -99,7 +99,8 @@ jobs:
           dataFactoryName: ${{ secrets.ADFNAME }}
           armTemplateFile: ARMTemplateForFactory.json
           armTemplateParametersFile: ARMTemplateParametersForFactory.json
-          # additionalParameters: key1=value1
+          additionalParameters: factoryName=${{ secrets.ADFNAME }} Common_LS_cumulusdatabase_connectionString="Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=${{ secrets.SQLSERVERNAME }}.database.windows.net;Initial Catalog=${{ secrets.DATABASENAME }}" Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl=https://${{ secrets.FUNCTIONAPPNAME }}.azurewebsites.net Common_LS_cumuluskeys_properties_typeProperties_baseUrl=https://${{ secrets.KEYVAULTNAME }}.vault.azure.net/
+
 
 
   deploy_prod:
@@ -129,4 +130,4 @@ jobs:
           dataFactoryName: ${{ secrets.ADFNAME }}
           armTemplateFile: ARMTemplateForFactory.json
           armTemplateParametersFile: ARMTemplateParametersForFactory.json
-          # additionalParameters: key1=value1
+          additionalParameters: factoryName=${{ secrets.ADFNAME }} Common_LS_cumulusdatabase_connectionString="Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=${{ secrets.SQLSERVERNAME }}.database.windows.net;Initial Catalog=${{ secrets.DATABASENAME }}" Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl=https://${{ secrets.FUNCTIONAPPNAME }}.azurewebsites.net Common_LS_cumuluskeys_properties_typeProperties_baseUrl=https://${{ secrets.KEYVAULTNAME }}.vault.azure.net/

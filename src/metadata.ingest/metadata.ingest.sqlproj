@@ -72,15 +72,14 @@
     <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
     <Build Include="ingest\Stored Procedures\GetMergePayload.sql" />
     <Build Include="ingest\Stored Procedures\SetIngestLoadStatus.sql" />
-	<Build Include="ingest\Stored Procedures\AddDatasets.sql" />
-	<Build Include="ingest\Stored Procedures\AddAttributes.sql" />
+    <Build Include="ingest\Stored Procedures\AddDatasets.sql" />
+    <Build Include="ingest\Stored Procedures\AddAttributes.sql" />
     <Build Include="ingest\Functions\GetIngestLoadAction.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Build>
     <Build Include="Scripts\DynamicsGetAttributeMetadata.sql" />
     <Build Include="Scripts\OracleGetAttributeMetadata.sql" />
     <Build Include="Scripts\SqlGetAttributeMetadata.sql" />
-	<None Include="Scripts\MetadataAsCodeIngestSample.sql" />
     <Build Include="Security\db_cumulususer.sql" />
     <Build Include="Security\ingest.sql" />
     <Build Include="ingest\Stored Procedures\AddIngestPayloadPipelineDependencies.sql" />

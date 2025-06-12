@@ -1,0 +1,98 @@
+  # Job to build and publish the dacpac
+name: CF.Cumulus-Sql-Server-Transform-CICD
+on:
+  workflow_dispatch:
+
+  # push:
+  #   branches:
+  #   - main
+
+jobs: 
+  build_transform:
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Build Database project
+      run: |
+        msbuild.exe src/metadata.transform/metadata.transform.sqlproj /p:Configuration=Release
+    - uses: actions/upload-artifact@v4
+      with: 
+        name: transformartifact
+        path: ${{ github.workspace }}/src/metadata.transform/bin/Release/
+
+# Deploy dacpac job
+  deploy_dev:
+    # Set the dependency for the build job
+    needs: build_transform
+    runs-on: windows-latest
+    environment: dev
+
+    steps:
+      - name: download artifact containing dacpac
+        uses: actions/download-artifact@v4
+        with:
+          name: transformartifact  # Match the uploaded artifact name
+          path: ${{ github.workspace }}/src/metadata.transform/bin/Release/
+
+      - name: Verify Artifact File
+        run: ls -R ${{ github.workspace }}/src/metadata.transform/bin/Release/
+
+      - name: Azure SQL Deploy
+        uses: Azure/sql-action@v2.3
+        with:
+          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+          path: ${{ github.workspace }}/src/metadata.transform/bin/Release/metadata.transform.dacpac
+          action: 'publish'
+
+# Deploy dacpac job
+  deploy_test:
+    # Set the dependency for the build job
+    needs: deploy_dev
+    runs-on: windows-latest
+    environment: test
+
+    steps:
+      - name: download artifact containing dacpac
+        uses: actions/download-artifact@v4
+        with:
+          name: transformartifact  # Match the uploaded artifact name
+          path: ${{ github.workspace }}/src/metadata.transform/bin/Release/
+
+      - name: Verify Artifact File
+        run: ls -R ${{ github.workspace }}/src/metadata.transform/bin/Release/
+
+      - name: Azure SQL Deploy
+        uses: Azure/sql-action@v2.3
+        with:
+          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+          path: ${{ github.workspace }}/src/metadata.transform/bin/Release/metadata.transform.dacpac
+          action: 'publish'
+
+
+# Deploy dacpac job
+  deploy_prod:
+    # Set the dependency for the build job
+    needs: deploy_test
+    runs-on: windows-latest
+    environment: prod
+
+    steps:
+      - name: download artifact containing dacpac
+        uses: actions/download-artifact@v4
+        with:
+          name: transformartifact  # Match the uploaded artifact name
+          path: ${{ github.workspace }}/src/metadata.transform/bin/Release/
+
+      - name: Verify Artifact File
+        run: ls -R ${{ github.workspace }}/src/metadata.transform/bin/Release/
+
+      - name: Azure SQL Deploy
+        uses: Azure/sql-action@v2.3
+        with:
+          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+          path: ${{ github.workspace }}/src/metadata.transform/bin/Release/metadata.transform.dacpac
+          action: 'publish'

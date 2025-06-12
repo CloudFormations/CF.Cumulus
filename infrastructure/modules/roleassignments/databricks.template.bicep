@@ -1,12 +1,12 @@
 // Input parameters
 param adbWorkspaceName string // = 'cfcumulusdevdbwuks04'
 param nameStorage string      // = 'cfcumulusdevdlsuks04'
+param databricksID string
 
 resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' existing = {
   name: adbWorkspaceName
 }
 
-var adb_workspace_managed_identity_id = databricks.identity.principalId
 var StorageBlobDataContributorId = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
 
 // Reference to existing Storage Account
@@ -20,6 +20,6 @@ resource storageAccountRoleAssignment 'Microsoft.Authorization/roleAssignments@2
   scope: storageAccount
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', StorageBlobDataContributorId) // Storage Blob Data Contributor role
-    principalId: adb_workspace_managed_identity_id
+    principalId: databricksID
   }
 }

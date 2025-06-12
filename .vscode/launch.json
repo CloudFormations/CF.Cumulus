@@ -6,6 +6,14 @@
             "type": "coreclr",
             "request": "attach",
             "processId": "${command:azureFunctions.pickProcess}"
-        }
+        },
+        {
+            "type": "databricks",
+            "request": "launch",
+            "name": "Unit Tests (on Databricks)",
+            "program": "${workspaceFolder}/src/azure.databricks/python/tests/pytest_databricks_ide.py",
+            "args": ["."],
+            "env": {}
+          }
     ]
 }

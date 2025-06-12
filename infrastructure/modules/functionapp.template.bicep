@@ -1,16 +1,26 @@
-// Input parameters for resource naming and location
-@description('Location for all resources.')
+@description('Resource group location.')
 param location string = resourceGroup().location
 
+@description('Resource name prefix as per template naming concatenated in the main file.')
+@minLength(3) // "logAnalyticsWorkspaceName" within the resource has a min length of 4. Adding this decorator constraint removes the warning.
 param namePrefix string 
+
+@description('Resource name suffix as per template naming concatenated in the main file.')
 param nameSuffix string 
+
+@description('Supporting storage account resource name.')
 param nameStorage string
+
+@description('App service plan SKU.')
+param aspSKU string
 
 // Construct resource names using prefix and suffix
 var functionAppName = '${namePrefix}func${nameSuffix}'
 var hostingPlanName = '${namePrefix}asp${nameSuffix}'
 var storageAccountName = '${namePrefix}${nameStorage}${nameSuffix}'
 var applicationInsightsName = '${namePrefix}appi${nameSuffix}'
+var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
+
 
 var contentShare = '${functionAppName}bb6a'
 
@@ -25,7 +35,7 @@ resource functionStorage 'Microsoft.Storage/storageAccounts@2023-05-01' existing
 }
 
 // Create Elastic Premium App Service Plan for the Function App
-resource functionHostingPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
+resource functionHostingPlanPremium 'Microsoft.Web/serverfarms@2023-12-01' = if (aspSKU == 'premium') {
   name: hostingPlanName
   location: location
   sku: {
@@ -38,6 +48,19 @@ resource functionHostingPlan 'Microsoft.Web/serverfarms@2023-12-01' = {
   kind: 'elastic'
 }
 
+
+resource functionHostingPlanConsumption 'Microsoft.Web/serverfarms@2024-04-01' =  if (aspSKU == 'consumption') {
+  name: hostingPlanName
+  location: location
+  sku: {
+    name: 'Y1'
+    tier: 'Dynamic'
+    size: 'Y1'
+    family: 'Y'
+    capacity: 0
+  }
+  kind: 'functionapp'
+}
 
 // Create the Function App with isolated .NET runtime
 resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
@@ -114,9 +137,13 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
     functionsRuntimeAdminIsolationEnabled: true
     publicNetworkAccess: 'Enabled'
     httpsOnly: true
-    serverFarmId: '/subscriptions/${subscription().subscriptionId}/resourcegroups/${resourceGroup().name}/providers/Microsoft.Web/serverfarms/${functionHostingPlan.name}'
+    serverFarmId: '/subscriptions/${subscription().subscriptionId}/resourcegroups/${resourceGroup().name}/providers/Microsoft.Web/serverfarms/${hostingPlanName}'
   }
-  dependsOn: []
+  dependsOn: [
+    functionHostingPlanConsumption
+    functionHostingPlanPremium
+    functionStorage
+  ]
 }
 
 // Configure SCM (Source Control Manager) publishing credentials
@@ -136,6 +163,44 @@ resource name_ftp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-0
     allow: true
   }
 }
+
+// Get existing Log Analytics Resource for Id value
+resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {  
+  name: logAnalyticsWorkspaceName
+}
+
+// // Enable Diagnostic Settings to send logs to Log Analytics
+// resource functionAppDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+//   name: 'functionAppDiagnostics'
+//   scope: functionApp
+//   properties: {
+//     workspaceId: logAnalyticsWorkspace.id
+//     logs: [
+//       {
+//         category: 'FunctionAppLogs'
+//         enabled: true
+//       }
+//       {
+//         category: 'AppServiceHTTPLogs'
+//         enabled: true
+//       }
+//       {
+//         category: 'AppServiceConsoleLogs'
+//         enabled: true
+//       }
+//       {
+//         category: 'AppServiceAuditLogs'
+//         enabled: true
+//       }
+//     ]
+//     metrics: [
+//       {
+//         category: 'AllMetrics'
+//         enabled: true
+//       }
+//     ]
+//   }
+// }
 
 
 // Output important values

@@ -3,58 +3,58 @@ from notebooks.ingest.utils.CreateMergeQuery import *
 
 class TestSelectSqlColumnsFormatString():
 
-    # def test_selectSqlColumnsFormatStringEmpty(self):
-    #     actual = selectSqlColumnsFormatString([''],[''], [''])
+    # def test_select_sql_columns_format_stringEmpty(self):
+    #     actual = select_sql_columns_format_string([''],[''], [''])
     #     expected = raise Exception
     #     self.assertException(actual, expected)
 
-    def test_selectSqlColumnsFormatStringInt1(self):
-        actual = selectSqlColumnsFormatString(['age'],['int'], [''])
+    def test_select_sql_columns_format_string_int1(self):
+        actual = select_sql_columns_format_string(['age'],['int'], [''])
         expected = 'cast(age as int) as age'
         assert actual == expected
     
-    def test_selectSqlColumnsFormatStringIntWithFormat(self):
-        actual = selectSqlColumnsFormatString(['age'],['int'], ['1'])
+    def test_select_sql_columns_format_string_int_with_format(self):
+        actual = select_sql_columns_format_string(['age'],['int'], ['1'])
         expected = 'cast(age as int) as age'
         assert actual == expected
     
-    def test_selectSqlColumnsFormatStringInt2(self):
-        actual = selectSqlColumnsFormatString(['age', 'number'],['int', 'int'], ['',''])
+    def test_select_sql_columns_format_string_int2(self):
+        actual = select_sql_columns_format_string(['age', 'number'],['int', 'int'], ['',''])
         expected = 'cast(age as int) as age, cast(number as int) as number'
         assert actual == expected
 
-    def test_selectSqlColumnsFormatStringString1(self):
-        actual = selectSqlColumnsFormatString(['name'],['string'], [''])
+    def test_select_sql_columns_format_string_string1(self):
+        actual = select_sql_columns_format_string(['name'],['string'], [''])
         expected = 'cast(name as string) as name'
         assert actual == expected
     
-    def test_selectSqlColumnsFormatStringStringWithFormat(self):
-        actual = selectSqlColumnsFormatString(['name'],['string'], ['txt'])
+    def test_select_sql_columns_format_string_string_with_format(self):
+        actual = select_sql_columns_format_string(['name'],['string'], ['txt'])
         expected = 'cast(name as string) as name'
         assert actual == expected
 
-    def test_selectSqlColumnsFormatStringString2(self):
-        actual = selectSqlColumnsFormatString(['name', 'hobby'],['string', 'string'], ['',''])
+    def test_select_sql_columns_format_string_string2(self):
+        actual = select_sql_columns_format_string(['name', 'hobby'],['string', 'string'], ['',''])
         expected = 'cast(name as string) as name, cast(hobby as string) as hobby'
         assert actual == expected
 
-    def test_selectSqlColumnsFormatStringIntAndString(self):
-        actual = selectSqlColumnsFormatString(['name', 'age'],['string', 'int'], ['',''])
+    def test_select_sql_columns_format_string_int_and_string(self):
+        actual = select_sql_columns_format_string(['name', 'age'],['string', 'int'], ['',''])
         expected = 'cast(name as string) as name, cast(age as int) as age'
         assert actual == expected
     
-    def test_selectSqlColumnsFormatStringTimestampFormatType1(self):
-        actual1 = selectSqlColumnsFormatString(['time'],['timestamp'], ['yyyy-MM-dd'])
+    def test_select_sql_columns_format_string_timestamp_format_type1(self):
+        actual1 = select_sql_columns_format_string(['time'],['timestamp'], ['yyyy-MM-dd'])
         expected1 = "to_timestamp(time,'yyyy-MM-dd') as time"
-        actual2 = selectSqlColumnsFormatString(['time'],['timestamp'], ['yyyy-MM-dd HH:mm'])
+        actual2 = select_sql_columns_format_string(['time'],['timestamp'], ['yyyy-MM-dd HH:mm'])
         expected2 = "to_timestamp(time,'yyyy-MM-dd HH:mm') as time"
-        actual3 = selectSqlColumnsFormatString(['time'],['timestamp'], ['yyyy-MM-dd HH'])
+        actual3 = select_sql_columns_format_string(['time'],['timestamp'], ['yyyy-MM-dd HH'])
         expected3 = "to_timestamp(time,'yyyy-MM-dd HH') as time"
-        actual4 = selectSqlColumnsFormatString(['time'],['timestamp'], ['yyyy/MM/dd HH:mm:ss'])
+        actual4 = select_sql_columns_format_string(['time'],['timestamp'], ['yyyy/MM/dd HH:mm:ss'])
         expected4 = "to_timestamp(time,'yyyy/MM/dd HH:mm:ss') as time"
-        actual5 = selectSqlColumnsFormatString(['time'],['timestamp'], ['yyyyMMdd HH:mm:ss'])
+        actual5 = select_sql_columns_format_string(['time'],['timestamp'], ['yyyyMMdd HH:mm:ss'])
         expected5 = "to_timestamp(time,'yyyyMMdd HH:mm:ss') as time"
-        actual6 = selectSqlColumnsFormatString(['time'],['timestamp'], ['yyMMd HH:mm:ss'])
+        actual6 = select_sql_columns_format_string(['time'],['timestamp'], ['yyMMd HH:mm:ss'])
         expected6 = "to_timestamp(time,'yyMMd HH:mm:ss') as time"
         assert actual1 == expected1
         assert actual2 == expected2
@@ -63,34 +63,34 @@ class TestSelectSqlColumnsFormatString():
         assert actual5 == expected5
         assert actual6 == expected6
 
-    def test_selectSqlColumnsFormatStringTimestampFormatType2(self):
-        actual1 = selectSqlColumnsFormatString(['time'],['timestamp'], ['yyyy-MM-ddTHH:mm:ss.SSSSSSSZ'])
+    def test_select_sql_columns_format_string_timestamp_format_type2(self):
+        actual1 = select_sql_columns_format_string(['time'],['timestamp'], ['yyyy-MM-ddTHH:mm:ss.SSSSSSSZ'])
         expected1 = "to_timestamp(time) as time"
         assert actual1 == expected1
         
 
-    # def test_selectSqlColumnsFormatStringTimestampLongFormat(self):
+    # def test_select_sql_columns_format_string_timestamp_long_format(self):
     #     with self.assertRaises(Exception) as context:
     #         checkSurrogateKey(surrogateKey="")
     #     expected = "Surrogate Key is a blank string. Please ensure this is populated for Curated tables."
     #     self.assertTrue(expected in str(context.exception))
     
-    # def test_selectSqlColumnsFormatStringDate(self):
+    # def test_select_sql_columns_format_string_date(self):
     #     actual = checkSurrogateKey(surrogateKey="StringValue")
     #     expected = True
     #     assert actual == expected
 
-    # def test_selectSqlColumnsFormatStringArrayUnstructured(self):
+    # def test_select_sql_columns_format_string_array_unstructured(self):
     #     actual = checkSurrogateKey(surrogateKey="StringValue")
     #     expected = True
     #     assert actual == expected
 
-    # def test_selectSqlColumnsFormatStringExplodedFormat(self):
+    # def test_select_sql_columns_format_string_exploded_format(self):
     #     actual = checkSurrogateKey(surrogateKey="StringValue")
     #     expected = True
     #     assert actual == expected
 
-    # def test_selectSqlColumnsFormatStringOther(self):
+    # def test_select_sql_columns_format_string_other(self):
     #     actual = checkSurrogateKey(surrogateKey="StringValue")
     #     expected = True
     #     assert actual == expected

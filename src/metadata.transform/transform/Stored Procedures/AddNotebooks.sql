@@ -34,7 +34,6 @@ BEGIN
 	MERGE INTO transform.Notebooks AS Target
 	USING @Notebooks AS Source
 	ON Source.NotebookName = Target.NotebookName 
-	AND Source.NotebookPath = Target.NotebookPath
 
 	WHEN NOT MATCHED BY Target THEN
 		INSERT (NotebookTypeFK, NotebookName, NotebookPath, Enabled) 
@@ -42,6 +41,7 @@ BEGIN
 
 	WHEN MATCHED THEN UPDATE SET
 		Target.NotebookTypeFK = Source.NotebookTypeFK,
+		Target.NotebookPath = Source.NotebookPath,
 		Target.Enabled = Source.Enabled
 	;
 END

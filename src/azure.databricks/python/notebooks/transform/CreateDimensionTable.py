@@ -1,21 +1,23 @@
 # Databricks notebook source
-# MAGIC %run ../utils/Initialise
+import sys, os
+from pprint import pprint
+
+current_directory = os.getcwd()
+parent_directory = os.path.abspath(os.path.join(current_directory, '..'))
+sys.path.append(parent_directory)
+utils_directory = os.path.abspath(os.path.join(current_directory, '..','utils'))
+sys.path.append(utils_directory)
 
 # COMMAND ----------
 
-# MAGIC %run ../utils/CreateDeltaObjects
+# Import Base utility functions
+from Initialise import *
+from HelperFunctions import *
+from CheckPayloadFunctions import *
+from CreateDeltaObjects import *
 
-# COMMAND ----------
-
-# MAGIC %run ../utils/HelperFunctions
-
-# COMMAND ----------
-
-# MAGIC %run ./utils/ConfigurePayloadVariables
-
-# COMMAND ----------
-
-# MAGIC %run ../utils/CheckPayloadFunctions
+# Import Ingest utility functions
+from utils.ConfigurePayloadVariables import *
 
 # COMMAND ----------
 
@@ -29,23 +31,23 @@ payload = json.loads(dbutils.widgets.get("Notebook Payload"))
 
 # COMMAND ----------
 
-cleansedSecret, cleansedStorageName, cleansedContainerName, curatedSecret, curatedStorageName, curatedContainerName, curatedSchemaName, curatedDatasetName, columnsList, columnTypeList, bkList, partitionList, surrogateKey, loadType, businessLogicNotebookPath = getTransformPayloadVariables(payload)
+cleansed_secret, cleansed_storage_name, cleansed_container_name, curated_secret, curated_storage_name, curated_container_name, curated_schema_name, curated_dataset_name, columns_list, columnTypeList, bk_list, partition_list, surrogate_key, load_type, businessLogicNotebookPath = get_transform_payload_variables(payload)
 
 # COMMAND ----------
 
 print("Setting cleansed ABFSS config...")
-setAbfssSparkConfig(cleansedSecret, cleansedStorageName)
+set_abfss_spark_config(cleansed_secret, cleansed_storage_name)
 
 print("Setting curated ABFSS config...")
-setAbfssSparkConfig(cleansedSecret, curatedStorageName)
+set_abfss_spark_config(cleansed_secret, curated_storage_name)
 
 # COMMAND ----------
 
 print("Setting cleansed ABFSS path...")
-cleansedAbfssPath = setAbfssPath(cleansedStorageName, cleansedContainerName)
+cleansed_abfss_path = set_abfss_path(cleansed_storage_name, cleansed_container_name)
 
 print("Setting curated ABFSS path...")
-curatedAbfssPath = setAbfssPath(curatedStorageName, curatedContainerName)
+curated_abfss_path = set_abfss_path(curated_storage_name, curated_container_name)
 
 # COMMAND ----------
 
@@ -56,30 +58,30 @@ curatedAbfssPath = setAbfssPath(curatedStorageName, curatedContainerName)
 
 # COMMAND ----------
 
-if loadType.upper() == "F":
+if load_type.upper() == "F":
    # This will catch schema changes based on upsteam load action configuration?
     replace = 1
-elif loadType.upper() == "I":
+elif load_type.upper() == "I":
     replace = 0
 else: 
-    raise Exception("LoadType not supported.")
+    raise ValueError("Load Type not supported.")
 
 # COMMAND ----------
 
 # check Delta Objects exist (import check functions)
 # check schema exists
-schemaExists = checkExistsDeltaSchema(schemaName=curatedSchemaName)
+schema_exists = check_exists_delta_schema(schema_name=curated_schema_name)
 
 # create schema, if required
-if schemaExists == False:
-    createSchema(containerName=curatedContainerName, schemaName=curatedSchemaName)
+if schema_exists == False:
+    create_schema(container_name=curated_container_name, schema_name=curated_schema_name)
 
 # COMMAND ----------
 
-partitionFieldsSQL = createPartitionFieldsSQL(partitionList)
-location = setDeltaTableLocation(schemaName=curatedSchemaName, tableName=curatedDatasetName, abfssPath=curatedAbfssPath)
-columnsString = formatColumnsSQL(columnsList, columnTypeList)
+partition_fields_sql = create_partition_fields_sql(partition_list)
+location = set_delta_table_location(schema_name=curated_schema_name, table_name=curated_dataset_name, abfss_path=curated_abfss_path)
+columns_string = format_columns_sql(columns_list, columnTypeList)
 
 # COMMAND ----------
 
-createTable(containerName=curatedContainerName, schemaName=curatedSchemaName, tableName=curatedDatasetName, location=location, partitionFieldsSQL=partitionFieldsSQL, columnsString=columnsString, surrogateKey=surrogateKey, replace=replace)
+create_table(container_name=curated_container_name, schema_name=curated_schema_name, table_name=curated_dataset_name, location=location, partition_fields_sql=partition_fields_sql, columns_string=columns_string, surrogate_key=surrogate_key, replace=replace)

@@ -12,8 +12,8 @@ param allowPublicAccess bool = true
 // Resource names
 var workspaceName = '${namePrefix}dbw${nameSuffix}'
 var managedResourceGroupName = '${namePrefix}rgm${nameSuffix}'
-var managedIdentityName = '${workspaceName}Identity'
 
+// var managedIdentityName = '${workspaceName}Identity' // Is this required
 
 
 // subnet names
@@ -41,13 +41,19 @@ resource databricksWorkspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
   }
 }
 
-// Managed Identity
-resource mIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
-  name: managedIdentityName
-  location: location
-}
+// // Managed Identity
+// resource mIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
+//   name: managedIdentityName
+//   location: location
+// }
 
 
 // Outputs
 output databricks_workspace object = databricksWorkspace
-output databricks_managed_identity object = mIdentity
+output databricksID string = databricksWorkspace.properties.authorizations[0].principalId
+output name string = workspaceName
+output workspaceID string = databricksWorkspace.id
+output workspaceURL string = databricksWorkspace.properties.workspaceUrl
+output workspaceProperties object = databricksWorkspace.properties
+
+// output databricks_managed_identity object = mIdentity
