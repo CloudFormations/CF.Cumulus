@@ -9,6 +9,13 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
+:r ..\..\metadata.transform\transform\"Stored Procedures"\AddNotebooks.sql
+:r ..\..\metadata.transform\transform\"Stored Procedures"\AddDatasets.sql
+:r ..\..\metadata.transform\transform\"Stored Procedures"\AddAttributes.sql
+:r ..\..\metadata.common\common\"Stored Procedures"\AddConnections.sql
+:r ..\..\metadata.ingest\ingest\"Stored Procedures"\AddDatasets.sql
+:r ..\..\metadata.ingest\ingest\"Stored Procedures"\AddAttributes.sql
+
 :r .\ConnectionsMetadataAsCode.sql
 :r .\IngestDatasetsMetadataAsCode.sql
 :r .\TransformDatasetsMetadataAsCode.sql
