@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddAttributes
+CREATE PROCEDURE [ingest].[AddAttributes]
 (
 	@ConnectionDisplayName NVARCHAR(50),
 	@DatasetDisplayName NVARCHAR(50),

@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddTransformAttributes
+CREATE PROCEDURE [transform].[AddTransformAttributes]
 (
 	@DatasetName NVARCHAR(100),
 	@DatasetSchema NVARCHAR(100),

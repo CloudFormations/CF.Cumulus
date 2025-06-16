@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddTenants
+CREATE PROCEDURE [control].[AddTenants]
 (
 	@TenantId UNIQUEIDENTIFIER,
 	@Name NVARCHAR(200),
