@@ -36,35 +36,13 @@ jobs:
       - name: Verify Artifact File
         run: ls -R ${{ github.workspace }}/src/metadata.core/bin/Release/
 
-      - name: Azure SQL Deploy Common
+      - name: Azure SQL Deploy
         uses: Azure/sql-action@v2.3
         with:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.common.dacpac
+          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.core.dacpac
           action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '
-
-      - name: Azure SQL Deploy Control
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.control.dacpac
-          action: 'publish'
-          arguments: '/v:Environment="Dev" /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
-
-      - name: Azure SQL Deploy Ingest
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.Ingest.dacpac
-          action: 'publish'
-
-      - name: Azure SQL Deploy Transform
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.Transform.dacpac
-          action: 'publish'
+          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Dev"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
 
 # Deploy dacpac job
   deploy_test:
@@ -83,35 +61,14 @@ jobs:
       - name: Verify Artifact File
         run: ls -R ${{ github.workspace }}/src/metadata.core/bin/Release/
 
-      - name: Azure SQL Deploy Common
+      - name: Azure SQL Deploy
         uses: Azure/sql-action@v2.3
         with:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.common.dacpac
+          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.core.dacpac
           action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Test"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '
+          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Test"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
 
-      - name: Azure SQL Deploy Control
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.control.dacpac
-          action: 'publish'
-          arguments: '/v:Environment="Test" /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
-          
-      - name: Azure SQL Deploy Ingest
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.ingest.dacpac
-          action: 'publish'
-
-      - name: Azure SQL Deploy Transform
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.transform.dacpac
-          action: 'publish'
 
 # Deploy dacpac job
   deploy_prod:
@@ -130,32 +87,10 @@ jobs:
       - name: Verify Artifact File
         run: ls -R ${{ github.workspace }}/src/metadata.core/bin/Release/
 
-      - name: Azure SQL Deploy Common
+      - name: Azure SQL Deploy
         uses: Azure/sql-action@v2.3
         with:
           connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.common.dacpac
+          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.core.dacpac
           action: 'publish'
-          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Prod"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" '
-
-      - name: Azure SQL Deploy Control
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.control.dacpac
-          action: 'publish'
-          arguments: '/v:Environment="Prod" /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
-          
-      - name: Azure SQL Deploy Ingest
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.ingest.dacpac
-          action: 'publish'
-
-      - name: Azure SQL Deploy Transform
-        uses: Azure/sql-action@v2.3
-        with:
-          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
-          path: ${{ github.workspace }}/src/metadata.core/bin/Release/metadata.transform.dacpac
-          action: 'publish'
+          arguments: '/v:DatabricksWSName="${{ secrets.DBWNAME }}" /v:DatabricksHost="${{ secrets.DATABRICKS_HOST }}" /v:DLSName="${{ secrets.DLSNAME }}"  /v:Environment="Prod"  /v:KeyVaultName="${{ secrets.KEYVAULTNAME }}"  /v:RGName="${{ secrets.RGNAME }}" /v:SubscriptionID="${{ secrets.AZURE_SUBSCRIPTION_ID }}" /v:ADFName="${{ secrets.ADFNAME }}" /v:TenantID="${{ secrets.AZURE_TENANT_ID }}" '
