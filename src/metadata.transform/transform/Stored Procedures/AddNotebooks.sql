@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddNotebooks
+CREATE PROCEDURE [transform].[AddNotebooks]
 (
 	@NotebookTypeName NVARCHAR(100),
 	@NotebookName NVARCHAR(100),

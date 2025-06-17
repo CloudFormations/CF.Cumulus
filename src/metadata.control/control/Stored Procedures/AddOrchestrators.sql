@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddOrchestrators
+CREATE PROCEDURE [control].[AddOrchestrators]
 (
 	@OrchestratorName NVARCHAR(200),
 	@OrchestratorType CHAR(3),

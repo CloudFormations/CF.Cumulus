@@ -7,9 +7,11 @@ jobs:
 # Execute core yml cicd
   exec_core:
     uses: ./.github/workflows/sql-server-core-cicd.yml
+    secrets: inherit
 
 # Execute core yml cicd
   exec_data:
     # Set the dependency on core
     needs: exec_core
     uses: ./.github/workflows/sql-server-data-cicd.yml
+    secrets: inherit
