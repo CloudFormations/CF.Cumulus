@@ -15,9 +15,11 @@ V25.1.0.0
 https://github.com/CloudFormations/CF.Cumulus/releases
 
 ## Choosing the Right Plan for You
-[![](https://static.wixstatic.com/media/bacfcb_023ca9a26e8341f897c0f5be2ce4f861~mv2.png)](https://static.wixstatic.com/media/bacfcb_023ca9a26e8341f897c0f5be2ce4f861~mv2.png)
+[![](https://static.wixstatic.com/media/bacfcb_1c2739eec5e743428df967a8a9ed051a~mv2.png)](https://static.wixstatic.com/media/bacfcb_1c2739eec5e743428df967a8a9ed051a~mv2.png)
 
 We offer a variety of different ways to get started with CF.Cumulus, which can be accessed through the Azure MarketPlace [here](https://azuremarketplace.microsoft.com/en-gb/marketplace/apps?search=cf.cumulus&page=1). This includes a variety of deployment and support options for you to use as per your organisation's requirements.
+
+[![](https://static.wixstatic.com/media/bacfcb_acf5aabad1284e7ba49e83f639ee5e91~mv2.png)](https://static.wixstatic.com/media/bacfcb_acf5aabad1284e7ba49e83f639ee5e91~mv2.png)
 
 We also have the Community Edition for Developers who want to run with Cumulus for themselves, available here on our Open-Source Repo!
 
