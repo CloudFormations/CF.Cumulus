@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddBatches
+CREATE PROCEDURE [control].[AddBatches]
 (
 	@BatchName VARCHAR(255),
 	@BatchDescription VARCHAR(4000),

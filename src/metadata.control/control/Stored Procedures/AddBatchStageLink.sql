@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddBatchStageLink
+CREATE PROCEDURE [control].[AddBatchStageLink]
 (
 	@BatchName VARCHAR(255),
 	@StageName VARCHAR(255)

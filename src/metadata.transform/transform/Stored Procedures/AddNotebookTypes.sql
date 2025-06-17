@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddNotebookTypes
+CREATE PROCEDURE [transform].[AddNotebookTypes]
 (
 	@NotebookTypeName NVARCHAR(100),
 	@Enabled BIT
