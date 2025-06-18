@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddStages
+CREATE PROCEDURE [control].[AddStages]
 (
 	@StageName VARCHAR(255),
 	@StageDescription VARCHAR(4000),

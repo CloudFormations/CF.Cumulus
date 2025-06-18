@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddTransformDatasets
+CREATE PROCEDURE [transform].[AddTransformDatasets]
 (
 	@ComputeConnectionDisplayName NVARCHAR(50),
 	@CreateNotebookName NVARCHAR(100),

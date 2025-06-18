@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddDatasets
+CREATE PROCEDURE [ingest].[AddDatasets]
 (
 	@ConnectionDisplayName NVARCHAR(50),
 	@LinkedServiceName NVARCHAR(200),

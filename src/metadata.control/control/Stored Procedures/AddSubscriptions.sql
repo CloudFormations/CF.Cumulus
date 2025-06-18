@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddSubscriptions
+CREATE PROCEDURE [control].[AddSubscriptions]
 (
 	@SubscriptionId UNIQUEIDENTIFIER,
 	@Name NVARCHAR(200),

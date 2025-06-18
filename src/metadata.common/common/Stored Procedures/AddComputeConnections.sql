@@ -1,4 +1,4 @@
-CREATE PROCEDURE ##AddComputeConnections
+CREATE PROCEDURE [common].[AddComputeConnections]
 (
 	@ConnectionTypeDisplayName NVARCHAR(50),
 	@ConnectionDisplayName NVARCHAR(50),

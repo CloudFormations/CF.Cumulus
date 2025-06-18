@@ -17,7 +17,7 @@ param(
 )
 
 # Login to the Azure Tenant
-az login --tenant $tenantId
+# az login --tenant $tenantId
 
 # DEMO: Start a timer
 $processTimerStart = [System.Diagnostics.Stopwatch]::StartNew()
@@ -36,6 +36,7 @@ $resourceGroupName = $bicepDeployment.properties.outputs.rgName.value
 $keyVaultName = $bicepDeployment.properties.outputs.keyVaultName.value
 $keyVaultId = $bicepDeployment.properties.outputs.keyVaultId.value
 $keyVaultUri = $bicepDeployment.properties.outputs.keyVaultUri.value
+$databricksWorkspaceName = $bicepDeployment.properties.outputs.databricksWorkspaceName.value
 $databricksWorkspaceURL = $bicepDeployment.properties.outputs.databricksWorkspaceURL.value
 $storageAccountName = $bicepDeployment.properties.outputs.storageAccountName.value
 $functionAppName = $bicepDeployment.properties.outputs.functionAppName.value
@@ -97,30 +98,28 @@ $deployDatabricksResourcesScript = $currentLocation + '\deploy_databricks_resour
     -databricksWorkspaceURL $databricksWorkspaceURL `
     -storageAccountName $storageAccountName
 
+
+# Demo interim duration logging + surfacing
+$processTimerInterim = $processTimerStart.Elapsed
+$elapsedTimeInterim = "{0:00}:{1:00}:{2:00}.{3:00}" -f $processTimerInterim.Hours, $processTimerInterim.Minutes, $tprocessTimerInterim.Seconds, ($processTimerInterim.Milliseconds / 10)
+Write-Host "Penultimate Deployment Complete! Elapsed Time $elapsedTimeInterim `r`n"
+
 # Deploy the SQL Server Metadata objects
-    # Child script: Create control Schema Objects
 # Child script: Create common Schema Objects
-    # Child script: Create ingest Schema Objects
-    # Child script: Create transform Schema Objects
-    # Child script: Query Databricks Workspace URL
-    # Child script: Populate Default values for control, common
-    # Child script: Create user for ADF, create role, add user to role
-
-# Optional: Deploy AdventureWorks SQL Database
-    # If $OptionalDataSource = true:
-        # Create Azure SQL DB with AdventureWorks DB
-        # Create user for ADF on AdventureWorks DB
-        # Populate Metadata with AdventureWorks Connection/Dataset info 
-    
-
-# Tests
-# ADF
-
-# Databricks
-# Test exection of the databricks notebook which runs dbutils to check secret scope configured correctly
-
-# Functions
-# Postman
+    # Includes: Publish DacPacs to the instance
+    # Includes: Create user for ADF, create role, grant role permissions, add user to role
+$deploySQLDacPacsScript = $currentLocation + '\deploy_sql_dacpacs.ps1'
+& $deploySQLDacPacsScript `
+    -tenantId $tenantId `
+    -subscriptionIdValue $subscriptionIdValue `
+    -keyVaultName $keyVaultName `
+    -sqlServerName $sqlServerName `
+    -sqlDatabaseName $sqlDatabaseName `
+    -databricksWorkspaceName $databricksWorkspaceName `
+    -databricksWorkspaceURL $databricksWorkspaceURL `
+    -storageAccountName $storageAccountName `
+    -resourceGroupName $resourceGroupName `
+    -dataFactoryName $dataFactoryName
 
 
 # Demo duration logging + surfacing
@@ -128,14 +127,13 @@ $processTimerEnd = $processTimerStart.Elapsed
 $elapsedTime = "{0:00}:{1:00}:{2:00}.{3:00}" -f $processTimerEnd.Hours, $processTimerEnd.Minutes, $tprocessTimerEnd.Seconds, ($processTimerEnd.Milliseconds / 10)
 Write-Host "Deployment Complete! Elapsed Time $elapsedTime `r`n"
 
-# # Cleanup Actions:
+# Cleanup Actions:
 
-# # Remove unrequired environment variables
-# # Set environment variables up for other PS script executions
-# $Env:SQLSERVER = '' 
-# $Env:SQLDATABASE = '' 
-# $Env:DATAFACTORY = '' 
-# $Env:FUNCTIONAPP = '' 
-# $Env:KEYVAULT = '' 
+# Remove unrequired environment variables
+# Set environment variables up for other PS script executions
+$Env:SQLSERVER = '' 
+$Env:SQLDATABASE = '' 
+$Env:DATAFACTORY = '' 
+$Env:FUNCTIONAPP = '' 
+$Env:KEYVAULT = '' 
 
-# # Remove Databricks Profile Config file
