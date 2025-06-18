@@ -38,17 +38,6 @@ resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
   }
 }
 
-
-// Define a firewall rule to allow your IP address
-resource allowAzureServicesFirewallRule 'Microsoft.Sql/servers/firewallRules@2024-05-01-preview' = {
-  name: 'AllowAzureServices'
-  parent: sqlServer
-  properties: {
-    startIpAddress: myIPAddress  // Replace with your actual IP
-    endIpAddress: myIPAddress    // Usually the same for a single IP rule
-  }
-}
-
 // Define a firewall rule to allow your IP address
 resource myIpFirewallRule 'Microsoft.Sql/servers/firewallRules@2024-05-01-preview' = if (myIPAddress != '') {
   name: 'AllowMyIP'

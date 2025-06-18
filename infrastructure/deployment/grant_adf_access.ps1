@@ -2,38 +2,37 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $ADFResource,
+    $dataFactoryName,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionID,
+    $subscriptionIdValue,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $instanceName,
+    $sqlServerName,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $databaseName
+    $sqlDatabaseName
 )
 
 # Uncomment the below commands for independent executions of the script.
-# Import-Module SQLServer
-# Import-Module Az.Accounts -MinimumVersion 2.2.0
-# Connect-AzAccount -SubscriptionId $subscriptionID
+Import-Module SQLServer
+Import-Module Az.Accounts -MinimumVersion 2.2.0
 
 $accessToken = (Get-AzAccessToken -ResourceUrl https://database.windows.net).Token
 
-$instanceNameFull = "$instanceName.database.windows.net"
+$sqlServerNameFull = "$sqlServerName.database.windows.net"
 
 $query = @"
 -- Cumulus Additional Database Data Source Pre-requisites
-IF NOT EXISTS (SELECT * FROM sys.sysusers WHERE name = '$ADFResource')
+IF NOT EXISTS (SELECT * FROM sys.sysusers WHERE name = '$dataFactoryName')
 BEGIN
-	CREATE USER [$ADFResource] FROM EXTERNAL PROVIDER;
+	CREATE USER [$dataFactoryName] FROM EXTERNAL PROVIDER;
 	PRINT 'Created ADF user'
 END
 
@@ -68,8 +67,8 @@ ON SCHEMA::[transform] TO [db_cumulususer];
 GO
 
 ALTER ROLE [db_cumulususer] 
-ADD MEMBER [$ADFResource];
+ADD MEMBER [$dataFactoryName];
 "@
 
 
-Invoke-Sqlcmd -ServerInstance $instanceNameFull -Database $databaseName -AccessToken $accessToken -Query $query
+Invoke-Sqlcmd -ServerInstance $sqlServerNameFull -Database $sqlDatabaseName -AccessToken $accessToken -Query $query
