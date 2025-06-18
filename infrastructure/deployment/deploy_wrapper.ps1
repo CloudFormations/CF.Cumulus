@@ -98,6 +98,12 @@ $deployDatabricksResourcesScript = $currentLocation + '\deploy_databricks_resour
     -databricksWorkspaceURL $databricksWorkspaceURL `
     -storageAccountName $storageAccountName
 
+
+# Demo interim duration logging + surfacing
+$processTimerInterim = $processTimerStart.Elapsed
+$elapsedTimeInterim = "{0:00}:{1:00}:{2:00}.{3:00}" -f $processTimerInterim.Hours, $processTimerInterim.Minutes, $tprocessTimerInterim.Seconds, ($processTimerInterim.Milliseconds / 10)
+Write-Host "Penultimate Deployment Complete! Elapsed Time $elapsedTimeInterim `r`n"
+
 # Deploy the SQL Server Metadata objects
 # Child script: Create common Schema Objects
     # Includes: Publish DacPacs to the instance

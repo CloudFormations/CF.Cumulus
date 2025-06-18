@@ -3,11 +3,13 @@ using '../../main.bicep'
 //Parameters for environment configuration
 // * These parameters control resource naming and deployment options
 // * Recommended for consistent resource naming across environments
-param orgName = 'cfc'
-param domainName = 'demo'
+param orgName = 'cf'
+param domainName = 'cumulus'
 param envName = 'dev'
 param location = 'uksouth'
 param uniqueIdentifier = '01'
+param myIPAddress = '1.1.1.1' // For SQL Server Firewall rule
+
 
 //Parameters for optional deployments
 param deployADF = true
@@ -26,7 +28,6 @@ param aspSKU = 'consumption'   // ASP SKU for function app
 param configureGitHub = false    // if GitHub repo configuration is required for ADF deployment
 
 // SQL Server: Optional Parameters
-param myIPAddress = '1.1.1.1' // For SQL Server Firewall rule
 param allowAzureServices = true // For allowing Azure services access to Azure SQL Server
 
 // Storage: Optional naming configurations
