@@ -324,6 +324,7 @@ module dataFactoryWorkersRoleAssignmentsDeploy './modules/roleassignments/datafa
 
 // OUTPUTS
 output rgName string = rgName
+output databricksWorkspaceName string = databricksWorkspaceDeploy.outputs.name
 output databricksWorkspaceURL string = databricksWorkspaceDeploy.outputs.workspaceURL
 output databricksWorkspaceId string = databricksWorkspaceDeploy.outputs.workspaceID
 output keyVaultName string = keyVaultDeploy.outputs.name

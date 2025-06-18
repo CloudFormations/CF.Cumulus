@@ -3,11 +3,11 @@ using '../../main.bicep'
 //Parameters for environment configuration
 // * These parameters control resource naming and deployment options
 // * Recommended for consistent resource naming across environments
-param orgName = 'cfc'
-param domainName = 'demo'
+param orgName = 'cf'
+param domainName = 'matt'
 param envName = 'dev'
 param location = 'uksouth'
-param uniqueIdentifier = '01'
+param uniqueIdentifier = '22'
 
 //Parameters for optional deployments
 param deployADF = true
