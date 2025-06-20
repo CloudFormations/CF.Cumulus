@@ -1,0 +1,31 @@
+{
+	"name": "AmazonS31",
+	"properties": {
+		"parameters": {
+			"AccessKeyId": {
+				"type": "string"
+			},
+			"SecretKeyName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AmazonS3",
+		"typeProperties": {
+			"serviceUrl": "https://s3.amazonaws.com",
+			"accessKeyId": "@{linkedService().AccessKeyId}",
+			"secretAccessKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().SecretKeyName",
+					"type": "Expression"
+				}
+			},
+			"authenticationType": "AccessKey"
+		}
+	}
+}
