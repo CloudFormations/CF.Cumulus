@@ -7,12 +7,15 @@
 			},
 			"SecretKeyName": {
 				"type": "string"
+			},
+			"ServiceURL": {
+				"type": "string"
 			}
 		},
 		"annotations": [],
 		"type": "AmazonS3",
 		"typeProperties": {
-			"serviceUrl": "https://s3.amazonaws.com",
+			"serviceUrl": "@{linkedService().ServiceURL}",
 			"accessKeyId": "@{linkedService().AccessKeyId}",
 			"secretAccessKey": {
 				"type": "AzureKeyVaultSecret",
