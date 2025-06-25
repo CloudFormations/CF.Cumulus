@@ -2,19 +2,19 @@
 	"name": "Ingest_DS_Amazon_S3_Parquet",
 	"properties": {
 		"linkedServiceName": {
-			"referenceName": "AmazonS31",
+			"referenceName": "Ingest_LS_AmazonS3_AKAuth",
 			"type": "LinkedServiceReference",
 			"parameters": {
-				"AccessKeyId": {
-					"value": "@dataset().DSAccessKeyId",
+				"ServiceURL": {
+					"value": "@dataset().DSServiceURL",
 					"type": "Expression"
 				},
 				"SecretKeyName": {
 					"value": "@dataset().DSSecretKeyName",
 					"type": "Expression"
 				},
-				"ServiceURL": {
-					"value": "@dataset().DSServiceURL",
+				"AccessKeyId": {
+					"value": "@dataset().DSAccessKeyId",
 					"type": "Expression"
 				}
 			}
