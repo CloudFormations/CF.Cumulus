@@ -1,0 +1,67 @@
+{
+	"name": "Ingest_DS_Amazon_S3_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AmazonS31",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"AccessKeyId": {
+					"value": "@dataset().DSAccessKeyId",
+					"type": "Expression"
+				},
+				"SecretKeyName": {
+					"value": "@dataset().DSSecretKeyName",
+					"type": "Expression"
+				},
+				"ServiceURL": {
+					"value": "@dataset().DSServiceURL",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSAccessKeyId": {
+				"type": "string"
+			},
+			"DSSecretKeyName": {
+				"type": "string"
+			},
+			"DSServiceURL": {
+				"type": "string"
+			},
+			"DSBucket": {
+				"type": "string"
+			},
+			"DSDirectory": {
+				"type": "string"
+			},
+			"DSFileName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AmazonS3Location",
+				"bucketName": {
+					"value": "@dataset().DSBucket",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().DSDirectory",
+					"type": "Expression"
+				},
+				"fileName": {
+					"value": "@dataset().DSFileName",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
