@@ -1,0 +1,60 @@
+{
+	"name": "Ingest_DS_Datalake_AKAuth_Parquet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_DataLake_AKAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSStorageName": {
+					"value": "@dataset().DSStorageName",
+					"type": "Expression"
+				},
+				"LSSecretKeyName": {
+					"value": "@dataset().DSSecretKeyName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSStorageName": {
+				"type": "String"
+			},
+			"DSSecretKeyName": {
+				"type": "String"
+			},
+			"DSContainerName": {
+				"type": "String"
+			},
+			"DSDirectoryName": {
+				"type": "String"
+			},
+			"DSFileName": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().DSFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().DSDirectoryName",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().DSContainerName",
+					"type": "Expression"
+				}
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
