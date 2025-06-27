@@ -1,0 +1,29 @@
+{
+	"name": "Ingest_LS_DataLake_AKAuth",
+	"properties": {
+		"type": "AzureBlobFS",
+		"parameters": {
+			"LSStorageName": {
+				"type": "string"
+			},
+			"LSSecretKeyName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"typeProperties": {
+			"url": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}",
+			"accountKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().LSSecretKeyName",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}
