@@ -21,7 +21,7 @@
 					},
 					"cases": [
 						{
-							"value": "DataLake_Csv",
+							"value": "DataLake_AKAuth_Csv",
 							"activities": [
 								{
 									"name": "Csv Copy",
@@ -133,7 +133,7 @@
 							]
 						},
 						{
-							"value": "DataLake_Parquet",
+							"value": "DataLake_AKAuth_Parquet",
 							"activities": [
 								{
 									"name": "Parquet Copy",
