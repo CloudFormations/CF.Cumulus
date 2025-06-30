@@ -248,6 +248,28 @@
 									]
 								}
 							]
+						},
+						{
+							"value": "DataLake_AKAuth_Excel",
+							"activities": [
+								{
+									"name": "Unpacked Datasets",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "UnpackedDatasets",
+										"value": {
+											"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
 						}
 					],
 					"defaultActivities": [
@@ -401,14 +423,7 @@
 			{
 				"name": "Update Metadata Load Status",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [
-					{
-						"activity": "DataLake Type",
-						"dependencyConditions": [
-							"Succeeded"
-						]
-					}
-				],
+				"dependsOn": [],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -451,6 +466,58 @@
 					"referenceName": "Common_LS_cumulusdatabase",
 					"type": "LinkedServiceReference"
 				}
+			},
+			{
+				"name": "For Each Unpacked Dataset",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "DataLake Type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('UnpackedDatasets')",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Copy Unpacked File",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Copy_Unpacked_File",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"DirectoryName": {
+										"value": "@variables('DirectoryName')",
+										"type": "Expression"
+									},
+									"SourceQuery": {
+										"value": "@item()",
+										"type": "Expression"
+									},
+									"IngestPayload": {
+										"value": "@string(activity('Get Ingest Payload').output.firstRow)",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
 			}
 		],
 		"parameters": {
@@ -474,6 +541,9 @@
 			},
 			"LoadType": {
 				"type": "String"
+			},
+			"UnpackedDatasets": {
+				"type": "Array"
 			}
 		},
 		"folder": {
