@@ -251,6 +251,18 @@ BEGIN
     SET @SourceQuery += '</entity></fetch>'
     END
 
+    ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType = 'Azure Data Lake Gen2'
+    BEGIN
+        SELECT 
+            @SourceQuery = ds.LoadClause
+        FROM 
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+    END
+        
     ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType <> 'REST API'
     BEGIN
         SELECT 
@@ -259,18 +271,6 @@ BEGIN
             [ingest].[Datasets] AS ds
         INNER JOIN [common].[Connections] AS cn
             ON ds.ConnectionFK = cn.ConnectionId
-        WHERE
-            ds.DatasetId = @DatasetId
-        AND 
-            ds.[Enabled] = 1
-    END
-
-    ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType = 'Azure Data Lake Gen2'
-    BEGIN
-        SELECT 
-            @SourceQuery = ds.LoadClause
-        FROM 
-            [ingest].[Datasets] AS ds
         WHERE
             ds.DatasetId = @DatasetId
         AND 
