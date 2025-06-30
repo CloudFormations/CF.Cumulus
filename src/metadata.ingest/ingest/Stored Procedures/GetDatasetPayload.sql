@@ -265,6 +265,18 @@ BEGIN
             ds.[Enabled] = 1
     END
 
+    ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType = 'Azure Data Lake Gen2'
+    BEGIN
+        SELECT 
+            @SourceQuery = ds.LoadClause
+        FROM 
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+    END
+
     ELSE IF @ConnectionType = 'REST API'
     BEGIN
         DECLARE @LoadClauseAPI NVARCHAR(MAX);
