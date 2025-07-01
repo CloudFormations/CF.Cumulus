@@ -226,7 +226,7 @@
 							]
 						},
 						{
-							"value": "DataLake_MIAuth_Excel",
+							"value": "DataLake_MIAuth_Binary",
 							"activities": [
 								{
 									"name": "DLS Binary Copy",
