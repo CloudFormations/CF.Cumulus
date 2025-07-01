@@ -95,10 +95,22 @@
 											"referenceName": "Ingest_DS_DataLake_Csv",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSFileName": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageName",
-												"DSDirectoryName": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageContainer",
-												"DSContainerName": "@concat(     json(string(pipeline().parameters.IngestPayload)).ConnectionDisplayName,     '\\staging\\',     json(string(pipeline().parameters.SourceQuery)).SheetName,     '\\'     )",
-												"DSStorageName": "@json(string(pipeline().parameters.SourceQuery)).SheetName"
+												"DSFileName": {
+													"value": "@json(string(pipeline().parameters.SourceQuery)).SheetName",
+													"type": "Expression"
+												},
+												"DSDirectoryName": {
+													"value": "@concat(     json(string(pipeline().parameters.IngestPayload)).ConnectionDisplayName,     '\\staging\\',     json(string(pipeline().parameters.SourceQuery)).SheetName,     '\\'     )",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageContainer",
+													"type": "Expression"
+												},
+												"DSStorageName": {
+													"value": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageName",
+													"type": "Expression"
+												}
 											}
 										}
 									]

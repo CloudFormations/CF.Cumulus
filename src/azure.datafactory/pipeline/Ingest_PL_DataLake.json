@@ -21,7 +21,7 @@
 					},
 					"cases": [
 						{
-							"value": "DataLake_AKAuth_Csv",
+							"value": "DataLake_MIAuth_Csv",
 							"activities": [
 								{
 									"name": "Csv Copy",
@@ -75,33 +75,25 @@
 												"fileExtension": ".txt"
 											}
 										},
-										"enableStaging": false
+										"enableStaging": false,
+										"translator": {
+											"type": "TabularTranslator",
+											"typeConversion": true,
+											"typeConversionSettings": {
+												"allowDataTruncation": true,
+												"treatBooleanAsNumber": false
+											}
+										}
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_DataLake_AKAuth_Csv",
+											"referenceName": "Ingest_DS_DataLake_Csv",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSStorageName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation\n",
-													"type": "Expression"
-												},
-												"DSSecretKeyName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret\n",
-													"type": "Expression"
-												},
-												"DSContainerName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation\n",
-													"type": "Expression"
-												},
-												"DSDirectoryName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourcePath\n",
-													"type": "Expression"
-												},
-												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
-													"type": "Expression"
-												}
+												"DSFileName": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+												"DSDirectoryName": "@activity('Get Ingest Payload').output.firstRow.SourcePath",
+												"DSContainerName": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+												"DSStorageName": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation"
 											}
 										}
 									],
@@ -133,7 +125,7 @@
 							]
 						},
 						{
-							"value": "DataLake_AKAuth_Parquet",
+							"value": "DataLake_MIAuth_Parquet",
 							"activities": [
 								{
 									"name": "Parquet Copy",
@@ -196,29 +188,13 @@
 									},
 									"inputs": [
 										{
-											"referenceName": "Ingest_DS_Datalake_AKAuth_Parquet",
+											"referenceName": "Ingest_DS_DataLake_Parquet",
 											"type": "DatasetReference",
 											"parameters": {
-												"DSStorageName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
-													"type": "Expression"
-												},
-												"DSSecretKeyName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.KeyVaultSecret",
-													"type": "Expression"
-												},
-												"DSContainerName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
-													"type": "Expression"
-												},
-												"DSDirectoryName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourcePath",
-													"type": "Expression"
-												},
-												"DSFileName": {
-													"value": "@activity('Get Ingest Payload').output.firstRow.SourceName",
-													"type": "Expression"
-												}
+												"DSStorageName": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+												"DSContainerName": "@activity('Get Ingest Payload').output.firstRow.SourceLocation",
+												"DSDirectoryName": "@activity('Get Ingest Payload').output.firstRow.SourcePath",
+												"DSFileName": "@activity('Get Ingest Payload').output.firstRow.SourceName"
 											}
 										}
 									],
@@ -250,24 +226,73 @@
 							]
 						},
 						{
-							"value": "DataLake_AKAuth_Excel",
+							"value": "DataLake_MIAuth_Excel",
 							"activities": [
 								{
-									"name": "Unpacked Datasets",
-									"type": "SetVariable",
+									"name": "DLS Binary Copy",
+									"type": "Copy",
 									"dependsOn": [],
 									"policy": {
-										"secureOutput": false,
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
 										"secureInput": false
 									},
 									"userProperties": [],
 									"typeProperties": {
-										"variableName": "UnpackedDatasets",
-										"value": {
-											"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery)",
-											"type": "Expression"
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "AzureBlobFSReadSettings",
+												"recursive": true
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings",
+												"copyBehavior": "PreserveHierarchy"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Binary",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSDirectory": "@activity('Get Ingest Payload').output.firstRow.SourcePath",
+												"DSFileName": "@activity('Get Ingest Payload').output.firstRow.SourceName",
+												"DSStorageName": "@activity('Get Ingest Payload').output.firstRow.ConnectionLocation",
+												"DSContainerName": "@activity('Get Ingest Payload').output.firstRow.SourceLocation"
+											}
 										}
-									}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Binary",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSDirectory": "@variables('DirectoryName')",
+												"DSFileName": {
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'.',activity('Get Ingest Payload').output.firstRow.ExtensionType)",
+													"type": "Expression"
+												},
+												"DSStorageName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												}
+											}
+										}
+									]
 								}
 							]
 						}
@@ -423,7 +448,14 @@
 			{
 				"name": "Update Metadata Load Status",
 				"type": "SqlServerStoredProcedure",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "DataLake Type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -468,11 +500,41 @@
 				}
 			},
 			{
+				"name": "Unpacked Datasets",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "UnpackedDatasets",
+					"value": {
+						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
 				"name": "For Each Unpacked Dataset",
 				"type": "ForEach",
 				"dependsOn": [
 					{
 						"activity": "DataLake Type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Unpacked Datasets",
 						"dependencyConditions": [
 							"Succeeded"
 						]
