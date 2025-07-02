@@ -23,6 +23,35 @@ We offer a variety of different ways to get started with CF.Cumulus, which can b
 
 We also have the Community Edition for Developers who want to run with Cumulus for themselves, available here on our Open-Source Repo!
 
+## Pre-requisites
+To ensure a seamless deployment of CF.Cumulus in the Azure MarketPlace or via the Community Edition, we recommend registering the following Namespaces in your target subscription:
+
+- Microsoft.AlertsManagement
+- Microsoft.Consumption 
+- Microsoft.DataFactory
+- Microsoft.Databricks
+- Microsoft.Features
+- Microsoft.KeyVault
+- Microsoft.Maintenance
+- Microsoft.ManagedIdentity
+- Microsoft.MarketplaceOrdering
+- Microsoft.OperationalInsights
+- Microsoft.Portal
+- Microsoft.ResourceGraph
+- Microsoft.ResourceNotifications
+- Microsoft.Resources
+- Microsoft.SerialConsole
+- Microsoft.Solutions
+- Microsoft.Sql
+- Microsoft.Storage
+- Microsoft.Web
+- microsoft.insights
+- microsoft.support 
+
+> In the event any of these missing, please complete the following URL and enable as suggested: <https://portal.azure.com/#@organisation.org/resource/subscriptions/subscription-id/resourceproviders>
+
+If you would like following information on the topic before doing so, please follow this link from the [Microsoft Documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/resource-providers-and-types)
+
 ## Getting Started with the Community Edition of CF.Cumulus
 For further information on how to get started using the Community Edition of CF.Cumulus can be found in the members area of our website [here](https://www.cloudformations.org/cf-cumulus-deployment-guide/). It's free to become a member and gives you access to other great content from Cloud Formations. 
 
