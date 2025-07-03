@@ -83,3 +83,8 @@
 		@ConnectionTypeDisplayName = N'Jira', 
 		@SourceLanguageType = 'SQL',
 		@Enabled = 1;
+
+	EXEC [common].[AddConnectionType] 
+		@ConnectionTypeDisplayName = N'Amazon S3', 
+		@SourceLanguageType = 'NA',
+		@Enabled = 1;
