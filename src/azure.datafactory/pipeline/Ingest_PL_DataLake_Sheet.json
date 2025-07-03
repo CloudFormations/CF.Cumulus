@@ -1,5 +1,5 @@
 {
-	"name": "Ingest_PL_DataLake_Excel_Sheet",
+	"name": "Ingest_PL_DataLake_Sheet",
 	"properties": {
 		"activities": [
 			{
