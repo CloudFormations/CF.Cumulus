@@ -251,6 +251,18 @@ BEGIN
     SET @SourceQuery += '</entity></fetch>'
     END
 
+    ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType = 'Azure Data Lake Gen2'
+    BEGIN
+        SELECT 
+            @SourceQuery = ds.LoadClause
+        FROM 
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+    END
+        
     ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType <> 'REST API'
     BEGIN
         SELECT 
@@ -354,6 +366,12 @@ BEGIN
     ELSE IF (@LoadType = 'I') AND (@ConnectionType = 'Files')
     BEGIN
         RAISERROR('The Files Connection type does not support incremental loading. Please change the load type in ingest.Datasets.',16,1)
+        RETURN 0;
+    END
+
+    ELSE IF (@LoadType = 'I') AND (@ConnectionType = 'Azure Data Lake Gen2')
+    BEGIN
+        RAISERROR('The Azure Data Lake Gen2 Connection type does not support incremental loading. Please change the load type in ingest.Datasets.',16,1)
         RETURN 0;
     END
 
