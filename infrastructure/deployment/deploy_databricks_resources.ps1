@@ -16,7 +16,7 @@ param(
     [string] $storageAccountName
 )
 
-
+$databricksWorkspaceURL = "adb-1425948275744470.10.azuredatabricks.net"
 # Get Databricks Access Token
 $DATABRICKS_AAD_TOKEN = az account get-access-token --resource 2ff814a6-3304-4ab8-85cb-cd0e6f879c1d --query accessToken --output tsv
 
@@ -38,8 +38,12 @@ $json = @"
 "@
 
 # Create Databricks Secret Scope
-# TODO: Make command idempotent in event that the scope already exists
-databricks secrets create-scope --json $json --profile DEFAULT
+$ExistingScope = databricks secrets list-scopes | ConvertTo-Json
+if ($ExistingScope.Contains($secretScopeName)) {
+    Write-Host "Secret scope '$secretScopeName' already exists. Skipping creation."
+} else {
+    databricks secrets create-scope --json $json --profile DEFAULT
+}
 
 # Create Databricks Cluster
 $sparkConfig = @"
@@ -70,7 +74,12 @@ $clusterJSON = @"
 }
 "@
 
-databricks clusters create --json $clusterJSON --profile DEFAULT
+$ExistingCluster = databricks clusters list | ConvertTo-Json
+if ($ExistingCluster.Contains("General Purpose Cluster")) {
+    Write-Host "Cluster 'General Purpose Cluster' already exists. Skipping creation."
+} else {
+    databricks clusters create --json $clusterJSON --profile DEFAULT
+}
 
 
 # Programmatically find databricks folder path in Repo

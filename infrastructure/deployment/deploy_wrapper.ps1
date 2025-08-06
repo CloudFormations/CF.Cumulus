@@ -86,6 +86,15 @@ $deployDataFactoryComponentsScript = $currentLocation + '\deploy_data_factory_co
     -resourceGroupName $resourceGroupName `
     -dataFactoryName $dataFactoryName
 
+# Check the Azure Function App is working correctly and Pipelines have been deployed
+# This script will call the Function App to validate a pipeline using the returned status code to verify it is operational
+$checkAzureFunctionsScript = $currentLocation + '\check_azure_functions.ps1'
+& $checkAzureFunctionsScript `
+    -resourceGroupName $resourceGroupName `
+    -subscriptionId $subscriptionIdValue `
+    -dataFactoryName $dataFactoryName `
+    -functionAppName $functionAppName
+
 # Deploy Databricks Resources
     # Includes: Create PAT
     # Includes: Create Secret Scope
@@ -98,6 +107,9 @@ $deployDatabricksResourcesScript = $currentLocation + '\deploy_databricks_resour
     -databricksWorkspaceURL $databricksWorkspaceURL `
     -storageAccountName $storageAccountName
 
+# Check if the notebooks have been deployed to the Databricks workspace
+$checkDatabricksNotebooksScript = $currentLocation + '\check_databricks_notebooks.ps1'
+& $checkDatabricksNotebooksScript
 
 # Demo interim duration logging + surfacing
 $processTimerInterim = $processTimerStart.Elapsed
