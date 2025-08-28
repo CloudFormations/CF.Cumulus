@@ -19,10 +19,10 @@
 						"type": "AzureSqlSource",
 						"sqlReaderStoredProcedureName": "[transform].[GetUnmanagedNotebookPayload]",
 						"storedProcedureParameters": {
-							"DatasetId": {
+							"NotebookId": {
 								"type": "Int32",
 								"value": {
-									"value": "@pipeline().parameters.DatasetId",
+									"value": "@pipeline().parameters.NotebookId",
 									"type": "Expression"
 								}
 							}
@@ -239,7 +239,7 @@
 			}
 		],
 		"parameters": {
-			"DatasetId": {
+			"NotebookId": {
 				"type": "string"
 			}
 		},

@@ -1,6 +1,6 @@
 CREATE PROCEDURE [transform].[GetUnmanagedNotebookPayload]
 	(
-	@DatasetId INT
+	@NotebookId INT
 	)
 AS
 BEGIN
@@ -11,9 +11,9 @@ BEGIN
 	SELECT 
 		@ResultRowCount = COUNT(*)
 	FROM 
-		[transform].[Datasets] AS ds
-	INNER JOIN
 		[transform].[Notebooks] AS n
+	INNER JOIN
+		[transform].[Datasets] AS ds
 	ON 
 		n.NotebookId = ds.BusinessLogicNotebookFK
 	INNER JOIN 
@@ -44,7 +44,7 @@ BEGIN
 		[common].Connections AS cn5
 	ON cn5.ConnectionDisplayName = 'PrimaryKeyVault'
 	WHERE
-		ds.DatasetId = @DatasetId
+		n.NotebookId = @NotebookId
 	AND 
 		nt.NotebookTypeName = 'Unmanaged'
 	AND
@@ -58,13 +58,13 @@ BEGIN
 
 	IF @ResultRowCount = 0
 	BEGIN
-		RAISERROR('No results returned for the provided Dataset Id.  Confirm Dataset is enabled, and related Connections and Notebooks Parameters are enabled.',16,1)
+		RAISERROR('No results returned for the provided Notebook Id.  Confirm Notebook is enabled, and related Connections and Parameters are enabled.',16,1)
 		RETURN 0;
 	END
 
 	IF @ResultRowCount > 1
 	BEGIN
-		RAISERROR('Multiple results returned for the provided Dataset Id. Confirm that only a single active dataset is being referenced.',16,1)
+		RAISERROR('Multiple results returned for the provided Notebook Id. Confirm that only a single active Notebook is being referenced.',16,1)
 		RETURN 0;
 	END
 
@@ -94,9 +94,9 @@ BEGIN
 		ds.SchemaName,
 		n.NotebookPath AS 'NotebookFullPath'
 	FROM 
-		[transform].[Datasets] AS ds
-	INNER JOIN
 		[transform].[Notebooks] AS n
+	INNER JOIN
+		[transform].[Datasets] AS ds
 	ON 
 		n.NotebookId = ds.BusinessLogicNotebookFK
 	INNER JOIN 
@@ -128,7 +128,7 @@ BEGIN
 	ON 
 		cn5.ConnectionDisplayName = 'PrimaryKeyVault'
 	WHERE
-		ds.DatasetId = @DatasetId
+		n.NotebookId = @NotebookId
 	AND 
 		nt.NotebookTypeName = 'Unmanaged'
 	AND
