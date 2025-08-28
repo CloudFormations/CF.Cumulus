@@ -22,6 +22,17 @@ def format_nested(col, _type, _format, _unpack):
     else:
         return None
 
+def format_nested_xml(col, _type, _format, _unpack):
+    if _unpack:
+        if _type == "timestamp":
+            return f"to_timestamp(xpath_string({col}, '{_unpack}'), '{_format}') as {col}"
+        elif _type == "date":
+            return f"to_date(xpath_string({col}, '{_unpack}'), '{_format}') as {col}"
+        else:
+            return f"cast(xpath_string({col}, '{_unpack}') as {_type}) as {col}"
+    else:
+        return None
+
 
 def format_default(col, _type):
     return f"cast({col} as {_type}) as {col}"
@@ -40,7 +51,8 @@ def select_sql_columns_format_string(total_column_list: list, total_column_type_
         formatted = (
             format_timestamp(col, _type, _format) or
             format_date(col, _type, _format) or
-            format_nested(col, _type, _format, _unpack) or
+            format_nested_json(col, _type, _format, _unpack) or
+            format_nested_xml(col, _type, _format, _unpack) or
             format_default(col, _type, _format)
         )
         sql_format.append(formatted)
