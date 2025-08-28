@@ -29,6 +29,7 @@ def get_merge_payload_variables(payload: dict()) -> list():
     columns_list = payload["CleansedColumnsList"].split(",")
     columns_type_list = payload["CleansedColumnsTypeList"].split(",")
     columns_format_list = payload["CleansedColumnsFormatList"].split(",")
+    columns_unpack_list = payload["CleansedUnpackList"].split(",")
     metadata_column_list = ["PipelineRunId","PipelineExecutionDateTime"]
     metadata_column_type_list = ["STRING","TIMESTAMP"]
     metadata_column_format_list = ["","yyyy-MM-dd HH:mm:ss"]
@@ -45,6 +46,6 @@ def get_merge_payload_variables(payload: dict()) -> list():
     # totalColumnTypeList = columnsTypeList
     # totalColumnFormatList = columnsFormatList
 
-    output = [table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list]
+    output = [table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, columns_unpack_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list]
 
     return output

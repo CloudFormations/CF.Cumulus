@@ -61,7 +61,7 @@ pipeline_execution_datetime = pd.to_datetime(pipeline_execution_datetime, format
 
 # COMMAND ----------
 
-[table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list] = get_merge_payload_variables(payload)
+[table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, columns_unpack_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list] = get_merge_payload_variables(payload)
 
 
 # COMMAND ----------
@@ -140,7 +140,7 @@ additional_config = select_sql_exploded_option_string(total_column_list, total_c
 
 format_total_column_format_list = format_attribute_target_data_format_list(total_column_format_list)
 
-total_column_str = select_sql_columns_format_string(total_column_list, total_column_type_list, format_total_column_format_list)
+total_column_str = select_sql_columns_format_string(total_column_list, total_column_type_list, format_total_column_format_list, columns_unpack_list)
 
 select_sql_full_string = f"SELECT {total_column_str} FROM {temp_view_name} {additional_config}"
 print(select_sql_full_string)

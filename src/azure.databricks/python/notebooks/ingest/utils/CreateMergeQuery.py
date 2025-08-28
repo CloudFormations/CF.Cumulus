@@ -1,32 +1,51 @@
-def select_sql_columns_format_string(total_column_list:list,total_column_type_list:list, total_column_format_list:list) -> list:
+def format_timestamp(col, _type, _format):
+    if _type == "timestamp":
+        if _format != 'yyyy-MM-ddTHH:mm:ss.SSSSSSSZ':
+            return f"to_timestamp({col},'{_format}') as {col}"
+        else:
+            return f"to_timestamp({col}) as {col}"
+    return None
+
+def format_date(col, _type, _format):
+    if _type == "date":
+        return f"to_date({col},'{_format}') as {col}"
+    return None
+
+def format_nested(col, _type, _format, _unpack):
+    if _unpack:
+        if _type == "timestamp":
+            return f"to_timestamp({_unpack},'{_format}') as {col}"
+        elif _type == "date":
+            return f"to_date({_unpack},'{_format}') as {col}"
+        else:
+            return f"cast({_unpack} as {_type}) as {col}"
+    else:
+        return None
+
+
+def format_default(col, _type):
+    return f"cast({col} as {_type}) as {col}"
+
+def select_sql_columns_format_string(total_column_list: list, total_column_type_list: list, total_column_format_list: list, columns_unpack_list: list) -> str:
     """
     Format strings with required schema enforcement for SQL.
     """
-    
+
     total_column_list_lowercase = [x.lower() for x in total_column_list]
     total_column_type_list_lowercase = [x.lower() for x in total_column_type_list]
-    # Note we do not want total_column_format_list in lowercase
+    columns_unpack_list_lowercase = [x.lower() for x in columns_unpack_list]
 
-    sql_format = [
-        # timestamp handling
-        f"to_timestamp({str(col)},'{_format}') as {str(col)}" if _type == "timestamp" and _format != 'yyyy-MM-ddTHH:mm:ss.SSSSSSSZ'
-        else f"to_timestamp({str(col)}) as {str(col)}" if (_type == "timestamp" and _format == 'yyyy-MM-ddTHH:mm:ss.SSSSSSSZ')
+    sql_format = []
+    for col, _type, _format, _unpack in zip(total_column_list_lowercase, total_column_type_list_lowercase, total_column_format_list, columns_unpack_list_lowercase):
+        formatted = (
+            format_timestamp(col, _type, _format) or
+            format_date(col, _type, _format) or
+            format_nested(col, _type, _format, _unpack) or
+            format_default(col, _type, _format)
+        )
+        sql_format.append(formatted)
 
-        # date handling
-        else f"to_date({str(col)},'{_format}') as {str(col)}" if _type == "date" 
-
-        # nested json handling
-        else f"{str(_format)} as {str(col)}" if "_exploded" in _format and not "." in _format
-        else f"cast({_format} as {_type}) as {str(col)}" if "_exploded" in _format and "." in _format
-
-        # else
-        else f"cast({str(col)} as {_type}) as {str(col)}"
-
-        for col,_type,_format in zip(total_column_list_lowercase,total_column_type_list_lowercase, total_column_format_list)
-        ]
-        
-    total_column_str = ", ".join(sql_format)
-    return total_column_str
+    return ", ".join(sql_format)
 
 # Further editing required for timestamp and date when specific formats required.
 # Worth reviewing, as this saves us from creating a temp table for the select statement and creating another pyspark dataframe.

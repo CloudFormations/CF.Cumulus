@@ -65,6 +65,7 @@ BEGIN
     DECLARE @CleansedColumnsList NVARCHAR(MAX)
     DECLARE @CleansedColumnsTypeList NVARCHAR(MAX)
     DECLARE @CleansedColumnsFormatList NVARCHAR(MAX)
+    DECLARE @CleansedUnpackList NVARCHAR(MAX)
 
     DECLARE @PkAttributesList NVARCHAR(MAX) = ''
     DECLARE @PartitionByAttributesList NVARCHAR(MAX) = ''
@@ -76,6 +77,7 @@ BEGIN
         @CleansedColumnsList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),','),
         @CleansedColumnsTypeList = STRING_AGG(CAST(att.AttributeTargetDataType AS NVARCHAR(MAX)),','),
         @CleansedColumnsFormatList = STRING_AGG(CAST(att.AttributeTargetDataFormat AS NVARCHAR(MAX)), ',')
+        @CleansedUnpackList = STRING_AGG(CAST(att.AttributeUnpack AS NVARCHAR(MAX)), ',')
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 
@@ -214,6 +216,7 @@ BEGIN
         @CleansedColumnsList AS 'CleansedColumnsList', 
         @CleansedColumnsTypeList AS 'CleansedColumnsTypeList',
         @CleansedColumnsFormatList AS 'CleansedColumnsFormatList',
+        @CleansedUnpackList AS 'CleansedUnpackList',
         @PkAttributesList AS 'CleansedPkList',
         @PartitionByAttributesList AS 'CleansedPartitionFields',
         @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy'
