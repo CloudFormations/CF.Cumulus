@@ -1,0 +1,900 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "cfcumulusdevadfuks25"
+		},
+		"Common_LS_cumulusdatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
+		},
+		"Ingest_LS_SQLDB_MIAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLDB_MIAuth'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
+		},
+		"Common_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "@linkedService().ClusterId"
+		},
+		"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://cfcdemodevkvuks01.vault.azure.net/"
+		},
+		"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}"
+		},
+		"Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().BaseURL}"
+		},
+		"Ingest_LS_REST_AnonAuth_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().BaseURL}"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Get_Databricks_Compute_ID')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Fetch Bearer Token from AKV",
+						"type": "WebActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:15:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": true,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {},
+							"url": {
+								"value": "@concat(json(pipeline().parameters.Payload).KeyVaultAddress,'/secrets/databricks-adf-pat/','?api-version=7.0')",
+								"type": "Expression"
+							},
+							"authentication": {
+								"type": "MSI",
+								"resource": "https://vault.azure.net"
+							}
+						}
+					},
+					{
+						"name": "Get Cluster Metadata",
+						"type": "WebActivity",
+						"dependsOn": [
+							{
+								"activity": "Fetch Bearer Token from AKV",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.00:15:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": true
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"method": "GET",
+							"headers": {
+								"Authorization": {
+									"value": "@concat('Bearer ',activity('Fetch Bearer Token from AKV').output.value)",
+									"type": "Expression"
+								}
+							},
+							"url": {
+								"value": "@concat(json(pipeline().parameters.Payload).ComputeWorkspaceURL,'/api/2.1/clusters/list')",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Filter Cluster",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Get Cluster Metadata",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@activity('Get Cluster Metadata').output.clusters",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@equals(item().cluster_name,json(pipeline().parameters.Payload).ComputeName)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Cluster Id Variable",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Filter Cluster",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "pipelineReturnValue",
+							"value": [
+								{
+									"key": "ClusterId",
+									"value": {
+										"type": "Expression",
+										"content": "@activity('Filter Cluster').output.value[0].cluster_id"
+									}
+								}
+							],
+							"setSystemVariable": true
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Payload": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"Clusters": {
+						"type": "Array"
+					},
+					"ClusterId": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Cumulus.Utils"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Wait 1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Used just so the procfwk has something to call during development.",
+				"activities": [
+					{
+						"name": "Wait1",
+						"description": "Framework development worker simulator.",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": {
+								"value": "@pipeline().parameters.WaitTime",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"WaitTime": {
+						"type": "int",
+						"defaultValue": 5
+					}
+				},
+				"folder": {
+					"name": "_Workers"
+				},
+				"annotations": [
+					"_ProcFwkWorker"
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Wait 2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Used just so the procfwk has something to call during development.",
+				"activities": [
+					{
+						"name": "Wait2",
+						"description": "Framework development worker simulator.",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": {
+								"value": "@pipeline().parameters.WaitTime",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"WaitTime": {
+						"type": "int",
+						"defaultValue": 5
+					}
+				},
+				"folder": {
+					"name": "_Workers"
+				},
+				"annotations": [
+					"_ProcFwkWorker"
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Common_LS_Databricks_Cluster_MIAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"WorkspaceURL": {
+						"type": "string"
+					},
+					"ResourceGroupName": {
+						"type": "string"
+					},
+					"ResourceName": {
+						"type": "string"
+					},
+					"ClusterId": {
+						"type": "string"
+					},
+					"SubscriptionId": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "@linkedService().WorkspaceURL",
+					"authentication": "MSI",
+					"workspaceResourceId": "@concat('/subscriptions/',linkedService().SubscriptionId,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
+					"existingClusterId": "[parameters('Common_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Common_LS_Databricks_JobCluster_MIAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"WorkspaceURL": {
+						"type": "string"
+					},
+					"ClusterVersion": {
+						"type": "string"
+					},
+					"NodeType": {
+						"type": "string"
+					},
+					"PythonVersion": {
+						"type": "string",
+						"defaultValue": "Unused"
+					},
+					"NumWorkers": {
+						"type": "string"
+					},
+					"SubscriptionId": {
+						"type": "string"
+					},
+					"ResourceName": {
+						"type": "string"
+					},
+					"ResourceGroupName": {
+						"type": "string"
+					}
+				},
+				"annotations": [
+					"JobCluster"
+				],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "@linkedService().WorkspaceURL",
+					"authentication": "MSI",
+					"workspaceResourceId": "@concat('/subscriptions/',linkedService().SubscriptionId,'/resourceGroups/',linkedService().ResourceGroupName,'/providers/Microsoft.Databricks/workspaces/',linkedService().ResourceName)",
+					"newClusterNodeType": "@linkedService().NodeType",
+					"newClusterNumOfWorker": "@linkedService().NumWorkers",
+					"newClusterSparkEnvVars": {
+						"PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+					},
+					"newClusterVersion": "@linkedService().ClusterVersion",
+					"clusterOption": "Fixed",
+					"newClusterInitScripts": []
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Common_LS_cumulusdatabase')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection between ADF and processing framework metadata SQLDB.",
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Common"
+				],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('Common_LS_cumulusdatabase_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Common_LS_cumuluskeys')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Common"
+				],
+				"type": "AzureKeyVault",
+				"typeProperties": {
+					"baseUrl": "[parameters('Common_LS_cumuluskeys_properties_typeProperties_baseUrl')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_DataLake_MIAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSStorageName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('Ingest_LS_DataLake_MIAuth_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_HTTP_AnonAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"BaseURL": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "HttpServer",
+				"typeProperties": {
+					"url": "[parameters('Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_REST_AnonAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"BaseURL": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "RestService",
+				"typeProperties": {
+					"url": "[parameters('Ingest_LS_REST_AnonAuth_properties_typeProperties_url')]",
+					"enableServerCertificateValidation": true,
+					"authenticationType": "Anonymous"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_SQLDB_MIAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSHostName": {
+						"type": "string"
+					},
+					"LSDatabaseName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"connectionString": "[parameters('Ingest_LS_SQLDB_MIAuth_connectionString')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FunctionalTestingTrigger')]",
+			"type": "Microsoft.DataFactory/factories/triggers",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Used for functional testing of the framework in a dedicated environment.",
+				"annotations": [
+					"procfwk"
+				],
+				"runtimeState": "Stopped",
+				"pipelines": [],
+				"type": "ScheduleTrigger",
+				"typeProperties": {
+					"recurrence": {
+						"frequency": "Hour",
+						"interval": 2,
+						"startTime": "2020-04-06T15:00:00Z",
+						"timeZone": "UTC"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/GetSetMetadata')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Single generic dataset used to get and set all database metadata.",
+				"linkedServiceName": {
+					"referenceName": "Common_LS_cumulusdatabase",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Cumulus"
+				},
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Common"
+				],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Common_LS_cumulusdatabase')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_Binary_HTTP_AnonAuth')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_HTTP_AnonAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"BaseURL": {
+							"value": "@dataset().DSBaseUrl",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DSBaseUrl": {
+						"type": "string"
+					},
+					"DSRelativeUrl": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().DSRelativeUrl",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_HTTP_AnonAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DataLake_Binary')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_DataLake_MIAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"LSStorageName": {
+							"value": "@dataset().DSStorageName",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DSDirectory": {
+						"type": "string"
+					},
+					"DSFileName": {
+						"type": "string"
+					},
+					"DSStorageName": {
+						"type": "string"
+					},
+					"DSContainerName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().DSFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().DSDirectory",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().DSContainerName",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_DataLake_MIAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DataLake_Csv')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_DataLake_MIAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"LSStorageName": {
+							"value": "@dataset().DSStorageName",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DSFileName": {
+						"type": "string"
+					},
+					"DSDirectoryName": {
+						"type": "string"
+					},
+					"DSContainerName": {
+						"type": "string"
+					},
+					"DSStorageName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().DSFileName,'.csv')",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().DSDirectoryName",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().DSContainerName",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_DataLake_MIAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DataLake_Excel')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_DataLake_MIAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"LSStorageName": {
+							"value": "@dataset().DSStorageName",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DSSheetName": {
+						"type": "string"
+					},
+					"DSContainerName": {
+						"type": "string"
+					},
+					"DSDirectoryName": {
+						"type": "string"
+					},
+					"DSFileName": {
+						"type": "string"
+					},
+					"DSStorageName": {
+						"type": "string"
+					},
+					"DSCellRange": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "Excel",
+				"typeProperties": {
+					"sheetName": {
+						"value": "@dataset().DSSheetName",
+						"type": "Expression"
+					},
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().DSFileName",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().DSDirectoryName",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().DSContainerName",
+							"type": "Expression"
+						}
+					},
+					"range": {
+						"value": "@dataset().DSCellRange",
+						"type": "Expression"
+					},
+					"firstRowAsHeader": true
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_DataLake_MIAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DataLake_JSON')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_DataLake_MIAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"LSStorageName": "@dataset().DSStorageName"
+					}
+				},
+				"parameters": {
+					"DSStorageName": {
+						"type": "string"
+					},
+					"DSContainerName": {
+						"type": "string"
+					},
+					"DSDirectoryName": {
+						"type": "string"
+					},
+					"DSFileName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().DSFileName,'.json')",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().DSDirectoryName",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().DSContainerName",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_DataLake_MIAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_DataLake_Parquet')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_DataLake_MIAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"LSStorageName": {
+							"value": "@dataset().DSStorageName",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DSStorageName": {
+						"type": "string"
+					},
+					"DSContainerName": {
+						"type": "string"
+					},
+					"DSDirectoryName": {
+						"type": "string"
+					},
+					"DSFileName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@concat(dataset().DSFileName,'.parquet')",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().DSDirectoryName",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().DSContainerName",
+							"type": "Expression"
+						}
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_DataLake_MIAuth')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_JSON_HTTP_AnonAuth')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_HTTP_AnonAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"BaseURL": {
+							"value": "@dataset().BaseURL",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"RelativeURL": {
+						"type": "string"
+					},
+					"BaseURL": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "HttpServerLocation",
+						"relativeUrl": {
+							"value": "@dataset().RelativeURL",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Ingest_LS_HTTP_AnonAuth')]"
+			]
+		}
+	]
+}

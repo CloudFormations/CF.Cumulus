@@ -1,0 +1,345 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "cfcumulusdevadfuks25"
+		},
+		"Common_LS_cumulusdatabase_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Common_LS_cumulusdatabase'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks01.database.windows.net;Initial Catalog=metadata-db"
+		},
+		"Ingest_LS_Oracle_SIDAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_Oracle_SIDAuth'",
+			"defaultValue": "host=@{linkedService().LSHostname};port=@{linkedService().LSPortNumber};sid=@{linkedService().LSOracleSid};user id=@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_SQLDB_MIAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLDB_MIAuth'",
+			"defaultValue": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_SQLServer_SQLAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLServer_SQLAuth'",
+			"defaultValue": "Integrated Security=False;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_SQLServer_WinAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLServer_WinAuth'",
+			"defaultValue": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
+		},
+		"Common_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
+			"type": "string",
+			"defaultValue": "@linkedService().ClusterId"
+		},
+		"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://cfcdemodevfuncuks01.azurewebsites.net"
+		},
+		"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
+			"type": "string",
+			"defaultValue": "https://cfcdemodevkvuks01.vault.azure.net/"
+		},
+		"Ingest_LS_AmazonS3_AKAuth_properties_typeProperties_accessKeyId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().AccessKeyId}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSServicePrincipalName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_tenant": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSTenant}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSServicePrincipalID}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUserName}"
+		},
+		"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{concat('https://',linkedService().LSStorageName,'.dfs.core.windows.net/')}"
+		},
+		"Ingest_LS_Dynamics_SPAuth_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().ServicePrincipalId}"
+		},
+		"Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().ServicePrincipalId}"
+		},
+		"Ingest_LS_FileServer_UserAuth_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_FileServer_UserAuth_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUserName}"
+		},
+		"Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().BaseURL}"
+		},
+		"Ingest_LS_Jira_UserAuth_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_Jira_UserAuth_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUserName}"
+		},
+		"Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{concat(\n    '(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=',\n    linkedService().LSHostname,\n    ')(PORT=',\n    linkedService().LSPortNumber,\n    '))(CONNECT_DATA=(SID=',\n    linkedService().LSOracleSid,')))'\n    )}"
+		},
+		"Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_REST_AnonAuth_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "@{linkedService().BaseURL}"
+		},
+		"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_Salesforce_OAuth_properties_typeProperties_environmentUrl": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSEnvironmentUrl}"
+		},
+		"Ingest_LS_Salesforce_OAuth_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSClientId}"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "cfcumulusdevadfuks25_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Common_LS_cumulusdatabase_connectionString": {
+						"value": "[parameters('Common_LS_cumulusdatabase_connectionString')]"
+					},
+					"Ingest_LS_SQLDB_MIAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_SQLDB_MIAuth_connectionString')]"
+					},
+					"Common_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId": {
+						"value": "[parameters('Common_LS_Databricks_Cluster_MIAuth_properties_typeProperties_existingClusterId')]"
+					},
+					"Common_LS_cumuluskeys_properties_typeProperties_baseUrl": {
+						"value": "[parameters('Common_LS_cumuluskeys_properties_typeProperties_baseUrl')]"
+					},
+					"Ingest_LS_DataLake_MIAuth_properties_typeProperties_url": {
+						"value": "[parameters('Ingest_LS_DataLake_MIAuth_properties_typeProperties_url')]"
+					},
+					"Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url": {
+						"value": "[parameters('Ingest_LS_HTTP_AnonAuth_properties_typeProperties_url')]"
+					},
+					"Ingest_LS_REST_AnonAuth_properties_typeProperties_url": {
+						"value": "[parameters('Ingest_LS_REST_AnonAuth_properties_typeProperties_url')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "cfcumulusdevadfuks25_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"Ingest_LS_Oracle_SIDAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_Oracle_SIDAuth_connectionString')]"
+					},
+					"Ingest_LS_SQLServer_SQLAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_SQLServer_SQLAuth_connectionString')]"
+					},
+					"Ingest_LS_SQLServer_WinAuth_connectionString": {
+						"value": "[parameters('Ingest_LS_SQLServer_WinAuth_connectionString')]"
+					},
+					"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
+						"value": "[parameters('Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl')]"
+					},
+					"Ingest_LS_AmazonS3_AKAuth_properties_typeProperties_accessKeyId": {
+						"value": "[parameters('Ingest_LS_AmazonS3_AKAuth_properties_typeProperties_accessKeyId')]"
+					},
+					"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_server": {
+						"value": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_server')]"
+					},
+					"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_database": {
+						"value": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_database')]"
+					},
+					"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_username": {
+						"value": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_username')]"
+					},
+					"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_tenant": {
+						"value": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_tenant')]"
+					},
+					"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_servicePrincipalId": {
+						"value": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_servicePrincipalId')]"
+					},
+					"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_server": {
+						"value": "[parameters('Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_server')]"
+					},
+					"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_database": {
+						"value": "[parameters('Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_database')]"
+					},
+					"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_username": {
+						"value": "[parameters('Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_username')]"
+					},
+					"Ingest_LS_Dynamics_SPAuth_properties_typeProperties_servicePrincipalId": {
+						"value": "[parameters('Ingest_LS_Dynamics_SPAuth_properties_typeProperties_servicePrincipalId')]"
+					},
+					"Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId": {
+						"value": "[parameters('Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId')]"
+					},
+					"Ingest_LS_FileServer_UserAuth_properties_typeProperties_host": {
+						"value": "[parameters('Ingest_LS_FileServer_UserAuth_properties_typeProperties_host')]"
+					},
+					"Ingest_LS_FileServer_UserAuth_properties_typeProperties_userId": {
+						"value": "[parameters('Ingest_LS_FileServer_UserAuth_properties_typeProperties_userId')]"
+					},
+					"Ingest_LS_Jira_UserAuth_properties_typeProperties_host": {
+						"value": "[parameters('Ingest_LS_Jira_UserAuth_properties_typeProperties_host')]"
+					},
+					"Ingest_LS_Jira_UserAuth_properties_typeProperties_username": {
+						"value": "[parameters('Ingest_LS_Jira_UserAuth_properties_typeProperties_username')]"
+					},
+					"Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_server": {
+						"value": "[parameters('Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_server')]"
+					},
+					"Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_username": {
+						"value": "[parameters('Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_username')]"
+					},
+					"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_server": {
+						"value": "[parameters('Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_server')]"
+					},
+					"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_database": {
+						"value": "[parameters('Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_database')]"
+					},
+					"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_userName": {
+						"value": "[parameters('Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_userName')]"
+					},
+					"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
+						"value": "[parameters('Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName')]"
+					},
+					"Ingest_LS_Salesforce_OAuth_properties_typeProperties_environmentUrl": {
+						"value": "[parameters('Ingest_LS_Salesforce_OAuth_properties_typeProperties_environmentUrl')]"
+					},
+					"Ingest_LS_Salesforce_OAuth_properties_typeProperties_clientId": {
+						"value": "[parameters('Ingest_LS_Salesforce_OAuth_properties_typeProperties_clientId')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'cfcumulusdevadfuks25_ArmTemplate_0')]"
+			]
+		},
+		{
+			"name": "cfcumulusdevadfuks25_ArmTemplate_2",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_2.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'cfcumulusdevadfuks25_ArmTemplate_1')]"
+			]
+		},
+		{
+			"name": "cfcumulusdevadfuks25_ArmTemplate_3",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2024-03-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_3.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'cfcumulusdevadfuks25_ArmTemplate_2')]"
+			]
+		}
+	]
+}

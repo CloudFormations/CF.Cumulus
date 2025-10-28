@@ -1,0 +1,2030 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "cfcumulusdevadfuks25"
+		},
+		"Ingest_LS_Oracle_SIDAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_Oracle_SIDAuth'",
+			"defaultValue": "host=@{linkedService().LSHostname};port=@{linkedService().LSPortNumber};sid=@{linkedService().LSOracleSid};user id=@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_SQLServer_SQLAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLServer_SQLAuth'",
+			"defaultValue": "Integrated Security=False;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName};User ID=@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_SQLServer_WinAuth_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Ingest_LS_SQLServer_WinAuth'",
+			"defaultValue": "Integrated Security=True;Data Source=@{linkedService().LSHostName};Initial Catalog=@{linkedService().LSDatabaseName}"
+		},
+		"Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl": {
+			"type": "string",
+			"defaultValue": "https://cfcdemodevfuncuks01.azurewebsites.net"
+		},
+		"Ingest_LS_AmazonS3_AKAuth_properties_typeProperties_accessKeyId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().AccessKeyId}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSServicePrincipalName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_tenant": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSTenant}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSServicePrincipalID}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUserName}"
+		},
+		"Ingest_LS_Dynamics_SPAuth_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().ServicePrincipalId}"
+		},
+		"Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().ServicePrincipalId}"
+		},
+		"Ingest_LS_FileServer_UserAuth_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_FileServer_UserAuth_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUserName}"
+		},
+		"Ingest_LS_Jira_UserAuth_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_Jira_UserAuth_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUserName}"
+		},
+		"Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{concat(\n    '(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=',\n    linkedService().LSHostname,\n    ')(PORT=',\n    linkedService().LSPortNumber,\n    '))(CONNECT_DATA=(SID=',\n    linkedService().LSOracleSid,')))'\n    )}"
+		},
+		"Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_username": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSHostName}"
+		},
+		"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSDatabaseName}"
+		},
+		"Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSUsername}"
+		},
+		"Ingest_LS_Salesforce_OAuth_properties_typeProperties_environmentUrl": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSEnvironmentUrl}"
+		},
+		"Ingest_LS_Salesforce_OAuth_properties_typeProperties_clientId": {
+			"type": "string",
+			"defaultValue": "@{linkedService().LSClientId}"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_REST')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_REST_AnonAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"BaseURL": {
+							"value": "@dataset().BaseURL",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"BaseURL": {
+						"type": "string"
+					},
+					"RelativeURL": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "RestResource",
+				"typeProperties": {
+					"relativeUrl": {
+						"value": "@dataset().RelativeURL",
+						"type": "Expression"
+					}
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_DS_SQLDB_MIAuth')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Ingest_LS_SQLDB_MIAuth",
+					"type": "LinkedServiceReference",
+					"parameters": {
+						"LSHostName": {
+							"value": "@dataset().DSHostname",
+							"type": "Expression"
+						},
+						"LSDatabaseName": {
+							"value": "@dataset().DSDatabaseName",
+							"type": "Expression"
+						}
+					}
+				},
+				"parameters": {
+					"DSHostname": {
+						"type": "string"
+					},
+					"DSDatabaseName": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Ingest"
+				},
+				"annotations": [],
+				"type": "AzureSqlTable",
+				"schema": [],
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Common_LS_cumulusfunctions')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Interact with the Azure Functions App used as middle ware when making requests to Worker pipelines. Authentication done at the Function App level.",
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Common"
+				],
+				"type": "AzureFunction",
+				"typeProperties": {
+					"functionAppUrl": "[parameters('Common_LS_cumulusfunctions_properties_typeProperties_functionAppUrl')]",
+					"authentication": "Anonymous",
+					"functionKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "cumulusfunctionsKey"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_AmazonS3_AKAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"ServiceURL": {
+						"type": "string"
+					},
+					"SecretKeyName": {
+						"type": "string"
+					},
+					"AccessKeyId": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AmazonS3",
+				"typeProperties": {
+					"serviceUrl": "@{linkedService().ServiceURL}",
+					"accessKeyId": "[parameters('Ingest_LS_AmazonS3_AKAuth_properties_typeProperties_accessKeyId')]",
+					"secretAccessKey": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().SecretKeyName",
+							"type": "Expression"
+						}
+					},
+					"authenticationType": "AccessKey"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_AzurePostgreSQL_SPAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSServicePrincipalKey": {
+						"type": "String"
+					},
+					"LSHostName": {
+						"type": "String"
+					},
+					"LSPortNumber": {
+						"type": "String"
+					},
+					"LSDatabaseName": {
+						"type": "String"
+					},
+					"LSServicePrincipalName": {
+						"type": "String"
+					},
+					"LSTenant": {
+						"type": "String"
+					},
+					"LSServicePrincipalID": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"version": "2.0",
+				"typeProperties": {
+					"server": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_server')]",
+					"port": "@{linkedService().LSPortNumber}",
+					"database": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_database')]",
+					"sslMode": 2,
+					"username": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_username')]",
+					"authenticationType": "ServicePrincipal",
+					"tenant": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_tenant')]",
+					"servicePrincipalId": "[parameters('Ingest_LS_AzurePostgreSQL_SPAuth_properties_typeProperties_servicePrincipalId')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_AzurePostgreSQL_SQLAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSHostName": {
+						"type": "String"
+					},
+					"LSDatabaseName": {
+						"type": "String"
+					},
+					"LSUserName": {
+						"type": "String"
+					},
+					"LSPassword": {
+						"type": "String"
+					},
+					"LSPortNumber": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzurePostgreSql",
+				"version": "2.0",
+				"typeProperties": {
+					"server": "[parameters('Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_server')]",
+					"port": "@{linkedService().LSPortNumber}",
+					"database": "[parameters('Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_database')]",
+					"sslMode": 2,
+					"username": "[parameters('Ingest_LS_AzurePostgreSQL_SQLAuth_properties_typeProperties_username')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().LSPassword",
+							"type": "Expression"
+						}
+					},
+					"authenticationType": "Basic"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Dynamics_SPAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"ServiceURI": {
+						"type": "string"
+					},
+					"ServicePrincipalId": {
+						"type": "string"
+					},
+					"ServicePrincipalKey": {
+						"type": "String"
+					}
+				},
+				"annotations": [],
+				"type": "DynamicsCrm",
+				"typeProperties": {
+					"deploymentType": "Online",
+					"serviceUri": "@{linkedService().ServiceURI}",
+					"authenticationType": "AADServicePrincipal",
+					"servicePrincipalId": "[parameters('Ingest_LS_Dynamics_SPAuth_properties_typeProperties_servicePrincipalId')]",
+					"servicePrincipalCredential": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().ServicePrincipalKey",
+							"type": "Expression"
+						}
+					},
+					"servicePrincipalCredentialType": "ServicePrincipalKey"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Dynamics_SPNAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"ServiceURI": {
+						"type": "string"
+					},
+					"ServicePrincipalId": {
+						"type": "string"
+					},
+					"ServicePrincipalKVSecretName": {
+						"type": "string"
+					}
+				},
+				"annotations": [
+					"CF.Cumulus",
+					"Cloud Formations",
+					"Ingest"
+				],
+				"type": "DynamicsCrm",
+				"typeProperties": {
+					"deploymentType": "Online",
+					"serviceUri": "@{linkedService().ServiceURI}",
+					"authenticationType": "AADServicePrincipal",
+					"servicePrincipalId": "[parameters('Ingest_LS_Dynamics_SPNAuth_properties_typeProperties_servicePrincipalId')]",
+					"servicePrincipalCredential": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().ServicePrincipalKVSecretName",
+							"type": "Expression"
+						}
+					},
+					"servicePrincipalCredentialType": "ServicePrincipalKey"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_FileServer_UserAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSHostName": {
+						"type": "string"
+					},
+					"LSUserName": {
+						"type": "string"
+					},
+					"LSPassword": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "FileServer",
+				"typeProperties": {
+					"host": "[parameters('Ingest_LS_FileServer_UserAuth_properties_typeProperties_host')]",
+					"userId": "[parameters('Ingest_LS_FileServer_UserAuth_properties_typeProperties_userId')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "vmadminpassword"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Jira_UserAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "Jira",
+				"parameters": {
+					"LSHostName": {
+						"type": "string"
+					},
+					"LSUserName": {
+						"type": "string"
+					},
+					"LSPassword": {
+						"type": "string"
+					},
+					"LSPortNumber": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"typeProperties": {
+					"host": "[parameters('Ingest_LS_Jira_UserAuth_properties_typeProperties_host')]",
+					"port": "@{linkedService().LSPortNumber}",
+					"username": "[parameters('Ingest_LS_Jira_UserAuth_properties_typeProperties_username')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": "@{linkedService().LSPassword}"
+					},
+					"useEncryptedEndpoints": true,
+					"useHostVerification": true,
+					"usePeerVerification": true
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Oracle_SIDAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSHostname": {
+						"type": "string"
+					},
+					"LSUsername": {
+						"type": "string"
+					},
+					"LSOracleSid": {
+						"type": "string"
+					},
+					"LSPortNumber": {
+						"type": "string"
+					},
+					"LSPassword": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Oracle",
+				"typeProperties": {
+					"connectionString": "[parameters('Ingest_LS_Oracle_SIDAuth_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().LSPassword",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Oracle_V2_SIDAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSHostname": {
+						"type": "string"
+					},
+					"LSUsername": {
+						"type": "string"
+					},
+					"LSOracleSid": {
+						"type": "string"
+					},
+					"LSPortNumber": {
+						"type": "string"
+					},
+					"LSPassword": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Oracle",
+				"version": "2.0",
+				"typeProperties": {
+					"server": "[parameters('Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_server')]",
+					"authenticationType": "Basic",
+					"username": "[parameters('Ingest_LS_Oracle_V2_SIDAuth_properties_typeProperties_username')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().LSPassword",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_SQLDB_SQLAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSHostName": {
+						"type": "string"
+					},
+					"LSDatabaseName": {
+						"type": "string"
+					},
+					"LSUsername": {
+						"type": "string"
+					},
+					"LSPassword": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "AzureSqlDatabase",
+				"typeProperties": {
+					"server": "[parameters('Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_server')]",
+					"database": "[parameters('Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": false,
+					"authenticationType": "SQL",
+					"userName": "[parameters('Ingest_LS_SQLDB_SQLAuth_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().LSPassword",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_SQLServer_SQLAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSHostName": {
+						"type": "string"
+					},
+					"LSDatabaseName": {
+						"type": "string"
+					},
+					"LSUsername": {
+						"type": "string"
+					},
+					"LSPassword": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('Ingest_LS_SQLServer_SQLAuth_connectionString')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().LSPassword",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_SQLServer_WinAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSHostName": {
+						"type": "string"
+					},
+					"LSDatabaseName": {
+						"type": "string"
+					},
+					"LSUsername": {
+						"type": "string"
+					},
+					"LSPassword": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"connectionString": "[parameters('Ingest_LS_SQLServer_WinAuth_connectionString')]",
+					"userName": "[parameters('Ingest_LS_SQLServer_WinAuth_properties_typeProperties_userName')]",
+					"password": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().LSPassword",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_LS_Salesforce_OAuth')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"parameters": {
+					"LSClientId": {
+						"type": "string"
+					},
+					"LSAPIVersion": {
+						"type": "string"
+					},
+					"LSEnvironmentUrl": {
+						"type": "string"
+					},
+					"LSSecretName": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "SalesforceV2",
+				"typeProperties": {
+					"environmentUrl": "[parameters('Ingest_LS_Salesforce_OAuth_properties_typeProperties_environmentUrl')]",
+					"clientId": "[parameters('Ingest_LS_Salesforce_OAuth_properties_typeProperties_clientId')]",
+					"clientSecret": {
+						"type": "AzureKeyVaultSecret",
+						"store": {
+							"referenceName": "Common_LS_cumuluskeys",
+							"type": "LinkedServiceReference"
+						},
+						"secretName": {
+							"value": "@linkedService().LSSecretName",
+							"type": "Expression"
+						}
+					},
+					"apiVersion": "@{linkedService().LSAPIVersion}",
+					"authenticationType": "OAuth2ClientCredential"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Check For Running Pipeline')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "For a given pipeline and optional batch name establish if a pipeline run is already in progress. Throw an exception if it it.",
+				"activities": [
+					{
+						"name": "Filter Running Pipelines",
+						"description": "Filter the pipeline runs results for pipelines that exclude the current triggered run and that are currently running (in progress or queued).",
+						"type": "Filter",
+						"dependsOn": [
+							{
+								"activity": "Switch For Orchestrator Type",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@variables('PipelineRuns')",
+								"type": "Expression"
+							},
+							"condition": {
+								"value": "@and(not(equals(item().runId,pipeline().parameters.ThisRunId)),or(equals(item().status,'InProgress'),equals(item().status,'Queued')))",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Get Framework Orchestrator Details",
+						"description": "Using the metadata orchestrators return details about the resource running the framework pipelines.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[control].[GetFrameworkOrchestratorDetails]",
+								"storedProcedureParameters": {
+									"CallingOrchestratorName": {
+										"type": "String",
+										"value": {
+											"value": "@pipeline().DataFactory",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "GetSetMetadata",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Get Query Run Days Value",
+						"description": "Using the metadata properties table return the run days value to provide the API request with a date range for pipeline executions.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[control].[GetPropertyValue]",
+								"storedProcedureParameters": {
+									"PropertyName": {
+										"type": "String",
+										"value": "PreviousPipelineRunsQueryRange"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "GetSetMetadata",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "If Pipeline Is Running",
+						"description": "If the running pipeline count is greater than or equal to one.\nTrue = raise an exception.",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "If Using Batch Executions",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greaterOrEquals(int(variables('RunCount')),1)",
+								"type": "Expression"
+							},
+							"ifTrueActivities": [
+								{
+									"name": "Throw Exception - Pipeline Already Running",
+									"description": "Raise an exception to stop the new trigger while a run is already in progress.",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": {
+											"value": "@concat('Provided pipeline name (',pipeline().parameters.PipelineName,') still has a run in progress or queued given the query range parameters set in the properties table.')",
+											"type": "Expression"
+										},
+										"errorCode": "16"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Get Execution Batch Status",
+						"description": "Using the metadata properties table return the flag to indicate if batch execution setting are enabled or disabled.",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[control].[GetPropertyValue]",
+								"storedProcedureParameters": {
+									"PropertyName": {
+										"type": "String",
+										"value": "UseExecutionBatches"
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "GetSetMetadata",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "If Using Batch Executions",
+						"description": "True = batch executions are enabled.\nFalse = batch execution are disabled.",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "Get Execution Batch Status",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Filter Running Pipelines",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@equals(activity('Get Execution Batch Status').output.firstRow.PropertyValue,string(1))",
+								"type": "Expression"
+							},
+							"ifFalseActivities": [
+								{
+									"name": "Set Run Count Without Batch",
+									"description": "Set the pipelines running count variable to be tested later.",
+									"type": "SetVariable",
+									"dependsOn": [],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "RunCount",
+										"value": {
+											"value": "@string(activity('Filter Running Pipelines').output.FilteredItemsCount)",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"ifTrueActivities": [
+								{
+									"name": "Filter for Batch Name",
+									"description": "Further filter the return pipeline runs for any running pipelines with the same batch name value.",
+									"type": "Filter",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"items": {
+											"value": "@activity('Filter Running Pipelines').output.value",
+											"type": "Expression"
+										},
+										"condition": {
+											"value": "@equals(item().parameters.BatchName,pipeline().parameters.BatchName)",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "Set Run Count for Batch",
+									"description": "Set the resulting pipeline running count variable to be tested later.",
+									"type": "SetVariable",
+									"dependsOn": [
+										{
+											"activity": "Filter for Batch Name",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"variableName": "RunCount",
+										"value": {
+											"value": "@string(activity('Filter for Batch Name').output.FilteredItemsCount)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Set Subscription Id",
+						"description": "Set the subscription Id value to a local variable for use in various downstream activities.",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get Framework Orchestrator Details",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "SubscriptionId",
+							"value": {
+								"value": "@activity('Get Framework Orchestrator Details').output.firstRow.SubscriptionId",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Resource Group Name",
+						"description": "Set the resource group name value to a local variable for use in various downstream activities.",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get Framework Orchestrator Details",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "ResourceGroupName",
+							"value": {
+								"value": "@activity('Get Framework Orchestrator Details').output.firstRow.ResourceGroupName",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Set Orchestrator Type",
+						"description": "Set the orchestrator type value to a local variable for use in various downstream activities.",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get Framework Orchestrator Details",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "OrchestratorType",
+							"value": {
+								"value": "@toUpper(activity('Get Framework Orchestrator Details').output.firstRow.OrchestratorType)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "Switch For Orchestrator Type",
+						"description": "Switch and handle requests for both Azure Data Factory (ADF) and Azure Synapse Analytics (SYN).",
+						"type": "Switch",
+						"dependsOn": [
+							{
+								"activity": "Set Orchestrator Type",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set Query Run Days",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set Resource Group Name",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set Subscription Id",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"on": {
+								"value": "@variables('OrchestratorType')",
+								"type": "Expression"
+							},
+							"cases": [
+								{
+									"value": "ADF",
+									"activities": [
+										{
+											"name": "Check for Valid ADF Pipeline Name",
+											"description": "Use the Azure Management API to return and establish if the framework pipeline exists in the target Data Factory instance, including being deployed.",
+											"type": "WebActivity",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "7.00:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"method": "GET",
+												"headers": {},
+												"url": {
+													"value": "https://management.azure.com/subscriptions/@{variables('SubscriptionId')}/resourceGroups/@{variables('ResourceGroupName')}/providers/Microsoft.DataFactory/factories/@{pipeline().DataFactory}/pipelines/@{pipeline().parameters.PipelineName}?api-version=2018-06-01",
+													"type": "Expression"
+												},
+												"authentication": {
+													"type": "MSI",
+													"resource": "https://management.core.windows.net/"
+												}
+											}
+										},
+										{
+											"name": "Get ADF Pipeline Runs",
+											"description": "Use the Azure Management API to return a list of data factory pipeline runs within the given time window.",
+											"type": "WebActivity",
+											"dependsOn": [
+												{
+													"activity": "Check for Valid ADF Pipeline Name",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "7.00:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"method": "POST",
+												"headers": {},
+												"url": {
+													"value": "https://management.azure.com/subscriptions/@{variables('SubscriptionId')}/resourceGroups/@{variables('ResourceGroupName')}/providers/Microsoft.DataFactory/factories/@{pipeline().DataFactory}/queryPipelineRuns?api-version=2018-06-01",
+													"type": "Expression"
+												},
+												"body": {
+													"value": "{\n  \"lastUpdatedAfter\": \"@{adddays(utcnow(),int(variables('QueryRunDays')))}\",\n  \"lastUpdatedBefore\": \"@{utcnow()}\",\n  \"filters\": [\n    {\n      \"operand\": \"PipelineName\",\n      \"operator\": \"Equals\",\n      \"values\": [\n        \"@{pipeline().parameters.PipelineName}\"\n      ]\n    }\n  ]\n}",
+													"type": "Expression"
+												},
+												"authentication": {
+													"type": "MSI",
+													"resource": "https://management.core.windows.net/"
+												}
+											}
+										},
+										{
+											"name": "Set ADF Runs Output",
+											"description": "Set output to local array for use in downstream filtering and pipeline checks. Use the same array output for both switch cases.",
+											"type": "SetVariable",
+											"dependsOn": [
+												{
+													"activity": "Get ADF Pipeline Runs",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"variableName": "PipelineRuns",
+												"value": {
+													"value": "@activity('Get ADF Pipeline Runs').output.value",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								},
+								{
+									"value": "SYN",
+									"activities": [
+										{
+											"name": "Check for Valid SYN Pipeline Name",
+											"description": "Use the Azure Management API to return and establish if the framework pipeline exists in the target Synapse instance, including being deployed.\n\nSee: https://docs.microsoft.com/en-us/rest/api/synapse/data-plane/pipeline/getpipeline",
+											"type": "WebActivity",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "7.00:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"method": "GET",
+												"headers": {},
+												"url": {
+													"value": "https://@{pipeline().DataFactory}.dev.azuresynapse.net/pipelines/@{pipeline().parameters.PipelineName}?api-version=2019-06-01-preview",
+													"type": "Expression"
+												},
+												"authentication": {
+													"type": "MSI",
+													"resource": "https://management.core.windows.net/"
+												}
+											}
+										},
+										{
+											"name": "Get SYN Pipeline Runs",
+											"description": "Use the Azure Management API to return a list of synapse pipeline runs within the given time window.\n\nSee: https://docs.microsoft.com/en-us/rest/api/synapse/data-plane/pipelinerun/querypipelinerunsbyworkspace",
+											"type": "WebActivity",
+											"dependsOn": [
+												{
+													"activity": "Check for Valid SYN Pipeline Name",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "7.00:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"method": "POST",
+												"headers": {},
+												"url": {
+													"value": "https://@{pipeline().DataFactory}.dev.azuresynapse.net/queryPipelineRuns?api-version=2019-06-01-preview",
+													"type": "Expression"
+												},
+												"body": {
+													"value": "{\n  \"lastUpdatedAfter\": \"@{adddays(utcnow(),int(variables('QueryRunDays')))}\",\n  \"lastUpdatedBefore\": \"@{utcnow()}\",\n  \"filters\": [\n    {\n      \"operand\": \"PipelineName\",\n      \"operator\": \"Equals\",\n      \"values\": [\n        \"@{pipeline().parameters.PipelineName}\"\n      ]\n    }\n  ]\n}",
+													"type": "Expression"
+												},
+												"authentication": {
+													"type": "MSI",
+													"resource": "https://management.core.windows.net/"
+												}
+											}
+										},
+										{
+											"name": "Set SYN Runs Output",
+											"description": "Set output to local array for use in downstream filtering and pipeline checks. Use the same array output for both switch cases.",
+											"type": "SetVariable",
+											"dependsOn": [
+												{
+													"activity": "Get SYN Pipeline Runs",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"variableName": "PipelineRuns",
+												"value": {
+													"value": "@activity('Get SYN Pipeline Runs').output.value",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							],
+							"defaultActivities": [
+								{
+									"name": "Throw Exception - Invalid Orchestrator Type",
+									"description": "Throw exception if switch cases are not met.",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": {
+											"value": "@concat('Invalid orchestrator type provided. Unable to check pipeline running state.')",
+											"type": "Expression"
+										},
+										"errorCode": "16"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Set Query Run Days",
+						"description": "Set the query run days value to a local variable for use in various downstream activities.",
+						"type": "SetVariable",
+						"dependsOn": [
+							{
+								"activity": "Get Query Run Days Value",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "QueryRunDays",
+							"value": {
+								"value": "@activity('Get Query Run Days Value').output.firstRow.PropertyValue",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"BatchName": {
+						"type": "string",
+						"defaultValue": "NotUsed"
+					},
+					"PipelineName": {
+						"type": "string"
+					},
+					"ThisRunId": {
+						"type": "string"
+					}
+				},
+				"variables": {
+					"SubscriptionId": {
+						"type": "String"
+					},
+					"RunCount": {
+						"type": "String"
+					},
+					"ResourceGroupName": {
+						"type": "String"
+					},
+					"OrchestratorType": {
+						"type": "String"
+					},
+					"QueryRunDays": {
+						"type": "String"
+					},
+					"PipelineRuns": {
+						"type": "Array"
+					}
+				},
+				"folder": {
+					"name": "Cumulus.Utils"
+				},
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control",
+					"Running Pipeline Check"
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_Unpacked_File')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Target File Type",
+						"type": "Switch",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"on": {
+								"value": "@json(string(pipeline().parameters.SourceQuery)).ExtensionType",
+								"type": "Expression"
+							},
+							"cases": [
+								{
+									"value": "csv",
+									"activities": [
+										{
+											"name": "Copy Excel Sheet to csv",
+											"type": "Copy",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"source": {
+													"type": "ExcelSource",
+													"storeSettings": {
+														"type": "AzureBlobFSReadSettings",
+														"recursive": true,
+														"enablePartitionDiscovery": false
+													}
+												},
+												"sink": {
+													"type": "DelimitedTextSink",
+													"storeSettings": {
+														"type": "AzureBlobFSWriteSettings"
+													},
+													"formatSettings": {
+														"type": "DelimitedTextWriteSettings",
+														"quoteAllText": true,
+														"fileExtension": ".txt"
+													}
+												},
+												"enableStaging": false,
+												"translator": {
+													"type": "TabularTranslator",
+													"typeConversion": true,
+													"typeConversionSettings": {
+														"allowDataTruncation": true,
+														"treatBooleanAsNumber": false
+													}
+												}
+											},
+											"inputs": [
+												{
+													"referenceName": "Ingest_DS_DataLake_Excel",
+													"type": "DatasetReference",
+													"parameters": {
+														"DSSheetName": {
+															"value": "@json(string(pipeline().parameters.SourceQuery)).SheetName",
+															"type": "Expression"
+														},
+														"DSContainerName": {
+															"value": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageContainer",
+															"type": "Expression"
+														},
+														"DSDirectoryName": {
+															"value": "@pipeline().parameters.DirectoryName",
+															"type": "Expression"
+														},
+														"DSFileName": {
+															"value": "@concat(json(string(pipeline().parameters.IngestPayload)).DatasetDisplayName,'.',json(string(pipeline().parameters.IngestPayload)).ExtensionType)",
+															"type": "Expression"
+														},
+														"DSStorageName": {
+															"value": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageName",
+															"type": "Expression"
+														},
+														"DSCellRange": {
+															"value": "@json(string(pipeline().parameters.SourceQuery)).CellRange",
+															"type": "Expression"
+														}
+													}
+												}
+											],
+											"outputs": [
+												{
+													"referenceName": "Ingest_DS_DataLake_Csv",
+													"type": "DatasetReference",
+													"parameters": {
+														"DSFileName": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageName",
+														"DSDirectoryName": "@json(string(pipeline().parameters.IngestPayload)).TargetStorageContainer",
+														"DSContainerName": "@concat(     json(string(pipeline().parameters.IngestPayload)).ConnectionDisplayName,     '\\staging\\',     json(string(pipeline().parameters.SourceQuery)).SheetName,     '\\'     )",
+														"DSStorageName": "@json(string(pipeline().parameters.SourceQuery)).SheetName"
+													}
+												}
+											]
+										}
+									]
+								}
+							],
+							"defaultActivities": [
+								{
+									"name": "Supported File Type",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": {
+											"value": "@concat('The File type is not currently supported.')",
+											"type": "Expression"
+										},
+										"errorCode": "16"
+									}
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"DirectoryName": {
+						"type": "string"
+					},
+					"SourceQuery": {
+						"type": "string"
+					},
+					"IngestPayload": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Cumulus.Utils"
+				},
+				"annotations": [],
+				"lastPublishTime": "2025-04-11T13:21:10Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Email Sender')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Provide a simple abstract over the send email function with request body item exposed as pipeline parameters.",
+				"activities": [
+					{
+						"name": "Send Email",
+						"description": "Use an Azure Function to perform an SMTP client email send operation.",
+						"type": "AzureFunctionActivity",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:10:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"functionName": "SendEmail",
+							"body": {
+								"value": "{\n\"emailRecipients\": \"@{pipeline().parameters.Recipients}\",\n\"emailCcRecipients\": \"@{pipeline().parameters.CcRecipients}\",\n\"emailBccRecipients\": \"@{pipeline().parameters.BccRecipients}\",\n\"emailSubject\": \"@{pipeline().parameters.Subject}\",\n\"emailBody\": \"@{pipeline().parameters.Body}\",\n\"emailImportance\": \"@{pipeline().parameters.Importance}\"\n}",
+								"type": "Expression"
+							},
+							"headers": {},
+							"method": "POST"
+						},
+						"linkedServiceName": {
+							"referenceName": "Common_LS_cumulusfunctions",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"Recipients": {
+						"type": "string"
+					},
+					"CcRecipients": {
+						"type": "string"
+					},
+					"BccRecipients": {
+						"type": "string"
+					},
+					"Subject": {
+						"type": "string"
+					},
+					"Body": {
+						"type": "string"
+					},
+					"Importance": {
+						"type": "string"
+					}
+				},
+				"folder": {
+					"name": "Cumulus.Utils"
+				},
+				"annotations": [
+					"Cloud Formations",
+					"CF.Cumulus",
+					"Control",
+					"Send Alerts"
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Common_LS_cumulusfunctions')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Ingest_PL_Merge')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Get Merge Payload",
+						"type": "Lookup",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "AzureSqlSource",
+								"sqlReaderStoredProcedureName": "[[ingest].[GetMergePayload]",
+								"storedProcedureParameters": {
+									"DatasetId": {
+										"type": "Int32",
+										"value": {
+											"value": "@pipeline().parameters.DatasetId",
+											"type": "Expression"
+										}
+									}
+								},
+								"queryTimeout": "02:00:00",
+								"partitionOption": "None"
+							},
+							"dataset": {
+								"referenceName": "GetSetMetadata",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						}
+					},
+					{
+						"name": "Switch Compute",
+						"type": "Switch",
+						"dependsOn": [
+							{
+								"activity": "Get Merge Payload",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							},
+							{
+								"activity": "Set Pipeline Run DateTime",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"on": {
+								"value": "@replace(activity('Get Merge Payload').output.firstRow.ComputeLinkedServiceName,'Common_LS_','')",
+								"type": "Expression"
+							},
+							"cases": [
+								{
+									"value": "Databricks_Cluster_MIAuth",
+									"activities": [
+										{
+											"name": "Check Payload Validity Small Databricks Compute",
+											"type": "DatabricksNotebook",
+											"dependsOn": [
+												{
+													"activity": "Get Databricks Compute Id",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"notebookPath": "/Workspace/Shared/Live/files/ingest/ingestpayload/CheckPayloadExecution",
+												"baseParameters": {
+													"Merge Payload": {
+														"value": "@string(activity('Get Merge Payload').output.firstRow)",
+														"type": "Expression"
+													},
+													"Pipeline Run Id": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													},
+													"Pipeline Run DateTime": {
+														"value": "@variables('PipelineRunDateTime')",
+														"type": "Expression"
+													}
+												}
+											},
+											"linkedServiceName": {
+												"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
+												"type": "LinkedServiceReference",
+												"parameters": {
+													"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+													"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+													"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+													"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
+													"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId"
+												}
+											}
+										},
+										{
+											"name": "Raw to Cleansed Execution Small Databricks Compute",
+											"type": "DatabricksNotebook",
+											"dependsOn": [
+												{
+													"activity": "Check Payload Validity Small Databricks Compute",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"notebookPath": "/Workspace/Shared/Live/files/ingest/ingestpayload/IngestExecution",
+												"baseParameters": {
+													"Merge Payload": {
+														"value": "@string(activity('Get Merge Payload').output.firstRow)",
+														"type": "Expression"
+													},
+													"Pipeline Run Id": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													},
+													"Pipeline Run DateTime": {
+														"value": "@variables('PipelineRunDateTime')",
+														"type": "Expression"
+													}
+												}
+											},
+											"linkedServiceName": {
+												"referenceName": "Common_LS_Databricks_Cluster_MIAuth",
+												"type": "LinkedServiceReference",
+												"parameters": {
+													"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+													"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName",
+													"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+													"ClusterId": "@activity('Get Databricks Compute Id').output.pipelineReturnValue.ClusterId",
+													"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId"
+												}
+											}
+										},
+										{
+											"name": "Get Databricks Compute Id",
+											"type": "ExecutePipeline",
+											"dependsOn": [],
+											"policy": {
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"pipeline": {
+													"referenceName": "Get_Databricks_Compute_ID",
+													"type": "PipelineReference"
+												},
+												"waitOnCompletion": true,
+												"parameters": {
+													"Payload": {
+														"value": "@string(activity('Get Merge Payload').output.firstRow)",
+														"type": "Expression"
+													}
+												}
+											}
+										}
+									]
+								},
+								{
+									"value": "Databricks_JobCluster_MIAuth",
+									"activities": [
+										{
+											"name": "Check Payload Validity Small Databricks Compute Job",
+											"type": "DatabricksNotebook",
+											"dependsOn": [],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"notebookPath": "/Workspace/Shared/Live/files/ingest/ingestpayload/CheckPayloadExecution",
+												"baseParameters": {
+													"Merge Payload": {
+														"value": "@string(activity('Get Merge Payload').output.firstRow)",
+														"type": "Expression"
+													},
+													"Pipeline Run Id": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													},
+													"Pipeline Run DateTime": {
+														"value": "@variables('PipelineRunDateTime')",
+														"type": "Expression"
+													}
+												}
+											},
+											"linkedServiceName": {
+												"referenceName": "Common_LS_Databricks_JobCluster_MIAuth",
+												"type": "LinkedServiceReference",
+												"parameters": {
+													"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+													"ClusterVersion": "@activity('Get Merge Payload').output.firstRow.ComputeVersion",
+													"NodeType": "@activity('Get Merge Payload').output.firstRow.ComputeSize",
+													"PythonVersion": "3",
+													"NumWorkers": "@activity('Get Merge Payload').output.firstRow.CountNodes",
+													"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+													"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+													"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName"
+												}
+											}
+										},
+										{
+											"name": "Raw to Cleansed Execution Small Databricks Compute Job",
+											"type": "DatabricksNotebook",
+											"dependsOn": [
+												{
+													"activity": "Check Payload Validity Small Databricks Compute Job",
+													"dependencyConditions": [
+														"Succeeded"
+													]
+												}
+											],
+											"policy": {
+												"timeout": "0.12:00:00",
+												"retry": 0,
+												"retryIntervalInSeconds": 30,
+												"secureOutput": false,
+												"secureInput": false
+											},
+											"userProperties": [],
+											"typeProperties": {
+												"notebookPath": "/Workspace/Shared/Live/files/ingest/ingestpayload/IngestExecution",
+												"baseParameters": {
+													"Merge Payload": {
+														"value": "@string(activity('Get Merge Payload').output.firstRow)",
+														"type": "Expression"
+													},
+													"Pipeline Run Id": {
+														"value": "@pipeline().RunId",
+														"type": "Expression"
+													},
+													"Pipeline Run DateTime": {
+														"value": "@variables('PipelineRunDateTime')",
+														"type": "Expression"
+													}
+												}
+											},
+											"linkedServiceName": {
+												"referenceName": "Common_LS_Databricks_JobCluster_MIAuth",
+												"type": "LinkedServiceReference",
+												"parameters": {
+													"WorkspaceURL": "@activity('Get Merge Payload').output.firstRow.ComputeWorkspaceURL",
+													"ClusterVersion": "@activity('Get Merge Payload').output.firstRow.ComputeVersion",
+													"NodeType": "@activity('Get Merge Payload').output.firstRow.ComputeSize",
+													"PythonVersion": "3",
+													"NumWorkers": "@activity('Get Merge Payload').output.firstRow.CountNodes",
+													"SubscriptionId": "@activity('Get Merge Payload').output.firstRow.SubscriptionId",
+													"ResourceName": "@activity('Get Merge Payload').output.firstRow.ComputeResourceName",
+													"ResourceGroupName": "@activity('Get Merge Payload').output.firstRow.ResourceGroupName"
+												}
+											}
+										}
+									]
+								}
+							],
+							"defaultActivities": [
+								{
+									"name": "Supported Linked Service Type",
+									"type": "Fail",
+									"dependsOn": [],
+									"userProperties": [],
+									"typeProperties": {
+										"message": {
+											"value": "@concat('The Linked Service type and authentication combination is not currently supported.')",
+											"type": "Expression"
+										},
+										"errorCode": "16"
+									}
+								}
+							]
+						}
+					},
+					{
+						"name": "Update Metadata Load Status",
+						"type": "SqlServerStoredProcedure",
+						"dependsOn": [
+							{
+								"activity": "Switch Compute",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"storedProcedureName": "[[ingest].[SetIngestLoadStatus]",
+							"storedProcedureParameters": {
+								"DatasetId": {
+									"value": {
+										"value": "@pipeline().parameters.DatasetId",
+										"type": "Expression"
+									},
+									"type": "Int32"
+								},
+								"IngestStage": {
+									"value": "Cleansed",
+									"type": "String"
+								},
+								"LoadType": {
+									"value": {
+										"value": "@activity('Get Merge Payload').output.firstRow.LoadAction",
+										"type": "Expression"
+									},
+									"type": "String"
+								},
+								"FileLoadDateTime": {
+									"value": {
+										"value": "@activity('Get Merge Payload').output.firstRow.RawLastLoadDate",
+										"type": "Expression"
+									},
+									"type": "DateTime"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "Common_LS_cumulusdatabase",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Set Pipeline Run DateTime",
+						"type": "SetVariable",
+						"dependsOn": [],
+						"policy": {
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"variableName": "PipelineRunDateTime",
+							"value": {
+								"value": "@string(utcnow())",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"parameters": {
+					"DatasetId": {
+						"type": "int"
+					}
+				},
+				"variables": {
+					"PipelineRunDateTime": {
+						"type": "String"
+					},
+					"Clusters": {
+						"type": "Array"
+					}
+				},
+				"folder": {
+					"name": "Cumulus.Ingest"
+				},
+				"annotations": []
+			},
+			"dependsOn": []
+		}
+	]
+}
