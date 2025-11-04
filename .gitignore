@@ -260,6 +260,12 @@ paket-files/
 # PyTest coverage report
 .coverage
 
+# Ignore Python cache files
+**/*/__pycache__/*
+**/*/__pycache__/
+**/*.py[cod]
+**/*.pyc
+
 # Function App Local Publish files
 publishFunctions
 funcapp.zip
