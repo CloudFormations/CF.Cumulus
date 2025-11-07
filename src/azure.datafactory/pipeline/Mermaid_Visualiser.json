@@ -1,0 +1,126 @@
+{
+    "name": "Mermaid_Visualiser",
+    "properties": {
+        "activities": [
+            {
+                "name": "GetMarkdown",
+                "type": "Lookup",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "source": {
+                        "type": "AzureSqlSource",
+                        "sqlReaderStoredProcedureName": "[control].[GetOrchestrationLineage]",
+                        "storedProcedureParameters": {
+                            "BatchName": {
+                                "type": "String",
+                                "value": "ControlDemoDaily"
+                            },
+                            "UseStatusColours": {
+                                "type": "Byte[]",
+                                "value": "1"
+                            }
+                        },
+                        "queryTimeout": "02:00:00",
+                        "partitionOption": "None"
+                    },
+                    "dataset": {
+                        "referenceName": "GetSetMetadata",
+                        "type": "DatasetReference"
+                    }
+                }
+            },
+            {
+                "name": "TempDelete Mermaid",
+                "type": "WebActivity",
+                "dependsOn": [],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "method": "DELETE",
+                    "headers": {
+                        "Authorization": {
+                            "value": "@pipeline().parameters.Auth",
+                            "type": "Expression"
+                        }
+                    },
+                    "url": {
+                        "value": "@pipeline().parameters.DeleteURL",
+                        "type": "Expression"
+                    }
+                }
+            },
+            {
+                "name": "Post Mermaid",
+                "type": "WebActivity",
+                "dependsOn": [
+                    {
+                        "activity": "GetMarkdown",
+                        "dependencyConditions": [
+                            "Succeeded"
+                        ]
+                    },
+                    {
+                        "activity": "TempDelete Mermaid",
+                        "dependencyConditions": [
+                            "Completed"
+                        ]
+                    }
+                ],
+                "policy": {
+                    "timeout": "0.12:00:00",
+                    "retry": 0,
+                    "retryIntervalInSeconds": 30,
+                    "secureOutput": false,
+                    "secureInput": false
+                },
+                "userProperties": [],
+                "typeProperties": {
+                    "method": "PUT",
+                    "headers": {
+                        "Authorization": {
+                            "value": "@pipeline().parameters.Auth",
+                            "type": "Expression"
+                        }
+                    },
+                    "url": {
+                        "value": "@pipeline().parameters.PutURL",
+                        "type": "Expression"
+                    },
+                    "body": {
+                        "value": "@concat('{\n  \"content\": \"',activity('GetMarkdown').output.firstRow.MarkdownOutput, '\"\n}')\n",
+                        "type": "Expression"
+                    }
+                }
+            }
+        ],
+        "parameters": {
+            "Auth": {
+                "type": "string"
+            },
+            "DeleteURL": {
+                "type": "string"
+            },
+            "PutURL": {
+                "type": "string"
+            }
+        },
+        "folder": {
+            "name": "Cumulus.Utils"
+        },
+        "annotations": []
+    }
+}

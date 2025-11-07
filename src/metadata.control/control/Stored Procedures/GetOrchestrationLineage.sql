@@ -41,13 +41,13 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	IF @BatchExists = 0
 	BEGIN
 		RAISERROR('Batch name specified does not exist within metadata.',16,1);
-		RETURN;
+		RETURN '';
 	END
 
 	IF (@3_FilterDataSource = 1 OR @3_FilterDataSourceByType = 1) AND @2_FilterDataset = 1
 	BEGIN
 		RAISERROR('Filtering Data Source and Specific Datasets is not an allowed combination currently.',16,1);
-		RETURN;
+		RETURN '';
 	END
 
 	IF (@3_FilterDataSource = 1 AND @3_FilterDataSourceByType = 1)
@@ -318,9 +318,9 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		SELECT DISTINCT
 			[OrchestratorId],
 			[OrchestratorName],
-			'subgraph ' + [OrchestratorName] + CHAR(13) + 
-			'style ' + [OrchestratorName] + ' fill:#F5F5F5,stroke:#F5F5F5' + CHAR(13) + 
-			'##o' + CAST([OrchestratorId] * 10000 AS VARCHAR) + '##' + CHAR(13) + 'end' + CHAR(13)
+			'subgraph ' + [OrchestratorName] + '\n' + 
+			'style ' + [OrchestratorName] + ' fill:#F5F5F5,stroke:#F5F5F5' + '\n' + 
+			'##o' + CAST([OrchestratorId] * 10000 AS VARCHAR) + '##' + '\n' + 'end' + '\n'
 			 AS OrchestratorSubGraphs
 		FROM
 			@BaseData
@@ -347,9 +347,9 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		(
 		SELECT
 			[OrchestratorId],
-			STRING_AGG('subgraph ' + [StageName] + CHAR(13) + 
-				'style ' + [StageName] + ' fill:#E0E0E0,stroke:#E0E0E0' + CHAR(13) + 
-				'##s' + CAST([StageId] AS VARCHAR) + '##' + CHAR(13) + 'end', CHAR(13)
+			STRING_AGG('subgraph ' + [StageName] + '\n' + 
+				'style ' + [StageName] + ' fill:#E0E0E0,stroke:#E0E0E0' + '\n' + 
+				'##s' + CAST([StageId] AS VARCHAR) + '##' + '\n' + 'end', '\n'
 				) AS 'StageSubGraphs'
 		FROM
 			stages
@@ -465,8 +465,8 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		SELECT
 			BE.[StageId],
 			STRING_AGG(
-				CONCAT('p',CAST(BE.[PipelineId] * 10 AS VARCHAR),'(',BE.[PipelineName],BE.[AdditionalPipelineInfo],')',CHAR(13),
-				'style ','p',CAST(BE.[PipelineId] * 10 AS VARCHAR),' fill:#',LE.[HexColour],',stroke:#',LE.[HexColour],''),CHAR(13)
+				CONCAT('p',CAST(BE.[PipelineId] * 10 AS VARCHAR),'(',BE.[PipelineName],BE.[AdditionalPipelineInfo],')','\n',
+				'style ','p',CAST(BE.[PipelineId] * 10 AS VARCHAR),' fill:#',LE.[HexColour],',stroke:#',LE.[HexColour],''),'\n'
 				) AS 'PipelinesInStage'
 		FROM
 			@BaseData BE
@@ -512,8 +512,8 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		(
 		SELECT DISTINCT
 			BE.[StageId],
-			's' + CAST(BE.[StageId] * 100 AS VARCHAR) + '[' + BE.[StageName] + ']' + CHAR(13) +
-			'style s' + CAST(BE.[StageId] * 100 AS VARCHAR) + ' fill:#' + SNS.HexColour + ',stroke:#'  + SNS.HexColour  + '''' + CHAR(13) AS StageNode
+			's' + CAST(BE.[StageId] * 100 AS VARCHAR) + '[' + BE.[StageName] + ']' + '\n' +
+			'style s' + CAST(BE.[StageId] * 100 AS VARCHAR) + ' fill:#' + SNS.HexColour + ',stroke:#'  + SNS.HexColour  + '''' + '\n' AS StageNode
 		FROM
 			@BaseData BE
 		LEFT JOIN 
@@ -531,7 +531,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	--add stage to pipeline relationships
 	SELECT 
 		@PageContent = @PageContent + 's' + CAST([StageId] * 100 AS VARCHAR) 
-		+ ' --> ' + 'p' + CAST([PipelineId] * 10 AS VARCHAR) + CHAR(13)
+		+ ' --> ' + 'p' + CAST([PipelineId] * 10 AS VARCHAR) + '\n'
 	FROM
 		@BaseData;
  
@@ -560,7 +560,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		(
 		SELECT DISTINCT
 			's' + CAST(b.[StageId] * 100 AS VARCHAR) 
-			+ ' ==> ' + 's' + CAST(n.[NextStageId] * 100 AS VARCHAR) + CHAR(13) AS Content
+			+ ' ==> ' + 's' + CAST(n.[NextStageId] * 100 AS VARCHAR) + '\n' AS Content
 		FROM
 			@BaseData b
 		INNER JOIN nextStage n
@@ -578,7 +578,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	--add pipeline to pipeline relationships
 	;WITH pipelineRelationships AS (
 		SELECT DISTINCT 'p' + CAST(pd.[PipelineId] * 10 AS VARCHAR) 
-			+ ' -.- ' + 'p' + CAST(pd.[DependantPipelineId] * 10 AS VARCHAR) + CHAR(13) AS RelationshipTxt
+			+ ' -.- ' + 'p' + CAST(pd.[DependantPipelineId] * 10 AS VARCHAR) + '\n' AS RelationshipTxt
 		FROM
 		[control].[PipelineDependencies] pd
 		INNER JOIN @BaseData b1
@@ -593,8 +593,8 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		pipelineRelationships;
 	--add batch subgraph
 	SELECT
-		@PageContent = 'subgraph ' + [BatchName] + CHAR(13) +
-		'style ' + @BatchName + ' fill:#DEEBF7,stroke:#DEEBF7' + CHAR(13) + @PageContent
+		@PageContent = 'subgraph ' + [BatchName] + '\n' +
+		'style ' + @BatchName + ' fill:#DEEBF7,stroke:#DEEBF7' + '\n' + @PageContent
 	FROM
 		[control].[Batches]
 	WHERE
@@ -603,17 +603,18 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	SET @PageContent = @PageContent + 'end';
  
 	--add mermaid header
-	DECLARE @PageHeader VARCHAR(1000) = '::: mermaid' + CHAR(13) + 'graph'
+	DECLARE @PageHeader VARCHAR(1000) = '::: mermaid' + '\n' + 'graph'
 	IF @UseStatusColours = 1
 	BEGIN
-		SET @PageHeader = @PageHeader + CHAR(13) + 'subgraph Legend [Pipeline Status]' + CHAR(13) + 'style Legend fill:#FFFFFF,stroke:#FFFFFF' + CHAR(13) + 
-		'success(Success)' + CHAR(13) + 'style success fill:#' + @SuccessColour +',stroke:#' + @SuccessColour + ',color:#FFFFFF' + CHAR(13) + 
-		'failure(Failure)' + CHAR(13) + 'style failure fill:#' + @FailedColour + ',stroke:#' + @FailedColour + ',color:#FFFFFF' + CHAR(13) + 
-		'blocked(Blocked)' + CHAR(13) + 'style blocked fill:#' + @BlockedColour + ',stroke:#' + @BlockedColour + ',color:#FFFFFF' + CHAR(13) + 
+		SET @PageHeader = @PageHeader + '\n' + 'subgraph Legend [Pipeline Status]' + '\n' + 'style Legend fill:#FFFFFF,stroke:#FFFFFF' + '\n' + 
+		'success(Success)' + '\n' + 'style success fill:#' + @SuccessColour +',stroke:#' + @SuccessColour + ',color:#FFFFFF' + '\n' + 
+		'failure(Failure)' + '\n' + 'style failure fill:#' + @FailedColour + ',stroke:#' + @FailedColour + ',color:#FFFFFF' + '\n' + 
+		'blocked(Blocked)' + '\n' + 'style blocked fill:#' + @BlockedColour + ',stroke:#' + @BlockedColour + ',color:#FFFFFF' + '\n' + 
 		'end'
 	END
 	SELECT
-		@PageContent = @PageHeader + CHAR(13) + @PageContent + CHAR(13) + ':::';
+		@PageContent = @PageHeader + '\n' + @PageContent + '\n' + ':::';
 
 	--return output
 	PRINT CAST(@PageContent AS NTEXT);
+	SELECT CAST(@PageContent AS NTEXT) AS MarkdownOutput;
