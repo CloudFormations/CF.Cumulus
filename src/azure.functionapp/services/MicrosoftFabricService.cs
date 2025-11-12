@@ -83,7 +83,6 @@ namespace cloudformations.cumulus.services
 
                         _logger.LogInformation("Resolved workspace Id: " + workspaceId);
                     }
-
                 }
 
                 //resolve pipeline id
@@ -123,13 +122,14 @@ namespace cloudformations.cumulus.services
 
             List<string> parts;
             String pipelineRunId = String.Empty;
+            string pipelineRunLocation;
 
             if (pipeRunResponse.IsCompleted) 
             {
                 _logger.LogInformation("Data pipeline run instance response status: " + pipeRunResponse.Result.StatusCode);
                 _logger.LogDebug(pipeRunResponse.Result.ToString());
 
-                string pipelineRunLocation = pipeRunResponse.Result.Headers.Location.OriginalString;
+                pipelineRunLocation = pipeRunResponse.Result.Headers.Location.OriginalString;
                 parts = pipelineRunLocation.Split('/').ToList();
                 pipelineRunId = parts.Last();
             }
