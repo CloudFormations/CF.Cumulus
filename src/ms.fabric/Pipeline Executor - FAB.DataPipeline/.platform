@@ -2,10 +2,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
     "type": "DataPipeline",
-    "displayName": "Wait 6"
+    "displayName": "Pipeline Executor - FAB"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "f14da1fd-eb3e-a67b-4797-a02ff360c92a"
+    "logicalId": "b00279fd-80a2-83d1-4cac-bd97adaca84f"
   }
 }
