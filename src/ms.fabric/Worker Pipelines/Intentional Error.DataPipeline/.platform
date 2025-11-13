@@ -2,10 +2,10 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
     "type": "DataPipeline",
-    "displayName": "Wait 6"
+    "displayName": "Intentional Error"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "f14da1fd-eb3e-a67b-4797-a02ff360c92a"
+    "logicalId": "e55cdf00-2f93-8032-4270-f77afcbe57a5"
   }
 }

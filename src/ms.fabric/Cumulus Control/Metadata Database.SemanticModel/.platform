@@ -1,11 +1,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
   "metadata": {
-    "type": "DataPipeline",
-    "displayName": "Wait 6"
+    "type": "SemanticModel",
+    "displayName": "Metadata Database"
   },
   "config": {
     "version": "2.0",
-    "logicalId": "f14da1fd-eb3e-a67b-4797-a02ff360c92a"
+    "logicalId": "9dbf6ff3-e6ce-b9c5-4220-7d3e58c8421f"
   }
 }
