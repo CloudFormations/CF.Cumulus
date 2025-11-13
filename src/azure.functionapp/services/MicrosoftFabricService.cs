@@ -12,6 +12,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Security.Policy;
+using System.Text;
 using Windows.Media.Protection.PlayReady;
 
 namespace cloudformations.cumulus.services
@@ -34,13 +36,16 @@ namespace cloudformations.cumulus.services
             fabricClient = new FabricClient(true);
             pbiApiClient = fabricClient.CreatePowerBIAPIClient();
             fabApiClient = fabricClient.CreateFabricAPIClient();
+
             workspaceId = String.Empty;
             pipelineId = String.Empty;
 
             Task<HttpResponseMessage> wsResponse;
 
             bearerToken = fabricClient.GetBearerToken();
+            _logger.LogDebug(bearerToken);
 
+            //Resolve workspace Id regardless of service calls
             using (var clientGeneral = new HttpClient())
             {
                 clientGeneral.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
@@ -82,60 +87,23 @@ namespace cloudformations.cumulus.services
         }
 
         public override PipelineRunStatus PipelineExecute(PipelineRequest request)
-        {
-            Console.WriteLine("Getting Fabric API bearer token.");
-
-            //bearerToken = fabricClient.GetBearerToken();
-
-            _logger.LogDebug(bearerToken);
-
-            //Task<HttpResponseMessage> wsResponse;
+        {         
             Task<HttpResponseMessage> pipeResponse;
             Task<HttpResponseMessage> pipeRunResponse;
-            
-            //use Fabric API to resolve guid values from reference names before making instance call
+
+            //Resolve pipeline Id
             using (var clientExecute = new HttpClient())
             {
-                /*
+                
                 clientExecute.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
 
-                //resolve workspace id
-                _logger.LogInformation("Getting workspace Id.");
-
-                HttpRequestMessage wsRequest = new HttpRequestMessage(HttpMethod.Get, $"https://api.fabric.microsoft.com/v1/workspaces");
-                wsResponse = clientExecute.SendAsync(wsRequest);
-                wsResponse.Wait();
-
-                _logger.LogInformation("Getting workspace response status: " + wsResponse.Result.StatusCode);
-
-                if (wsResponse.IsCompleted) 
-                {
-                    FabricWorkspaces? workspaceResponse = JsonConvert.DeserializeObject<FabricWorkspaces>(wsResponse.Result.Content.ReadAsStringAsync().Result);
-
-                    if(workspaceResponse is null)
-                    {
-                        throw new Exception("Fabric Workspaces workspaceResponse is null. Check content response values from clientGeneral request.");
-                    }
-                    else
-                    {
-                        workspaceId = workspaceResponse.Value
-                            .AsQueryable()
-                            .Where(workspace => workspace.DisplayName.Equals(request.OrchestratorName, StringComparison.OrdinalIgnoreCase))
-                            .Select(workspace => workspace.Id)
-                            .First();
-
-                        _logger.LogInformation("Resolved workspace Id: " + workspaceId);
-                    }
-                }
-                */
-                //resolve pipeline id
-                _logger.LogInformation("Getting pipeline Id.");
+                _logger.LogInformation("Getting pipeline Id for workspace Id: " + workspaceId);
 
                 HttpRequestMessage pipeRequest = new HttpRequestMessage(HttpMethod.Get, $"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items?type=DataPipeline");
                 pipeResponse = clientExecute.SendAsync(pipeRequest);
                 pipeResponse.Wait();
 
-                _logger.LogInformation("Getting workspace response status: " + pipeResponse.Result.StatusCode);
+                _logger.LogInformation("Getting pipeline Id response status: " + pipeResponse.Result.StatusCode);
 
                 if (pipeResponse.IsCompleted)
                 { 
@@ -153,21 +121,41 @@ namespace cloudformations.cumulus.services
                             .Select(workspace => workspace.Id)
                             .First();
 
-                        _logger.LogInformation("Resolved pipeline Id: " + pipelineId);
+                        _logger.LogInformation("Resolved pipeline Id: " + pipelineId + " for pipeline Name: " + request.PipelineName);
                     }
                 }
             }
 
-            _logger.LogInformation("Data pipeline run instance request.");
+            //Using resolved Ids to create a job instance
+            _logger.LogInformation("Creating data pipeline run instance request.");
 
-            pipeRunResponse = pbiApiClient.PostAsync($"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items/{pipelineId}/jobs/instances?jobType=Pipeline",null);
+            //Build dictionary to house pipeline parameters
+            Dictionary<string, BinaryData> pipeParameters;
+            pipeParameters = [];
+
+            foreach (var key in request.PipelineParameters.Keys)
+            {
+                if (String.IsNullOrEmpty(request.PipelineParameters[key])) continue;
+
+                _logger.LogInformation($"Adding parameter key: {key} value: {request.PipelineParameters[key]} to pipeline call.");
+
+                pipeParameters.Add(key, BinaryData.FromString('"' + request.PipelineParameters[key] + '"')); 
+            }
+
+            //Convert dictionary of pipeline parameters for API content call
+            var json = JsonConvert.SerializeObject(pipeParameters);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            //Post job instance for pipeline and parameters
+            pipeRunResponse = pbiApiClient.PostAsync($"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items/{pipelineId}/jobs/instances?jobType=Pipeline", content);
             pipeRunResponse.Wait();
 
             List<string> parts;
             String pipelineRunId = String.Empty;
             string pipelineRunLocation;
 
-            if (pipeRunResponse.IsCompleted) 
+            //Check run instance details
+            if (pipeRunResponse.IsCompletedSuccessfully) 
             {
                 _logger.LogInformation("Data pipeline run instance response status: " + pipeRunResponse.Result.StatusCode);
                 _logger.LogDebug(pipeRunResponse.Result.ToString());
@@ -185,17 +173,139 @@ namespace cloudformations.cumulus.services
                 RunId = pipelineRunId,
                 ActualStatus = "Not Started"
             };
-
         }
 
         public override PipelineErrorDetail PipelineGetErrorDetails(PipelineRunRequest request)
         {
-            throw new NotImplementedException();
+            HttpRequestMessage pipeRequest;
+            HttpRequestMessage pipeRunRequest;
+            Task<HttpResponseMessage> pipeResponse;
+            Task<HttpResponseMessage> pipeRunResponse;
+            FabricJobInstance? pipelineRunResponse;
+
+            //Resolve pipeline Id & get job instance status
+            using (var clientError = new HttpClient())
+            {
+                clientError.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+                _logger.LogInformation("Getting pipeline Id for workspace Id: " + workspaceId);
+
+                pipeRequest = new HttpRequestMessage(HttpMethod.Get, $"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items?type=DataPipeline");
+                pipeResponse = clientError.SendAsync(pipeRequest);
+                pipeResponse.Wait();
+
+                _logger.LogInformation("Getting pipeline Id response status: " + pipeResponse.Result.StatusCode);
+
+                if (pipeResponse.IsCompleted)
+                {
+                    FabricDataPipelines? pipelineResponse = JsonConvert.DeserializeObject<FabricDataPipelines>(pipeResponse.Result.Content.ReadAsStringAsync().Result);
+
+                    if (pipelineResponse is null)
+                    {
+                        throw new Exception("FabricDataPipelines pipelineResponse is null. Check content response values from clientGeneral request.");
+                    }
+                    else
+                    {
+                        pipelineId = pipelineResponse.Value
+                            .AsQueryable()
+                            .Where(workspace => workspace.DisplayName.Equals(request.PipelineName, StringComparison.OrdinalIgnoreCase))
+                            .Select(workspace => workspace.Id)
+                            .First();
+
+                        _logger.LogInformation("Resolved pipeline Id: " + pipelineId + " for pipeline Name: " + request.PipelineName);
+                    }
+                }
+
+                string jobUrl = $"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items/{pipelineId}/jobs/instances/{request.RunId}";
+
+                pipeRunRequest = new HttpRequestMessage(HttpMethod.Get, jobUrl);
+                pipeRunResponse = clientError.SendAsync(pipeRunRequest);
+                pipeRunResponse.Wait();
+
+                _logger.LogDebug(pipeRunResponse.Result.Content.ReadAsStringAsync().Result.ToString());
+
+                pipelineRunResponse = JsonConvert.DeserializeObject<FabricJobInstance>(pipeRunResponse.Result.Content.ReadAsStringAsync().Result);
+            }
+
+            PipelineErrorDetail output = new PipelineErrorDetail()
+            {
+                PipelineName = request.PipelineName,
+                ActualStatus = pipelineRunResponse.JobStatus,
+                RunId = request.RunId,
+                ResponseCount = 1
+            };
+
+            output.Errors.Add(new FailedActivity()
+            {
+                ActivityRunId = pipelineRunResponse.RootActivityId.ToString(),
+                ActivityName = "Unknown",
+                ActivityType = "Unknown",
+                ErrorCode = pipelineRunResponse.FailureReason.ErrorCode,
+                ErrorType = pipelineRunResponse.JobType,
+                ErrorMessage = pipelineRunResponse.FailureReason.Message
+            });
+
+            return output;
         }
 
         public override PipelineRunStatus PipelineGetStatus(PipelineRunRequest request)
         {
-            throw new NotImplementedException();
+            HttpRequestMessage pipeRequest;
+            HttpRequestMessage pipeRunRequest;
+            Task<HttpResponseMessage> pipeResponse;
+            Task<HttpResponseMessage> pipeRunResponse;
+            FabricJobInstance? pipelineRunResponse;
+
+            //Resolve pipeline Id & get job instance status
+            using (var clientStatus = new HttpClient())
+            {
+                clientStatus.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+                _logger.LogInformation("Getting pipeline Id for workspace Id: " + workspaceId);
+
+                pipeRequest = new HttpRequestMessage(HttpMethod.Get, $"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items?type=DataPipeline");
+                pipeResponse = clientStatus.SendAsync(pipeRequest);
+                pipeResponse.Wait();
+
+                _logger.LogInformation("Getting pipeline Id response status: " + pipeResponse.Result.StatusCode);
+
+                if (pipeResponse.IsCompleted)
+                {
+                    FabricDataPipelines? pipelineResponse = JsonConvert.DeserializeObject<FabricDataPipelines>(pipeResponse.Result.Content.ReadAsStringAsync().Result);
+
+                    if (pipelineResponse is null)
+                    {
+                        throw new Exception("FabricDataPipelines pipelineResponse is null. Check content response values from clientGeneral request.");
+                    }
+                    else
+                    {
+                        pipelineId = pipelineResponse.Value
+                            .AsQueryable()
+                            .Where(workspace => workspace.DisplayName.Equals(request.PipelineName, StringComparison.OrdinalIgnoreCase))
+                            .Select(workspace => workspace.Id)
+                            .First();
+
+                        _logger.LogInformation("Resolved pipeline Id: " + pipelineId + " for pipeline Name: " + request.PipelineName);
+                    }
+                }
+
+                string jobUrl = $"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items/{pipelineId}/jobs/instances/{request.RunId}";
+
+                pipeRunRequest = new HttpRequestMessage(HttpMethod.Get, jobUrl);
+                pipeRunResponse = clientStatus.SendAsync(pipeRunRequest);            
+                pipeRunResponse.Wait();
+
+                _logger.LogInformation(pipeRunResponse.Result.Content.ReadAsStringAsync().Result.ToString());
+
+                pipelineRunResponse = JsonConvert.DeserializeObject<FabricJobInstance>(pipeRunResponse.Result.Content.ReadAsStringAsync().Result);
+            }
+
+            return new PipelineRunStatus
+            {
+                PipelineName = request.PipelineName,
+                ActualStatus = pipelineRunResponse.JobStatus,
+                RunId = request.RunId
+            };
         }
 
         public override PipelineDescription PipelineValidate(PipelineRequest request)
@@ -204,22 +314,25 @@ namespace cloudformations.cumulus.services
 
             Task<HttpResponseMessage> pipeResponse;
 
-            using (var clientExecute = new HttpClient())
-            {
-                HttpRequestMessage pipeRequest = new HttpRequestMessage(HttpMethod.Get, $"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items?type=DataPipeline");
-                pipeResponse = clientExecute.SendAsync(pipeRequest);
-                pipeResponse.Wait();
-            }
-
             try
             {
+                using (var clientValidate = new HttpClient())
+                {
+                    clientValidate.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", bearerToken);
+
+                    _logger.LogInformation("Getting pipeline Id for workspace Id: " + workspaceId);
+                    HttpRequestMessage pipeRequest = new HttpRequestMessage(HttpMethod.Get, $"https://api.fabric.microsoft.com/v1/workspaces/{workspaceId}/items?type=DataPipeline");
+                    pipeResponse = clientValidate.SendAsync(pipeRequest);
+                    pipeResponse.Wait();
+                }
+
                 if (pipeResponse.IsCompleted)
                 {
                     FabricDataPipelines? pipelineResponse = JsonConvert.DeserializeObject<FabricDataPipelines>(pipeResponse.Result.Content.ReadAsStringAsync().Result);
 
                     if (pipelineResponse is null)
                     {
-                        throw new Exception("FabricDataPipelines pipelineResponse is null. Check content response values from clientGeneral request.");
+                        throw new InvalidRequestException("FabricDataPipelines pipelineResponse is null. Check content response values from clientValidate request.");
                     }
                     else
                     {
@@ -242,22 +355,9 @@ namespace cloudformations.cumulus.services
                     ActivityCount = 0
                 };
             }
-            catch (System.InvalidCastException) //for bug in underlying activity classes, pipeline does exist
+            catch (System.InvalidOperationException)
             {
-                _logger.LogInformation("Validated ADF pipeline exists.");
-
-                return new PipelineDescription()
-                {
-                    PipelineExists = "True",
-                    PipelineName = request.PipelineName,
-                    PipelineId = "Unknown",
-                    PipelineType = "Unknown",
-                    ActivityCount = 0
-                };
-            }
-            catch (Azure.RequestFailedException)
-            {
-                _logger.LogInformation("Validated ADF pipeline does not exist.");
+                _logger.LogInformation("Validated FAB pipeline does not exist.");
 
                 return new PipelineDescription()
                 {
