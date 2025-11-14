@@ -95,7 +95,7 @@
                 "userProperties": [],
                 "typeProperties": {
                     "on": {
-                        "value": "@activity('GetMarkdown').output.firstRow.MarkdownTarget",
+                        "value": "@activity('GetVisualiser').output.firstRow.MarkdownTarget",
                         "type": "Expression"
                     },
                     "cases": [
