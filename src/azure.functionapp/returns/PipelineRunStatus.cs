@@ -23,6 +23,8 @@ namespace cloudformations.cumulus.returns
         {
             string simpleStatus = actualStatus switch
             {
+                "Not Started" => Running,
+                "Not started" => Running, //microsoft inconsistency
                 "Queued" => Running,
                 "InProgress" => Running,
                 "Canceling" => Running, //microsoft typo
