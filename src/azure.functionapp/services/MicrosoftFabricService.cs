@@ -262,14 +262,26 @@ namespace cloudformations.cumulus.services
                 if (pipelineRunResponse is null)
                 {
                     throw new Exception("FabricJobInstance response was null.");
-                }             
+                }
 
-                return new PipelineRunStatus
+                if (pipelineRunResponse.JobStatus == "Completed")
                 {
-                    PipelineName = request.PipelineName,
-                    ActualStatus = pipelineRunResponse.JobStatus,
-                    RunId = request.RunId
-                };
+                    return new PipelineRunStatus
+                    {
+                        PipelineName = request.PipelineName,
+                        ActualStatus = "Succeeded", //possible bug in Microsoft API not returning Succeeded for a 'completed' pipeline.
+                        RunId = request.RunId
+                    };
+                }
+                else
+                {
+                    return new PipelineRunStatus
+                    {
+                        PipelineName = request.PipelineName,
+                        ActualStatus = pipelineRunResponse.JobStatus,
+                        RunId = request.RunId
+                    };
+                }
             }
             catch (Exception ex)
             {
