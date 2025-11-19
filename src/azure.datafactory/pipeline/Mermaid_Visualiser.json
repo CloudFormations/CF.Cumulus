@@ -1,268 +1,268 @@
 {
-    "name": "Mermaid_Visualiser",
-    "properties": {
-        "activities": [
-            {
-                "name": "GetMarkdown",
-                "type": "Lookup",
-                "dependsOn": [],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": false,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "source": {
-                        "type": "AzureSqlSource",
-                        "sqlReaderStoredProcedureName": "[control].[GetOrchestrationLineage]",
-                        "storedProcedureParameters": {
-                            "1_FilterFailedAndBlocked": {
-                                "type": "Boolean",
-                                "value": {
-                                    "value": "@pipeline().parameters.FilterFailedAndBlocked",
-                                    "type": "Expression"
-                                }
-                            },
-                            "BatchName": {
-                                "type": "String",
-                                "value": {
-                                    "value": "@pipeline().parameters.BatchName",
-                                    "type": "Expression"
-                                }
-                            },
-                            "UseStatusColours": {
-                                "type": "Boolean",
-                                "value": {
-                                    "value": "@pipeline().parameters.UseStatusColours",
-                                    "type": "Expression"
-                                }
-                            }
-                        },
-                        "queryTimeout": "02:00:00",
-                        "partitionOption": "None"
-                    },
-                    "dataset": {
-                        "referenceName": "GetSetMetadata",
-                        "type": "DatasetReference"
-                    }
-                }
-            },
-            {
-                "name": "GetVisualiser",
-                "type": "Lookup",
-                "dependsOn": [],
-                "policy": {
-                    "timeout": "0.12:00:00",
-                    "retry": 0,
-                    "retryIntervalInSeconds": 30,
-                    "secureOutput": true,
-                    "secureInput": false
-                },
-                "userProperties": [],
-                "typeProperties": {
-                    "source": {
-                        "type": "AzureSqlSource",
-                        "sqlReaderQuery": "EXEC control.GetVisualiser;",
-                        "queryTimeout": "02:00:00",
-                        "partitionOption": "None"
-                    },
-                    "dataset": {
-                        "referenceName": "GetSetMetadata",
-                        "type": "DatasetReference"
-                    }
-                }
-            },
-            {
-                "name": "SwitchMarkdownTarget",
-                "type": "Switch",
-                "dependsOn": [
-                    {
-                        "activity": "GetMarkdown",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    },
-                    {
-                        "activity": "GetVisualiser",
-                        "dependencyConditions": [
-                            "Succeeded"
-                        ]
-                    }
-                ],
-                "userProperties": [],
-                "typeProperties": {
-                    "on": {
-                        "value": "@activity('GetVisualiser').output.firstRow.MarkdownTarget",
-                        "type": "Expression"
-                    },
-                    "cases": [
-                        {
-                            "value": "AzureDevOps",
-                            "activities": [
-                                {
-                                    "name": "GetADOToken",
-                                    "type": "WebActivity",
-                                    "dependsOn": [],
-                                    "policy": {
-                                        "timeout": "0.12:00:00",
-                                        "retry": 0,
-                                        "retryIntervalInSeconds": 30,
-                                        "secureOutput": true,
-                                        "secureInput": true
-                                    },
-                                    "userProperties": [],
-                                    "typeProperties": {
-                                        "method": "GET",
-                                        "url": {
-                                            "value": "@concat(activity('GetVisualiser').output.firstRow.PATSecretName,'?api-version=7.0')",
-                                            "type": "Expression"
-                                        },
-                                        "authentication": {
-                                            "type": "MSI",
-                                            "resource": "https://vault.azure.net"
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "GetADOBaseURL",
-                                    "type": "WebActivity",
-                                    "dependsOn": [],
-                                    "policy": {
-                                        "timeout": "0.12:00:00",
-                                        "retry": 0,
-                                        "retryIntervalInSeconds": 30,
-                                        "secureOutput": true,
-                                        "secureInput": true
-                                    },
-                                    "userProperties": [],
-                                    "typeProperties": {
-                                        "method": "GET",
-                                        "url": {
-                                            "value": "@concat(activity('GetVisualiser').output.firstRow.URLSecretName,'?api-version=7.0')",
-                                            "type": "Expression"
-                                        },
-                                        "authentication": {
-                                            "type": "MSI",
-                                            "resource": "https://vault.azure.net"
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "TempDeleteWiki",
-                                    "type": "WebActivity",
-                                    "dependsOn": [
-                                        {
-                                            "activity": "GetADOToken",
-                                            "dependencyConditions": [
-                                                "Succeeded"
-                                            ]
-                                        },
-                                        {
-                                            "activity": "GetADOBaseURL",
-                                            "dependencyConditions": [
-                                                "Succeeded"
-                                            ]
-                                        }
-                                    ],
-                                    "policy": {
-                                        "timeout": "0.12:00:00",
-                                        "retry": 0,
-                                        "retryIntervalInSeconds": 30,
-                                        "secureOutput": true,
-                                        "secureInput": true
-                                    },
-                                    "userProperties": [],
-                                    "typeProperties": {
-                                        "method": "DELETE",
-                                        "headers": {
-                                            "Authorization": {
-                                                "value": "@concat('Bearer ',activity('GetADOToken').output.value)",
-                                                "type": "Expression"
-                                            }
-                                        },
-                                        "url": {
-                                            "value": "@concat(activity('GetADOBaseURL').output.value,'/pages?path=/','Mermaid','&api-version=7.1')",
-                                            "type": "Expression"
-                                        }
-                                    }
-                                },
-                                {
-                                    "name": "PopulateWiki",
-                                    "type": "WebActivity",
-                                    "dependsOn": [
-                                        {
-                                            "activity": "TempDeleteWiki",
-                                            "dependencyConditions": [
-                                                "Succeeded"
-                                            ]
-                                        }
-                                    ],
-                                    "policy": {
-                                        "timeout": "0.12:00:00",
-                                        "retry": 0,
-                                        "retryIntervalInSeconds": 30,
-                                        "secureOutput": true,
-                                        "secureInput": true
-                                    },
-                                    "userProperties": [],
-                                    "typeProperties": {
-                                        "method": "PUT",
-                                        "headers": {
-                                            "Authorization": {
-                                                "value": "@concat('Bearer ',activity('GetADOToken').output.value)",
-                                                "type": "Expression"
-                                            }
-                                        },
-                                        "url": {
-                                            "value": "@concat(activity('GetADOBaseURL').output.value,'/pages/','Mermaid','?api-version=7.1')",
-                                            "type": "Expression"
-                                        },
-                                        "body": {
-                                            "value": "@concat('{  \n    \"content\": \"',activity('GetMarkdown').output.firstRow.MarkdownOutput,\n    '\"}')",
-                                            "type": "Expression"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    "defaultActivities": [
-                        {
-                            "name": "InvalidMarkdownTarget",
-                            "type": "Fail",
-                            "dependsOn": [],
-                            "userProperties": [],
-                            "typeProperties": {
-                                "message": "Invalid Markdown Target Selected",
-                                "errorCode": "16"
-                            }
-                        }
-                    ]
-                }
-            }
-        ],
-        "parameters": {
-            "BatchName": {
-                "type": "String",
-                "defaultValue": "Daily"
-            },
-            "UseStatusColours": {
-                "type": "Bool",
-                "defaultValue": true
-            },
-            "FilterFailedAndBlocked": {
-                "type": "Bool",
-                "defaultValue": false
-            }
-        },
-        "folder": {
-            "name": "Cumulus.Utils"
-        },
-        "annotations": [],
-        "lastPublishTime": "2025-11-07T12:58:30Z"
-    },
-    "type": "Microsoft.DataFactory/factories/pipelines"
+	"name": "Mermaid_Visualiser",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetMarkdown",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[control].[GetOrchestrationLineage]",
+						"storedProcedureParameters": {
+							"1_FilterFailedAndBlocked": {
+								"type": "Boolean",
+								"value": {
+									"value": "@pipeline().parameters.FilterFailedAndBlocked",
+									"type": "Expression"
+								}
+							},
+							"BatchName": {
+								"type": "String",
+								"value": {
+									"value": "@pipeline().parameters.BatchName",
+									"type": "Expression"
+								}
+							},
+							"UseStatusColours": {
+								"type": "Boolean",
+								"value": {
+									"value": "@pipeline().parameters.UseStatusColours",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "GetSetMetadata",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "GetVisualiser",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": true,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "EXEC control.GetVisualiser;",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "GetSetMetadata",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "SwitchMarkdownTarget",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "GetMarkdown",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "GetVisualiser",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@activity('GetVisualiser').output.firstRow.MarkdownTargetName",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "AzureDevOps",
+							"activities": [
+								{
+									"name": "GetADOToken",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('GetVisualiser').output.firstRow.PATSecretName,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "GetADOBaseURL",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('GetVisualiser').output.firstRow.URLSecretName,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "TempDeleteWiki",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "GetADOToken",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "GetADOBaseURL",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "DELETE",
+										"headers": {
+											"Authorization": {
+												"value": "@concat('Bearer ',activity('GetADOToken').output.value)",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "@concat(activity('GetADOBaseURL').output.value,'/pages?path=/','Mermaid','&api-version=7.1')",
+											"type": "Expression"
+										}
+									}
+								},
+								{
+									"name": "PopulateWiki",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "TempDeleteWiki",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": true
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "PUT",
+										"headers": {
+											"Authorization": {
+												"value": "@concat('Bearer ',activity('GetADOToken').output.value)",
+												"type": "Expression"
+											}
+										},
+										"url": {
+											"value": "@concat(activity('GetADOBaseURL').output.value,'/pages/','Mermaid','?api-version=7.1')",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "@concat('{  \n    \"content\": \"',activity('GetMarkdown').output.firstRow.MarkdownOutput,\n    '\"}')",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "InvalidMarkdownTarget",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": "Invalid Markdown Target Selected",
+								"errorCode": "16"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"BatchName": {
+				"type": "String",
+				"defaultValue": "Daily"
+			},
+			"UseStatusColours": {
+				"type": "Bool",
+				"defaultValue": true
+			},
+			"FilterFailedAndBlocked": {
+				"type": "Bool",
+				"defaultValue": false
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Utils"
+		},
+		"annotations": [],
+		"lastPublishTime": "2025-11-07T12:58:30Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
 }
