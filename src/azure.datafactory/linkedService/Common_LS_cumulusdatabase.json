@@ -9,7 +9,11 @@
 		],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcdemodevsqldbuks25.database.windows.net;Initial Catalog=metadata-db"
+			"server": "cfcdemodevsqldbuks25.database.windows.net",
+			"database": "metadata-db",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SystemAssignedManagedIdentity"
 		}
 	}
 }
