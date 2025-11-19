@@ -48,8 +48,7 @@ $sqlDatabaseName = $bicepDeployment.properties.outputs.sqlDatabaseName.value
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 
 # Get Subscription Id from Name
-$subscriptionDetails = az account subscription list | ConvertFrom-Json 
-$subscriptionIdValue = $subscriptionDetails.subscriptionId
+$subscriptionIdValue = az account list --query "[?name=='${subscriptionId}'].id" --output tsv
 
 # Grant User Key Vault Secret Administrator RBAC to save Function App Key to KV
 $userDetails = az ad signed-in-user show | ConvertFrom-Json

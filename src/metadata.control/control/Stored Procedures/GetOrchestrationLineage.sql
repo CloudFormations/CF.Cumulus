@@ -19,6 +19,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	@SuccessColour VARCHAR(6) = '40B0A6',
 	@FailedColour VARCHAR(6) = 'E66100',
 	@BlockedColour VARCHAR(6) = 'DCDB88',
+	@RunningColour VARCHAR(6) = 'AEAEBD',
 	@DefaultColour VARCHAR(6) = 'ECECFF'
 
 ) AS
@@ -397,16 +398,19 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			[PipelineName],
 			[PipelineStatus],
 			CASE 
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Success' THEN @SuccessColour
 				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Failed' THEN @FailedColour
 				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Blocked' THEN @BlockedColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Running' THEN @RunningColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Success' THEN @SuccessColour
 				ELSE @DefaultColour
 			END AS HexColour,		
 			CASE 
-				WHEN PipelineStatus = 'Success' THEN 0
-				WHEN PipelineStatus = 'Failed' THEN 2
-				WHEN PipelineStatus = 'Blocked' THEN 1
-				ELSE 0
+				WHEN PipelineStatus = 'Failed' THEN 1
+				WHEN PipelineStatus = 'Blocked' THEN 2
+				WHEN PipelineStatus = 'Pending' THEN 3
+				WHEN PipelineStatus = 'Running' THEN 4
+				WHEN PipelineStatus = 'Success' THEN 5
+				ELSE 999
 			END AS [PipelinePrecedence]
 		FROM control.CurrentExecution
 	END
@@ -429,16 +433,19 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			[PipelineName],
 			[PipelineStatus],
 			CASE 
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Success' THEN @SuccessColour
 				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Failed' THEN @FailedColour
 				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Blocked' THEN @BlockedColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Running' THEN @RunningColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Success' THEN @SuccessColour
 				ELSE @DefaultColour
 			END AS HexColour,
 			CASE 
-				WHEN PipelineStatus = 'Success' THEN 0
-				WHEN PipelineStatus = 'Failed' THEN 2
-				WHEN PipelineStatus = 'Blocked' THEN 1
-				ELSE 0
+				WHEN PipelineStatus = 'Failed' THEN 1
+				WHEN PipelineStatus = 'Blocked' THEN 2
+				WHEN PipelineStatus = 'Pending' THEN 3
+				WHEN PipelineStatus = 'Running' THEN 4
+				WHEN PipelineStatus = 'Success' THEN 5
+				ELSE 999
 			END AS [PipelinePrecedence]
 		FROM control.ExecutionLog
 		WHERE LocalExecutionId = (
@@ -488,7 +495,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	;WITH stageNodeExecutions AS (
 		SELECT 
 			BE.StageId,
-			MAX(LE.PipelinePrecedence) AS StageStatus
+			MIN(LE.PipelinePrecedence) AS StageStatus
 		FROM 
 			@BaseData BE
 		LEFT JOIN 
@@ -500,9 +507,10 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		SELECT
 			StageId
 			,CASE 
-				WHEN @UseStatusColours = 1 AND StageStatus = 0 THEN @SuccessColour
-				WHEN @UseStatusColours = 1 AND StageStatus = 2 THEN @FailedColour
-				WHEN @UseStatusColours = 1 AND StageStatus = 1 THEN @BlockedColour
+				WHEN @UseStatusColours = 1 AND StageStatus = 1 THEN @SuccessColour
+				WHEN @UseStatusColours = 1 AND StageStatus = 2 THEN @BlockedColour
+				WHEN @UseStatusColours = 1 AND StageStatus = 3 THEN @FailedColour
+				WHEN @UseStatusColours = 1 AND StageStatus = 4 THEN @RunningColour
 				ELSE @DefaultColour
 			END AS HexColour
 		FROM stageNodeExecutions
@@ -607,9 +615,11 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	IF @UseStatusColours = 1
 	BEGIN
 		SET @PageHeader = @PageHeader + '\n' + 'subgraph Legend [Pipeline Status]' + '\n' + 'style Legend fill:#FFFFFF,stroke:#FFFFFF' + '\n' + 
-		'success(Success)' + '\n' + 'style success fill:#' + @SuccessColour +',stroke:#' + @SuccessColour + ',color:#FFFFFF' + '\n' + 
-		'failure(Failure)' + '\n' + 'style failure fill:#' + @FailedColour + ',stroke:#' + @FailedColour + ',color:#FFFFFF' + '\n' + 
-		'blocked(Blocked)' + '\n' + 'style blocked fill:#' + @BlockedColour + ',stroke:#' + @BlockedColour + ',color:#FFFFFF' + '\n' + 
+		'success(Success)' + '\n' + 'style success fill:#' + @SuccessColour +',stroke:#' + @SuccessColour + '\n' + 
+		'failure(Failure)' + '\n' + 'style failure fill:#' + @FailedColour + ',stroke:#' + @FailedColour + '\n' + 
+		'blocked(Blocked)' + '\n' + 'style blocked fill:#' + @BlockedColour + ',stroke:#' + @BlockedColour + '\n' + 
+		'running(Running)' + '\n' + 'style running fill:#' + @RunningColour + ',stroke:#' + @RunningColour + '\n' + 
+		'pending(Pending)' + '\n' + 'style pending fill:#' + @DefaultColour + ',stroke:#' + @DefaultColour + '\n' + 
 		'end'
 	END
 	SELECT
