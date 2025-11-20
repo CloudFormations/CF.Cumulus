@@ -398,18 +398,18 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			[PipelineName],
 			[PipelineStatus],
 			CASE 
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Failed' THEN @FailedColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Blocked' THEN @BlockedColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Running' THEN @RunningColour
 				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Success' THEN @SuccessColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Blocked' THEN @BlockedColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Failed' THEN @FailedColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Running' THEN @RunningColour
 				ELSE @DefaultColour
 			END AS HexColour,		
 			CASE 
-				WHEN PipelineStatus = 'Failed' THEN 1
+				WHEN PipelineStatus = 'Success' THEN 1
 				WHEN PipelineStatus = 'Blocked' THEN 2
-				WHEN PipelineStatus = 'Pending' THEN 3
+				WHEN PipelineStatus = 'Failed' THEN 3
 				WHEN PipelineStatus = 'Running' THEN 4
-				WHEN PipelineStatus = 'Success' THEN 5
+				WHEN PipelineStatus = 'Pending' THEN 5
 				ELSE 999
 			END AS [PipelinePrecedence]
 		FROM control.CurrentExecution
@@ -433,18 +433,18 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			[PipelineName],
 			[PipelineStatus],
 			CASE 
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Failed' THEN @FailedColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Blocked' THEN @BlockedColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Running' THEN @RunningColour
 				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Success' THEN @SuccessColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Blocked' THEN @BlockedColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Failed' THEN @FailedColour
+				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Running' THEN @RunningColour
 				ELSE @DefaultColour
 			END AS HexColour,
 			CASE 
-				WHEN PipelineStatus = 'Failed' THEN 1
+				WHEN PipelineStatus = 'Success' THEN 1
 				WHEN PipelineStatus = 'Blocked' THEN 2
-				WHEN PipelineStatus = 'Pending' THEN 3
+				WHEN PipelineStatus = 'Failed' THEN 3
 				WHEN PipelineStatus = 'Running' THEN 4
-				WHEN PipelineStatus = 'Success' THEN 5
+				WHEN PipelineStatus = 'Pending' THEN 5
 				ELSE 999
 			END AS [PipelinePrecedence]
 		FROM control.ExecutionLog
@@ -495,7 +495,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	;WITH stageNodeExecutions AS (
 		SELECT 
 			BE.StageId,
-			MIN(LE.PipelinePrecedence) AS StageStatus
+			MAX(LE.PipelinePrecedence) AS StageStatus
 		FROM 
 			@BaseData BE
 		LEFT JOIN 
@@ -521,7 +521,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		SELECT DISTINCT
 			BE.[StageId],
 			's' + CAST(BE.[StageId] * 100 AS VARCHAR) + '[' + BE.[StageName] + ']' + '\n' +
-			'style s' + CAST(BE.[StageId] * 100 AS VARCHAR) + ' fill:#' + SNS.HexColour + ',stroke:#'  + SNS.HexColour  + '''' + '\n' AS StageNode
+			'style s' + CAST(BE.[StageId] * 100 AS VARCHAR) + ' fill:#' + SNS.HexColour + ',stroke:#'  + SNS.HexColour  + '\n' AS StageNode
 		FROM
 			@BaseData BE
 		LEFT JOIN 

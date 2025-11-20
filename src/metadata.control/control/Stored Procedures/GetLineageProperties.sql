@@ -9,7 +9,7 @@ BEGIN
     SELECT 
         @MarkdownTargetType = PropertyValue
     FROM control.LineageProperties
-    WHERE PropertyName = 'MarkdownTargetType';
+WHERE PropertyName = 'MarkdownTargetType';
 
     SELECT 
         @PATSecretName = PropertyValue
