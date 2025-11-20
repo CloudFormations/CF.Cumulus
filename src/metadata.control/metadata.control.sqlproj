@@ -68,6 +68,7 @@
     <Folder Include="control\Views" />
     <Folder Include="dbo" />
     <Folder Include="dbo\Tables" />
+    <Folder Include="dbo\Stored Procedures" />
     <Folder Include="control\Functions" />
   </ItemGroup>
   <ItemGroup>
@@ -132,8 +133,12 @@
     <Build Include="control\Stored Procedures\AddBatchStageLink.sql" />
     <Build Include="control\Stored Procedures\AddOrchestrators.sql" />
     <Build Include="control\Stored Procedures\AddStages.sql" />
+    <Build Include="control\Stored Procedures\GetOrchestrationLineage.sql" />
     <Build Include="control\Stored Procedures\AddSubscriptions.sql" />
     <Build Include="control\Stored Procedures\AddTenants.sql" />
+    <Build Include="dbo\Stored Procedures\FailProcedure.sql" />
+    <Build Include="control\Tables\LineageProperties.sql" />
+    <Build Include="control\Stored Procedures\GetLineageProperties.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />

@@ -179,26 +179,26 @@ DECLARE @Dependencies TABLE (
 DECLARE @DependenciesStagingTable TABLE (
  PipelineId INT,
  StageId INT,
- ParameterValue INT
+ ParameterValue VARCHAR(250)
 )
 DECLARE @PipelineIdResult INT;
 DECLARE @DependantPipelineIdResult INT;
 
 INSERT INTO @DependenciesStagingTable (PipelineId, StageId, ParameterValue)
 SELECT 
-    p.PipelineId, p.StageId, CAST(pp.ParameterValue AS INT) AS ParameterValue --,*
+    p.PipelineId, p.StageId, pp.ParameterValue
 FROM control.Pipelines AS p
 INNER JOIN control.PipelineParameters AS pp
 ON p.PipelineId = pp.PipelineId
 
 SELECT @PipelineIdResult = PipelineId 
 FROM @DependenciesStagingTable
-WHERE ParameterValue = @DatasetId
+WHERE ParameterValue = CAST(@DatasetId AS VARCHAR(250))
 AND StageId = @StageId
 
 SELECT @DependantPipelineIdResult = PipelineId 
 FROM @DependenciesStagingTable
-WHERE ParameterValue = @DependantDatasetId
+WHERE ParameterValue = CAST(@DependantDatasetId AS VARCHAR(250))
 AND StageId = @DependantStageId
 
 

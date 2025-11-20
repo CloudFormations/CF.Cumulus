@@ -13,3 +13,4 @@ Post-Deployment Script Template
 :r .\IngestDatasetsMetadataAsCode.sql
 :r .\TransformDatasetsMetadataAsCode.sql
 :r .\ControlPipelineMetadataAsCode.sql
+:r .\ControlWaitPipelineMetadataAsCode.sql
