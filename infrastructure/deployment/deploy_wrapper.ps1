@@ -17,7 +17,7 @@ param(
 )
 
 # Login to the Azure Tenant
-# az login --tenant $tenantId
+az login --tenant $tenantId
 
 # DEMO: Start a timer
 $processTimerStart = [System.Diagnostics.Stopwatch]::StartNew()
@@ -81,6 +81,7 @@ $Env:KEYVAULT = $keyVaultName
 $deployDataFactoryComponentsScript = $currentLocation + '\deploy_data_factory_components.ps1'
 & $deployDataFactoryComponentsScript `
     -tenantId $tenantId `
+    -subscriptionId $subscriptionId `
     -location $location `
     -resourceGroupName $resourceGroupName `
     -dataFactoryName $dataFactoryName

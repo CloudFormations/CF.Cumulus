@@ -246,11 +246,18 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	DECLARE @CountCurrentExecution INT;
 	DECLARE @CountLatestExecution INT;
 
-	SELECT @CountCurrentExecution = COUNT(*)
-	FROM control.CurrentExecution;
+	SELECT @CountCurrentExecution = COALESCE(COUNT(*),0)
+	FROM control.CurrentExecution
+	WHERE LocalExecutionId = (
+		SELECT TOP 1 ExecutionId FROM control.BatchExecution WHERE BatchName = @BatchName
+		);
 
-	SELECT @CountLatestExecution = COUNT(*)
-	FROM control.ExecutionLog; 
+
+	SELECT @CountLatestExecution = COALESCE(COUNT(*),0)
+	FROM control.ExecutionLog
+	WHERE LocalExecutionId = (
+		SELECT TOP 1 ExecutionId FROM control.BatchExecution WHERE BatchName = @BatchName
+		);
 
 	--get reusable metadata
 
@@ -373,16 +380,11 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		[HexColour] [nvarchar](6) NOT NULL,
 		[PipelinePrecedence] INT NULL
 	)
-	SELECT @CountCurrentExecution = COUNT(*)
-	FROM control.CurrentExecution;
-
-	SELECT @CountLatestExecution = COUNT(*)
-	FROM control.ExecutionLog;
 
 
+	
 	IF @CountCurrentExecution > 0
 	BEGIN
-	--PRINT 'Current Execution'
 	INSERT INTO @LatestExecutions (
 			[LocalExecutionId],
 			[StageId],
@@ -417,7 +419,6 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 
 	ELSE IF @CountCurrentExecution = 0 AND @CountLatestExecution > 0
 	BEGIN
-	--PRINT 'Latest Execution'
 	INSERT INTO @LatestExecutions (
 			[LocalExecutionId],
 			[StageId],
@@ -480,7 +481,6 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		INNER JOIN 
 			@LatestExecutions LE
 		ON BE.PipelineId = LE.PipelineId
-		--WHERE BE.StageId = 1
 		GROUP BY
 			BE.[StageId]
 		)
