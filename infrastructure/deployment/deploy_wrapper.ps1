@@ -19,6 +19,22 @@ param(
 # Login to the Azure Tenant
 az login --tenant $tenantId
 
+$currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+$checkParamsScript = $currentLocation + '\check_params_from_file.ps1'
+& $checkParamsScript `
+    -parametersFile $parametersFile
+
+$acceptInput = Read-Host "Are the utilised parameters correct? (Y) yes, (all other input) no. Press enter to confirm."
+
+if ( $acceptInput.ToUpper() -eq "Y")
+{
+    Write-Host "Proceed with deployment"
+}
+else {
+    Write-Host "Cancelling deployment"
+    exit
+}
+
 # DEMO: Start a timer
 $processTimerStart = [System.Diagnostics.Stopwatch]::StartNew()
 
@@ -28,7 +44,6 @@ $bicepDeployment = az deployment sub create `
     --location $location `
     --template-file $templateFile `
     --parameters $parametersFile `
-    # --what-if
     | ConvertFrom-Json
 
 # Save Outputs of reusable details from BiCep for other scripts
