@@ -81,7 +81,8 @@ $deployAzureFunctionsScript = $currentLocation + '\deploy_azure_functions.ps1'
 & $deployAzureFunctionsScript `
     -currentLocation $currentLocation `
     -resourceGroupName $resourceGroupName `
-    -functionAppName $functionAppName
+    -functionAppName $functionAppName `
+    -keyVaultName $keyVaultName
 
 
 # Set environment variables for Data Factory LS deployments:
