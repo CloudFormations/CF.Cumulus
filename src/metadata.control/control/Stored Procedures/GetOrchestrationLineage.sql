@@ -81,7 +81,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		, filteredConnectionsJoin AS (
 		SELECT p.pipelineid 
 		FROM [control].[Pipelines] p
-		INNER JOIN [control].[PipelineParameters] pp
+		LEFT JOIN [control].[PipelineParameters] pp
 			ON p.PipelineId = pp.PipelineId
 		INNER JOIN [control].[Orchestrators] o
 			ON p.[OrchestratorId] = o.[OrchestratorId]
@@ -133,7 +133,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		, filteredConnectionsJoin AS (
 		SELECT p.pipelineid 
 		FROM [control].[Pipelines] p
-		INNER JOIN [control].[PipelineParameters] pp
+		LEFT JOIN [control].[PipelineParameters] pp
 			ON p.PipelineId = pp.PipelineId
 		INNER JOIN [control].[Orchestrators] o
 			ON p.[OrchestratorId] = o.[OrchestratorId]
@@ -182,7 +182,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		, filteredDatasetJoin AS (
 		SELECT p.pipelineid 
 		FROM [control].[Pipelines] p
-		INNER JOIN [control].[PipelineParameters] pp
+		LEFT JOIN [control].[PipelineParameters] pp
 			ON p.PipelineId = pp.PipelineId
 		INNER JOIN [control].[Orchestrators] o
 			ON p.[OrchestratorId] = o.[OrchestratorId]
