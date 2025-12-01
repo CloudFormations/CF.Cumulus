@@ -272,11 +272,12 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		CASE 
 			WHEN id.DatasetId IS NOT NULL THEN CONCAT(' - ', id.DatasetDisplayName)
 			WHEN td.DatasetId IS NOT NULL THEN CONCAT(' - ', td.DatasetName)
-			ELSE '' 
+			WHEN STRING_AGG(pp.ParameterName,'') IS NOT NULL THEN  CONCAT('{',STRING_AGG(CONCAT(pp.ParameterName, ': ', pp.ParameterValue),','),'}')
+			ELSE ''
 		END
 	FROM
 		[control].[Pipelines] p
-		INNER JOIN [control].[PipelineParameters] pp
+		LEFT JOIN [control].[PipelineParameters] pp
 			ON p.PipelineId = pp.PipelineId
 		INNER JOIN [control].[Orchestrators] o
 			ON p.[OrchestratorId] = o.[OrchestratorId]
@@ -303,7 +304,6 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 				SELECT TOP 1 LocalExecutionId FROM control.ExecutionLog ORDER BY LogId DESC)
 			AND LogId IN (SELECT MAX(LogId) FROM control.ExecutionLog GROUP BY PipelineId)
 
-
 	WHERE
 		p.[Enabled] = 1
 		AND b.[BatchName] = @BatchName
@@ -317,7 +317,14 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		AND p.PipelineId IN (
 			SELECT PipelineId
 			FROM @PipelineIds
-		);
+		)
+		
+	GROUP BY o.[OrchestratorId],
+		o.[OrchestratorName],
+		s.[StageId],
+		s.[StageName],
+		p.[PipelineId],
+		p.[PipelineName];
  
 
 	--add orchestrator(s) sub graphs
