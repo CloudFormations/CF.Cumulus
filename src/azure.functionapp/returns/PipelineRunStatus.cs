@@ -25,6 +25,9 @@ namespace cloudformations.cumulus.returns
             {
                 "Not Started" => Running,
                 "Not started" => Running, //microsoft inconsistency
+                "Notstarted" => Running, //microsoft inconsistency
+                "NotStarted" => Running, //microsoft inconsistency
+                "notstarted" => Running, //microsoft inconsistency
                 "Queued" => Running,
                 "InProgress" => Running,
                 "Canceling" => Running, //microsoft typo
