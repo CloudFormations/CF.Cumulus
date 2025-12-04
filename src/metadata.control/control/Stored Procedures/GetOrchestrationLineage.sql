@@ -4,6 +4,8 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 
 	-- Customisation
 	@UseStatusColours BIT = 0,
+	@StageLineageLevel VARCHAR(25) = 'Simple',
+	@UseExecutionHistory BIT = 1,
 
 	-- Filters
 	@1_FilterFailedAndBlocked BIT = 0,
@@ -91,16 +93,16 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			ON s.[StageId] = bs.[StageId]
 		INNER JOIN [control].[Batches] b
 			ON bs.[BatchId] = b.[BatchId]
-		LEFT JOIN [ingest].[Datasets] id
-			ON p.PipelineName like 'Ingest_PL_%'
-			AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
-		LEFT JOIN [transform].[Datasets] td
-			ON p.PipelineName like 'Transform_PL_%'
-			AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
+		 LEFT JOIN [ingest].[Datasets] id
+		 	ON p.PipelineName like 'Ingest_PL_%'
+		 	AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
+		 LEFT JOIN [transform].[Datasets] td
+		 	ON p.PipelineName like 'Transform_PL_%'
+		 	AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
 
-		WHERE (
-			id.ConnectionFK IN (SELECT ConnectionId FROM filteredConnections)
-			)
+		 WHERE (
+		 	id.ConnectionFK IN (SELECT ConnectionId FROM filteredConnections)
+		 	)
 		)
 
 		INSERT INTO @PipelineIds (PipelineId)
@@ -143,16 +145,16 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			ON s.[StageId] = bs.[StageId]
 		INNER JOIN [control].[Batches] b
 			ON bs.[BatchId] = b.[BatchId]
-		LEFT JOIN [ingest].[Datasets] id
-			ON p.PipelineName like 'Ingest_PL_%'
-			AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
-		LEFT JOIN [transform].[Datasets] td
-			ON p.PipelineName like 'Transform_PL_%'
-			AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
+		 LEFT JOIN [ingest].[Datasets] id
+		 	ON p.PipelineName like 'Ingest_PL_%'
+		 	AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
+		 LEFT JOIN [transform].[Datasets] td
+		 	ON p.PipelineName like 'Transform_PL_%'
+		 	AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
 
-		WHERE (
-			id.ConnectionFK IN (SELECT ConnectionId FROM filteredConnections)
-			)
+		 WHERE (
+		 	id.ConnectionFK IN (SELECT ConnectionId FROM filteredConnections)
+		 	)
 		)
 
 		INSERT INTO @PipelineIds (PipelineId)
@@ -192,18 +194,18 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			ON s.[StageId] = bs.[StageId]
 		INNER JOIN [control].[Batches] b
 			ON bs.[BatchId] = b.[BatchId]
-		LEFT JOIN [ingest].[Datasets] id
-			ON p.PipelineName like 'Ingest_PL_%'
-			AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
-		LEFT JOIN [transform].[Datasets] td
-			ON p.PipelineName like 'Transform_PL_%'
-			AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
+		 LEFT JOIN [ingest].[Datasets] id
+		 	ON p.PipelineName like 'Ingest_PL_%'
+		 	AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
+		 LEFT JOIN [transform].[Datasets] td
+		 	ON p.PipelineName like 'Transform_PL_%'
+		 	AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
 
-		WHERE (
-			id.DatasetDisplayName IN (SELECT name FROM filteredDatasets)
-			OR
-			td.DatasetName IN (SELECT name FROM filteredDatasets)
-			)
+		 WHERE (
+		 	id.DatasetDisplayName IN (SELECT name FROM filteredDatasets)
+		 	OR
+		 	td.DatasetName IN (SELECT name FROM filteredDatasets)
+		 	)
 		)
 
 		INSERT INTO @PipelineIds (PipelineId)
@@ -226,7 +228,10 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		FROM [control].[Pipelines]
 	END
 
-
+	DECLARE @UsingBatchExecutions BIT;
+	SELECT @UsingBatchExecutions = CAST(PropertyValue AS INT)
+	FROM control.Properties
+	WHERE PropertyName = 'UseExecutionBatches';
 
 
 
@@ -246,21 +251,31 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	DECLARE @CountCurrentExecution INT;
 	DECLARE @CountLatestExecution INT;
 
-	SELECT @CountCurrentExecution = COALESCE(COUNT(*),0)
-	FROM control.CurrentExecution
-	WHERE LocalExecutionId = (
-		SELECT TOP 1 ExecutionId FROM control.BatchExecution WHERE BatchName = @BatchName
-		);
+	IF @UseExecutionHistory = 1
+	BEGIN 
+		SELECT @CountCurrentExecution = COALESCE(COUNT(*),0)
+		FROM control.CurrentExecution
+		WHERE (@UsingBatchExecutions = 1
+		AND LocalExecutionId = (
+			SELECT TOP 1 ExecutionId FROM control.BatchExecution WHERE BatchName = @BatchName
+			))
+		OR @UsingBatchExecutions = 0;
 
-
-	SELECT @CountLatestExecution = COALESCE(COUNT(*),0)
-	FROM control.ExecutionLog
-	WHERE LocalExecutionId = (
-		SELECT TOP 1 ExecutionId FROM control.BatchExecution WHERE BatchName = @BatchName
-		);
+		SELECT @CountLatestExecution = COALESCE(COUNT(*),0)
+		FROM control.ExecutionLog
+		WHERE (@UsingBatchExecutions = 1
+		AND LocalExecutionId = (
+			SELECT TOP 1 ExecutionId FROM control.BatchExecution WHERE BatchName = @BatchName
+			))
+		OR @UsingBatchExecutions = 0;
+	END 
+	ELSE 
+	BEGIN
+		SET @CountCurrentExecution = 0
+		SET @CountLatestExecution = 0
+	END
 
 	--get reusable metadata
-
 	INSERT INTO @BaseData
 	SELECT
 		o.[OrchestratorId],
@@ -270,43 +285,42 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		p.[PipelineId],
 		p.[PipelineName],
 		CASE 
-			WHEN id.DatasetId IS NOT NULL THEN CONCAT(' - ', id.DatasetDisplayName)
-			WHEN td.DatasetId IS NOT NULL THEN CONCAT(' - ', td.DatasetName)
-			WHEN STRING_AGG(pp.ParameterName,'') IS NOT NULL THEN  CONCAT('{',STRING_AGG(CONCAT(pp.ParameterName, ': ', pp.ParameterValue),','),'}')
+			WHEN STRING_AGG(pp.ParameterName,'') IS NOT NULL THEN  CONCAT(' - ',STRING_AGG(CONCAT(pp.ParameterName, ': ', REPLACE(REPLACE(pp.ParameterValue,'[','#91;'),']','#93;')),','))
 			ELSE ''
 		END
 	FROM
 		[control].[Pipelines] p
-		LEFT JOIN [control].[PipelineParameters] pp
-			ON p.PipelineId = pp.PipelineId
-		INNER JOIN [control].[Orchestrators] o
-			ON p.[OrchestratorId] = o.[OrchestratorId]
-		INNER JOIN [control].[Stages] s
-			ON p.[StageId] = s.[StageId]
-		INNER JOIN [control].[BatchStageLink] bs
-			ON s.[StageId] = bs.[StageId]
-		INNER JOIN [control].[Batches] b
-			ON bs.[BatchId] = b.[BatchId]
-		LEFT JOIN [ingest].[Datasets] id
-			ON p.PipelineName like 'Ingest_PL_%'
-			AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
-		LEFT JOIN [transform].[Datasets] td
-			ON p.PipelineName like 'Transform_PL_%'
-			AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
-		LEFT JOIN [control].[CurrentExecution] AS ce -- IF OR
-			ON p.PipelineId = ce.PipelineId
-			AND @CountCurrentExecution > 0
-		LEFT JOIN [control].[ExecutionLog] AS el -- IF OR
-			ON p.PipelineId = el.PipelineId
-			AND @CountLatestExecution > 0 
-			AND @CountCurrentExecution = 0
-			AND el.LocalExecutionId = (
-				SELECT TOP 1 LocalExecutionId FROM control.ExecutionLog ORDER BY LogId DESC)
-			AND LogId IN (SELECT MAX(LogId) FROM control.ExecutionLog GROUP BY PipelineId)
-
+	LEFT JOIN [control].[PipelineParameters] pp
+		ON p.PipelineId = pp.PipelineId
+	INNER JOIN [control].[Orchestrators] o
+		ON p.[OrchestratorId] = o.[OrchestratorId]
+	INNER JOIN [control].[Stages] s
+		ON p.[StageId] = s.[StageId]
+	INNER JOIN [control].[BatchStageLink] bs
+		ON s.[StageId] = bs.[StageId]
+	INNER JOIN [control].[Batches] b
+		ON bs.[BatchId] = b.[BatchId]
+	LEFT JOIN [ingest].[Datasets] id
+		ON p.PipelineName like 'Ingest_PL_%'
+		AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
+	LEFT JOIN [transform].[Datasets] td
+		ON p.PipelineName like 'Transform_PL_%'
+		AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
+	LEFT JOIN [control].[CurrentExecution] AS ce -- IF OR
+		ON p.PipelineId = ce.PipelineId
+		AND @CountCurrentExecution > 0
+	LEFT JOIN [control].[ExecutionLog] AS el -- IF OR
+		ON p.PipelineId = el.PipelineId
+		AND @CountLatestExecution > 0 
+		AND @CountCurrentExecution = 0
+		AND el.LocalExecutionId = (
+			SELECT TOP 1 LocalExecutionId FROM control.ExecutionLog ORDER BY LogId DESC)
+		AND LogId IN (SELECT MAX(LogId) FROM control.ExecutionLog GROUP BY PipelineId)
 	WHERE
 		p.[Enabled] = 1
 		AND b.[BatchName] = @BatchName
+		AND id.DatasetId IS NULL 
+		AND td.DatasetId IS NULL
 		AND (
 			-- Filter for blocked and failed against current executions table
 			(@1_FilterFailedAndBlocked = 1 AND @CountCurrentExecution > 0 AND ce.PipelineStatus IN ('Failed' , 'Blocked')) OR
@@ -318,13 +332,70 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			SELECT PipelineId
 			FROM @PipelineIds
 		)
-		
 	GROUP BY o.[OrchestratorId],
 		o.[OrchestratorName],
 		s.[StageId],
 		s.[StageName],
 		p.[PipelineId],
-		p.[PipelineName];
+		p.[PipelineName]
+
+	UNION 
+
+	SELECT
+		o.[OrchestratorId],
+		o.[OrchestratorName],
+		s.[StageId],
+		s.[StageName],
+		p.[PipelineId],
+		p.[PipelineName],
+		CASE 
+			WHEN id.DatasetId IS NOT NULL THEN CONCAT(' - ', id.DatasetDisplayName)
+			WHEN td.DatasetId IS NOT NULL THEN CONCAT(' - ', td.DatasetName)
+			ELSE ''
+		END
+	FROM
+		[control].[Pipelines] p
+	LEFT JOIN [control].[PipelineParameters] pp
+		ON p.PipelineId = pp.PipelineId
+	INNER JOIN [control].[Orchestrators] o
+		ON p.[OrchestratorId] = o.[OrchestratorId]
+	INNER JOIN [control].[Stages] s
+		ON p.[StageId] = s.[StageId]
+	INNER JOIN [control].[BatchStageLink] bs
+		ON s.[StageId] = bs.[StageId]
+	INNER JOIN [control].[Batches] b
+		ON bs.[BatchId] = b.[BatchId]
+	LEFT JOIN [ingest].[Datasets] id
+		ON p.PipelineName like 'Ingest_PL_%'
+		AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
+	LEFT JOIN [transform].[Datasets] td
+		ON p.PipelineName like 'Transform_PL_%'
+		AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
+	LEFT JOIN [control].[CurrentExecution] AS ce -- IF OR
+		ON p.PipelineId = ce.PipelineId
+		AND @CountCurrentExecution > 0
+	LEFT JOIN [control].[ExecutionLog] AS el -- IF OR
+		ON p.PipelineId = el.PipelineId
+		AND @CountLatestExecution > 0 
+		AND @CountCurrentExecution = 0
+		AND el.LocalExecutionId = (
+			SELECT TOP 1 LocalExecutionId FROM control.ExecutionLog ORDER BY LogId DESC)
+		AND LogId IN (SELECT MAX(LogId) FROM control.ExecutionLog GROUP BY PipelineId)
+	WHERE
+		p.[Enabled] = 1
+		AND b.[BatchName] = @BatchName
+		AND (id.[DatasetId] IS NOT NULL OR td.[DatasetId] IS NOT NULL)
+		AND (
+			-- Filter for blocked and failed against current executions table
+			(@1_FilterFailedAndBlocked = 1 AND @CountCurrentExecution > 0 AND ce.PipelineStatus IN ('Failed' , 'Blocked')) OR
+			-- Filter for blocked and failed against latest executions table
+			(@1_FilterFailedAndBlocked = 1 AND @CountLatestExecution > 0 AND @CountCurrentExecution = 0 AND el.PipelineStatus IN ('Failed' , 'Blocked')) OR
+			-- No filter on pipeline status
+			(@1_FilterFailedAndBlocked = 0))
+		AND p.PipelineId IN (
+			SELECT PipelineId
+			FROM @PipelineIds
+		);
  
 
 	--add orchestrator(s) sub graphs
@@ -476,28 +547,30 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	END
 
 	;WITH pipelines AS
-		(
-		SELECT
-			BE.[StageId],
-			STRING_AGG(
-				CONCAT('p',CAST(BE.[PipelineId] * 10 AS VARCHAR),'(',BE.[PipelineName],BE.[AdditionalPipelineInfo],')','\n',
-				'style ','p',CAST(BE.[PipelineId] * 10 AS VARCHAR),' fill:#',LE.[HexColour],',stroke:#',LE.[HexColour],''),'\n'
-				) AS 'PipelinesInStage'
-		FROM
-			@BaseData BE
-		INNER JOIN 
-			@LatestExecutions LE
-		ON BE.PipelineId = LE.PipelineId
-		GROUP BY
-			BE.[StageId]
-		)
+    (
+        SELECT
+            BE.StageId,
+            STRING_AGG(
+                CAST(
+                    'p' + CAST(BE.PipelineId * 10 AS VARCHAR(MAX)) +
+                    '(' + BE.PipelineName + BE.AdditionalPipelineInfo + ')' + '\n' +
+                    'style p' + CAST(BE.PipelineId * 10 AS VARCHAR(MAX)) +
+                    ' fill:#' + LE.HexColour + ',stroke:#' + LE.HexColour
+                    AS VARCHAR(MAX)
+                ),
+                '\n'
+            ) AS PipelinesInStage
+        FROM @BaseData BE
+        INNER JOIN @LatestExecutions LE
+            ON BE.PipelineId = LE.PipelineId
+        GROUP BY BE.StageId
+    )
+
 	SELECT
 		@PageContent = REPLACE(@PageContent,'##s' + CAST([StageId] AS VARCHAR) + '##',[PipelinesInStage])
 	FROM
 		pipelines
 
-
- 
 	--add stage nodes
 	;WITH stageNodeExecutions AS (
 		SELECT 
@@ -544,11 +617,22 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		[StageId];
  
 	--add stage to pipeline relationships
-	SELECT 
-		@PageContent = @PageContent + 's' + CAST([StageId] * 100 AS VARCHAR) 
+	IF @StageLineageLevel = 'Detail'
+	BEGIN
+		SELECT @PageContent = @PageContent + 's' + CAST([StageId] * 100 AS VARCHAR) 
 		+ ' --> ' + 'p' + CAST([PipelineId] * 10 AS VARCHAR) + '\n'
-	FROM
-		@BaseData;
+		FROM @BaseData;
+	END
+	ELSE IF @StageLineageLevel = 'Simple'
+	BEGIN
+		WITH StageLineageCTE AS (
+		SELECT DISTINCT 
+			's' + CAST([StageId] * 100 AS VARCHAR) 
+						+ ' --> ' + [StageName] + '\n' AS StageLineage
+		FROM @BaseData)
+		SELECT @PageContent = @PageContent + StageLineage
+		FROM StageLineageCTE
+	END
  
 	--add stage to stage relationships
 	;WITH maxStage AS
@@ -593,7 +677,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	--add pipeline to pipeline relationships
 	;WITH pipelineRelationships AS (
 		SELECT DISTINCT 'p' + CAST(pd.[PipelineId] * 10 AS VARCHAR) 
-			+ ' -.- ' + 'p' + CAST(pd.[DependantPipelineId] * 10 AS VARCHAR) + '\n' AS RelationshipTxt
+			+ ' -.-> ' + 'p' + CAST(pd.[DependantPipelineId] * 10 AS VARCHAR) + '\n' AS RelationshipTxt
 		FROM
 		[control].[PipelineDependencies] pd
 		INNER JOIN @BaseData b1
