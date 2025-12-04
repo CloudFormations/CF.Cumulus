@@ -8,6 +8,7 @@ EXEC [control].[AddStages] 'Fact', 'Transform cleansed data and apply business l
 EXEC [control].[AddStages] 'Speed', 'Regular loading of frequently used data.', 0
 EXEC [control].[AddStages] 'ControlRaw', 'Demo of wait pipelines representing Raw load .', 0
 EXEC [control].[AddStages] 'ControlCleansed', 'Demo of wait pipelines representing cleansed load.', 0
+EXEC [control].[AddStages] 'ControlCurated', 'Demo of wait pipelines representing curated load.', 0
 EXEC [control].[AddStages] 'ControlSpeed', 'Demo of wait pipelines loading of frequently used data.', 0
 
 EXEC [control].[AddBatches] 'ControlDemoHourly', 'Ad-hoc Demo Batch for Control Wait pipeline executions.', 1
@@ -23,6 +24,7 @@ EXEC [control].[AddBatchStageLink] 'Daily', 'Dimension'
 EXEC [control].[AddBatchStageLink] 'Daily', 'Fact'
 EXEC [control].[AddBatchStageLink] 'ControlDemoDaily', 'ControlRaw'
 EXEC [control].[AddBatchStageLink] 'ControlDemoDaily', 'ControlCleansed'
+EXEC [control].[AddBatchStageLink] 'ControlDemoDaily', 'ControlCurated'
 
 -- Add tenants to the metadata control table.
 EXEC [control].[AddTenants] '$(TenantID)', 'Default', 'Example value for $(Environment) environment.'
