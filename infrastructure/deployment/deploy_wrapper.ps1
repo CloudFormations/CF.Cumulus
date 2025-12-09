@@ -17,7 +17,7 @@ param(
 )
 
 # Login to the Azure Tenant
-az login --tenant $tenantId
+# az login --tenant $tenantId
 
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $checkParamsScript = $currentLocation + '\check_params_from_file.ps1'
