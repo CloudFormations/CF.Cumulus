@@ -19,6 +19,22 @@ param(
 # Login to the Azure Tenant
 # az login --tenant $tenantId
 
+$currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+$checkParamsScript = $currentLocation + '\check_params_from_file.ps1'
+& $checkParamsScript `
+    -parametersFile $parametersFile
+
+$acceptInput = Read-Host "Are the utilised parameters correct? (Y) yes, (all other input) no. Press enter to confirm."
+
+if ( $acceptInput.ToUpper() -eq "Y")
+{
+    Write-Host "Proceed with deployment"
+}
+else {
+    Write-Host "Cancelling deployment"
+    exit
+}
+
 # DEMO: Start a timer
 $processTimerStart = [System.Diagnostics.Stopwatch]::StartNew()
 
@@ -28,7 +44,6 @@ $bicepDeployment = az deployment sub create `
     --location $location `
     --template-file $templateFile `
     --parameters $parametersFile `
-    # --what-if
     | ConvertFrom-Json
 
 # Save Outputs of reusable details from BiCep for other scripts
@@ -48,8 +63,7 @@ $sqlDatabaseName = $bicepDeployment.properties.outputs.sqlDatabaseName.value
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 
 # Get Subscription Id from Name
-$subscriptionDetails = az account subscription list | ConvertFrom-Json 
-$subscriptionIdValue = $subscriptionDetails.subscriptionId
+$subscriptionIdValue = az account list --query "[?name=='${subscriptionId}'].id" --output tsv
 
 # Grant User Key Vault Secret Administrator RBAC to save Function App Key to KV
 $userDetails = az ad signed-in-user show | ConvertFrom-Json
@@ -67,7 +81,8 @@ $deployAzureFunctionsScript = $currentLocation + '\deploy_azure_functions.ps1'
 & $deployAzureFunctionsScript `
     -currentLocation $currentLocation `
     -resourceGroupName $resourceGroupName `
-    -functionAppName $functionAppName
+    -functionAppName $functionAppName `
+    -keyVaultName $keyVaultName
 
 
 # Set environment variables for Data Factory LS deployments:
@@ -82,6 +97,7 @@ $Env:KEYVAULT = $keyVaultName
 $deployDataFactoryComponentsScript = $currentLocation + '\deploy_data_factory_components.ps1'
 & $deployDataFactoryComponentsScript `
     -tenantId $tenantId `
+    -subscriptionId $subscriptionId `
     -location $location `
     -resourceGroupName $resourceGroupName `
     -dataFactoryName $dataFactoryName

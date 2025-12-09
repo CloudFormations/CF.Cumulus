@@ -7,7 +7,10 @@ param(
     [string] $resourceGroupName,
 
     [Parameter(Mandatory=$true)]
-    [string] $functionAppName
+    [string] $functionAppName,
+    
+    [Parameter(Mandatory=$true)]
+    [string] $keyVaultName
 )
 
 # This command cleans the build output of the specified project using the Release configuration.

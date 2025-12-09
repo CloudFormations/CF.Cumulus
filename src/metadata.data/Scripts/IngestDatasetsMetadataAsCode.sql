@@ -1,9 +1,9 @@
 -- Metadata As Code - Ingest - add sample Datasets
 
 --Datasets:
-EXEC [ingest].[AddDatasets] 'AdventureWorksDemo', 'Ingest_LS_SQLDB_MIAuth', 'CumulusDemoDataSource01', 'CF.Cumulus.Ingest.Compute', 'SalesOrderHeader', 'SalesLT', 'SalesOrderHeader', 'parquet', 1, '2025-01-01 00:00:00.0000000', NULL, 'I', 0, 0, 'WHERE ModifiedDate > GETDATE() - 7', 'SalesLT', 'SalesOrderHeader', 1;
-EXEC [ingest].[AddDatasets] 'AdventureWorksDemo', 'Ingest_LS_SQLDB_MIAuth', 'CumulusDemoDataSource01', 'CF.Cumulus.Ingest.Compute', 'SalesOrderDetail', 'SalesLT', 'SalesOrderDetail', 'parquet', 1, '2025-01-01 00:00:00.0000000', NULL, 'I', 0, 0, 'WHERE ModifiedDate > GETDATE() - 7', 'SalesLT', 'SalesOrderDetail', 1;
-EXEC [ingest].[AddDatasets] 'AdventureWorksDemo', 'Ingest_LS_SQLDB_MIAuth', 'CumulusDemoDataSource01', 'CF.Cumulus.Ingest.Compute', 'Product', 'SalesLT', 'Product', 'parquet', 1, '2025-01-01 00:00:00.0000000', NULL, 'I', 0, 0, 'WHERE ModifiedDate > GETDATE() - 7', 'SalesLT', 'Product', 1;
+EXEC [ingest].[AddDatasets] 'AdventureWorksDemo', 'Ingest_LS_SQLDB_MIAuth', '$(DemoResourceName)', 'CF.Cumulus.Ingest.Compute', 'SalesOrderHeader', 'SalesLT', 'SalesOrderHeader', 'parquet', 1, '2025-01-01 00:00:00.0000000', NULL, 'I', 0, 0, 'WHERE ModifiedDate > GETDATE() - 7', 'SalesLT', 'SalesOrderHeader', 1;
+EXEC [ingest].[AddDatasets] 'AdventureWorksDemo', 'Ingest_LS_SQLDB_MIAuth', '$(DemoResourceName)', 'CF.Cumulus.Ingest.Compute', 'SalesOrderDetail', 'SalesLT', 'SalesOrderDetail', 'parquet', 1, '2025-01-01 00:00:00.0000000', NULL, 'I', 0, 0, 'WHERE ModifiedDate > GETDATE() - 7', 'SalesLT', 'SalesOrderDetail', 1;
+EXEC [ingest].[AddDatasets] 'AdventureWorksDemo', 'Ingest_LS_SQLDB_MIAuth', '$(DemoResourceName)', 'CF.Cumulus.Ingest.Compute', 'Product', 'SalesLT', 'Product', 'parquet', 1, '2025-01-01 00:00:00.0000000', NULL, 'I', 0, 0, 'WHERE ModifiedDate > GETDATE() - 7', 'SalesLT', 'Product', 1;
 
 --Attributes for SalesOrderHeader
 EXEC [ingest].[AddAttributes] 'AdventureWorksDemo', 'SalesOrderHeader', 1, 'SalesOrderID', 'int', 'INTEGER', '', '', 1, 0, 1

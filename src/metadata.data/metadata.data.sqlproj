@@ -61,7 +61,9 @@
   <ItemGroup>
     <None Include="Scripts\ConnectionsMetadataAsCode.sql" />
     <None Include="Scripts\ControlPipelineMetadataAsCode.sql" />
+    <None Include="Scripts\ControlWaitPipelineMetadataAsCode.sql" />
     <None Include="Scripts\TransformDatasetsMetadataAsCode.sql" />
+    <None Include="metadata.data.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
