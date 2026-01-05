@@ -34,47 +34,43 @@ CREATE FUNCTION [ingest].[GetIngestLoadAction]
         SET @LoadType = 'F'
     END
 
+    -- If Bronze is a delta table, register a load status that reflects that a full and incremental load into raw has been performed. This ensures the Merge to cleansed performs as able.
+    IF @ExtensionType = 'Delta'
+    BEGIN
+        SET @LoadStatus = @LoadStatus | POWER(2,1) | POWER(2,2) 
+    END
+    
     -- PRINT @LoadStatus
 
     -- No load of any kind for this dataset
     -- next raw load: full
-    -- next incremental load (if bronze type <> Delta): error
-    -- next incremental load (if bronze type = Delta): full
+    -- next incremental load: error
     IF @LoadStatus = 0 
     BEGIN
         IF @IngestStage = 'Raw'
         BEGIN
             SET @LoadAction = 'F'
         END
-        IF @IngestStage = 'Cleansed' AND @ExtensionType <> 'Delta'
+        IF @IngestStage = 'Cleansed'
         BEGIN
             SET @LoadAction = 'X'
             --RAISERROR('No Raw Full load completed. Please confirm this has not failed before proceeding with this cleansed load operation.',16,1)
-        END
-        IF @IngestStage = 'Cleansed' AND @ExtensionType = 'Delta'
-        BEGIN
-            SET @LoadAction = 'F'
         END
     END
 
     -- raw no loads
     -- next raw load: full
-    -- next incremental load (if bronze type <> Delta): error
-    -- next incremental load (if bronze type = Delta): full
+    -- next incremental load: error
     IF ( (2 & @LoadStatus) <> 2 )
     BEGIN
         IF @IngestStage = 'Raw'
         BEGIN
             SET @LoadAction = 'F'
         END
-        IF @IngestStage = 'Cleansed' AND @ExtensionType <> 'Delta'
+        IF @IngestStage = 'Cleansed'
         BEGIN
             SET @LoadAction = 'X'
             -- RAISERROR('No Raw Full load completed. Please confirm this has not failed before proceeding with this cleansed load operation.',16,1)
-        END
-        IF @IngestStage = 'Cleansed' AND @ExtensionType = 'Delta'
-        BEGIN
-            SET @LoadAction = 'F'
         END
     END
 
