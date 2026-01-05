@@ -22,6 +22,8 @@ def get_merge_payload_variables(payload: dict()) -> list():
 
     cleansed_schema_name = payload["CleansedSchemaName"] 
 
+    filter_condition = payload["FilterCondition"] 
+
     # Semantic checks for these required in the IngestChecks notebook?
     pk_list =  payload["CleansedPkList"].split(",")
     partition_list =  payload["CleansedPartitionFields"].split(",") if  payload["CleansedPartitionFields"] != "" else []
@@ -45,6 +47,6 @@ def get_merge_payload_variables(payload: dict()) -> list():
     # totalColumnTypeList = columnsTypeList
     # totalColumnFormatList = columnsFormatList
 
-    output = [table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list]
+    output = [table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, filter_condition, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list]
 
     return output

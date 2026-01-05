@@ -61,6 +61,18 @@ BEGIN
         RETURN 0;
     END
 
+    DECLARE @FilterCondition NVARCHAR(MAX)
+
+    SELECT 
+        @FilterCondition = 
+        CASE 
+            WHEN ExtensionType = 'Delta' THEN LoadClause
+            ELSE ''
+        END
+    FROM
+        [ingest].[Datasets]
+    WHERE
+        DatasetId = @DatasetId
 
     DECLARE @CleansedColumnsList NVARCHAR(MAX)
     DECLARE @CleansedColumnsTypeList NVARCHAR(MAX)
@@ -216,7 +228,8 @@ BEGIN
         @CleansedColumnsFormatList AS 'CleansedColumnsFormatList',
         @PkAttributesList AS 'CleansedPkList',
         @PartitionByAttributesList AS 'CleansedPartitionFields',
-        @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy'
+        @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy',
+        @FilterCondition AS 'FilterCondition'
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 

@@ -11,6 +11,7 @@ CREATE FUNCTION [ingest].[GetIngestLoadAction]
     DECLARE @LoadAction VARCHAR(1)
     DECLARE @RawLastLoadDate DATETIME2
     DECLARE @CleansedLastLoadDate DATETIME2
+    DECLARE @ExtensionType NVARCHAR(20)
 
     -- Defensive check for valid @IngestStage parameter: RAISERROR not allowed in UDF
     -- IF @IngestStage NOT IN ('Raw','Cleansed')
@@ -20,12 +21,14 @@ CREATE FUNCTION [ingest].[GetIngestLoadAction]
 
     SELECT 
         @LoadStatus = LoadStatus,
-        @LoadType = LoadType
+        @LoadType = LoadType,
+        @ExtensionType = ExtensionType
     FROM 
         ingest.[Datasets]
     WHERE
         DatasetId = @DatasetId
 
+    -- U = Unpack, used for Excel data sources. Therefore, always perform a full load.
     IF @LoadType = 'U'
     BEGIN
         SET @LoadType = 'F'
@@ -35,32 +38,43 @@ CREATE FUNCTION [ingest].[GetIngestLoadAction]
 
     -- No load of any kind for this dataset
     -- next raw load: full
-    -- next incremental load: error
+    -- next incremental load (if bronze type <> Delta): error
+    -- next incremental load (if bronze type = Delta): full
     IF @LoadStatus = 0 
     BEGIN
         IF @IngestStage = 'Raw'
         BEGIN
             SET @LoadAction = 'F'
         END
-        IF @IngestStage = 'Cleansed'
+        IF @IngestStage = 'Cleansed' AND @ExtensionType <> 'Delta'
         BEGIN
             SET @LoadAction = 'X'
             --RAISERROR('No Raw Full load completed. Please confirm this has not failed before proceeding with this cleansed load operation.',16,1)
         END
+        IF @IngestStage = 'Cleansed' AND @ExtensionType = 'Delta'
+        BEGIN
+            SET @LoadAction = 'F'
+        END
     END
+
     -- raw no loads
     -- next raw load: full
-    -- next incremental load: error
+    -- next incremental load (if bronze type <> Delta): error
+    -- next incremental load (if bronze type = Delta): full
     IF ( (2 & @LoadStatus) <> 2 )
     BEGIN
         IF @IngestStage = 'Raw'
         BEGIN
             SET @LoadAction = 'F'
         END
-        IF @IngestStage = 'Cleansed'
+        IF @IngestStage = 'Cleansed' AND @ExtensionType <> 'Delta'
         BEGIN
             SET @LoadAction = 'X'
             -- RAISERROR('No Raw Full load completed. Please confirm this has not failed before proceeding with this cleansed load operation.',16,1)
+        END
+        IF @IngestStage = 'Cleansed' AND @ExtensionType = 'Delta'
+        BEGIN
+            SET @LoadAction = 'F'
         END
     END
 
