@@ -32,11 +32,11 @@ BEGIN
     INNER JOIN
         [common].Connections AS cn5
     ON 
-        cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation IN ('raw','bronze')
+        ds.RawStorageConnectionFK = cn5.ConnectionId AND cn5.SourceLocation IN ('raw','bronze')
     INNER JOIN
         [common].Connections AS cn6
     ON 
-        cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation IN ('cleansed', 'silver')
+        ds.CleansedStorageConnectionFK = cn6.ConnectionId AND cn6.SourceLocation IN ('cleansed', 'silver')
 
     WHERE
         ds.DatasetId = @DatasetId
@@ -61,6 +61,18 @@ BEGIN
         RETURN 0;
     END
 
+    DECLARE @FilterCondition NVARCHAR(MAX)
+
+    SELECT 
+        @FilterCondition = 
+        CASE 
+            WHEN ExtensionType = 'Delta' THEN LoadClause
+            ELSE ''
+        END
+    FROM
+        [ingest].[Datasets]
+    WHERE
+        DatasetId = @DatasetId
 
     DECLARE @CleansedColumnsList NVARCHAR(MAX)
     DECLARE @CleansedColumnsTypeList NVARCHAR(MAX)
@@ -216,7 +228,8 @@ BEGIN
         @CleansedColumnsFormatList AS 'CleansedColumnsFormatList',
         @PkAttributesList AS 'CleansedPkList',
         @PartitionByAttributesList AS 'CleansedPartitionFields',
-        @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy'
+        @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy',
+        @FilterCondition AS 'FilterCondition'
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 
@@ -238,11 +251,11 @@ BEGIN
     INNER JOIN
         [common].Connections AS cn5
     ON 
-        cn5.ConnectionDisplayName = 'PrimaryDataLake' AND cn5.SourceLocation IN ('raw','bronze')
+        ds.RawStorageConnectionFK = cn5.ConnectionId AND cn5.SourceLocation IN ('raw','bronze')
     INNER JOIN
         [common].Connections AS cn6
     ON 
-        cn6.ConnectionDisplayName = 'PrimaryDataLake' AND cn6.SourceLocation IN ('cleansed','silver')
+        ds.CleansedStorageConnectionFK = cn6.ConnectionId AND cn6.SourceLocation IN ('cleansed', 'silver')
     INNER JOIN 
         [common].Connections AS cn7
     ON cn7.ConnectionDisplayName = 'PrimaryKeyVault'

@@ -61,7 +61,7 @@ pipeline_execution_datetime = pd.to_datetime(pipeline_execution_datetime, format
 
 # COMMAND ----------
 
-[table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list] = get_merge_payload_variables(payload)
+[table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, filter_condition, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list] = get_merge_payload_variables(payload)
 
 
 # COMMAND ----------
@@ -86,22 +86,30 @@ cleansed_abfss_path = set_abfss_path(cleansed_storage_name, cleansed_container_n
 # MAGIC #Get dataset from raw
 
 # COMMAND ----------
+if raw_file_type != "delta":
+    # Spark Read extended options. When switching versions of dataset, this is a required option.
+    options = {
+        'header':'True',
+        "mergeSchema": "true"
+        }
 
-# Spark Read extended options. When switching versions of dataset, this is a required option.
-options = {
-    'header':'True',
-    "mergeSchema": "true"
-    }
+    #different options for specifying, based on how we save abfss folder hierarchy.
+    file_full_path = f"{raw_abfss_path}/{raw_schema_name}/{table_name}/version={version_number}/{load_action_text}/{datetime_folder_hierarchy}/{table_name}.{raw_file_type}"
+    print(file_full_path)
 
-#different options for specifying, based on how we save abfss folder hierarchy.
-file_full_path = f"{raw_abfss_path}/{raw_schema_name}/{table_name}/version={version_number}/{load_action_text}/{datetime_folder_hierarchy}/{table_name}.{raw_file_type}"
-print(file_full_path)
-
-# assuming json,csv, parquet
-df = spark.read \
-    .options(**options) \
-    .format(raw_file_type) \
-    .load(file_full_path)
+    # assuming json,csv, parquet
+    df = spark.read \
+        .options(**options) \
+        .format(raw_file_type) \
+        .load(file_full_path)
+    
+elif raw_file_type == "delta":
+    file_full_path = f"{raw_abfss_path}/{raw_schema_name}/{table_name}"
+    df = spark.read.format("delta").load(file_full_path)
+    
+    # apply incremental loading filter
+    if load_action == "I":
+        df = spark.sql(f"SELECT * FROM {{df}} {filter_condition}",df=df)
 
 # display(df)
 
