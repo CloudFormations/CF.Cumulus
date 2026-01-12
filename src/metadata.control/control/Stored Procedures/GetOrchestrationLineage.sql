@@ -18,10 +18,11 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	@3_DataSourceDetails VARCHAR(MAX) = '',
 	
 	-- Visualisation
-	@SuccessColour VARCHAR(6) = '40B0A6',
-	@FailedColour VARCHAR(6) = 'E66100',
-	@BlockedColour VARCHAR(6) = 'DCDB88',
+	@SuccessColour VARCHAR(6) = '75CEB1',
+	@FailedColour VARCHAR(6) = 'DB257C',
+	@BlockedColour VARCHAR(6) = 'EE8023',
 	@RunningColour VARCHAR(6) = 'AEAEBD',
+	@DisabledColour VARCHAR(6) = 'F1F5E6',
 	@DefaultColour VARCHAR(6) = 'ECECFF'
 
 ) AS
@@ -93,16 +94,16 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			ON s.[StageId] = bs.[StageId]
 		INNER JOIN [control].[Batches] b
 			ON bs.[BatchId] = b.[BatchId]
-		 LEFT JOIN [ingest].[Datasets] id
-		 	ON p.PipelineName like 'Ingest_PL_%'
-		 	AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
-		 LEFT JOIN [transform].[Datasets] td
-		 	ON p.PipelineName like 'Transform_PL_%'
-		 	AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
+		LEFT JOIN [ingest].[Datasets] id
+			ON p.PipelineName like 'Ingest_PL_%'
+			AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
+		LEFT JOIN [transform].[Datasets] td
+			ON p.PipelineName like 'Transform_PL_%'
+			AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
 
-		 WHERE (
-		 	id.ConnectionFK IN (SELECT ConnectionId FROM filteredConnections)
-		 	)
+		WHERE (
+			id.ConnectionFK IN (SELECT ConnectionId FROM filteredConnections)
+			)
 		)
 
 		INSERT INTO @PipelineIds (PipelineId)
@@ -145,16 +146,16 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			ON s.[StageId] = bs.[StageId]
 		INNER JOIN [control].[Batches] b
 			ON bs.[BatchId] = b.[BatchId]
-		 LEFT JOIN [ingest].[Datasets] id
-		 	ON p.PipelineName like 'Ingest_PL_%'
-		 	AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
-		 LEFT JOIN [transform].[Datasets] td
-		 	ON p.PipelineName like 'Transform_PL_%'
-		 	AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
+		LEFT JOIN [ingest].[Datasets] id
+			ON p.PipelineName like 'Ingest_PL_%'
+			AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
+		LEFT JOIN [transform].[Datasets] td
+			ON p.PipelineName like 'Transform_PL_%'
+			AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
 
-		 WHERE (
-		 	id.ConnectionFK IN (SELECT ConnectionId FROM filteredConnections)
-		 	)
+		WHERE (
+			id.ConnectionFK IN (SELECT ConnectionId FROM filteredConnections)
+			)
 		)
 
 		INSERT INTO @PipelineIds (PipelineId)
@@ -194,18 +195,18 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			ON s.[StageId] = bs.[StageId]
 		INNER JOIN [control].[Batches] b
 			ON bs.[BatchId] = b.[BatchId]
-		 LEFT JOIN [ingest].[Datasets] id
-		 	ON p.PipelineName like 'Ingest_PL_%'
-		 	AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
-		 LEFT JOIN [transform].[Datasets] td
-		 	ON p.PipelineName like 'Transform_PL_%'
-		 	AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
+		LEFT JOIN [ingest].[Datasets] id
+			ON p.PipelineName like 'Ingest_PL_%'
+			AND pp.ParameterValue = CAST(id.DatasetId AS CHAR(4))
+		LEFT JOIN [transform].[Datasets] td
+			ON p.PipelineName like 'Transform_PL_%'
+			AND pp.ParameterValue = CAST(td.DatasetId AS CHAR(4)) 
 
-		 WHERE (
-		 	id.DatasetDisplayName IN (SELECT name FROM filteredDatasets)
-		 	OR
-		 	td.DatasetName IN (SELECT name FROM filteredDatasets)
-		 	)
+		WHERE (
+			id.DatasetDisplayName IN (SELECT name FROM filteredDatasets)
+			OR
+			td.DatasetName IN (SELECT name FROM filteredDatasets)
+			)
 		)
 
 		INSERT INTO @PipelineIds (PipelineId)
@@ -242,11 +243,13 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		[OrchestratorName] NVARCHAR(200) NOT NULL,
 		[StageId] INT NOT NULL,
 		[StageName] VARCHAR(225) NOT NULL,
+		[StageEnabled] BIT NOT NULL,
 		[PipelineId] INT NOT NULL,
 		[PipelineName] NVARCHAR(200) NOT NULL,
+		[PipelineEnabled] BIT NOT NULL,
 		[AdditionalPipelineInfo] NVARCHAR(500) NULL
 		)
- 
+
 	-- Get LatestExecution counts 
 	DECLARE @CountCurrentExecution INT;
 	DECLARE @CountLatestExecution INT;
@@ -282,8 +285,10 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		o.[OrchestratorName],
 		s.[StageId],
 		s.[StageName],
+		s.[Enabled],
 		p.[PipelineId],
 		p.[PipelineName],
+		p.[Enabled],
 		CASE 
 			WHEN STRING_AGG(pp.ParameterName,'') IS NOT NULL THEN  CONCAT(' - ',STRING_AGG(CONCAT(pp.ParameterName, ': ', REPLACE(REPLACE(pp.ParameterValue,'[','#91;'),']','#93;')),','))
 			ELSE ''
@@ -317,8 +322,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			SELECT TOP 1 LocalExecutionId FROM control.ExecutionLog ORDER BY LogId DESC)
 		AND LogId IN (SELECT MAX(LogId) FROM control.ExecutionLog GROUP BY PipelineId)
 	WHERE
-		p.[Enabled] = 1
-		AND b.[BatchName] = @BatchName
+		b.[BatchName] = @BatchName
 		AND id.DatasetId IS NULL 
 		AND td.DatasetId IS NULL
 		AND (
@@ -336,8 +340,10 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		o.[OrchestratorName],
 		s.[StageId],
 		s.[StageName],
+		s.[Enabled],
 		p.[PipelineId],
-		p.[PipelineName]
+		p.[PipelineName],
+		p.[Enabled]
 
 	UNION 
 
@@ -346,8 +352,10 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		o.[OrchestratorName],
 		s.[StageId],
 		s.[StageName],
+	s.[Enabled],
 		p.[PipelineId],
 		p.[PipelineName],
+	p.[Enabled],
 		CASE 
 			WHEN id.DatasetId IS NOT NULL THEN CONCAT(' - ', id.DatasetDisplayName)
 			WHEN td.DatasetId IS NOT NULL THEN CONCAT(' - ', td.DatasetName)
@@ -382,8 +390,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			SELECT TOP 1 LocalExecutionId FROM control.ExecutionLog ORDER BY LogId DESC)
 		AND LogId IN (SELECT MAX(LogId) FROM control.ExecutionLog GROUP BY PipelineId)
 	WHERE
-		p.[Enabled] = 1
-		AND b.[BatchName] = @BatchName
+		b.[BatchName] = @BatchName
 		AND (id.[DatasetId] IS NOT NULL OR td.[DatasetId] IS NOT NULL)
 		AND (
 			-- Filter for blocked and failed against current executions table
@@ -396,7 +403,6 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			SELECT PipelineId
 			FROM @PipelineIds
 		);
- 
 
 	--add orchestrator(s) sub graphs
 	;WITH orchestrators AS
@@ -407,7 +413,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			'subgraph ' + [OrchestratorName] + '\n' + 
 			'style ' + [OrchestratorName] + ' fill:#F5F5F5,stroke:#F5F5F5' + '\n' + 
 			'##o' + CAST([OrchestratorId] * 10000 AS VARCHAR) + '##' + '\n' + 'end' + '\n'
-			 AS OrchestratorSubGraphs
+			AS OrchestratorSubGraphs
 		FROM
 			@BaseData
 		)
@@ -418,14 +424,15 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		orchestrators;
 
 
- 
+
 	--add stage sub graphs
 	;WITH stages AS
 		(
 		SELECT DISTINCT
 			[OrchestratorId],
 			[StageName],
-			[StageId]
+			[StageId],
+			[StageEnabled]
 		FROM
 			@BaseData
 		),
@@ -446,7 +453,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		@PageContent = REPLACE(@PageContent,'##o' + CAST([OrchestratorId] * 10000 AS VARCHAR) + '##',[StageSubGraphs])
 	FROM
 		stageSubs;
- 
+
 	--add pipelines within stage
 
 	DECLARE @LatestExecutions TABLE (
@@ -472,27 +479,30 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			[HexColour],
 			[PipelinePrecedence])
 		SELECT
-			[LocalExecutionId],
-			[StageId],
-			[PipelineId],
-			[PipelineName],
-			[PipelineStatus],
+			ce.[LocalExecutionId],
+			bd.[StageId],
+			bd.[PipelineId],
+			bd.[PipelineName],
+			ce.[PipelineStatus],
 			CASE 
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Success' THEN @SuccessColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Blocked' THEN @BlockedColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Failed' THEN @FailedColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Running' THEN @RunningColour
+				WHEN @UseStatusColours = 1 AND ce.PipelineStatus = 'Success' THEN @SuccessColour
+				WHEN @UseStatusColours = 1 AND ce.PipelineStatus = 'Blocked' THEN @BlockedColour
+				WHEN @UseStatusColours = 1 AND ce.PipelineStatus = 'Failed' THEN @FailedColour
+				WHEN @UseStatusColours = 1 AND ce.PipelineStatus = 'Running' THEN @RunningColour
+				WHEN @UseExecutionHistory = 1 AND bd.StageEnabled = 0 OR bd.PipelineId = 0 THEN @DisabledColour
 				ELSE @DefaultColour
 			END AS HexColour,		
 			CASE 
-				WHEN PipelineStatus = 'Success' THEN 1
-				WHEN PipelineStatus = 'Blocked' THEN 2
-				WHEN PipelineStatus = 'Failed' THEN 3
-				WHEN PipelineStatus = 'Running' THEN 4
-				WHEN PipelineStatus = 'Pending' THEN 5
+				WHEN ce.PipelineStatus = 'Success' THEN 1
+				WHEN ce.PipelineStatus = 'Blocked' THEN 2
+				WHEN ce.PipelineStatus = 'Failed' THEN 3
+				WHEN ce.PipelineStatus = 'Running' THEN 4
+				WHEN ce.PipelineStatus = 'Pending' THEN 5
 				ELSE 999
 			END AS [PipelinePrecedence]
-		FROM control.CurrentExecution
+		FROM @BaseData AS bd
+		LEFT JOIN control.CurrentExecution AS ce
+		ON ce.PipelineId = bd.PipelineId
 	END
 
 	ELSE IF @CountCurrentExecution = 0 AND @CountLatestExecution > 0
@@ -506,28 +516,31 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 			[HexColour],
 			[PipelinePrecedence])
 		SELECT
-			[LocalExecutionId],
-			[StageId],
-			[PipelineId],
-			[PipelineName],
-			[PipelineStatus],
+			el.[LocalExecutionId],
+			bd.[StageId],
+			bd.[PipelineId],
+			bd.[PipelineName],
+			el.[PipelineStatus],
 			CASE 
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Success' THEN @SuccessColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Blocked' THEN @BlockedColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Failed' THEN @FailedColour
-				WHEN @UseStatusColours = 1 AND PipelineStatus = 'Running' THEN @RunningColour
+				WHEN @UseStatusColours = 1 AND el.PipelineStatus = 'Success' THEN @SuccessColour
+				WHEN @UseStatusColours = 1 AND el.PipelineStatus = 'Blocked' THEN @BlockedColour
+				WHEN @UseStatusColours = 1 AND el.PipelineStatus = 'Failed' THEN @FailedColour
+				WHEN @UseStatusColours = 1 AND el.PipelineStatus = 'Running' THEN @RunningColour
+				WHEN @UseExecutionHistory = 1 AND bd.StageEnabled = 0 OR bd.PipelineId = 0 THEN @DisabledColour
 				ELSE @DefaultColour
 			END AS HexColour,
 			CASE 
-				WHEN PipelineStatus = 'Success' THEN 1
-				WHEN PipelineStatus = 'Blocked' THEN 2
-				WHEN PipelineStatus = 'Failed' THEN 3
-				WHEN PipelineStatus = 'Running' THEN 4
-				WHEN PipelineStatus = 'Pending' THEN 5
+				WHEN el.PipelineStatus = 'Success' THEN 1
+				WHEN el.PipelineStatus = 'Blocked' THEN 2
+				WHEN el.PipelineStatus = 'Failed' THEN 3
+				WHEN el.PipelineStatus = 'Running' THEN 4
+				WHEN el.PipelineStatus = 'Pending' THEN 5
 				ELSE 999
 			END AS [PipelinePrecedence]
-		FROM control.ExecutionLog
-		WHERE LocalExecutionId = (
+			FROM @BaseData AS bd
+		LEFT JOIN control.ExecutionLog AS el
+		ON el.PipelineId = bd.PipelineId
+		WHERE el.LocalExecutionId = (
 			SELECT TOP 1 LocalExecutionId FROM control.ExecutionLog ORDER BY LogId DESC)
 		AND LogId IN (SELECT MAX(LogId) FROM control.ExecutionLog GROUP BY PipelineId)
 
@@ -547,24 +560,24 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	END
 
 	;WITH pipelines AS
-    (
-        SELECT
-            BE.StageId,
-            STRING_AGG(
-                CAST(
-                    'p' + CAST(BE.PipelineId * 10 AS VARCHAR(MAX)) +
-                    '(' + BE.PipelineName + BE.AdditionalPipelineInfo + ')' + '\n' +
-                    'style p' + CAST(BE.PipelineId * 10 AS VARCHAR(MAX)) +
-                    ' fill:#' + LE.HexColour + ',stroke:#' + LE.HexColour
-                    AS VARCHAR(MAX)
-                ),
-                '\n'
-            ) AS PipelinesInStage
-        FROM @BaseData BE
-        INNER JOIN @LatestExecutions LE
-            ON BE.PipelineId = LE.PipelineId
-        GROUP BY BE.StageId
-    )
+	(
+		SELECT
+			BE.StageId,
+			STRING_AGG(
+				CAST(
+					'p' + CAST(BE.PipelineId * 10 AS VARCHAR(MAX)) +
+					'(' + BE.PipelineName + BE.AdditionalPipelineInfo + ')' + '\n' +
+					'style p' + CAST(BE.PipelineId * 10 AS VARCHAR(MAX)) +
+					' fill:#' + LE.HexColour + ',stroke:#' + LE.HexColour
+					AS VARCHAR(MAX)
+				),
+				'\n'
+			) AS PipelinesInStage
+		FROM @BaseData BE
+		INNER JOIN @LatestExecutions LE
+			ON BE.PipelineId = LE.PipelineId
+		GROUP BY BE.StageId
+	)
 
 	SELECT
 		@PageContent = REPLACE(@PageContent,'##s' + CAST([StageId] AS VARCHAR) + '##',[PipelinesInStage])
@@ -575,13 +588,14 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 	;WITH stageNodeExecutions AS (
 		SELECT 
 			BE.StageId,
+			BE.StageEnabled,
 			MAX(LE.PipelinePrecedence) AS StageStatus
 		FROM 
 			@BaseData BE
 		LEFT JOIN 
 			@LatestExecutions LE
 		ON BE.PipelineId = LE.PipelineId
-		GROUP BY BE.StageId
+		GROUP BY BE.StageId, BE.StageEnabled
 	),
 	StageNodeStatuses AS (
 		SELECT
@@ -591,6 +605,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 				WHEN @UseStatusColours = 1 AND StageStatus = 2 THEN @BlockedColour
 				WHEN @UseStatusColours = 1 AND StageStatus = 3 THEN @FailedColour
 				WHEN @UseStatusColours = 1 AND StageStatus = 4 THEN @RunningColour
+				WHEN @UseExecutionHistory = 1 AND StageEnabled = 0 THEN @DisabledColour
 				ELSE @DefaultColour
 			END AS HexColour
 		FROM stageNodeExecutions
@@ -615,7 +630,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		stageNodes
 	ORDER BY
 		[StageId];
- 
+
 	--add stage to pipeline relationships
 	IF @StageLineageLevel = 'Detail'
 	BEGIN
@@ -633,7 +648,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		SELECT @PageContent = @PageContent + StageLineage
 		FROM StageLineageCTE
 	END
- 
+
 	--add stage to stage relationships
 	;WITH maxStage AS
 		(
@@ -698,9 +713,9 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		[control].[Batches]
 	WHERE
 		[BatchName] = @BatchName;
- 
+
 	SET @PageContent = @PageContent + 'end';
- 
+
 	--add mermaid header
 	DECLARE @PageHeader VARCHAR(1000) = '::: mermaid' + '\n' + 'graph'
 	IF @UseStatusColours = 1
@@ -710,6 +725,7 @@ CREATE PROCEDURE [control].[GetOrchestrationLineage] (
 		'failure(Failure)' + '\n' + 'style failure fill:#' + @FailedColour + ',stroke:#' + @FailedColour + '\n' + 
 		'blocked(Blocked)' + '\n' + 'style blocked fill:#' + @BlockedColour + ',stroke:#' + @BlockedColour + '\n' + 
 		'running(Running)' + '\n' + 'style running fill:#' + @RunningColour + ',stroke:#' + @RunningColour + '\n' + 
+		'disabled(Disabled)' + '\n' + 'style disabled fill:#' + @DisabledColour + ',stroke:#' + @DisabledColour + '\n' + 
 		'pending(Pending)' + '\n' + 'style pending fill:#' + @DefaultColour + ',stroke:#' + @DefaultColour + '\n' + 
 		'end'
 	END
