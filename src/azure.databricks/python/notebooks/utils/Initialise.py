@@ -4,7 +4,7 @@ from databricks.sdk.runtime import dbutils, spark
 # Set abfss paths
 # Check abfss exists
 
-def set_abfss_spark_config(account_key_secret_name:str, storage_name: str) -> None:
+def set_abfss_spark_config(account_key_secret_name:str, storage_name: str, secret_scope: str = "CumulusScope01") -> None:
     """
     Set the Spark configuration for the ABFSS link to a storage account.
 
@@ -12,7 +12,7 @@ def set_abfss_spark_config(account_key_secret_name:str, storage_name: str) -> No
         account_key_secret_name (str): The Azure Key Vault Secret name for the storage account.
         storage_name (str): The ADLS storage account name. 
     """
-    account_key = dbutils.secrets.get(scope = "CumulusScope01", key = account_key_secret_name)
+    account_key = dbutils.secrets.get(scope = secret_scope, key = account_key_secret_name)
     spark.conf.set(
         f"fs.azure.account.key.{storage_name}.dfs.core.windows.net",
         account_key
