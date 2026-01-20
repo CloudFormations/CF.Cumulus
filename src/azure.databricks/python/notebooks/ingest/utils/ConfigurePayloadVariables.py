@@ -11,7 +11,7 @@ def get_merge_payload_variables(payload: dict()) -> list():
     raw_secret = payload["RawStorageAccessKey"]
     raw_last_load_date = payload["RawLastLoadDate"]
 
-    raw_schema_name = payload["RawSchemaName"] # connection name of data source
+    raw_connection_name = payload["RawConnectionName"] # connection name of data source
     raw_file_type = payload["RawFileType"] 
     raw_source_path = payload["RawSourcePath"] # physical path in raw container
     raw_source_name = payload["RawSourceName"] # file name in raw container
@@ -23,7 +23,7 @@ def get_merge_payload_variables(payload: dict()) -> list():
     cleansed_secret = payload["CleansedStorageAccessKey"]
     cleansed_last_load_date = payload["CleansedLastLoadDate"]
 
-    cleansed_schema_name = payload["CleansedSchemaName"] # connection name of data source
+    cleansed_connection_name = payload["CleansedConnectionName"] # connection name of data source
     cleansed_source_path = payload["CleansedSourcePath"] # desired physical path in cleansed container
     cleansed_source_name = payload["CleansedSourceName"] # desired file name in cleansed container
 
@@ -44,6 +44,6 @@ def get_merge_payload_variables(payload: dict()) -> list():
     total_column_type_list = columns_type_list + metadata_column_type_list
     total_column_format_list = columns_format_list + metadata_column_format_list
 
-    output = [table_name,load_type,load_action,load_action_text,version_number,raw_storage_name,raw_container_name,raw_secret,raw_last_load_date,raw_schema_name,raw_file_type,raw_source_path,raw_source_name,datetime_folder_hierarchy,cleansed_storage_name,cleansed_container_name,cleansed_secret,cleansed_last_load_date,cleansed_schema_name,cleansed_source_path,cleansed_source_name,filter_condition,pk_list,partition_list,columns_list,columns_type_list,columns_format_list,metadata_column_list,metadata_column_type_list,metadata_column_format_list,total_column_list,total_column_type_list,total_column_format_list]
+    output = [table_name,load_type,load_action,load_action_text,version_number,raw_storage_name,raw_container_name,raw_secret,raw_last_load_date,raw_connection_name,raw_file_type,raw_source_path,raw_source_name,datetime_folder_hierarchy,cleansed_storage_name,cleansed_container_name,cleansed_secret,cleansed_last_load_date,cleansed_connection_name,cleansed_source_path,cleansed_source_name,filter_condition,pk_list,partition_list,columns_list,columns_type_list,columns_format_list,metadata_column_list,metadata_column_type_list,metadata_column_format_list,total_column_list,total_column_type_list,total_column_format_list]
 
     return output

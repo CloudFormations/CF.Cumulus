@@ -192,7 +192,7 @@ BEGIN
         ds.[Enabled] = 1
 
     SELECT 
-        [cn].[ConnectionDisplayName] AS 'RawSchemaName',
+        [cn].[ConnectionDisplayName] AS 'RawConnectionName',
         [cn2].[ConnectionDisplayName] AS 'ComputeName',
         [cn2].[ConnectionLocation] AS 'ComputeWorkspaceURL',
         [cn2].[ComputeLocation] AS 'ComputeClusterId',
@@ -216,7 +216,7 @@ BEGIN
         ds.SourceName,
         ds.ExtensionType AS 'RawFileType',
         ds.VersionNumber,
-        [cn].[ConnectionDisplayName] AS 'CleansedSchemaName',
+        [cn].[ConnectionDisplayName] AS 'CleansedConnectionName',
         ds.CleansedName AS 'CleansedTableName',
         ds.Enabled,
         ds.LoadType,
