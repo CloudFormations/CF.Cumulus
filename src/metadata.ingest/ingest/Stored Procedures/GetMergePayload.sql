@@ -32,11 +32,11 @@ BEGIN
     INNER JOIN
         [common].Connections AS cn5
     ON 
-        ds.RawStorageConnectionFK = cn5.ConnectionId AND cn5.SourceLocation IN ('raw','bronze')
+        ds.RawStorageConnectionFK = cn5.ConnectionId
     INNER JOIN
         [common].Connections AS cn6
     ON 
-        ds.CleansedStorageConnectionFK = cn6.ConnectionId AND cn6.SourceLocation IN ('cleansed', 'silver')
+        ds.CleansedStorageConnectionFK = cn6.ConnectionId
 
     WHERE
         ds.DatasetId = @DatasetId
@@ -85,9 +85,9 @@ BEGIN
 
     -- Get attribute data as comma separated string values for the dataset
     SELECT 
-        @CleansedColumnsList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),','),
-        @CleansedColumnsTypeList = STRING_AGG(CAST(att.AttributeTargetDataType AS NVARCHAR(MAX)),','),
-        @CleansedColumnsFormatList = STRING_AGG(CAST(att.AttributeTargetDataFormat AS NVARCHAR(MAX)), ',')
+        @CleansedColumnsList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'|'),
+        @CleansedColumnsTypeList = STRING_AGG(CAST(att.AttributeTargetDataType AS NVARCHAR(MAX)),'|'),
+        @CleansedColumnsFormatList = STRING_AGG(CAST(att.AttributeTargetDataFormat AS NVARCHAR(MAX)), '|')
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 
@@ -105,7 +105,7 @@ BEGIN
 
     -- Get pk columns as comma separated string values for the dataset
     SELECT 
-        @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),',')
+        @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'|')
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 
@@ -125,7 +125,7 @@ BEGIN
 
     -- Get pk columns as comma separated string values for the dataset
     SELECT 
-        @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),',')
+        @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'|')
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 
@@ -192,7 +192,7 @@ BEGIN
         ds.[Enabled] = 1
 
     SELECT 
-        [cn].[ConnectionDisplayName] AS 'RawSchemaName',
+        [cn].[ConnectionDisplayName] AS 'RawConnectionName',
         [cn2].[ConnectionDisplayName] AS 'ComputeName',
         [cn2].[ConnectionLocation] AS 'ComputeWorkspaceURL',
         [cn2].[ComputeLocation] AS 'ComputeClusterId',
@@ -212,11 +212,13 @@ BEGIN
         [cn7].[ConnectionLocation] AS 'KeyVaultAddress',
 
         ds.DatasetDisplayName,
-        ds.SourcePath,
-        ds.SourceName,
+        ds.SourcePath AS 'RawPath',
+        ds.SourceName AS 'RawName',
+        ds.CleansedPath AS 'CleansedPath',
+        ds.CleansedName AS 'CleansedName',
         ds.ExtensionType AS 'RawFileType',
         ds.VersionNumber,
-        [cn].[ConnectionDisplayName] AS 'CleansedSchemaName',
+        [cn].[ConnectionDisplayName] AS 'CleansedConnectionName',
         ds.CleansedName AS 'CleansedTableName',
         ds.Enabled,
         ds.LoadType,
@@ -251,11 +253,11 @@ BEGIN
     INNER JOIN
         [common].Connections AS cn5
     ON 
-        ds.RawStorageConnectionFK = cn5.ConnectionId AND cn5.SourceLocation IN ('raw','bronze')
+        ds.RawStorageConnectionFK = cn5.ConnectionId
     INNER JOIN
         [common].Connections AS cn6
     ON 
-        ds.CleansedStorageConnectionFK = cn6.ConnectionId AND cn6.SourceLocation IN ('cleansed', 'silver')
+        ds.CleansedStorageConnectionFK = cn6.ConnectionId
     INNER JOIN 
         [common].Connections AS cn7
     ON cn7.ConnectionDisplayName = 'PrimaryKeyVault'

@@ -48,7 +48,7 @@ payload = json.loads(dbutils.widgets.get("Merge Payload"))
 
 # COMMAND ----------
 
-[table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, filter_condition, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list] = get_merge_payload_variables(payload)
+[table_name,load_type,load_action,load_action_text,version_number,raw_storage_name,raw_container_name,raw_secret,raw_last_load_date,raw_connection_name,raw_file_type,raw_path,raw_name,datetime_folder_hierarchy,cleansed_storage_name,cleansed_container_name,cleansed_secret,cleansed_last_load_date,cleansed_connection_name,cleansed_path,cleansed_name,cleansed_folder,filter_condition,pk_list,partition_list,columns_list,columns_type_list,columns_format_list,metadata_column_list,metadata_column_type_list,metadata_column_format_list,total_column_list,total_column_type_list,total_column_format_list] = get_merge_payload_variables(payload)
 
 # COMMAND ----------
 
@@ -87,14 +87,6 @@ check_merge_and_pk_conditions(load_action = load_action, pk_list=pk_list)
 
 # COMMAND ----------
 
-check_container_name(container_name = raw_container_name)
-
-# COMMAND ----------
-
-check_container_name(container_name = cleansed_container_name)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # Check: Storage accessibility
 
@@ -113,7 +105,7 @@ check_abfss(abfss_path=cleansed_abfss_path)
 
 # COMMAND ----------
 
-schema_exists = check_exists_delta_schema(schema_name = cleansed_schema_name)
+schema_exists = check_exists_delta_schema(schema_name = cleansed_folder)
 
 # COMMAND ----------
 
@@ -122,7 +114,7 @@ schema_exists = check_exists_delta_schema(schema_name = cleansed_schema_name)
 
 # COMMAND ----------
 
-cleansed_table_path = set_table_path(schema_name =cleansed_schema_name, table_name =table_name)
+cleansed_table_path = set_table_path(schema_name =cleansed_folder, table_name =table_name)
 print(cleansed_table_path)
 
 # COMMAND ----------

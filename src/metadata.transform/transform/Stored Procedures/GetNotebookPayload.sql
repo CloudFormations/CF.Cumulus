@@ -70,8 +70,8 @@ BEGIN
 
     -- Get attribute data as comma separated string values for the dataset. This excludes the SurrogateKey.
     SELECT 
-        @CuratedColumnsList = STRING_AGG(att.AttributeName,','),
-        @CuratedColumnsTypeList = STRING_AGG(att.AttributeTargetDataType,',')
+        @CuratedColumnsList = STRING_AGG(att.AttributeName,'|'),
+        @CuratedColumnsTypeList = STRING_AGG(att.AttributeTargetDataType,'|')
     FROM 
         [transform].[Datasets] AS ds
     INNER JOIN 
@@ -107,7 +107,7 @@ BEGIN
 
     -- Get Bk columns as comma separated string values for the dataset
     SELECT 
-        @BkAttributesList = STRING_AGG(att.AttributeName,',')
+        @BkAttributesList = STRING_AGG(att.AttributeName,'|')
     FROM 
         [transform].[Datasets] AS ds
     INNER JOIN 
@@ -123,7 +123,7 @@ BEGIN
 
     -- Get partitionby  columns as comma separated string values for the dataset
     SELECT 
-        @PartitionByAttributesList = STRING_AGG(att.AttributeName,',')
+        @PartitionByAttributesList = STRING_AGG(att.AttributeName,'|')
     FROM 
         [transform].[Datasets] AS ds
     INNER JOIN 
