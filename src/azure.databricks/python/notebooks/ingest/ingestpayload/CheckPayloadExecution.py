@@ -87,14 +87,6 @@ check_merge_and_pk_conditions(load_action = load_action, pk_list=pk_list)
 
 # COMMAND ----------
 
-check_container_name(container_name = raw_container_name)
-
-# COMMAND ----------
-
-check_container_name(container_name = cleansed_container_name)
-
-# COMMAND ----------
-
 # MAGIC %md
 # MAGIC # Check: Storage accessibility
 

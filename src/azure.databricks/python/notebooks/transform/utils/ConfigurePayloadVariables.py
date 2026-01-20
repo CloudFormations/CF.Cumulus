@@ -9,11 +9,11 @@ def get_transform_payload_variables(payload: dict()) -> list():
 
     curated_schema_name = payload["SchemaName"]
     curated_dataset_name = payload["DatasetName"]
-    columns_list = payload["ColumnsList"].split(",")
-    column_type_list = payload["ColumnTypeList"].split(",")
+    columns_list = payload["ColumnsList"].split("|")
+    column_type_list = payload["ColumnTypeList"].split("|")
 
-    bk_list =  payload["BkAttributesList"].split(",")
-    partition_list =  payload["PartitionByAttributesList"].split(",") if  payload["PartitionByAttributesList"] != "" else []
+    bk_list =  payload["BkAttributesList"].split("|")
+    partition_list =  payload["PartitionByAttributesList"].split("|") if  payload["PartitionByAttributesList"] != "" else []
 
     surrogate_key = payload["SurrogateKey"]
 
