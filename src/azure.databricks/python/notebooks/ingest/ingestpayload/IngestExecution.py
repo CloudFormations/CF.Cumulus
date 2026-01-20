@@ -104,7 +104,7 @@ if raw_file_type != "delta":
         .load(file_full_path)
     
 elif raw_file_type == "delta":
-    file_full_path = f"{raw_abfss_path}/{raw_connection_name}/{raw_source_path}/{raw_source_name}"
+    file_full_path = f"{raw_abfss_path}/{raw_source_path}/{raw_source_name}"
     df = spark.read.format("delta").load(file_full_path)
     
     # apply incremental loading filter
