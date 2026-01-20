@@ -212,8 +212,10 @@ BEGIN
         [cn7].[ConnectionLocation] AS 'KeyVaultAddress',
 
         ds.DatasetDisplayName,
-        ds.SourcePath,
-        ds.SourceName,
+        ds.SourcePath AS 'RawPath',
+        ds.SourceName AS 'RawName',
+        ds.CleansedPath AS 'CleansedPath',
+        ds.CleansedName AS 'CleansedName',
         ds.ExtensionType AS 'RawFileType',
         ds.VersionNumber,
         [cn].[ConnectionDisplayName] AS 'CleansedConnectionName',
