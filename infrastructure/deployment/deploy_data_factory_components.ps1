@@ -17,16 +17,9 @@ param(
 )
 
 # Modules
-# Install-Module -Name "Az"
-# az login --tenant $tenantId
-
-# Import-Module -Name "Az"
-
-# Install-Module -Name "Az.DataFactory"
 Import-Module -Name "Az.DataFactory"
 
 # https://github.com/Azure-Player/azure.datafactory.tools/
-# Install-Module -Name azure.datafactory.tools -Scope CurrentUser
 Import-Module -Name azure.datafactory.tools
 
 # Get Deployment Objects and Params files
