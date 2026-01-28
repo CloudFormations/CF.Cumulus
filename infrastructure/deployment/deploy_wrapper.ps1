@@ -23,8 +23,12 @@ $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $checkImportsScript = $currentLocation + '\check_imports.ps1'
 & $checkImportsScript `
 
-# Login to the Azure Tenant
+# Authenticate Azure CLI
 az login --tenant $tenantId
+$subscriptionId = az account list --query "[?name=='${subscriptionName}'].id" --output tsv
+
+# Authenticate Azure PowerShell
+Connect-AzAccount -SubscriptionId $subscriptionId
 
 $checkParamsScript = $currentLocation + '\check_params_from_file.ps1'
 & $checkParamsScript `
@@ -68,8 +72,6 @@ $sqlDatabaseName = $bicepDeployment.properties.outputs.sqlDatabaseName.value
 
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 
-# Get Subscription Id from Name
-$subscriptionId = az account list --query "[?name=='${subscriptionName}'].id" --output tsv
 
 # Grant User Key Vault Secret Administrator RBAC to save Function App Key to KV
 $userDetails = az ad signed-in-user show | ConvertFrom-Json
