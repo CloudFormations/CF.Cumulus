@@ -4,7 +4,7 @@ param(
     [string] $tenantId,
 
     [Parameter(Mandatory=$true)]
-    [string] $subscriptionId,
+    [string] $subscriptionName,
 
     [Parameter(Mandatory=$true)]
     [string] $location,
@@ -42,5 +42,5 @@ $options.CreateNewInstance = $false # New ADF workspace deployment not required.
 $options.Excludes.Add("trigger.*","")
 $options.Excludes.Add("factory.*","")
 
-Set-AzContext -Subscription $subscriptionId
+Set-AzContext -Subscription $subscriptionName
 Publish-AdfV2FromJson -RootFolder "$scriptPath" -ResourceGroupName "$resourceGroupName" -DataFactoryName "$dataFactoryName" -Location "$location" -Option $options -Stage "install"

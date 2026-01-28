@@ -7,11 +7,6 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionIdValue,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
     $sqlServerName,
 
     [Parameter(Mandatory=$true)]

@@ -4,7 +4,7 @@ param(
     [string] $tenantId,
 
     [Parameter(Mandatory=$true)]
-    [string] $subscriptionId,
+    [string] $subscriptionName,
 
     [Parameter(Mandatory=$true)]
     [string] $location,
@@ -16,10 +16,16 @@ param(
     [string] $parametersFile = "infrastructure/configuration/_installation/main.bicepparam"
 )
 
-# Login to the Azure Tenant
-# az login --tenant $tenantId
-
+# Get relative path within local OS
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+
+# Perform pre-execution checks of required modules
+$checkImportsScript = $currentLocation + '\check_imports.ps1'
+& $checkImportsScript `
+
+# Login to the Azure Tenant
+az login --tenant $tenantId
+
 $checkParamsScript = $currentLocation + '\check_params_from_file.ps1'
 & $checkParamsScript `
     -parametersFile $parametersFile
@@ -40,7 +46,7 @@ $processTimerStart = [System.Diagnostics.Stopwatch]::StartNew()
 
 # Run the *main*.bicep file to deploy your resources to Azure as per your configuration file
 $bicepDeployment = az deployment sub create `
-    --subscription $subscriptionId `
+    --subscription $subscriptionName `
     --location $location `
     --template-file $templateFile `
     --parameters $parametersFile `
@@ -63,18 +69,18 @@ $sqlDatabaseName = $bicepDeployment.properties.outputs.sqlDatabaseName.value
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 
 # Get Subscription Id from Name
-$subscriptionIdValue = az account list --query "[?name=='${subscriptionId}'].id" --output tsv
+$subscriptionId = az account list --query "[?name=='${subscriptionName}'].id" --output tsv
 
 # Grant User Key Vault Secret Administrator RBAC to save Function App Key to KV
 $userDetails = az ad signed-in-user show | ConvertFrom-Json
 $userId = $userDetails.id
-az role assignment create --role "Key Vault Secrets Officer" --assignee $userId --scope "/subscriptions/$subscriptionIdValue/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+az role assignment create --role "Key Vault Secrets Officer" --assignee $userId --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
 
 # Grant Databricks Key Vault Secrets User RBAC to read secrets from KV
 # Get Databricks Object Id
 $databricksDetails = az ad sp list --query "[?displayName=='AzureDatabricks']" | ConvertFrom-Json
 
-az role assignment create --assignee-object-id $databricksDetails.id --role "Key Vault Secrets User" --scope "/subscriptions/$subscriptionIdValue/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
+az role assignment create --assignee-object-id $databricksDetails.id --role "Key Vault Secrets User" --scope "/subscriptions/$subscriptionId/resourceGroups/$resourceGroupName/providers/Microsoft.KeyVault/vaults/$keyVaultName"
 
 # Deploy the C# Functions to the Function App
 $deployAzureFunctionsScript = $currentLocation + '\deploy_azure_functions.ps1'
@@ -97,7 +103,7 @@ $Env:KEYVAULT = $keyVaultName
 $deployDataFactoryComponentsScript = $currentLocation + '\deploy_data_factory_components.ps1'
 & $deployDataFactoryComponentsScript `
     -tenantId $tenantId `
-    -subscriptionId $subscriptionId `
+    -subscriptionName $subscriptionName `
     -location $location `
     -resourceGroupName $resourceGroupName `
     -dataFactoryName $dataFactoryName
@@ -127,7 +133,7 @@ Write-Host "Penultimate Deployment Complete! Elapsed Time $elapsedTimeInterim `r
 $deploySQLDacPacsScript = $currentLocation + '\deploy_sql_dacpacs.ps1'
 & $deploySQLDacPacsScript `
     -tenantId $tenantId `
-    -subscriptionIdValue $subscriptionIdValue `
+    -subscriptionId $subscriptionId `
     -keyVaultName $keyVaultName `
     -sqlServerName $sqlServerName `
     -sqlDatabaseName $sqlDatabaseName `

@@ -3,7 +3,7 @@ param(
     [string] $tenantId,
 
     [Parameter(Mandatory=$true)]
-    [string] $subscriptionIdValue,
+    [string] $subscriptionId,
 
     [Parameter(Mandatory=$true)]
     [string] $keyVaultName,
@@ -33,7 +33,10 @@ param(
     [string] $sqlUsernameSecret = $sqlServerName + '-adminusername',
 
     [Parameter(Mandatory=$false)]
-    [string] $sqlValueSecret = $sqlServerName + '-adminpassword'
+    [string] $sqlValueSecret = $sqlServerName + '-adminpassword',
+
+    [Parameter(Mandatory=$false)]
+    [string] $environment = 'Dev'
 
 )
 
@@ -47,10 +50,10 @@ $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
 $sourceFolderPath = $currentLocation -replace '\\infrastructure\\deployment'
 
 # Publish the common schema DacPac
-SqlPackage /Action:Publish /SourceFile:"$sourceFolderPath\src\metadata.common\metadata.common.dacpac" /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" /v:DatabricksWSName=$databricksWorkspaceName /v:DatabricksHost="https://$databricksWorkspaceURL" /v:DLSName=$storageAccountName  /v:Environment="Dev"  /v:KeyVaultName=$keyVaultName  /v:RGName=$resourceGroupName /v:SubscriptionID=$subscriptionIdValue 
+SqlPackage /Action:Publish /SourceFile:"$sourceFolderPath\src\metadata.common\metadata.common.dacpac" /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" /v:DatabricksWSName=$databricksWorkspaceName /v:DatabricksHost="https://$databricksWorkspaceURL" /v:DLSName=$storageAccountName  /v:Environment=$environment  /v:KeyVaultName=$keyVaultName  /v:RGName=$resourceGroupName /v:SubscriptionID=$subscriptionId 
 
 # Publish the control schema DacPac
-SqlPackage /Action:Publish /SourceFile:"$sourceFolderPath\src\metadata.control\metadata.control.dacpac" /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" /v:Environment="Dev"  /v:RGName=$resourceGroupName /v:SubscriptionID=$subscriptionIdValue /v:ADFName=$dataFactoryName /v:TenantID=$tenantId
+SqlPackage /Action:Publish /SourceFile:"$sourceFolderPath\src\metadata.control\metadata.control.dacpac" /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" /v:Environment=$environment  /v:RGName=$resourceGroupName /v:SubscriptionID=$subscriptionId /v:ADFName=$dataFactoryName /v:TenantID=$tenantId
 
 # Publish the ingest schema DacPac
 SqlPackage /Action:Publish /SourceFile:"$sourceFolderPath\src\metadata.ingest\metadata.ingest.dacpac" /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" 
@@ -67,7 +70,6 @@ az sql server ad-admin create --resource-group $resourceGroupName --server $sqlS
 # Create permissions for ADF on the SQL Instance, including a user, role and assigment of user to the role
 $createADFUserScript = $currentLocation + '\grant_adf_access.ps1'
 & $createADFUserScript `
-    -subscriptionIdValue $subscriptionIdValue `
     -sqlServerName $sqlServerName `
     -sqlDatabaseName $sqlDatabaseName `
     -dataFactoryName $dataFactoryName

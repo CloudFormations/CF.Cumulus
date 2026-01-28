@@ -27,6 +27,7 @@ We also have the Community Edition for Developers who want to run with Cumulus f
 To ensure a seamless deployment of CF.Cumulus in the Azure MarketPlace or via the Community Edition, we recommend registering the following Namespaces in your target subscription:
 
 - Microsoft.AlertsManagement
+- Microsoft.Compute
 - Microsoft.Consumption 
 - Microsoft.DataFactory
 - Microsoft.Databricks
@@ -35,6 +36,7 @@ To ensure a seamless deployment of CF.Cumulus in the Azure MarketPlace or via th
 - Microsoft.Maintenance
 - Microsoft.ManagedIdentity
 - Microsoft.MarketplaceOrdering
+- Microsoft.Networking
 - Microsoft.OperationalInsights
 - Microsoft.Portal
 - Microsoft.ResourceGraph
@@ -107,7 +109,7 @@ param myIPAddress = '1.1.1.1' // For SQL Server Firewall rule
 6. Open the infrastructure/deployment/deploy_wrapper.ps1 file to view the PowerShell executor module. Review the parameters listed here and get these from your Azure tenant.
 7. For ease of use, and confidence you've recorded the right values, input them in to the following PowerShell command:
 ```
-. 'C:\Users\MyUser\Repos\CF.Cumulus\infrastructure\deployment\deploy_wrapper.ps1' -tenantId 'My Tenant GUID' -subscriptionId 'My Subscription Name' -location 'uksouth'
+. 'C:\Users\MyUser\Repos\CF.Cumulus\infrastructure\deployment\deploy_wrapper.ps1' -tenantId 'My Tenant GUID' -subscriptionName 'My Subscription Name' -location 'uksouth'
 ```
 > Note: The deploy_wrapper.ps1 PowerShell script allows you to input these parameters at execution time, but it is also easy to specify them as part of a declarative statement, as above. This allows users to verify the command, path of file and parameters before executing.
 
