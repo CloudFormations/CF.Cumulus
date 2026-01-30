@@ -137,8 +137,8 @@
     <Build Include="control\Stored Procedures\AddSubscriptions.sql" />
     <Build Include="control\Stored Procedures\AddTenants.sql" />
     <Build Include="dbo\Stored Procedures\FailProcedure.sql" />
-    <Build Include="control\Tables\LineageProperties.sql" />
-    <Build Include="control\Stored Procedures\GetLineageProperties.sql" />
+    <Build Include="control\Tables\Mermaid.sql" />
+    <Build Include="control\Stored Procedures\GetMermaidPayload.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
