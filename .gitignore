@@ -281,3 +281,6 @@ configuration/prod
 # Data Factory Integration Runtime files
 src/azure.datafactory/integrationRuntime/
 
+src/azure.datafactory/linkedService/~Common_LS_cumulusdatabase.json
+src/azure.datafactory/linkedService/~Common_LS_cumulusfunctions.json
+src/azure.datafactory/linkedService/~Common_LS_cumuluskeys.json

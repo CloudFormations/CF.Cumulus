@@ -70,7 +70,7 @@ $clusterJSON = @"
 }
 "@
 
-databricks clusters create --json $clusterJSON --profile DEFAULT
+# databricks clusters create --json $clusterJSON --profile DEFAULT
 
 
 # Programmatically find databricks folder path in Repo
