@@ -3,14 +3,11 @@ from functools import partial
 from pyspark.sql import SparkSession
 from notebooks.utils.WriteToDelta import set_operation_parameters, merge_delta, overwrite_delta, write_to_delta_executor, get_target_delta_table
 
-@pytest.fixture(scope="module")
-def spark():
-    return SparkSession.builder.master("local").appName("PyTest").getOrCreate()
 
 @pytest.fixture
-def test_data(spark):
-    target_df = spark.createDataFrame([], schema="id INT, name STRING")
-    df = spark.createDataFrame([], schema="id INT, name STRING")
+def test_data(spark_session):
+    target_df = spark_session.createDataFrame([], schema="id INT, name STRING")
+    df = spark_session.createDataFrame([], schema="id INT, name STRING")
     return target_df, df
 
 @pytest.fixture

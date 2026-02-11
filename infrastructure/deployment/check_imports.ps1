@@ -9,13 +9,13 @@ $checks = @(
     @{ Name = "databricks";                 Type = "CLI";           Install = 'winget install -e --id Databricks.DatabricksCLI   (or)  pip install databricks-cli' }
 
     # PowerShell Module checks
-    @{ Name = "Az";                         Type = "Module";        Install = 'Install-Module -Name Az -Repository PSGallery -Force -AllowClobber' }
+    @{ Name = "Az";                         Type = "Module";        Install = 'Install-Module -Name Az -Repository PSGallery -Force -AllowClobber -Scope CurrentUser' }
     @{ Name = "Az.DataFactory";             Type = "Module";        Install = 'Install-Module -Name Az.DataFactory -Scope CurrentUser' }
     @{ Name = "Az.Accounts";                Type = "Module";        Install = 'Install-Module -Name Az.Accounts -Scope CurrentUser' }
     @{ Name = "azure.datafactory.tools";    Type = "Module";        Install = 'Install-Module -Name azure.datafactory.tools -Repository PSGallery -Force -Scope CurrentUser' }
 
     # Executable checks
-    @{ Name = "SqlPackage";                 Type = "Executable";    Install = 'Download from: https://aka.ms/sqlpackage' }
+    @{ Name = "SqlPackage";                 Type = "Executable";    Install = 'dotnet tool install -g microsoft.sqlpackage troubleshooting and details at https://learn.microsoft.com/en-us/sql/tools/sqlpackage/sqlpackage-download?view=sql-server-ver17' }
 )
 
 

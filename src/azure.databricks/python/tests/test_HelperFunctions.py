@@ -6,20 +6,17 @@ from pyspark.sql.types import StructType, StructField, LongType, FloatType, Stri
 from pyspark.testing import assertSchemaEqual, assertDataFrameEqual
 
 
-# Start Spark Session as using .py file rather than notebook
-@pytest.fixture
-def spark():
-    spark = SparkSession.builder.appName("unit-tests").getOrCreate()
-    yield spark
 
-def test_check_df_size_true(spark) -> None:
+
+
+def test_check_df_size_true(spark_session) -> None:
     source_data1 = [("John", 25)]
-    df1 = spark.createDataFrame(source_data1, ["name", "age"])
+    df1 = spark_session.createDataFrame(source_data1, ["name", "age"])
     actual1 = check_df_size(df1)
     expected1 = True
 
     source_data2 = [("John", 25), ("Alice", 30), ("Bob", 35)]
-    df2 = spark.createDataFrame(source_data2, ["name", "age"])
+    df2 = spark_session.createDataFrame(source_data2, ["name", "age"])
     actual2 = check_df_size(df2)
     expected2 = True
 
@@ -28,7 +25,7 @@ def test_check_df_size_true(spark) -> None:
         StructField('Age', StringType(), True),
     ])
     source_data3 = [("John", 25), ("Alice", 30), ("Bob", 35)]
-    df3 = spark.createDataFrame(source_data2, schema)
+    df3 = spark_session.createDataFrame(source_data2, schema)
     actual3 = check_df_size(df3)
     expected3 = True
 
@@ -36,19 +33,19 @@ def test_check_df_size_true(spark) -> None:
     assert actual2 == expected2
     assert actual3 == expected3
 
-def test_check_df_size_false(spark) -> None:
+def test_check_df_size_false(spark_session) -> None:
     schema = StructType([
         StructField('Name', StringType(), True),
         StructField('Age', StringType(), True),
     ])
 
     source_data1 = []
-    df1 = spark.createDataFrame(source_data1, schema)
+    df1 = spark_session.createDataFrame(source_data1, schema)
     actual1 = check_df_size(df1)
     expected1 = False
 
     source_data2 = []
-    df2 = spark.createDataFrame([], schema)
+    df2 = spark_session.createDataFrame([], schema)
     actual2 = check_df_size(df2)
     expected2 = False
 
@@ -82,28 +79,28 @@ class TestCreatePartitionFieldsSQL():
 
 
 
-def test_get_columns_not_in_schema_matched(spark):
+def test_get_columns_not_in_schema_matched(spark_session):
     source_data = [("John", 25)]
     columns_list = ["name", "age"]
-    df = spark.createDataFrame(source_data, columns_list)
+    df = spark_session.createDataFrame(source_data, columns_list)
     actual = get_columns_not_in_schema(columns_list=columns_list,  df=df)
     expected = []
     assert actual == expected
 
-def test_get_columns_not_in_schema_unmatched(spark):
+def test_get_columns_not_in_schema_unmatched(spark_session):
     source_data = [("John", 25)]
     columns_list = ["name", "age"]
-    df = spark.createDataFrame(source_data, columns_list)
+    df = spark_session.createDataFrame(source_data, columns_list)
     columns_list_complete = ["name", "age", "missing_col"]
 
     actual = get_columns_not_in_schema(columns_list=columns_list_complete, df=df)
     expected = ["missing_col"]
     assert actual == expected
 
-def test_get_columns_not_in_schema_unmatched_2(spark):
+def test_get_columns_not_in_schema_unmatched_2(spark_session):
     source_data = [("John", 25)]
     columns_list = ["name", "age"]
-    df = spark.createDataFrame(source_data, columns_list)
+    df = spark_session.createDataFrame(source_data, columns_list)
     columns_list_complete = ["name"]
 
     actual = get_columns_not_in_schema(columns_list=columns_list_complete, df=df)
@@ -111,10 +108,10 @@ def test_get_columns_not_in_schema_unmatched_2(spark):
     assert actual == expected
 
 
-def test_set_null_column(spark):
+def test_set_null_column(spark_session):
     source_data = [("John", 25)]
     columns_list = ["name", "age"]
-    df = spark.createDataFrame(source_data, columns_list)
+    df = spark_session.createDataFrame(source_data, columns_list)
     column_to_add = "missing_col"
 
     schema = StructType([
@@ -123,7 +120,7 @@ def test_set_null_column(spark):
         StructField("missing_col", StringType(), True)
         ])
     df_actual = set_null_column(df=df, column=column_to_add)
-    df_expected = spark.createDataFrame([("John", 25, None)], schema)
+    df_expected = spark_session.createDataFrame([("John", 25, None)], schema)
     
     assertDataFrameEqual(df_actual, df_expected)
     assertSchemaEqual(df_actual.schema, df_expected.schema)

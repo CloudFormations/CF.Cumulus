@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionID,
+    $subscriptionId,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -52,7 +52,7 @@ param(
 
 Import-Module SQLServer
 Import-Module Az.Accounts -MinimumVersion 2.2.0
-# Connect-AzAccount -SubscriptionId $subscriptionID -TenantId $tenantID
+# Connect-AzAccount -SubscriptionId $subscriptionId -TenantId $tenantID
 
 $scriptRoot = (Resolve-Path -Path ".\").Path
 $commonFilesDirectory = Join-Path -Path $scriptRoot -ChildPath "..\common"
@@ -68,17 +68,17 @@ $filesToExecuteSets = @('SetSampleTenant', 'SetSampleSubscription', 'SetSampleOr
 $filesToExecuteSets = @('SetSampleTenant', 'SetSampleSubscription', 'SetSampleOrchestrators', 'SetSampleBatches', 'SetSampleStages', 'SetSampleBatchStageLink', 'SetSamplePipelines','SetSamplePipelineParameters', 'SetSamplePipelineDependants', 'SetDefaultProperties')
 
 # Create the database user and role for data factory to use 
-& "$PSScriptRoot\GrantADFAccess" -ADFResource $factoryDataFactory -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName
+& "$PSScriptRoot\GrantADFAccess" -ADFResource $factoryDataFactory -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName
 
 # Create the database user and role for data factory to query the Source Database
-& "$PSScriptRoot\GrantADFAccessSourceDB" -ADFResource $factoryDataFactory -subscriptionID $subscriptionID -instanceName $sourceInstanceName -databaseName $sourceDatabaseName
+& "$PSScriptRoot\GrantADFAccessSourceDB" -ADFResource $factoryDataFactory -subscriptionId $subscriptionId -instanceName $sourceInstanceName -databaseName $sourceDatabaseName
 
 # Create the parameterised SQL Scripts to execute
 $directoryPath = "..\..\Stored Procedures SQL DB Demo"
-& "$commonFilesDirectory\CreateTemporaryScriptCopies" -subscriptionID $subscriptionID -tenantID $tenantID -resourceGroup $resourceGroup -factoryDataFactory $factoryDataFactory -workersDataFactory $workersDataFactory -directoryPath $directoryPath -databricksWorkspaceURL $databricksWorkspaceURL -databricksClusterId $databricksClusterId -databricksWorkspaceName $databricksWorkspaceName
+& "$commonFilesDirectory\CreateTemporaryScriptCopies" -subscriptionId $subscriptionId -tenantID $tenantID -resourceGroup $resourceGroup -factoryDataFactory $factoryDataFactory -workersDataFactory $workersDataFactory -directoryPath $directoryPath -databricksWorkspaceURL $databricksWorkspaceURL -databricksClusterId $databricksClusterId -databricksWorkspaceName $databricksWorkspaceName
 
 # Execute the parameterised scripts
-& "$commonFilesDirectory\ExecuteTemporaryScriptCopies" -subscriptionID $subscriptionID -tenantID $tenantID -instanceName $instanceName -databaseName $databaseName -clearTables $clearTables -migrationScript $migrationScript -filesToExecuteDeletes $filesToExecuteDeletes -filesToExecuteAdds $filesToExecuteAdds -filesToExecuteSets $filesToExecuteSets 
+& "$commonFilesDirectory\ExecuteTemporaryScriptCopies" -subscriptionId $subscriptionId -tenantID $tenantID -instanceName $instanceName -databaseName $databaseName -clearTables $clearTables -migrationScript $migrationScript -filesToExecuteDeletes $filesToExecuteDeletes -filesToExecuteAdds $filesToExecuteAdds -filesToExecuteSets $filesToExecuteSets 
 
 # Delete the parameterised scripts
 & "$commonFilesDirectory\DeleteTemporaryScriptCopies"
