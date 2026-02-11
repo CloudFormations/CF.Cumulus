@@ -5,10 +5,10 @@ using '../../main.bicep'
 // * Recommended for consistent resource naming across environments
 param orgName = 'cf'
 param domainName = 'cumulus'
-param envName = 'val'
+param envName = 'dev'
 param location = 'uksouth'
 param uniqueIdentifier = '01'
-param myIPAddress = '217.42.160.12' // For SQL Server Firewall rule
+param myIPAddress = '1.1.1.1' // For SQL Server Firewall rule
 
 
 //Parameters for optional deployments
