@@ -1,36 +1,65 @@
-#Assigining the parameters for the environment
+# ============================================
+# Parameters
+# ============================================
 param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $currentLocation,
     
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $resourceGroupName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $functionAppName,
     
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $keyVaultName
 )
 
-# This command cleans the build output of the specified project using the Release configuration.
-# Generates full paths in the output, and suppresses the summary in the console logger
+# ============================================
+# Paths
+# ============================================
 $sourceFolderPath = $currentLocation -replace '\\infrastructure\\deployment'
-$functionAppPath = $sourceFolderPath + '\src\azure.functionapp'
-dotnet clean $functionAppPath --configuration Release /property:GenerateFullPaths=true /consoleloggerparameters:NoSummary
+$functionAppPath  = Join-Path $sourceFolderPath 'src\azure.functionapp'
+$publishPath      = Join-Path $currentLocation 'publishFunctions'
 
-# Package the function app including the functions into a folder for deployment
-$publishPath = $currentLocation + '\publishFunctions'
-dotnet publish $functionAppPath --configuration Release --output $publishPath
+# ============================================
+# Clean project output
+# ============================================
+dotnet clean `
+    $functionAppPath `
+    --configuration Release `
+    /property:GenerateFullPaths=true `
+    /consoleloggerparameters:NoSummary
 
-# Compressing the publish folder into a zip file
+# ============================================
+# Publish Function App
+# ============================================
+dotnet publish `
+    $functionAppPath `
+    --configuration Release `
+    --output $publishPath
+
+# ============================================
+# Create deployment ZIP
+# ============================================
 $sourcePath = $publishPath + '/*'
 Compress-Archive -Path $sourcePath -DestinationPath ./funcapp.zip -Update
 
-# Deploying the zip to the functionapp
-az functionapp deployment source config-zip --resource-group $resourceGroupName --name $functionAppName --src ./funcapp.zip
+# ============================================
+# Deploy ZIP package to Azure Function App
+# ============================================
+az functionapp deployment source config-zip `
+    --resource-group $resourceGroupName `
+    --name $functionAppName `
+    --src ./funcapp.zip
 
-# Add Function App Key to Azure Key Vault secrets with the name cumulusfunctionsKey
-$functionAppKeys = az functionapp keys list -g $resourceGroupName -n $functionAppName | ConvertFrom-Json 
+# ============================================
+# Store Function App Master Key in Key Vault
+# ============================================
+$functionAppKeys      = az functionapp keys list -g $resourceGroupName -n $functionAppName | ConvertFrom-Json
 $functionAppMasterKey = $functionAppKeys.masterKey
-az keyvault secret set --vault-name $keyVaultName --name "cumulusfunctionsKey" --value $functionAppMasterKey
+
+az keyvault secret set `
+    --vault-name $keyVaultName `
+    --name "cumulusfunctionsKey" `
+    --value "'$functionAppMasterKey'"

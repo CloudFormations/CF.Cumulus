@@ -1,39 +1,55 @@
-#Assigining the parameters for the environment
+# ============================================
+# Parameters
+# ============================================
 param(
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $tenantId,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $subscriptionName,
 
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $location,
     
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $resourceGroupName,
     
-    [Parameter(Mandatory=$true)]
+    [Parameter(Mandatory = $true)]
     [string] $dataFactoryName
 )
 
-# Modules
+# ============================================
+# Import Required Modules
+# ============================================
 Import-Module -Name "Az.DataFactory"
+Import-Module -Name "azure.datafactory.tools"   # https://github.com/Azure-Player/azure.datafactory.tools/
 
-# https://github.com/Azure-Player/azure.datafactory.tools/
-Import-Module -Name azure.datafactory.tools
+# ============================================
+# Resolve ADF Source Folder
+# ============================================
+$repoRoot     = (Get-Location).Path -replace 'infrastructure\\deployment', ''
+$scriptPath   = Join-Path $repoRoot "src\azure.datafactory"
 
-# Get Deployment Objects and Params files
-$scriptPath = (Join-Path -Path (Get-Location) -ChildPath "src/azure.datafactory") 
-
-$scriptPath = (Get-Location).Path -replace 'infrastructure\\deployment',''
-
-$scriptPath += "\src\azure.datafactory"
-
-
+# ============================================
+# Configure Publish Options
+# ============================================
 $options = New-AdfPublishOption
-$options.CreateNewInstance = $false # New ADF workspace deployment not required.
-$options.Excludes.Add("trigger.*","")
-$options.Excludes.Add("factory.*","")
+$options.CreateNewInstance = $false      # Not a fresh workspace deployment
+$options.Excludes.Add("trigger.*", "")   # Exclude triggers
+$options.Excludes.Add("factory.*", "")   # Exclude factory definition
 
+# ============================================
+# Set Azure Context
+# ============================================
 Set-AzContext -Subscription $subscriptionName
-Publish-AdfV2FromJson -RootFolder "$scriptPath" -ResourceGroupName "$resourceGroupName" -DataFactoryName "$dataFactoryName" -Location "$location" -Option $options -Stage "install"
+
+# ============================================
+# Publish ADF from JSON Files
+# ============================================
+Publish-AdfV2FromJson `
+    -RootFolder        $scriptPath `
+    -ResourceGroupName $resourceGroupName `
+    -DataFactoryName   $dataFactoryName `
+    -Location          $location `
+    -Option            $options `
+    -Stage             "install"
