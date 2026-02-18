@@ -10,7 +10,7 @@ CF.Cumulus is an Open-Source Metadata-driven Lakehouse Accelerator designed for 
 
 ## Release Details
 ### Latest Release Notes
-V25.1.0.0
+V25.1.1.0
 
 https://github.com/CloudFormations/CF.Cumulus/releases
 
