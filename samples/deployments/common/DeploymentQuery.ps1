@@ -2,11 +2,6 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionID,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
     $instanceName,
 
     [Parameter(Mandatory=$true)]

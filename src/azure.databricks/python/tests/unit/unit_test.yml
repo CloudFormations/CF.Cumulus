@@ -1,0 +1,15 @@
+
+resources:
+  jobs:
+    run_unit_tests:
+      name: "Unit Tests - ${bundle.target}"
+      tasks:
+        - task_key: run_pytest
+          notebook_task:
+            notebook_path: ./tests/pytest_databricks
+            source: WORKSPACE
+          new_cluster:
+            spark_version: "13.3.x-scala2.12"
+            node_type_id: "Standard_DS3_v2"
+            num_workers: 0  # Single node for tests
+          timeout_seconds: 3600

@@ -7,7 +7,7 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionID,
+    $subscriptionId,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -23,7 +23,7 @@ param(
 Import-Module SQLServer
 Import-Module Az.Accounts -MinimumVersion 2.2.0
 
-# Connect-AzAccount -SubscriptionId $subscriptionID
+# Connect-AzAccount -SubscriptionId $subscriptionId
 
 $accessToken = (Get-AzAccessToken -ResourceUrl https://database.windows.net).Token
 

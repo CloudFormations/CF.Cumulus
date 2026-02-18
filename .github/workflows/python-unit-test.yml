@@ -1,38 +1,56 @@
-name: Run Python Unit Testing on Cluster
-  
-on: 
-  pull_request:
+name: CF.Cumulus-Databricks-CICD-Unit-Test
+
+concurrency: 1
+
+on:
   workflow_dispatch:
 
-env:
-  DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
-  
-jobs:  
-  run-python-unit-tests:
+
+jobs:
+  deploy_dev:
+    name: "Deploy unit test to dev"
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    environment: dev
+    defaults:
+      run:
+        working-directory: ./src/azure.databricks/python
 
-    steps:        
-      - name: Checkout repo
-        uses: actions/checkout@v4 
-      - name: Unit tests for PySpark Notebooks on Databricks
-        uses: databricks/run-notebook@main
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
         with:
-          databricks-token: ${{ secrets.DATABRICKS_TOKEN }}
+          python-version: '3.10'
+      - run: python -m pip install --upgrade pip
+      - run: pip install wheel
+      - run: pip3 install wheel
+      - run: pip install -r requirements.txt
+      - run: |
+            pip install databricks-cli 
+            echo "[dev]" >> ~/.databrickscfg
+            echo "host = ${{ secrets.DATABRICKS_HOST }}" >> ~/.databrickscfg
+            echo "token = ${{ secrets.DATABRICKS_TOKEN }}" >> ~/.databrickscfg
 
-          local-notebook-path: src/azure.databricks/python/tests/pytest_databricks.py
+      - name: Set up Databricks CLI
+        uses: databricks/setup-cli@main
 
-          existing-cluster-id: ${{ secrets.DATABRICKS_CLUSTER_ID}}
+      - name: Cleanup old code
+        run: databricks workspace delete /Workspace/Shared/UnitTest --recursive
+        continue-on-error: true
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: dev
 
-          git-commit: "${{ github.event.pull_request.head.sha }}"
+      - name: Deploy DAB
+        run: databricks bundle deploy --target unit-test --profile dev
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_BUNDLE_ENV: dev
 
-          # Grant all users view permission on the notebook's results, so that they can
-          # see the result of the notebook, if they have related access permissions.
-          access-control-list-json: >
-            [
-              {
-                "group_name": "users",
-                "permission_level": "CAN_VIEW"
-              }
-            ]
-          run-name: "Python functions unit test suite"
+      - name: Run unit tests
+        run: databricks bundle run run_unit_tests -p dev
+        env:
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+  

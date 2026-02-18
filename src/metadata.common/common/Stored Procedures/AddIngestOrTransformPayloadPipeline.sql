@@ -104,6 +104,7 @@ ON p.PipelineId = pp.PipelineId
 WHERE pp.parametervalue IN (SELECT CAST(datasetid AS VARCHAR(5))  FROM @Datasets)
 AND pp.ParameterName = 'DatasetId'
 AND p.PipelineName = @PipelineName
+AND p.StageId = @StageId
 
 DECLARE @OrchestratorId INT
 
@@ -132,9 +133,11 @@ MERGE INTO control.pipelines AS target
 USING (SELECT @PipelineId AS PipelineId) AS source
 ON target.PipelineId = source.PipelineId
 WHEN NOT MATCHED THEN
-    INSERT (OrchestratorId, StageId, PipelineName, Enabled) VALUES (@OrchestratorId, @StageId, @PipelineName, @Enabled)
+    INSERT (OrchestratorId, StageId, PipelineName, Enabled) 
+	VALUES (@OrchestratorId, @StageId, @PipelineName, @Enabled)
 WHEN MATCHED THEN
-    UPDATE SET target.PipelineName = @PipelineName
+    UPDATE SET 
+		target.PipelineName = @PipelineName
 OUTPUT
    inserted.PipelineId AS PipelineId
    -- ,updated.PipelineId AS PipelineId

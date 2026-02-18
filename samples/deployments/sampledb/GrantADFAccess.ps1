@@ -7,11 +7,6 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionID,
-
-    [Parameter(Mandatory=$true)]
-    [ValidateNotNullOrEmpty()]
-    [string]
     $instanceName,
 
     [Parameter(Mandatory=$true)]
@@ -23,7 +18,6 @@ param(
 # Uncomment the below commands for independent executions of the script.
 # Import-Module SQLServer
 # Import-Module Az.Accounts -MinimumVersion 2.2.0
-# Connect-AzAccount -SubscriptionId $subscriptionID
 
 $accessToken = (Get-AzAccessToken -ResourceUrl https://database.windows.net).Token
 
