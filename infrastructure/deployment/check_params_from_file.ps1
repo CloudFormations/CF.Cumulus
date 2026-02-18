@@ -1,15 +1,22 @@
-#Assigining the parameters for the environment
+# ============================================
+# Parameters
+# ============================================
 param(
-    [Parameter(Mandatory=$false)]
+    [Parameter(Mandatory = $false)]
     [string] $parametersFile
 )
 
-# Read all lines, ignore comments and 'using' statements
+# ============================================
+# Read parameter file and ignore comments / using statements
+# ============================================
 $lines = Get-Content $parametersFile | Where-Object {
-    $_ -notmatch '^\s*//' -and $_ -notmatch '^\s*using'
+    $_ -notmatch '^\s*//' -and
+    $_ -notmatch '^\s*using'
 }
 
-# Extract param name and value
+# ============================================
+# Extract parameter names and values
+# ============================================
 $params = foreach ($line in $lines) {
     if ($line -match 'param\s+(\w+)\s*=\s*(.+)') {
         [PSCustomObject]@{
@@ -19,5 +26,7 @@ $params = foreach ($line in $lines) {
     }
 }
 
-# Render as table
+# ============================================
+# Output in table format
+# ============================================
 $params | Format-Table -AutoSize

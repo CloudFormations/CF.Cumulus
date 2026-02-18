@@ -12,6 +12,12 @@ targets:
       profile: DEFAULT
       root_path: /Workspace/Shared/Live/
 
+  unit-test:
+    mode: production
+    workspace:
+      profile: dev
+      root_path: /Workspace/Shared/UnitTest/
+
   dev:
     mode: production
     workspace:

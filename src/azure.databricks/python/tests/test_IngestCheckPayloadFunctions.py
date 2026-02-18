@@ -3,31 +3,32 @@ import unittest
 import pytest
 import time
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def setup_default_schema_name() -> str:
     return "unit_test_default_schema"
 
-@pytest.fixture
-def setup_default_schema():
+@pytest.fixture(scope="session")
+def setup_default_schema(spark_session):
     default_schema_name = "unit_test_default_schema"
-    print("\nSetting up resources...")
-    spark.sql(f"CREATE SCHEMA {default_schema_name}")
-    yield default_schema_name  # Provide the data to the test
+    print("\nSetting up schema...")
+    spark_session.sql(f"CREATE SCHEMA IF NOT EXISTS {default_schema_name}")
+    yield default_schema_name
     
-    # Teardown: Clean up resources (if any) after the test
-    print("\nTearing down resources...")
-    spark.sql(f"DROP SCHEMA {default_schema_name}")
+    print("\nTearing down schema...")
+    spark_session.sql(f"DROP SCHEMA IF EXISTS {default_schema_name} CASCADE")
 
-@pytest.fixture
-def setup_default_table():
-    default_table_name = "unit_test_default_table"
-    print("\nSetting up resources...")
-    spark.sql(f"CREATE TABLE {default_table_name}")
-    yield default_table_name  # Provide the data to the test
+@pytest.fixture(scope="session")
+def setup_default_table(spark_session, setup_default_schema):
+    schema_name = setup_default_schema
+    table_name = "unit_test_default_table"
+    full_table_name = f"{schema_name}.{table_name}"
     
-    # Teardown: Clean up resources (if any) after the test
-    print("\nTearing down resources...")
-    spark.sql(f"DROP TABLE {default_table_name}")
+    print(f"\nSetting up table {full_table_name}...")
+    spark_session.sql(f"CREATE TABLE IF NOT EXISTS {full_table_name} (id INT)")
+    yield full_table_name
+    
+    print(f"\nTearing down table {full_table_name}...")
+    spark_session.sql(f"DROP TABLE IF EXISTS {full_table_name}")
 
 
 class TestCheckLoadAction(unittest.TestCase):

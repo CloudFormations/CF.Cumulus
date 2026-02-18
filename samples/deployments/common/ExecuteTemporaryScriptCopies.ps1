@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionID,
+    $subscriptionId,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -49,7 +49,7 @@ param(
 # Uncomment the below commands for independent executions of the script.
 # Import-Module SQLServer
 # Import-Module Az.Accounts -MinimumVersion 2.2.0
-# Connect-AzAccount -SubscriptionId $subscriptionID
+# Connect-AzAccount -SubscriptionId $subscriptionId
 
 # Assuming the relative path is from the script's directory
 $scriptRoot = (Resolve-Path -Path ".\").Path
@@ -64,7 +64,7 @@ $queryPath = "$commonScriptRoot\common\DeploymentQuery.ps1"
 
 $migrationScriptPath  = "$targetDirectory\$migrationScript.sql"
 
-# & $inputScriptPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -inputFile $migrationScriptPath
+# & $inputScriptPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -inputFile $migrationScriptPath
 
 # TODO: Check all files exist in ExecutableCopies before running
 # $files.Name
@@ -79,7 +79,7 @@ $createSchemaQuery = "
     END
 "
 
-& $queryPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -query $createSchemaQuery 
+& $queryPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -query $createSchemaQuery 
 Write-Output "Created the schema"
 
 # If clearing down previous executions, including reseeding the tables, create, run and drop the samples.DeleteMetadataWithIntegrity stored proc. 
@@ -91,11 +91,11 @@ if ($clearTables) {
         $deleteExecQuery = "EXEC samples.$deleteSP"
         $deleteDropQuery = "DROP PROCEDURE samples.$deleteSP"
 
-        & $inputScriptPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -inputFile $deleteInputFile
+        & $inputScriptPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -inputFile $deleteInputFile
         Write-Host "Created the Stored Proc $deleteSP"
-        & $queryPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -query $deleteExecQuery
+        & $queryPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -query $deleteExecQuery
         Write-Host "Executed the Stored Proc $deleteSP"
-        & $queryPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -query $deleteDropQuery
+        & $queryPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -query $deleteDropQuery
         Write-Host "Dropped the Stored Proc $deleteSP"
     }
 }
@@ -103,7 +103,7 @@ if ($clearTables) {
 foreach ($f in $filesToExecuteAdds){
     Write-Host "$f"
     $InputFile = "$targetDirectory\$f.sql"
-    & $inputScriptPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -inputFile $InputFile
+    & $inputScriptPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -inputFile $InputFile
     Write-Host "Created the Stored Proc $f"
 }
 
@@ -116,17 +116,17 @@ foreach ($f in $filesToExecuteSets){
     $execQuery = "EXEC samples.$f"
     $dropQuery = "DROP PROCEDURE samples.$f"
 
-    & $inputScriptPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -inputFile $inputFile
+    & $inputScriptPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -inputFile $inputFile
     Write-Host "Created the Stored Proc $f"
-    & $queryPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -query $execQuery 
+    & $queryPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -query $execQuery 
     Write-Host "Executed the Stored Proc $f"
-    & $queryPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -query $dropQuery 
+    & $queryPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -query $dropQuery 
     Write-Host "Dropped the Stored Proc $f"
 }
 
 foreach ($f in $filesToExecuteAdds){
     Write-Host "$f"
     $DropQuery = "DROP PROCEDURE samples.$f"
-    & $queryPath -subscriptionID $subscriptionID -instanceName $instanceName -databaseName $databaseName -query $DropQuery
+    & $queryPath -subscriptionId $subscriptionId -instanceName $instanceName -databaseName $databaseName -query $DropQuery
     Write-Host "Dropped the Stored Proc $f"
 }

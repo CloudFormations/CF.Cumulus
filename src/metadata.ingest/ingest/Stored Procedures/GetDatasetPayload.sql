@@ -15,7 +15,7 @@ BEGIN
     INNER JOIN [common].[Connections] cn1
         ON ds.[ConnectionFK] = cn1.[ConnectionId]
     INNER JOIN [common].[Connections] cn2
-        ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] IN ('raw','bronze')
+        ON ds.[RawStorageConnectionFK] = cn2.ConnectionId
     INNER JOIN [common].[Connections] cn3
         ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
     WHERE
@@ -414,7 +414,7 @@ BEGIN
     INNER JOIN [common].[Connections] cn1
     ON ds.[ConnectionFK] = cn1.[ConnectionId]
     INNER JOIN [common].[Connections] cn2
-    ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] IN ('raw','bronze')
+    ON ds.[RawStorageConnectionFK] = cn2.ConnectionId
     INNER JOIN [common].[Connections] cn3
     ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
     WHERE

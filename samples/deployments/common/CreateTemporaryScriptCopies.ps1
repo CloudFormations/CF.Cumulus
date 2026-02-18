@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionID,
+    $subscriptionId,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -65,7 +65,7 @@ New-Item -Path $targetDirectory -ItemType Directory
 # Define your placeholder and replacement values
 $replacements = @{
     "CF.Cumulus.Samples" = $resourceGroup
-    "subscriptionID-12345678-1234-1234-1234-012345678910" = $subscriptionID
+    "subscriptionId-12345678-1234-1234-1234-012345678910" = $subscriptionId
     "tenantID-12345678-1234-1234-1234-012345678910" = $tenantID
     "FrameworkDataFactory" = $factoryDataFactory
     "WorkersDataFactory" = $workersDataFactory
