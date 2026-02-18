@@ -1,6 +1,6 @@
 # Read Me - Cloud Formations CF.Cumulus Community Edition
 
-[ ![](https://static.wixstatic.com/media/e66568_635e25cb91f44be580ef08cd83e68c6f~mv2.jpg/v1/crop/x_480,y_506,w_5433,h_2414/fill/w_2221,h_987,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/Cumulus%20Diagram.jpg) ](https://static.wixstatic.com/media/e66568_635e25cb91f44be580ef08cd83e68c6f~mv2.jpg/v1/crop/x_480,y_506,w_5433,h_2414/fill/w_2221,h_987,al_c,q_90,usm_0.66_1.00_0.01,enc_auto/Cumulus%20Diagram.jpg)
+[ ![](https://static.wixstatic.com/media/fb2e49_ee1fa91f1ad049d2a4b151f3d8caeb9e~mv2.png) ](https://static.wixstatic.com/media/fb2e49_ee1fa91f1ad049d2a4b151f3d8caeb9e~mv2.png)
 
 CF.Cumulus is an Open-Source Metadata-driven Lakehouse Accelerator designed for Data Teams to quickly deploy and use a Lakehouse in Azure. Key features include:
 * Deployment of a Lakehouse to Azure within minutes.
@@ -14,14 +14,19 @@ V25.1.0.0
 
 https://github.com/CloudFormations/CF.Cumulus/releases
 
-## Choosing the Right Plan for You
-[![](https://static.wixstatic.com/media/bacfcb_1c2739eec5e743428df967a8a9ed051a~mv2.png)](https://static.wixstatic.com/media/bacfcb_1c2739eec5e743428df967a8a9ed051a~mv2.png)
-
+## Choosing the Right Product Edition For You
 We offer a variety of different ways to get started with CF.Cumulus, which can be accessed through the Azure MarketPlace [here](https://azuremarketplace.microsoft.com/en-gb/marketplace/apps?search=cf.cumulus&page=1). This includes a variety of deployment and support options for you to use as per your organisation's requirements.
 
-[![](https://static.wixstatic.com/media/bacfcb_acf5aabad1284e7ba49e83f639ee5e91~mv2.png)](https://static.wixstatic.com/media/bacfcb_acf5aabad1284e7ba49e83f639ee5e91~mv2.png)
+* **Community** - Self-service deployment to try out and use all CF.Cumulus’ core capabilities.
+* **Supported** - Ideal for early-stage exploration with light touch support.
+* **Professional** - For teams in production who need onboarding, SLA-backed response times and managed upgrade support.
+* **Premium** - A strategic engagement with product roadmap input, defect resolution, and access to engineering expertise.
+* **Assisted Deployment** - Collaborate with our professional services team to provision CF.Cumulus tailored to your requirements and platform.
 
-We also have the Community Edition for Developers who want to run with Cumulus for themselves, available here on our Open-Source Repo!
+
+[![](https://static.wixstatic.com/media/fb2e49_c6c533ad89cd40a7a342c4b2b65a3c70~mv2.png)](https://static.wixstatic.com/media/fb2e49_c6c533ad89cd40a7a342c4b2b65a3c70~mv2.png)
+
+We also have the Community Edition for Developers who want to run with CF.Cumulus for themselves, available here on our Open-Source Repo!
 
 ## Pre-requisites
 To ensure a seamless deployment of CF.Cumulus in the Azure MarketPlace or via the Community Edition, we recommend registering the following Namespaces in your target subscription:
@@ -47,8 +52,8 @@ To ensure a seamless deployment of CF.Cumulus in the Azure MarketPlace or via th
 - Microsoft.Sql
 - Microsoft.Storage
 - Microsoft.Web
-- microsoft.insights
-- microsoft.support 
+- Microsoft.Insights
+- Microsoft.Support 
 
 > In the event any of these missing, please complete the following URL and enable as suggested: <https://portal.azure.com/#@organisation.org/resource/subscriptions/subscription-id/resourceproviders>
 
@@ -59,7 +64,7 @@ For further information on how to get started using the Community Edition of CF.
 
 Below is our Getting Started guide for installing CF.Cumulus in your Azure Subscription. The installation gives you a complete deployment of the Azure Resources required for a Lakehouse, with resource dependencies and objects all included at the click of a button.
 
-[![](https://static.wixstatic.com/media/bacfcb_381bbf27373f4ea99dc919d8af47ff56~mv2.png)](https://static.wixstatic.com/media/bacfcb_381bbf27373f4ea99dc919d8af47ff56~mv2.png)
+[![](https://static.wixstatic.com/media/fb2e49_7e111fe8b804491fa087490e9353f58c~mv2.png)](https://static.wixstatic.com/media/fb2e49_7e111fe8b804491fa087490e9353f58c~mv2.png)
 
 ### What's Included
 The deployment demonstrated in this guide includes the following:
@@ -86,7 +91,7 @@ As a user, you're only requirement is to get some details regarding your Azure T
 
 
 ### The Process
-[![](https://static.wixstatic.com/media/bacfcb_4c93b531a1264bd4a71ceefce9ac4061~mv2.png)](https://static.wixstatic.com/media/bacfcb_4c93b531a1264bd4a71ceefce9ac4061~mv2.png)
+[![](https://static.wixstatic.com/media/fb2e49_55a9415aeb6e4ee69776a80e90ac73ab~mv2.png)](https://static.wixstatic.com/media/fb2e49_55a9415aeb6e4ee69776a80e90ac73ab~mv2.png)
 
 1. Navigate to our CF.Cumulus GitHub repository.
 2. Clone the repo to your local computer and open in Visual Studio Code.
