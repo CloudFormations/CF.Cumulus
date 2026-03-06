@@ -1,5 +1,5 @@
 {
-	"name": "Email Sender",
+	"name": "Utils_PL_Email_Sender",
 	"properties": {
 		"description": "Provide a simple abstract over the send email function with request body item exposed as pipeline parameters.",
 		"activities": [

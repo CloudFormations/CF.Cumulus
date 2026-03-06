@@ -136,7 +136,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "Get_Databricks_Compute_ID",
+											"referenceName": "Utils_PL_Get_Databricks_Compute_ID",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,

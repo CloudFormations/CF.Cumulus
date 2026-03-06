@@ -1,5 +1,5 @@
 {
-	"name": "Check For Running Pipeline",
+	"name": "Utils_PL_Check_For_Running_Pipeline",
 	"properties": {
 		"description": "For a given pipeline and optional batch name establish if a pipeline run is already in progress. Throw an exception if it it.",
 		"activities": [

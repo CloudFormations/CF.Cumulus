@@ -3,6 +3,11 @@ CREATE PROCEDURE [transform].[AddTransformDatasets]
 	@ComputeConnectionDisplayName NVARCHAR(50),
 	@CreateNotebookName NVARCHAR(100),
 	@BusinessLogicName NVARCHAR(100),
+	@CleansedConnectionDisplayName NVARCHAR(50),
+	@CleansedSourceLocation NVARCHAR(200),
+	@CuratedConnectionDisplayName NVARCHAR(50),
+	@CuratedSourceLocation NVARCHAR(200),
+	@DomainName NVARCHAR(100),
 	@SchemaName NVARCHAR(100),
 	@DatasetName NVARCHAR(100),
 	@VersionNumber INT,
@@ -17,25 +22,32 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 	DECLARE @TransformDatasets TABLE (
-		ComputeConnectionDisplayName NVARCHAR(50),
-		ComputeConnectionFK INT,
-		CreateNotebookName NVARCHAR(100),
-		CreateNotebookFK INT,
-		BusinessLogicName NVARCHAR(100),
-		BusinessLogicNotebookFK INT,
-		SchemaName NVARCHAR(100),
-		DatasetName NVARCHAR(100),
-		VersionNumber INT,
-		VersionValidFrom DATETIME2(7),
-		VersionValidTo DATETIME2(7),
-		LoadType CHAR(1),
-		LoadStatus INT,
-		LastLoadDate DATETIME2(7),
-		Enabled BIT
+		[ComputeConnectionDisplayName] NVARCHAR(50),
+		[ComputeConnectionFK] INT,
+		[CreateNotebookName] NVARCHAR(100),
+		[CreateNotebookFK] INT,
+		[BusinessLogicName] NVARCHAR(100),
+		[BusinessLogicNotebookFK] INT,
+		[CleansedStorageConnectionFK] INT,
+		[CleansedConnectionDisplayName] NVARCHAR(50),
+		[CleansedSourceLocation]  NVARCHAR(200),
+		[CuratedStorageConnectionFK] INT,
+		[CuratedConnectionDisplayName] NVARCHAR(50),
+		[CuratedSourceLocation] NVARCHAR(200),
+		[DomainName] NVARCHAR(100),
+		[SchemaName] NVARCHAR(100),
+		[DatasetName] NVARCHAR(100),
+		[VersionNumber] INT,
+		[VersionValidFrom] DATETIME2(7),
+		[VersionValidTo] DATETIME2(7),
+		[LoadType] CHAR(1),
+		[LoadStatus] INT,
+		[LastLoadDate] DATETIME2(7),
+		[Enabled] BIT
 	)
 
-	INSERT INTO @TransformDatasets(ComputeConnectionDisplayName, ComputeConnectionFK, CreateNotebookName, CreateNotebookFK, BusinessLogicName, BusinessLogicNotebookFK, SchemaName, DatasetName, VersionNumber, VersionValidFrom, VersionValidTo, LoadType, LoadStatus, LastLoadDate, Enabled)
-	VALUES (@ComputeConnectionDisplayName, -1, @CreateNotebookName, -1, @BusinessLogicName, -1, @SchemaName, @DatasetName, @VersionNumber, @VersionValidFrom, @VersionValidTo, @LoadType, @LoadStatus, @LastLoadDate, @Enabled)
+	INSERT INTO @TransformDatasets(ComputeConnectionDisplayName, ComputeConnectionFK, CreateNotebookName, CreateNotebookFK, BusinessLogicName, BusinessLogicNotebookFK, 	CleansedStorageConnectionFK,CleansedConnectionDisplayName,CleansedSourceLocation,CuratedStorageConnectionFK,CuratedConnectionDisplayName,CuratedSourceLocation,	DomainName, SchemaName, DatasetName, VersionNumber, VersionValidFrom, VersionValidTo, LoadType, LoadStatus, LastLoadDate, Enabled)
+	VALUES (@ComputeConnectionDisplayName, -1, @CreateNotebookName, -1, @BusinessLogicName, -1, 0,@CleansedConnectionDisplayName,@CleansedSourceLocation,0,@CuratedConnectionDisplayName,@CuratedSourceLocation,@DomainName,@SchemaName, @DatasetName, @VersionNumber, @VersionValidFrom, @VersionValidTo, @LoadType, @LoadStatus, @LastLoadDate, @Enabled)
 
 	UPDATE td
 	SET td.ComputeConnectionFK = c.ComputeConnectionId
@@ -73,16 +85,50 @@ BEGIN
 		RETURN 0;
 	END
 
+	-- Update Storage Connection Keys
+	UPDATE d
+	SET d.CleansedStorageConnectionFK = c.ConnectionId
+	FROM @TransformDatasets AS d
+	INNER JOIN common.Connections AS c
+	ON c.ConnectionDisplayName = d.CleansedConnectionDisplayName
+	AND c.SourceLocation = d.CleansedSourceLocation
+
+	UPDATE d
+	SET d.CuratedStorageConnectionFK = c.ConnectionId
+	FROM @TransformDatasets AS d
+	INNER JOIN common.Connections AS c
+	ON c.ConnectionDisplayName = d.CuratedConnectionDisplayName
+	AND c.SourceLocation = d.CuratedSourceLocation
+
+	-- Validate the RawStorage Connection FK is successfully updated
+    IF (SELECT COUNT(*) FROM @TransformDatasets WHERE CleansedStorageConnectionFK = 0) > 0
+	BEGIN
+		RAISERROR('CleansedStorageConnectionFK not updated as a record for the CleansedConnectionDisplayName and CleansedStorageLocation values does not exist within common.Connections.',16,1)
+		RETURN 0;
+	END
+
+	-- Validate the CleansedStorage Connection FK is successfully updated
+    IF (SELECT COUNT(*) FROM @TransformDatasets WHERE CuratedStorageConnectionFK = 0) > 0
+	BEGIN
+		RAISERROR('CuratedStorageConnectionFK not updated as a record for the CuratedConnectionDisplayName and CuratedStorageLocation values does not exist within common.Connections.',16,1)
+		RETURN 0;
+	END
+
+
 	MERGE INTO transform.Datasets AS Target
 	USING @TransformDatasets AS Source
 	ON Source.DatasetName = Target.DatasetName
 	AND Source.SchemaName = Target.SchemaName
+	AND Source.DomainName = Target.DomainName
 
 	WHEN NOT MATCHED THEN
-		INSERT (ComputeConnectionFK, CreateNotebookFK, BusinessLogicNotebookFK, SchemaName, DatasetName, VersionNumber, VersionValidFrom, VersionValidTo, LoadType, LoadStatus, LastLoadDate, Enabled)
+		INSERT (ComputeConnectionFK, CreateNotebookFK, BusinessLogicNotebookFK, CleansedStorageConnectionFK,CuratedStorageConnectionFK,DomainName,SchemaName, DatasetName, VersionNumber, VersionValidFrom, VersionValidTo, LoadType, LoadStatus, LastLoadDate, Enabled)
 		VALUES (Source.ComputeConnectionFK, 
 				Source.CreateNotebookFK, 
 				Source.BusinessLogicNotebookFK, 
+				Source.CleansedStorageConnectionFK,
+				Source.CuratedStorageConnectionFK,
+				Source.DomainName, 
 				Source.SchemaName, 
 				Source.DatasetName,  
 				Source.VersionNumber, 
@@ -97,6 +143,8 @@ BEGIN
 		Target.ComputeConnectionFK = Source.ComputeConnectionFK,
 		Target.CreateNotebookFK = Source.CreateNotebookFK,
 		Target.BusinessLogicNotebookFK = Source.BusinessLogicNotebookFK,
+		Target.CleansedStorageConnectionFK = Source.CleansedStorageConnectionFK,
+		Target.CuratedStorageConnectionFK = Source.CuratedStorageConnectionFK,
 		Target.VersionNumber = Source.VersionNumber,
 		Target.VersionValidFrom = Source.VersionValidFrom,
 		Target.VersionValidTo = Source.VersionValidTo,

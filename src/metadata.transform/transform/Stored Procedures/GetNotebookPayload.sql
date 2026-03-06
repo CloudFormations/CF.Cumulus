@@ -1,7 +1,7 @@
 CREATE PROCEDURE [transform].[GetNotebookPayload]
-    (
-    @DatasetId INT
-    )
+	(
+	@DatasetId INT
+	)
 AS
 BEGIN
 
@@ -10,40 +10,37 @@ BEGIN
 
     SELECT 
         @ResultRowCount = COUNT(*)
-    FROM 
-        [transform].[Datasets] AS ds
-    INNER JOIN
-        [transform].[Notebooks] AS n1
-    ON 
-        n1.NotebookId = ds.CreateNotebookFK
-    INNER JOIN
-        [transform].[Notebooks] AS n2
-    ON 
-        n2.NotebookId = ds.BusinessLogicNotebookFK
-    INNER JOIN 
-        [common].[ComputeConnections] AS ccn
-    ON
-        ds.ComputeConnectionFK = ccn.ComputeConnectionId
-    INNER JOIN
-        [common].[Connections] AS cn
-    ON 
-        cn.ConnectionDisplayName = 'PrimaryResourceGroup'
-    INNER JOIN
-        [common].[Connections] AS cn2
-    ON 
-        cn2.ConnectionDisplayName = 'PrimarySubscription'
-    INNER JOIN
-        [common].[Connections] AS cn3
-    ON 
-        cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
-    INNER JOIN
-        [common].[Connections] AS cn4
-    ON 
-        cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
-    INNER JOIN 
-        [common].Connections AS cn5
-    ON cn5.ConnectionDisplayName = 'PrimaryKeyVault'
-    WHERE
+	FROM 
+		[transform].[Datasets] AS ds
+	INNER JOIN
+		[transform].[Notebooks] AS n1
+	ON 
+		n1.NotebookId = ds.CreateNotebookFK
+	INNER JOIN
+		[transform].[Notebooks] AS n2
+	ON 
+		n2.NotebookId = ds.BusinessLogicNotebookFK
+	INNER JOIN 
+		[common].[ComputeConnections] AS ccn
+	ON
+		ds.ComputeConnectionFK = ccn.ComputeConnectionId
+	INNER JOIN
+		[common].[Connections] AS cn
+	ON 
+		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
+	INNER JOIN
+		[common].[Connections] AS cn2
+	ON 
+		cn2.ConnectionDisplayName = 'PrimarySubscription'
+	INNER JOIN
+		[common].[Connections] AS cn3
+	ON 
+		ds.CuratedStorageConnectionFK = cn3.ConnectionId
+	INNER JOIN
+		[common].[Connections] AS cn4
+	ON 
+		ds.CleansedStorageConnectionFK = cn4.ConnectionId
+	WHERE
         ds.DatasetId = @DatasetId
 
     IF @ResultRowCount = 0
@@ -59,7 +56,7 @@ BEGIN
     END
 
 
-    DECLARE @CuratedColumnsList NVARCHAR(MAX)
+	DECLARE @CuratedColumnsList NVARCHAR(MAX)
     DECLARE @CuratedColumnsTypeList NVARCHAR(MAX)
 
     DECLARE @BkAttributesList NVARCHAR(MAX) = ''
@@ -82,6 +79,8 @@ BEGIN
         ds.DatasetId = @DatasetId
     AND 
         att.SurrogateKeyAttribute = 0
+    AND 
+        att.Enabled = 1
     GROUP BY ds.DatasetId
 
     -- Get SurrogateKey column as string value.
@@ -97,6 +96,8 @@ BEGIN
         ds.DatasetId = @DatasetId
     AND 
         att.SurrogateKeyAttribute = 1
+    AND 
+        att.Enabled = 1
 
     -- Defensive check: Surrogate Key exists.
     IF @SurrogateKeyAttribute = ''
@@ -118,6 +119,8 @@ BEGIN
         ds.DatasetId = @DatasetId
     AND 
         att.BkAttribute = 1
+    AND 
+        att.Enabled = 1
     GROUP BY 
         ds.DatasetId
 
@@ -134,6 +137,8 @@ BEGIN
         ds.DatasetId = @DatasetId
     AND 
         att.PartitionByAttribute = 1
+    AND 
+        att.Enabled = 1
     GROUP BY 
         ds.DatasetId
 
@@ -156,9 +161,8 @@ BEGIN
         RETURN 0;
     END
 
-    SELECT 
+	SELECT 
         [ccn].[ConnectionLocation] AS 'ComputeWorkspaceURL',
-        [ccn].[ConnectionDisplayName] AS 'ComputeName',
         [ccn].[ComputeLocation] AS 'ComputeClusterId',
         [ccn].[ComputeSize],
         [ccn].[ComputeVersion],
@@ -168,17 +172,17 @@ BEGIN
         [cn].[SourceLocation] AS 'ResourceGroupName',
         [cn2].[SourceLocation] AS 'SubscriptionId',
         [cn3].[ConnectionLocation] AS 'CuratedStorageName',
-        [cn3].[SourceLocation] AS 'CuratedContainerName',
+		[cn3].[SourceLocation] AS 'CuratedContainerName',
         [cn4].[ConnectionLocation] AS 'CleansedStorageName',
-        [cn4].[SourceLocation] AS 'CleansedContainerName',
+		[cn4].[SourceLocation] AS 'CleansedContainerName',
         [cn3].[Username] AS 'CuratedStorageAccessKey',
         [cn4].[Username] AS 'CleansedStorageAccessKey',
-        [cn5].[ConnectionLocation] AS 'KeyVaultAddress',
 
         ds.DatasetName,
         ds.SchemaName,
+        ds.DomainName,
         n2.NotebookPath AS 'BusinessLogicNotebookPath',
-        n1.NotebookPath AS 'ExecutionNotebookPath',
+		n1.NotebookPath AS 'ExecutionNotebookPath',
         @CuratedColumnsList AS 'ColumnsList',
         @CuratedColumnsTypeList AS 'ColumnTypeList',
         @SurrogateKeyAttribute AS 'SurrogateKey',
@@ -188,39 +192,39 @@ BEGIN
         @LoadAction AS 'LoadType',
         ds.LastLoadDate
     FROM 
-        [transform].[Datasets] AS ds
-    INNER JOIN
-        [transform].[Notebooks] AS n1
-    ON 
-        n1.NotebookId = ds.CreateNotebookFK
-    INNER JOIN
-        [transform].[Notebooks] AS n2
-    ON 
-        n2.NotebookId = ds.BusinessLogicNotebookFK
-    INNER JOIN 
-        [common].[ComputeConnections] AS ccn
-    ON
-        ds.ComputeConnectionFK = ccn.ComputeConnectionId
-    INNER JOIN
-        [common].[Connections] AS cn
-    ON 
-        cn.ConnectionDisplayName = 'PrimaryResourceGroup'
-    INNER JOIN
-        [common].[Connections] AS cn2
-    ON 
-        cn2.ConnectionDisplayName = 'PrimarySubscription'
-    INNER JOIN
-        [common].[Connections] AS cn3
-    ON 
-        cn3.ConnectionDisplayName = 'PrimaryDataLake' AND cn3.SourceLocation = 'curated'
-    INNER JOIN
-        [common].[Connections] AS cn4
-    ON 
-        cn4.ConnectionDisplayName = 'PrimaryDataLake' AND cn4.SourceLocation = 'cleansed'
-    INNER JOIN 
-        [common].Connections AS cn5
-    ON cn5.ConnectionDisplayName = 'PrimaryKeyVault'
-    WHERE
+		[transform].[Datasets] AS ds
+	INNER JOIN
+		[transform].[Notebooks] AS n1
+	ON 
+		n1.NotebookId = ds.CreateNotebookFK
+	INNER JOIN
+		[transform].[Notebooks] AS n2
+	ON 
+		n2.NotebookId = ds.BusinessLogicNotebookFK
+	INNER JOIN 
+		[common].[ComputeConnections] AS ccn
+	ON
+		ds.ComputeConnectionFK = ccn.ComputeConnectionId
+	INNER JOIN
+		[common].[Connections] AS cn
+	ON 
+		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
+	INNER JOIN
+		[common].[Connections] AS cn2
+	ON 
+		cn2.ConnectionDisplayName = 'PrimarySubscription'
+	INNER JOIN
+		[common].[Connections] AS cn3
+	ON 
+		ds.CuratedStorageConnectionFK = cn3.ConnectionId
+	INNER JOIN
+		[common].[Connections] AS cn4
+	ON 
+		ds.CleansedStorageConnectionFK = cn4.ConnectionId
+	WHERE
         ds.DatasetId = @DatasetId
 
 END
+GO
+
+
