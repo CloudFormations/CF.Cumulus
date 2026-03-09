@@ -98,6 +98,19 @@ namespace cloudformations.cumulus.services
                     ActivityCount = 0
                 };
             }
+            catch (System.InvalidOperationException)
+            {
+                _logger.LogInformation("Validated ADF pipeline does not exist.");
+
+                return new PipelineDescription()
+                {
+                    PipelineExists = "False",
+                    PipelineName = request.PipelineName,
+                    PipelineId = "Unknown",
+                    PipelineType = "Unknown",
+                    ActivityCount = 0
+                };
+            }
             catch (Exception ex)
             {
                 _logger.LogInformation(ex.Message);
