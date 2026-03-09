@@ -38,6 +38,8 @@ BEGIN
 	Check 25 - Has the execution failed due to an invalid pipeline name? If so, attend to update this before the next run.
 	Check 26 - Is there more than one framework orchestrator set?
 	Check 27 - Has a framework orchestrator been set for any orchestrators?
+
+	Check 28 - Are any stages not unique to a batch. E.g. does a Stage Id exist more than once in the batch stage link?
 	*/
 
 	DECLARE @BatchId UNIQUEIDENTIFIER
@@ -517,6 +519,23 @@ BEGIN
 				( 
 				27,
 				'A FrameworkOrchestrator has not been set in the table [control].[Orchestrators]. Only one is supported.'
+				)		
+		END
+
+	--Check 28:
+	IF EXISTS
+		(
+		SELECT StageId, COUNT(*) 
+		FROM [control].[BatchStageLink] 
+		GROUP BY StageId
+		HAVING COUNT(*) > 1
+		)
+		BEGIN
+			INSERT INTO @MetadataIntegrityIssues
+			VALUES
+				( 
+				28,
+				'One or more stages are linked to more than one batch. Stages should be unique to a batch: Ensure these are separated and pipelines within control.Pipelines are registered for each stage they are desired to run within.'
 				)		
 		END
 
