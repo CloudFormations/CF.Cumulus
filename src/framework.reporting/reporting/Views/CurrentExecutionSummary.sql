@@ -1,4 +1,4 @@
-﻿CREATE VIEW [procfwkReporting].[CurrentExecutionSummary]
+﻿CREATE VIEW [reporting].[CurrentExecutionSummary]
 AS
 
 SELECT 

@@ -1,4 +1,4 @@
-﻿CREATE VIEW [procfwkReporting].[WorkerParallelismOverTime]
+﻿CREATE VIEW [reporting].[WorkerParallelismOverTime]
 AS
 
 WITH numbers AS

@@ -1,4 +1,4 @@
-﻿CREATE VIEW [procfwkReporting].[CompleteExecutionLog]
+﻿CREATE VIEW [reporting].[CompleteExecutionLog]
 AS
 
 SELECT
