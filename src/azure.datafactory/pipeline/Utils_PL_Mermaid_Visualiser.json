@@ -83,7 +83,10 @@
                         "storedProcedureParameters": {
                             "MarkdownTargetId": {
                                 "type": "Int32",
-                                "value": "1"
+                                "value": {
+                                    "value": "@pipeline().parameters.MarkdownTargetId",
+                                    "type": "Expression"
+                                }
                             }
                         },
                         "queryTimeout": "02:00:00",
@@ -124,8 +127,8 @@
                                         "timeout": "0.12:00:00",
                                         "retry": 0,
                                         "retryIntervalInSeconds": 30,
-                                        "secureOutput": false,
-                                        "secureInput": false
+                                        "secureOutput": true,
+                                        "secureInput": true
                                     },
                                     "userProperties": [],
                                     "typeProperties": {
@@ -148,8 +151,8 @@
                                         "timeout": "0.12:00:00",
                                         "retry": 0,
                                         "retryIntervalInSeconds": 30,
-                                        "secureOutput": false,
-                                        "secureInput": false
+                                        "secureOutput": true,
+                                        "secureInput": true
                                     },
                                     "userProperties": [],
                                     "typeProperties": {
@@ -185,8 +188,8 @@
                                         "timeout": "0.12:00:00",
                                         "retry": 0,
                                         "retryIntervalInSeconds": 30,
-                                        "secureOutput": false,
-                                        "secureInput": false
+                                        "secureOutput": true,
+                                        "secureInput": true
                                     },
                                     "userProperties": [],
                                     "typeProperties": {
@@ -198,7 +201,7 @@
                                             }
                                         },
                                         "url": {
-                                            "value": "@concat(activity('GetADOBaseURL').output.value,'/pages?path=/','Mermaid','&api-version=7.1')",
+                                            "value": "@concat(activity('GetADOBaseURL').output.value,'/pages?path=/',activity('GetMermaidPayload').output.firstRow.WikiPagePath,'&api-version=7.1')",
                                             "type": "Expression"
                                         }
                                     }
@@ -219,7 +222,7 @@
                                         "retry": 0,
                                         "retryIntervalInSeconds": 30,
                                         "secureOutput": true,
-                                        "secureInput": false
+                                        "secureInput": true
                                     },
                                     "userProperties": [],
                                     "typeProperties": {
@@ -231,7 +234,7 @@
                                             }
                                         },
                                         "url": {
-                                            "value": "@concat(activity('GetADOBaseURL').output.value,'/pages/','Mermaid','?api-version=7.1')",
+                                            "value": "@concat(activity('GetADOBaseURL').output.value,'/pages/',activity('GetMermaidPayload').output.firstRow.WikiPagePath,'?api-version=7.1')",
                                             "type": "Expression"
                                         },
                                         "body": {
@@ -279,7 +282,7 @@
             "name": "Cumulus.Utils"
         },
         "annotations": [],
-        "lastPublishTime": "2025-12-08T08:55:42Z"
+        "lastPublishTime": "2026-02-24T07:52:59Z"
     },
     "type": "Microsoft.DataFactory/factories/pipelines"
 }
