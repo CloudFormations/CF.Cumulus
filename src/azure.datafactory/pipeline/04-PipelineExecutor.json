@@ -367,7 +367,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "Email Sender",
+									"referenceName": "Utils_PL_Email_Sender",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,

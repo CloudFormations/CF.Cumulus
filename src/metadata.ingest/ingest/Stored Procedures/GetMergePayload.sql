@@ -123,9 +123,9 @@ BEGIN
     GROUP BY 
         ds.DatasetId
 
-    -- Get pk columns as comma separated string values for the dataset
+    -- Get partitionby columns as comma separated string values for the dataset
     SELECT 
-        @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'|')
+        @PartitionByAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'|')
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 

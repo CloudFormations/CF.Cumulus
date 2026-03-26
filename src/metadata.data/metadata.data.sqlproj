@@ -57,12 +57,14 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Scripts" />
+    <Folder Include="Scripts\Control\" />
+    <Folder Include="Scripts\Ingest" />
+    <Folder Include="Scripts\Transform" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\ConnectionsMetadataAsCode.sql" />
-    <None Include="Scripts\ControlPipelineMetadataAsCode.sql" />
+    <None Include="Scripts\Control\ControlPipelineMetadataAsCode.sql" />
     <None Include="Scripts\ControlWaitPipelineMetadataAsCode.sql" />
-    <None Include="Scripts\TransformDatasetsMetadataAsCode.sql" />
     <None Include="metadata.data.publish.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -132,6 +134,32 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Scripts\IngestDatasetsMetadataAsCode.sql" />
+    <None Include="Scripts\Ingest\Product.sql" />
+    <None Include="Scripts\Ingest\SalesOrderDetail.sql" />
+    <None Include="Scripts\Ingest\SalesOrderHeader.sql" />
+    <None Include="Scripts\Transform\DimDate.sql" />
+    <None Include="Scripts\Transform\DimProducts.sql" />
+    <None Include="Scripts\Transform\FactSales.sql" />
   </ItemGroup>
+  <!-- Auto-generate _AutoInclude.sql for Scripts\Ingest -->
+  <Target Name="GenerateIngestScripts" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <IngestScripts Include="Scripts\Ingest\*.sql" Exclude="Scripts\Ingest\_AutoInclude.sql" />
+    </ItemGroup>
+    <WriteLinesToFile File="Scripts\Ingest\_AutoInclude.sql" Lines="@(IngestScripts->':r .\%(RecursiveDir)%(Filename)%(Extension)')" Overwrite="true" />
+  </Target>
+  <!-- Auto-generate _AutoInclude.sql for Scripts\Transform -->
+  <Target Name="GenerateTransformScripts" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <TransformScripts Include="Scripts\Transform\*.sql" Exclude="Scripts\Transform\_AutoInclude.sql" />
+    </ItemGroup>
+    <WriteLinesToFile File="Scripts\Transform\_AutoInclude.sql" Lines="@(TransformScripts->':r .\%(RecursiveDir)%(Filename)%(Extension)')" Overwrite="true" />
+  </Target>
+  <!-- Auto-generate _AutoInclude.sql for Scripts\Control -->
+  <Target Name="GenerateControlScripts" BeforeTargets="BeforeBuild">
+    <ItemGroup>
+      <ControlScripts Include="Scripts\Control\*.sql" Exclude="Scripts\Control\_AutoInclude.sql" />
+    </ItemGroup>
+    <WriteLinesToFile File="Scripts\Control\_AutoInclude.sql" Lines="@(ControlScripts->':r .\%(RecursiveDir)%(Filename)%(Extension)')" Overwrite="true" />
+  </Target>
 </Project>

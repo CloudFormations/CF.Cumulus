@@ -1011,7 +1011,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "RefreshToken",
+											"referenceName": "Utils_PL_Refresh_Token",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,

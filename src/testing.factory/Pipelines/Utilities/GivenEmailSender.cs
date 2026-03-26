@@ -17,7 +17,7 @@ namespace framework.testing.Pipelines.Utilities
                 .WithParameter("Subject", "NUnit Test")
                 .WithParameter("Body", "NUnit Test"); ;
 
-            await _helper.RunPipeline("Email Sender");
+            await _helper.RunPipeline("Utils_PL_Email_Sender");
         }
 
         [Test]

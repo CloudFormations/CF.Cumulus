@@ -925,7 +925,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Check For Running Pipeline",
+						"referenceName": "Utils_PL_Check_For_Running_Pipeline",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

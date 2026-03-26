@@ -10,7 +10,7 @@ Post-Deployment Script Template
 --------------------------------------------------------------------------------------
 */
 :r .\ConnectionsMetadataAsCode.sql
-:r .\IngestDatasetsMetadataAsCode.sql
-:r .\TransformDatasetsMetadataAsCode.sql
-:r .\ControlPipelineMetadataAsCode.sql
 :r .\ControlWaitPipelineMetadataAsCode.sql
+:r .\Ingest\_AutoInclude.sql
+:r .\Transform\_AutoInclude.sql
+:r .\Control\_AutoInclude.sql
