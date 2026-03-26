@@ -1,6 +1,5 @@
 CREATE PROCEDURE [transform].[AddTransformDatasets]
 (
-	@ComputeConnectionDisplayName NVARCHAR(50),
 	@CreateNotebookName NVARCHAR(100),
 	@BusinessLogicName NVARCHAR(100),
 	@CleansedConnectionDisplayName NVARCHAR(50),
@@ -22,8 +21,6 @@ AS
 BEGIN
 	SET NOCOUNT ON;
 	DECLARE @TransformDatasets TABLE (
-		[ComputeConnectionDisplayName] NVARCHAR(50),
-		[ComputeConnectionFK] INT,
 		[CreateNotebookName] NVARCHAR(100),
 		[CreateNotebookFK] INT,
 		[BusinessLogicName] NVARCHAR(100),
@@ -46,20 +43,8 @@ BEGIN
 		[Enabled] BIT
 	)
 
-	INSERT INTO @TransformDatasets(ComputeConnectionDisplayName, ComputeConnectionFK, CreateNotebookName, CreateNotebookFK, BusinessLogicName, BusinessLogicNotebookFK, 	CleansedStorageConnectionFK,CleansedConnectionDisplayName,CleansedSourceLocation,CuratedStorageConnectionFK,CuratedConnectionDisplayName,CuratedSourceLocation,	DomainName, SchemaName, DatasetName, VersionNumber, VersionValidFrom, VersionValidTo, LoadType, LoadStatus, LastLoadDate, Enabled)
-	VALUES (@ComputeConnectionDisplayName, -1, @CreateNotebookName, -1, @BusinessLogicName, -1, 0,@CleansedConnectionDisplayName,@CleansedSourceLocation,0,@CuratedConnectionDisplayName,@CuratedSourceLocation,@DomainName,@SchemaName, @DatasetName, @VersionNumber, @VersionValidFrom, @VersionValidTo, @LoadType, @LoadStatus, @LastLoadDate, @Enabled)
-
-	UPDATE td
-	SET td.ComputeConnectionFK = c.ComputeConnectionId
-	FROM @TransformDatasets AS td
-	INNER JOIN common.ComputeConnections AS c
-	ON td.ComputeConnectionDisplayName = c.ConnectionDisplayName
-
-	IF (SELECT ComputeConnectionFK FROM @TransformDatasets) = -1
-	BEGIN
-		RAISERROR('ComputeConnectionFK not updated as the ComputeConnectionDisplayName does not exist within common.ComputeConnections.',16,1)
-		RETURN 0;
-	END
+	INSERT INTO @TransformDatasets(CreateNotebookName, CreateNotebookFK, BusinessLogicName, BusinessLogicNotebookFK, 	CleansedStorageConnectionFK,CleansedConnectionDisplayName,CleansedSourceLocation,CuratedStorageConnectionFK,CuratedConnectionDisplayName,CuratedSourceLocation,	DomainName, SchemaName, DatasetName, VersionNumber, VersionValidFrom, VersionValidTo, LoadType, LoadStatus, LastLoadDate, Enabled)
+	VALUES (@CreateNotebookName, -1, @BusinessLogicName, -1, 0,@CleansedConnectionDisplayName,@CleansedSourceLocation,0,@CuratedConnectionDisplayName,@CuratedSourceLocation,@DomainName,@SchemaName, @DatasetName, @VersionNumber, @VersionValidFrom, @VersionValidTo, @LoadType, @LoadStatus, @LastLoadDate, @Enabled)
 
 	UPDATE td
 	SET td.CreateNotebookFK = n.NotebookId
@@ -122,8 +107,8 @@ BEGIN
 	AND Source.DomainName = Target.DomainName
 
 	WHEN NOT MATCHED THEN
-		INSERT (ComputeConnectionFK, CreateNotebookFK, BusinessLogicNotebookFK, CleansedStorageConnectionFK,CuratedStorageConnectionFK,DomainName,SchemaName, DatasetName, VersionNumber, VersionValidFrom, VersionValidTo, LoadType, LoadStatus, LastLoadDate, Enabled)
-		VALUES (Source.ComputeConnectionFK, 
+		INSERT (CreateNotebookFK, BusinessLogicNotebookFK, CleansedStorageConnectionFK,CuratedStorageConnectionFK,DomainName,SchemaName, DatasetName, VersionNumber, VersionValidFrom, VersionValidTo, LoadType, LoadStatus, LastLoadDate, Enabled)
+		VALUES (
 				Source.CreateNotebookFK, 
 				Source.BusinessLogicNotebookFK, 
 				Source.CleansedStorageConnectionFK,
@@ -140,7 +125,6 @@ BEGIN
 				Source.Enabled)
 
 	WHEN MATCHED THEN UPDATE SET
-		Target.ComputeConnectionFK = Source.ComputeConnectionFK,
 		Target.CreateNotebookFK = Source.CreateNotebookFK,
 		Target.BusinessLogicNotebookFK = Source.BusinessLogicNotebookFK,
 		Target.CleansedStorageConnectionFK = Source.CleansedStorageConnectionFK,

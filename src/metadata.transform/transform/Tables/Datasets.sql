@@ -1,6 +1,5 @@
 CREATE TABLE [transform].[Datasets](
 	[DatasetId] [int] IDENTITY(1,1) NOT NULL,
-	[ComputeConnectionFK] [int] NOT NULL,
 	[CreateNotebookFK] [int] NULL,
 	[BusinessLogicNotebookFK] [int] NULL,
 	[CleansedStorageConnectionFK] [int] NULL,	

@@ -23,7 +23,7 @@ BEGIN
 	INNER JOIN 
 		[common].[ComputeConnections] AS ccn
 	ON
-		ds.ComputeConnectionFK = ccn.ComputeConnectionId
+		n2.ComputeConnectionFK = ccn.ComputeConnectionId
 	INNER JOIN
 		[common].[Connections] AS cn
 	ON 
@@ -164,9 +164,9 @@ BEGIN
 	SELECT 
         [ccn].[ConnectionLocation] AS 'ComputeWorkspaceURL',
         [ccn].[ComputeLocation] AS 'ComputeClusterId',
-        [ccn].[ComputeSize],
-        [ccn].[ComputeVersion],
-        [ccn].[CountNodes],
+        [ccn].[ComputeSize] AS 'ComputeSize',
+        [ccn].[ComputeVersion] AS 'ComputeVersion',
+        [ccn].[CountNodes] AS 'CountNodes',
         [ccn].[LinkedServiceName] AS 'ComputeLinkedServiceName',
         [ccn].[ResourceName] AS 'ComputeResourceName',
         [cn].[SourceLocation] AS 'ResourceGroupName',
@@ -204,7 +204,7 @@ BEGIN
 	INNER JOIN 
 		[common].[ComputeConnections] AS ccn
 	ON
-		ds.ComputeConnectionFK = ccn.ComputeConnectionId
+		n2.ComputeConnectionFK = ccn.ComputeConnectionId
 	INNER JOIN
 		[common].[Connections] AS cn
 	ON 
