@@ -11,6 +11,9 @@ param(
     
     [Parameter(Mandatory=$false)]
     [string] $templateFile = "infrastructure/main.bicep",
+
+    [Parameter(Mandatory=$false)]
+    [string] $postDeployTemplateFile = "infrastructure/mainpostdeploy.bicep",
     
     [Parameter(Mandatory=$false)]
     [string] $parametersFile = "infrastructure/configuration/_installation/main.bicepparam"
@@ -153,3 +156,10 @@ $Env:DATAFACTORY = ''
 $Env:FUNCTIONAPP = '' 
 $Env:KEYVAULT = '' 
 
+# Run the *mainpostdeploy*.bicep file to apply remaining network configuration to your resources deployed within this wrapper.
+$bicepDeployment = az deployment sub create `
+    --subscription $subscriptionId `
+    --location $location `
+    --template-file $postDeployTemplateFile `
+    --parameters $parametersFile `
+    | ConvertFrom-Json

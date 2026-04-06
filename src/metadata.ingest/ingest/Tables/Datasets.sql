@@ -11,7 +11,7 @@ CREATE TABLE [ingest].[Datasets](
 	[VersionNumber] [int] NOT NULL,
 	[VersionValidFrom] [datetime2](7) NULL,
 	[VersionValidTo] [datetime2](7) NULL,
-	[LoadType] [char](1) NOT NULL,
+	[LoadType] [varchar](10) NOT NULL,
 	[LoadStatus] [int] NULL,
 	[LoadClause] [nvarchar](max) NULL,
 	[RawLastFullLoadDate] [datetime2](7) NULL,
