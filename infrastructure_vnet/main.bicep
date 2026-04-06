@@ -8,8 +8,8 @@ targetScope = 'subscription'
 //Parameters for environment configuration
 // * These parameters control resource naming and deployment options
 // * Recommended for consistent resource naming across environments
-param orgName string = 'cfc'
-param domainName string = 'demo'
+param orgName string = 'cf'
+param domainName string = 'cumulus'
 param envName string = 'dev'
 param location string = 'uksouth'
 param uniqueIdentifier string = '01'
@@ -79,10 +79,15 @@ var nameSuffix = '${locationShortCode}${uniqueIdentifier}'
 
 // Resource Names
 var rgName = '${namePrefix}rg${nameSuffix}'
-var keyVaultName = '${namePrefix}kv${nameSuffix}'
 var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
 var applicationInsightsName = '${namePrefix}appi${nameSuffix}'
+
 var vNetName = '${namePrefix}vnet${nameSuffix}'
+var functionSubnetName = 'mattnwk-dev-sep-01'
+var privateSubnetName = 'mattnwk-dev-pep-01'
+
+var keyVaultName = '${namePrefix}kv${nameSuffix}'
+
 var functionStorageName = '${namePrefix}${functionStorageNameShort}${nameSuffix}'
 var functionStorageContainerName = 'app-package-${functionStorageName}-bb6a' //Function app storage name prefix
 var functionAppName = '${namePrefix}func${nameSuffix}'
@@ -169,9 +174,25 @@ module functionAppDeploy './modules/functionapp.template.bicep' = if (deployFunc
     aspSKU: aspSKU
     hostingPlanName: hostingPlanName
     vNetName: vNetName
-    subnetName: 'mattnwk-dev-sep-01'
+    subnetName: functionSubnetName
   }
   dependsOn: [
     functionStorageAccountDeploy
+  ]
+}
+
+// Deploy SQL Server with a basic blank database
+module sqlServerDeploy './modules/sqlserver.template.bicep' = if (deploySQL) {
+  scope: rg
+  name: 'sql-server${deploymentTimestamp}'
+  params: {
+    myIPAddress: myIPAddress
+    allowAzureServices: allowAzureServices
+    namePrefix: namePrefix
+    nameSuffix: nameSuffix
+  }
+  dependsOn: [
+    keyVaultDeploy
+    logAnalyticsDeploy
   ]
 }
