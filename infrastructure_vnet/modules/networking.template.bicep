@@ -1,28 +1,18 @@
-// Input parameters
+@description('Resource group location.')
 param location string = resourceGroup().location
 
-param namePrefix string
-param nameSuffix string
+@description('Environment name.')
+param environment string
+
+@description('Network Configuration JSON with NSG, VNet and Subnet details.')
 param networkConfig object
 
-
-// Names for Databricks-specific resources
-var names = {
-  virtualNetwork: '${namePrefix}vnet${nameSuffix}'
-  nsg: '${namePrefix}nsg${nameSuffix}'
-  subnets: {
-    controlPlane: '${namePrefix}snet-control${nameSuffix}'
-    workerNodes: '${namePrefix}snet-worker${nameSuffix}'
-    serviceEndpoint: '${namePrefix}sep${nameSuffix}'
-    privateEndpoint: '${namePrefix}pep${nameSuffix}'
-  }
-}
-
-
+@description('Network Configuration resource Names.')
+param names object = {}
 
 
 // Select network configuration based on environment
-var selectedNetworkConfig = networkConfig.default
+var selectedNetworkConfig = networkConfig[environment]
 
 // Output variables for use in the rest of your Bicep template
 var vnetAddressPrefix = selectedNetworkConfig.vnetAddressPrefix
@@ -180,14 +170,10 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
               }
             }
           ]
-          // serviceEndpoints: [
-          //   {
-          //     service: 'Microsoft.Storage'
-          //   }
-          // ]
+
         }
       }
-      {
+      { 
         name: names.subnets.workerNodes
         properties: {
           addressPrefix: subnetPrefixes.publicSubnetCIDR
@@ -202,11 +188,6 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
               }
             }
           ]
-          // serviceEndpoints: [
-          //   {
-          //     service: 'Microsoft.Storage'
-          //   }
-          // ]
         }
       }
       {
@@ -216,14 +197,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
           networkSecurityGroup: {
             id: nsg.id
           }
-          // serviceEndpoints: [
-          //   {
-          //     service: 'Microsoft.Storage'
-          //   }
-          //   {
-          //     service: 'Microsoft.KeyVault'
-          //   }
-          // ]
+
           privateEndpointNetworkPolicies: 'Disabled'
           privateLinkServiceNetworkPolicies: 'Enabled'
         }
@@ -242,67 +216,19 @@ resource vnet 'Microsoft.Network/virtualNetworks@2023-05-01' = {
     ]
   }
 }
-
-// Private DNS Zone
-// resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
-//   name: 'cfcdemodevpluks01'
-//   location: 'global'
-// }
-
-// DNS Zone Virtual Network Link
-// resource databricksVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-//   parent: databricksPrivateDnsZone
-//   name: uniqueString(vnet.id)
-//   location: 'global'
-//   properties: {
-//     registrationEnabled: false
-//     virtualNetwork: {
-//       id: vnet.id
-//     }
-//   }
-// }
+resource privateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-05-01' = {
+  name: names.subnets.privateEndpoint
+  parent: vnet
+  properties: {
+    addressPrefix: networkConfig[environment].subnetPrefixes.privateEndpoint
+    privateEndpointNetworkPolicies: 'Enabled' // REQUIRED for PEs
+  }
+}
 
 
-// Databricks Private Endpoint
-// resource databricksPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-05-01' = {
-//   name: '${workspaceName}-pe'
-//   location: location
-//   properties: {
-//     privateLinkServiceConnections: [
-//       {
-//         name: 'databricks-connection'
-//         properties: {
-//           privateLinkServiceId: databricksWorkspace.id
-//           groupIds: [
-//             'databricks_ui_api'
-//           ]
-//         }
-//       }
-//     ]
-//     subnet: {
-//       id: '${vnet.id}/subnets/${names.subnets.privateEndpoint}'
-//     }
-//   }
-// }
 
-
-// // Private DNS Zone Record for Databricks - only works for Premium workspace SKU
-// resource databricksPrivateDnsRecord 'Microsoft.Network/privateDnsZones/A@2020-06-01' = {
-//   parent: databricksPrivateDnsZone
-//   name: workspaceName
-//   properties: {
-//     ttl: 3600
-//     aRecords: [
-//       {
-//         ipv4Address: databricksPrivateEndpoint.properties.customDnsConfigs[0].ipAddresses[0]
-//       }
-//     ]
-//   }
-// }
 
 
 output vnetId string = vnet.id
+output privateEndpointSubnetId string = privateEndpointSubnet.id
 
-// output vnetName string = vnet.name
-// output databricksPublicSubnetName string = databricksPublicSubnetName
-// output databricksPrivateSubnetName string = databricksPrivateSubnetName

@@ -83,22 +83,100 @@ var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
 var applicationInsightsName = '${namePrefix}appi${nameSuffix}'
 
 var vNetName = '${namePrefix}vnet${nameSuffix}'
-var functionSubnetName = 'mattnwk-dev-sep-01'
-var privateSubnetName = 'mattnwk-dev-pep-01'
+var nsgName = '${namePrefix}nsg${nameSuffix}'
+var functionSubnetName = '${namePrefix}snetsep${nameSuffix}'
+var privateSubnetName = '${namePrefix}snetpep${nameSuffix}'
+var databricksControlPlaneSubnetName = '${namePrefix}snetpublic${nameSuffix}'
+var databricksWorkerPlaneSubnetName = '${namePrefix}snetprivate${nameSuffix}'
+
+var databricksWorkspaceName = '${namePrefix}dbw${nameSuffix}'
+var databricksManagedResourceGroupName = '${namePrefix}mrg${nameSuffix}'
+var databricksPEPName = '${namePrefix}dbwpep${nameSuffix}'
+
 
 var keyVaultName = '${namePrefix}kv${nameSuffix}'
+var keyVaultPEPName = '${namePrefix}kvpep${nameSuffix}'
+var keyVaultNICName = '${namePrefix}kvnic${nameSuffix}'
 
 var functionStorageName = '${namePrefix}${functionStorageNameShort}${nameSuffix}'
 var functionStorageContainerName = 'app-package-${functionStorageName}-bb6a' //Function app storage name prefix
 var functionAppName = '${namePrefix}func${nameSuffix}'
 var hostingPlanName = '${namePrefix}asp${nameSuffix}'
+var functionPEPName = '${namePrefix}funcpep${nameSuffix}'
+
+var sqlServerName = '${namePrefix}sql${nameSuffix}'
+var sqlServerPEPName = '${namePrefix}sqlpep${nameSuffix}'
+// var sqlServerNICName = '${namePrefix}sqlpepnic${nameSuffix}'
+
+var dataFactoryName = '${namePrefix}adf${nameSuffix}'
+var dataFactoryPEPName = '${namePrefix}adfpep${nameSuffix}'
+var dataFactoryNICName = '${namePrefix}adfnic${nameSuffix}'
+
+var StorageAccountName = '${namePrefix}dls${nameSuffix}'
+var StorageAccountBlobPEPName = '${namePrefix}dlsblobpep${nameSuffix}'
+var StorageAccountBlobNICName = '${namePrefix}dlsblobnic${nameSuffix}'
+var StorageAccountDFSPEPName = '${namePrefix}dlsdfspep${nameSuffix}'
+var StorageAccountDFSNICName = '${namePrefix}dlsdfsnic${nameSuffix}'
 
 
+@description('Network Configuration resource Names.')
+var networkNames = {
+  virtualNetwork: vNetName
+  nsg: nsgName
+  subnets: {
+    controlPlane: databricksControlPlaneSubnetName
+    workerNodes: databricksWorkerPlaneSubnetName
+    serviceEndpoint: functionSubnetName
+    privateEndpoint: privateSubnetName
+  }
+}
+
+@description('Network Configuration JSON with NSG, VNet and Subnet details.')
+var networkConfig = {
+  dev: {
+    vnetAddressPrefix: '10.0.0.0/22'
+    subnetPrefixes: {
+      privateSubnetCIDR: '10.0.0.0/24'
+      publicSubnetCIDR: '10.0.1.0/24'
+      serviceEndpoint: '10.0.2.0/24'
+      privateEndpoint: '10.0.3.0/24'
+    }
+  }
+  tst: {
+    vnetAddressPrefix: '10.0.4.0/22'
+    subnetPrefixes: {
+      privateSubnetCIDR: '10.0.4.0/24'
+      publicSubnetCIDR: '10.0.5.0/24'
+      serviceEndpoint: '10.0.6.0/24'
+      privateEndpoint: '10.0.7.0/24'
+    }
+  }
+  prd: {
+    vnetAddressPrefix: '10.0.8.0/22'
+    subnetPrefixes: {
+      privateSubnetCIDR: '10.0.8.0/23'
+      publicSubnetCIDR: '10.0.10.0/23'
+      serviceEndpoint: '10.0.12.0/23'
+      privateEndpoint: '10.0.14.0/23'
+    }
+  }
+}
 
 // Create resource group
 resource rg 'Microsoft.Resources/resourceGroups@2024-03-01' = {
   name: rgName
   location: location
+}
+
+// Deploy Networking Resources
+module networkingDeploy './modules/networking.template.bicep' = {
+  scope: rg
+  name: 'networking${deploymentTimestamp}'
+  params: {
+    environment: envName
+    networkConfig: networkConfig
+    names: networkNames
+  }
 }
 
 // Monitoring Resources
@@ -125,6 +203,18 @@ module appInsightsDeploy './modules/applicationinsights.template.bicep' = {
 }
 
 // Base resources
+module databricksWorkspaceDeploy './modules/databricksworkspace.template.bicep' = {
+  scope: rg
+  name: 'databricks${deploymentTimestamp}'
+  params: {
+    vNetName: vNetName
+    subnets: networkNames.subnets
+    privateEndpointName: databricksPEPName
+    workspaceName: databricksWorkspaceName
+    managedResourceGroupName: databricksManagedResourceGroupName
+  }
+}
+
 module keyVaultDeploy './modules/keyvault.template.bicep' = {
   scope: rg
   name: 'keyvault${deploymentTimestamp}'
@@ -137,7 +227,48 @@ module keyVaultDeploy './modules/keyvault.template.bicep' = {
   ]
 }
 
-// Deploy Function App
+// Deploy ADLS for Data Lake
+module storageAccountDeploy './modules/storage.template.bicep' = {
+  name: 'storageaccount${deploymentTimestamp}'
+  scope: rg
+  params: {
+    envName: envName
+    isHnsEnabled: false
+    isSftpEnabled: false
+    storageAccountName: functionStorageName
+    keyVaultName: keyVaultName
+    storageKind: 'StorageV2'
+    containers: {
+      bronze: {
+        name: 'raw'
+      }
+      silver: {
+        name: 'cleansed'
+      }
+      gold: {
+        name: 'curated'
+      }
+    }
+  }
+  dependsOn: [
+    keyVaultDeploy
+  ]
+}
+
+// Deploy Data Factory
+module dataFactoryDeploy './modules/datafactory.template.bicep' = if (deployADF) {
+  scope: rg
+  name: 'datafactory-orchestrator${deploymentTimestamp}'
+  params: {
+    dataFactoryName: dataFactoryName
+    logAnalyticsWorkspaceName: logAnalyticsWorkspaceName
+  }
+  dependsOn: [
+    keyVaultDeploy
+    logAnalyticsDeploy
+  ]
+}
+
 // Deploy Function App Storage Account
 module functionStorageAccountDeploy './modules/storage.template.bicep' = if (deployFunction) {
   name: 'functionStorage${deploymentTimestamp}'
@@ -196,3 +327,6 @@ module sqlServerDeploy './modules/sqlserver.template.bicep' = if (deploySQL) {
     logAnalyticsDeploy
   ]
 }
+
+
+// Deploy VM for SHIR ( + act as Jump box?)
