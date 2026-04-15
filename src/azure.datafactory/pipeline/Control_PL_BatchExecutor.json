@@ -1,5 +1,5 @@
 {
-	"name": "02-BatchExecutor",
+	"name": "Control_PL_BatchExecutor.json",
 	"properties": {
 		"description": "CF.Cumulus pipeline used to bootstrap the orchestration framework in perform the first level ForEach calls in sequence for the metadata stages.",
 		"activities": [
@@ -40,7 +40,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "GetSetMetadata",
+						"referenceName": "Control_DS_GetSetMetadata",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -84,7 +84,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "03-StageExecutor",
+									"referenceName": "Control_PL_StageExecutor",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,
@@ -228,7 +228,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "GetSetMetadata",
+						"referenceName": "Control_DS_GetSetMetadata",
 						"type": "DatasetReference"
 					}
 				}
@@ -314,7 +314,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "GetSetMetadata",
+						"referenceName": "Control_DS_GetSetMetadata",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -390,7 +390,7 @@
 									"partitionOption": "None"
 								},
 								"dataset": {
-									"referenceName": "GetSetMetadata",
+									"referenceName": "Control_DS_GetSetMetadata",
 									"type": "DatasetReference"
 								}
 							}

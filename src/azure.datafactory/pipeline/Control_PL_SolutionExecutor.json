@@ -1,5 +1,5 @@
 {
-	"name": "01-SolutionExecutor",
+	"name": "Control_PL_SolutionExecutor",
 	"properties": {
 		"description": "CF.Cumulus pipeline used optionally to bootstrap any wider processes in your Data Factory that then calls the processing framework.",
 		"activities": [
@@ -14,7 +14,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "02-BatchExecutor",
+						"referenceName": "Control_PL_BatchExecutor.json",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,
