@@ -1,5 +1,5 @@
 {
-	"name": "03-StageExecutor",
+	"name": "Control_PL_StageExecutor",
 	"properties": {
 		"description": "CF.Cumulus pipeline used to execute Worker pipelines within a given execution stage. This pipeline will be called once for each stage, then execute all Workers in parallel.",
 		"activities": [
@@ -40,7 +40,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "GetSetMetadata",
+						"referenceName": "Control_DS_GetSetMetadata",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": false
@@ -78,7 +78,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "04-PipelineExecutor",
+									"referenceName": "Control_PL_PipelineExecutor",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,

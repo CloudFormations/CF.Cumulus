@@ -59,7 +59,7 @@
                         "partitionOption": "None"
                     },
                     "dataset": {
-                        "referenceName": "GetSetMetadata",
+                        "referenceName": "Control_DS_GetSetMetadata",
                         "type": "DatasetReference"
                     }
                 }
@@ -93,7 +93,7 @@
                         "partitionOption": "None"
                     },
                     "dataset": {
-                        "referenceName": "GetSetMetadata",
+                        "referenceName": "Control_DS_GetSetMetadata",
                         "type": "DatasetReference"
                     }
                 }
