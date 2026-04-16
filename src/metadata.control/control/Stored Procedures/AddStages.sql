@@ -1,6 +1,7 @@
 CREATE PROCEDURE [control].[AddStages]
 (
 	@StageName VARCHAR(255),
+	@ExecutionOrderId INT,
 	@StageDescription VARCHAR(4000),
 	@Enabled BIT
 )
@@ -11,6 +12,7 @@ BEGIN
 	(
 		SELECT
 		@StageName AS StageName,
+		@ExecutionOrderId AS ExecutionOrderId,
 		@StageDescription AS StageDescription,
 		@Enabled AS Enabled
 	)
@@ -19,10 +21,11 @@ BEGIN
 	ON Source.StageName = Target.StageName
 
 	WHEN NOT MATCHED THEN
-		INSERT (StageName, StageDescription, Enabled) 
-		VALUES (Source.StageName, Source.StageDescription, Source.Enabled)
+		INSERT (StageName, ExecutionOrderId, StageDescription, Enabled) 
+		VALUES (Source.StageName, Source.ExecutionOrderId, Source.StageDescription, Source.Enabled)
 
 	WHEN MATCHED THEN UPDATE SET
+		Target.ExecutionOrderId = Source.ExecutionOrderId,
 		Target.StageDescription	= Source.StageDescription,
 		Target.Enabled			= Source.Enabled
 	;
