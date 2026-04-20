@@ -4,16 +4,11 @@ param location string = resourceGroup().location
 @description('Environment name, such as dev, test, prod.')
 param envName string
 
-@description('Resource name prefix as per template naming concatenated in the main file.')
-@minLength(3) // "logAnalyticsWorkspaceName" within the resource has a min length of 4. Adding this decorator constraint removes the warning.
-param namePrefix string 
+@description('Application Insights Name.')
+param applicationInsightsName string
 
-@description('Resource name suffix as per template naming concatenated in the main file.')
-param nameSuffix string 
-
-var name = '${namePrefix}appi${nameSuffix}'
-
-var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
+@description('Log Analytics Workspace Name.')
+param logAnalyticsWorkspaceName string
 
 // Get existing Log Analytics Resource for Id value
 resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {  
@@ -21,7 +16,7 @@ resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09
 }
 
 resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
-  name: name
+  name: applicationInsightsName
   location: location
   kind: 'web'
   properties: {

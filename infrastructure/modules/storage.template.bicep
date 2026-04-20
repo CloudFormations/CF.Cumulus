@@ -1,19 +1,14 @@
 @description('Resource group location.')
 param location string = resourceGroup().location
 
-@description('Resource name prefix as per template naming concatenated in the main file.')
-@minLength(1) // "name" within the resource has a min length of 4. Adding this decorator constraint removes the warning.
-param namePrefix string
-
-@description('Resource name suffix as per template naming concatenated in the main file.')
-param nameSuffix string 
-
 @description('Environment name such as dev, test, prod.')
 param envName string 
 
-@description('Name of the storage account. Currently allowed values (dls, st) for the purpose of CF.Cumulus')
-@allowed(['dls', 'st'])
-param nameStorage string
+@description('Storage Account Name.')
+param storageAccountName string 
+
+@description('Key Vault Name.')
+param keyVaultName string 
 
 // Type of storage account (StorageV2 recommended over Storage)
 // Note: Storage (v1) has limitations:
@@ -37,17 +32,11 @@ param isSftpEnabled bool
 @allowed(['Hot', 'Cold'])
 param accessTier string = 'Hot'
 
-// Construct storage account name from components
-var name = '${namePrefix}${nameStorage}${nameSuffix}'
-
-var keyVaultName = '${namePrefix}kv${nameSuffix}'
-
-var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
 
 
 // Create storage account resource
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
-  name: name
+  name: storageAccountName
   location: location
     // Warning: If storageKind is 'Storage', the following features are not supported:
   // - accessTier
@@ -111,47 +100,12 @@ module storageAccountSecretInVault 'secret.template.bicep' =  [for container in 
     keyVaultName: keyVault.name
     secrets: [
       {
-        name: '${name}${container.value.name}accesskey'
+        name: '${storageAccountName}${container.value.name}accesskey'
         value: storageAccount.listKeys().keys[0].value
       }
     ]
   }
 }]
-
-// // Get existing Log Analytics Resource for Id value
-// resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {  
-//   name: logAnalyticsWorkspaceName
-// }
-
-// resource storageDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   scope: storageAccount
-//   name: 'logs-${storageAccount.name}'
-//   properties: {
-//     workspaceId: logAnalyticsWorkspace.id
-//     logAnalyticsDestinationType: 'Dedicated'
-//     logs: [
-//       {
-//         category: 'StorageRead'
-//         enabled: true
-//       }
-//       {
-//         category: 'StorageWrite'
-//         enabled: true
-//       }
-//       {
-//         category: 'StorageDelete'
-//         enabled: true
-//       }
-//     ]
-//     metrics: [
-//       {
-//         category: 'AllMetrics'
-//         enabled: true
-//       }
-//     ]
-
-//   }
-// }
 
 
 // Output key properties for reference by other resources

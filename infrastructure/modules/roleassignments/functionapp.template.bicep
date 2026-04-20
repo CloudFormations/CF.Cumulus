@@ -1,32 +1,31 @@
-// Input parameters for resource naming and deployment control
+@description('Resource group location.')
 param location string = resourceGroup().location
-param namePrefix string 
-param nameSuffix string 
-//param nameFactory string
-param firstDeployment bool
-param deployWorkers bool
 
-var nameFactory = deployWorkers ? 'factory' : 'adf' // if workers adf is being setup we call this one factory, otherwise we call it adf
+@description('Function App Name.')
+param functionAppName string
 
-// Timestamp parameter used to generate unique GUIDs for role assignments
+@description('Key Vault name.')
+param keyVaultName string
+
+@description('Data Factory resource name.')
+param dataFactoryName string
+
+@description('Unique timestamp for RBAC deployments to prevent duplication conflicts.')
 param timestamp string = utcNow('yy-MM-dd-HHmm')
-
-// Construct the function app name using prefix and suffix
-var functionappName = '${namePrefix}func${nameSuffix}'
 
 // Reference to an existing Key Vault resource
 resource keyVault  'Microsoft.KeyVault/vaults@2019-09-01' existing = {
-  name: '${namePrefix}kv${nameSuffix}'
+  name: keyVaultName
 }
 
 // Reference to an existing Function App resource
 resource functionApp 'Microsoft.Web/sites@2023-12-01' existing = {
-  name: functionappName
+  name: functionAppName
 }
 
 // Assign Key Vault Reader role to the Function App's managed identity
 // Only executed during first deployment (firstDeployment == true)
-resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (firstDeployment) {
+resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(functionApp.id, keyVault.id, 'Reader', timestamp)
   scope: keyVault
   properties: {
@@ -37,30 +36,14 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
 
 // Reference to an existing Data Factory resource
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
-  name: '${namePrefix}${nameFactory}${nameSuffix}'
+  name: dataFactoryName
 }
 
 // Assign Data Factory Contributor role to the Function App's managed identity
 // Only executed during first deployment (firstDeployment == true)
-resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (firstDeployment) {
+resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(functionApp.id, dataFactory.id, 'Contributor', timestamp)
   scope: dataFactory
-  properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '673868aa-7521-48a0-acc6-0f60742d39f5') // Data Factory Contributor role
-    principalId: functionApp.identity.principalId
-  }
-}
-
-// Reference to an existing Workers Data Factory resource
-resource dataFactoryWorkers 'Microsoft.DataFactory/factories@2018-06-01' existing = if (deployWorkers) {
-  name: '${namePrefix}workers${nameSuffix}'
-}
-
-// Assign Data Factory Contributor role to the Function App's managed identity for the Workers Data Factory
-// Only executed during first deployment (firstDeployment == true)
-resource dataFactoryWorkersRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (firstDeployment && deployWorkers) {
-  name: guid(functionApp.id, dataFactoryWorkers.id, 'Contributor', timestamp)
-  scope: dataFactoryWorkers
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '673868aa-7521-48a0-acc6-0f60742d39f5') // Data Factory Contributor role
     principalId: functionApp.identity.principalId

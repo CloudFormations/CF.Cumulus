@@ -1,33 +1,18 @@
-// Input parameters
+@description('Resource group location.')
 param location string = resourceGroup().location
-param namePrefix string
-param nameSuffix string
-param skuTier string
-param deployVnet bool
-param vnetId string = ''
 
-// Optional parameters
-param allowPublicAccess bool = true
+@description('Databricks Workspace Name.')
+param workspaceName string 
 
-// Resource names
-var workspaceName = '${namePrefix}dbw${nameSuffix}'
-var managedResourceGroupName = '${namePrefix}rgm${nameSuffix}'
+@description('Databricks Managed Resource Group Name, used to host Databricks self-created resources, such as MI and Spark Compute VMs.')
+param managedResourceGroupName string
 
-// var managedIdentityName = '${workspaceName}Identity' // Is this required
+@description('Databricks Workspace Tier.')
+param skuTier string = 'Premium'
 
+@description('Public access configuration setting.')
+param publicAccess string = 'Enabled'
 
-// subnet names
-var subnets = {
-    controlPlane: '${namePrefix}snet-control${nameSuffix}'
-    workerNodes: '${namePrefix}snet-worker${nameSuffix}'
-}
-
-var workspaceParameters = {
-  enableNoPublicIp: { value: false } // Prevents public IPs on cluster nodes
-  customVirtualNetworkId: { value: vnetId }
-  customPublicSubnetName: { value: subnets.controlPlane }
-  customPrivateSubnetName: { value: subnets.workerNodes }
-}
 
 // Databricks Workspace
 resource databricksWorkspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
@@ -35,17 +20,15 @@ resource databricksWorkspace 'Microsoft.Databricks/workspaces@2024-05-01' = {
   location: location
   sku: { name: skuTier }
   properties: {
-    managedResourceGroupId: subscriptionResourceId('Microsoft.Resources/resourceGroups', managedResourceGroupName)
-    publicNetworkAccess: allowPublicAccess ? 'Enabled' : 'Disabled'
-    parameters: deployVnet ? workspaceParameters : {}
+    publicNetworkAccess: publicAccess
+
+    managedResourceGroupId: subscriptionResourceId(
+      'Microsoft.Resources/resourceGroups',
+      managedResourceGroupName
+    )
+    requiredNsgRules: 'NoAzureDatabricksRules'
   }
 }
-
-// // Managed Identity
-// resource mIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-07-31-preview' = {
-//   name: managedIdentityName
-//   location: location
-// }
 
 
 // Outputs
@@ -55,5 +38,3 @@ output name string = workspaceName
 output workspaceID string = databricksWorkspace.id
 output workspaceURL string = databricksWorkspace.properties.workspaceUrl
 output workspaceProperties object = databricksWorkspace.properties
-
-// output databricks_managed_identity object = mIdentity
