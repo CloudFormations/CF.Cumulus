@@ -5,28 +5,36 @@ param location string = resourceGroup().location
 param envName string = 'dev'
 
 @description('Virtual machine name')
-param vmName string = 'cfmattdevxuks01'
+param vmName string
 
 @description('Local admin username for the VM')
 param adminUsername string = 'shiradmin'
 
 @description('Existing VNet name')
-param vnetName string = 'cfmattdevvnetuks01'
+param vnetName string
 
 @description('Existing subnet name')
-param subnetName string = 'mattnwk-dev-pep-01'
+param subnetName string
 
 @description('Existing Network Security Group name')
-param nsgName string = 'cfmattdevvmnsguks01'
+param nsgName string
 
 @description('NIC name')
-param nicName string = 'cfmattdevvmnicuks01'
+param nicName string
 
 @description('Existing Key Vault name')
-param keyVaultName string = 'cfmattdevkvuks01'
+param keyVaultName string
 
 @description('Virtual Machine Size')
-param vmSize string = 'Standard_DS1_v2'
+param vmSize string = 'Standard_D2as_v4'
+
+@description('Virtual Machine Shutdown Time')
+param shutdownTime string = '1900'   // UTC
+
+@description('Virtual Machine Shutdown Timezone')
+param timezone string = 'GMT Standard Time'
+
+
 var osDiskSizeGB = 128
 
 // Password generation
@@ -141,5 +149,21 @@ resource vm 'Microsoft.Compute/virtualMachines@2024-03-01' = {
         enabled: true
       }
     }
+  }
+}
+resource autoShutdown 'Microsoft.DevTestLab/schedules@2018-09-15' = {
+  name: '${vmName}-shutdown'
+  location: location
+  properties: {
+    status: 'Enabled'
+    taskType: 'ComputeVmShutdownTask'
+    dailyRecurrence: {
+      time: shutdownTime
+    }
+    timeZoneId: timezone
+    notificationSettings: {
+      status: 'Disabled'
+    }
+    targetResourceId: resourceId('Microsoft.Compute/virtualMachines', vmName)
   }
 }
