@@ -1,5 +1,5 @@
 {
-	"name": "Control_PL_BatchExecutor.json",
+	"name": "Control_PL_BatchExecutor",
 	"properties": {
 		"description": "CF.Cumulus pipeline used to bootstrap the orchestration framework in perform the first level ForEach calls in sequence for the metadata stages.",
 		"activities": [
@@ -465,11 +465,11 @@
 							"userProperties": [],
 							"typeProperties": {
 								"functionName": "CheckPipelineStatus",
-								"method": "POST",
 								"body": {
 									"value": "@concat('\n{\n    \"tenantId\": \"',activity('Get SPN Details').output.firstRow.TenantId,'\",\n    \"applicationId\": \"',activity('Get SPN Details').output.firstRow.AppId,'\",\n    \"authenticationKey\": \"',activity('Get SPN Details').output.firstRow.AppSecret,'\",\n    \"subscriptionId\": \"',activity('Get SPN Details').output.firstRow.SubscriptionId,'\",\n    \"resourceGroupName\": \"',item().ResourceGroupName,'\",\n    \"orchestratorName\": \"',item().OrchestratorName,'\",\n    \"orchestratorType\": \"',item().OrchestratorType,'\",\n    \"pipelineName\": \"',item().PipelineName,'\",\n    \"runId\": \"',item().PipelineRunId,'\"\n}')",
 									"type": "Expression"
-								}
+								},
+								"method": "POST"
 							},
 							"linkedServiceName": {
 								"referenceName": "Common_LS_cumulusfunctions",
