@@ -25,6 +25,11 @@ namespace cloudformations.cumulus.helpers
             PipelineRunRequest request = JsonConvert.DeserializeObject<PipelineRunRequest>(Body) ?? throw new ArgumentNullException();
             return Task.FromResult(request);
         }
+        public Task<PipelineAlertRequest> GetAlertRequestBody()
+        {
+            PipelineAlertRequest request = JsonConvert.DeserializeObject<PipelineAlertRequest>(Body) ?? throw new ArgumentNullException();
+            return Task.FromResult(request);
+        }
 
         public async Task<PipelineRunRequest> GetRunRequestBodyAsync()
         {
