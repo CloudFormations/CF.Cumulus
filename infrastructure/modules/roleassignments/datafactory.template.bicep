@@ -1,23 +1,35 @@
-// Input parameters for resource naming and location
+@description('Resource group location.')
 param location string = resourceGroup().location
-param namePrefix string 
-param nameSuffix string 
-param nameFactory string
-param nameStorage string
-param statusADB bool
-param statusFunction bool
 
-// Construct the Data Factory name using prefix, factory name, and suffix
-var name = '${namePrefix}${nameFactory}${nameSuffix}'
+@description('Function App Name.')
+param functionAppName string
+
+@description('Key Vault name.')
+param keyVaultName string
+
+@description('Data Factory resource name.')
+param dataFactoryName string
+
+@description('Databricks Workspace name.')
+param databricksWorkspaceName string
+
+@description('SQL Server Logical Instance name.')
+param sqlServerName string
+
+@description('Storage Account Name.')
+param storageAccountName string 
+
+@description('Unique timestamp for RBAC deployments to prevent duplication conflicts.')
+param timestamp string = utcNow('yy-MM-dd-HHmm')
 
 // Reference to existing Data Factory resource
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
-  name: name
+  name: dataFactoryName
 }
 
 // Assign Data Factory Contributor role to the Data Factory's managed identity
 // Only created if nameFactory is 'factory' or 'adf'
-resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (nameFactory == 'factory' || nameFactory == 'adf') {
+resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' ={
   name: guid(dataFactory.id, dataFactory.id, 'Contributor')
   scope: dataFactory
   properties: {
@@ -28,7 +40,7 @@ resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
 
 // Reference to existing Key Vault resource
 resource keyVault  'Microsoft.KeyVault/vaults@2019-09-01' existing = {
-  name: '${namePrefix}kv${nameSuffix}'
+  name: keyVaultName
 }
 
 // Assign Key Vault Secrets User role to allow Data Factory to access secrets
@@ -43,7 +55,7 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
 
 // Reference to existing SQL Server resource
 resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' existing = {
-  name: '${namePrefix}sql${nameSuffix}'
+  name: sqlServerName
 }
 
 // Assign Reader role to Data Factory for SQL Server access
@@ -57,12 +69,12 @@ resource sqlRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
 }
 
 // Reference to existing Databricks workspace
-resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' existing = if (statusADB ) {
-  name: '${namePrefix}dbw${nameSuffix}'
+resource databricks 'Microsoft.Databricks/workspaces@2024-05-01' existing = {
+  name: databricksWorkspaceName
 }
 
 // Assign Contributor role to Data Factory for Databricks workspace access
-resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = if (statusADB ) {
+resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(dataFactory.id, databricks.id, 'Contributor')
   scope: databricks
   properties: {
@@ -72,12 +84,12 @@ resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-
 }
 
 //Reference to existing Function App
-resource functionApp 'Microsoft.Web/sites@2023-12-01' existing = if (statusFunction) {
-  name: '${namePrefix}func${nameSuffix}'
+resource functionApp 'Microsoft.Web/sites@2023-12-01' existing = {
+  name: functionAppName
 }
 
 // Assign Contributor role to Data Factory for Function App access
-resource functionAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' =  if (statusFunction) {
+resource functionAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(dataFactory.id, functionApp.id, 'Contributor')
   scope: functionApp
   properties: {
@@ -88,7 +100,7 @@ resource functionAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
 
 // Reference to existing Storage Account
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing = {
-  name: '${namePrefix}${nameStorage}${nameSuffix}'
+  name: storageAccountName
 }
 
 // Assign Storage Blob Data Contributor role to Data Factory for storage access

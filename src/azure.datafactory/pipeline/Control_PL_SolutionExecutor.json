@@ -14,7 +14,7 @@
 				"userProperties": [],
 				"typeProperties": {
 					"pipeline": {
-						"referenceName": "Control_PL_BatchExecutor.json",
+						"referenceName": "Control_PL_BatchExecutor",
 						"type": "PipelineReference"
 					},
 					"waitOnCompletion": true,

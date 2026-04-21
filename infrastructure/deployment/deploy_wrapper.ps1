@@ -35,13 +35,14 @@ $checkImportsScript = Join-Path $currentLocation "check_imports.ps1"
 az login --tenant $tenantId
 
 $subscriptionId = az account list `
-    --query "[?name=='${subscriptionName}'].id" `
+    --all `
+    --query "[?name=='$subscriptionName'].id" `
     --output tsv
-
+    
 # ============================================
 # Authenticate Azure PowerShell
 # ============================================
-Connect-AzAccount -SubscriptionId $subscriptionId
+Connect-AzAccount -Tenant $tenantId -SubscriptionId $subscriptionId
 
 # ============================================
 # Validate parameters
