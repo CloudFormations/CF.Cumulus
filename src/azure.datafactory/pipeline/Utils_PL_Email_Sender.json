@@ -26,7 +26,7 @@
 				"typeProperties": {
 					"functionName": "SendEmail",
 					"body": {
-						"value": "{\n\"AlertType\": \"@{pipeline().parameters.AlertType}\",\n\"FromUsername\": \"{@activity('Get From Username').output.firstRow.propertyValue}\",\n\"ToRecipients\": \"@{pipeline().parameters.Recipients}\",\n\"CcRecipients\": \"@{pipeline().parameters.CcRecipients}\",\n\"BccRecipients\": \"@{pipeline().parameters.BccRecipients}\",\n\"Subject\": \"@{pipeline().parameters.Subject}\",\n\"Message\": \"@{pipeline().parameters.Body}\",\n\"PassedImportance\": \"@{pipeline().parameters.Importance}\"\n}",
+						"value": "{\n\"AlertType\": \"@{pipeline().parameters.AlertType}\",\n\"FromUsername\": \"@{activity('Get From Username').output.firstRow.propertyValue}\",\n\"ToRecipients\": \"@{pipeline().parameters.Recipients}\",\n\"CcRecipients\": \"@{pipeline().parameters.CcRecipients}\",\n\"BccRecipients\": \"@{pipeline().parameters.BccRecipients}\",\n\"Subject\": \"@{pipeline().parameters.Subject}\",\n\"Message\": \"@{pipeline().parameters.Body}\",\n\"PassedImportance\": \"@{pipeline().parameters.Importance}\"\n}\n\n",
 						"type": "Expression"
 					},
 					"method": "POST"
