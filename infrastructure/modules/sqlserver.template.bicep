@@ -1,12 +1,18 @@
 @description('Resource group location.')
 param location string = resourceGroup().location
 
-@description('Resource name prefix as per template naming concatenated in the main file.')
-@minLength(3) // "logAnalyticsWorkspaceName" within the resource has a min length of 4. Adding this decorator constraint removes the warning.
-param namePrefix string 
+@description('SQL Server Logical Instance name.')
+param sqlServerName string
 
-@description('Resource name suffix as per template naming concatenated in the main file.')
-param nameSuffix string 
+@description('SQL Server Database name.')
+param sqlDatabaseName string
+
+@description('Key Vault name.')
+param keyVaultName string
+
+@description('Log Analytics Workspace name.')
+param logAnalyticsWorkspaceName string
+
 
 @description('Add firewall rule for user\'s local IP Address.')
 @secure()
@@ -19,15 +25,14 @@ param allowAzureServices bool = false // For allowing Azure services access to A
 @description('Random GUID used to create a SQL Server admin password.')
 param randomGuid string = newGuid()
 
-var serverName = '${namePrefix}sql${nameSuffix}'
-var databaseName = '${namePrefix}sqldb${nameSuffix}'
+
 
 var specialChars = '!@#$%^&*' // Special characters to be used in the password
 var sqlPassword = '${take(randomGuid, 16)}${take(specialChars, 2)}1A'
 
 // Create the SQL Server
 resource sqlServer 'Microsoft.Sql/servers@2023-05-01-preview' = {
-  name: serverName
+  name: sqlServerName
   location: location
   properties: {
     administratorLogin: 'sqladmin'
@@ -59,8 +64,7 @@ resource allowAzureResourcesFirewallRule 'Microsoft.Sql/servers/firewallRules@20
 }
 
 
-var keyVaultName = '${namePrefix}kv${nameSuffix}'
-var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
+
 
 // Validate Key Vault exists 
 resource sqlServerVault 'Microsoft.KeyVault/vaults@2024-04-01-preview' existing = {
@@ -88,7 +92,7 @@ module sqlServerkeyVault 'secret.template.bicep' = if (sqlServerVault.name != nu
 
 // Create database
 resource database 'Microsoft.Sql/servers/databases@2023-05-01-preview' = {
-  name: databaseName
+  name: sqlDatabaseName
   parent: sqlServer
   location: location
   properties: {
@@ -143,5 +147,5 @@ resource sqlServerDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-
 }
 
 // Output key properties for reference by other resources
-output sqlServerName string = serverName
-output databaseName string = databaseName
+output sqlServerName string = sqlServerName
+output databaseName string = sqlDatabaseName

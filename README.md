@@ -3,7 +3,7 @@
 [ ![](https://static.wixstatic.com/media/fb2e49_ee1fa91f1ad049d2a4b151f3d8caeb9e~mv2.png) ](https://static.wixstatic.com/media/fb2e49_ee1fa91f1ad049d2a4b151f3d8caeb9e~mv2.png)
 
 CF.Cumulus is an Open-Source Metadata-driven Lakehouse Accelerator designed for Data Teams to quickly deploy and use a Lakehouse in Azure. Key features include:
-* Deployment of a Lakehouse to Azure within minutes.
+* Deployment of a Lakehouse to Azure within minutes. 
 * Pre-built connectors to minimise development overhead of ingesting data from variety of data sources.
 * Easy-to-use Metadata configuration tables simplifying the onboarding of new data sources to your data lake.
 * Robust Data Orchestration Pipelines. 

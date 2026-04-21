@@ -1,26 +1,23 @@
 @description('Resource group location.')
 param location string = resourceGroup().location
 
-@description('Resource name prefix as per template naming concatenated in the main file.')
-@minLength(3) // "logAnalyticsWorkspaceName" within the resource has a min length of 4. Adding this decorator constraint removes the warning.
-param namePrefix string 
+@description('Function App Name.')
+param functionAppName string
 
-@description('Resource name suffix as per template naming concatenated in the main file.')
-param nameSuffix string 
+@description('Application Insights Name.')
+param applicationInsightsName string
 
 @description('Supporting storage account resource name.')
-param nameStorage string
+param storageAccountName string
+
+@description('Supporting storage account container resource name for app deployments.')
+param storageAccountContainerName string
 
 @description('App service plan SKU.')
 param aspSKU string
 
-// Construct resource names using prefix and suffix
-var functionAppName = '${namePrefix}func${nameSuffix}'
-var hostingPlanName = '${namePrefix}asp${nameSuffix}'
-var storageAccountName = '${namePrefix}${nameStorage}${nameSuffix}'
-var applicationInsightsName = '${namePrefix}appi${nameSuffix}'
-var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
-
+@description('App Service Plan Name.')
+param hostingPlanName string
 
 var contentShare = '${functionAppName}bb6a'
 
@@ -63,7 +60,7 @@ resource functionHostingPlanConsumption 'Microsoft.Web/serverfarms@2024-04-01' =
 }
 
 // Create the Function App with isolated .NET runtime
-resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
+resource functionApp 'Microsoft.Web/sites@2022-03-01' =  if (aspSKU != 'flex') {
   name: functionAppName
   kind: 'functionapp'
   location: location
@@ -146,63 +143,146 @@ resource functionApp 'Microsoft.Web/sites@2022-03-01' = {
   ]
 }
 
+resource functionHostingPlanFlexConsumption 'Microsoft.Web/serverfarms@2024-11-01' =  if (aspSKU == 'flex') {
+  name: hostingPlanName
+  location: location
+  sku: {
+    name: 'FC1'
+    tier: 'FlexConsumption'
+    size: 'FC1'
+    family: 'FC'
+    capacity: 0
+  }
+  kind: 'functionapp'
+  properties: {
+    perSiteScaling: false
+    elasticScaleEnabled: false
+    maximumElasticWorkerCount: 1
+    isSpot: false
+    reserved: true
+    isXenon: false
+    hyperV: false
+    targetWorkerCount: 0
+    targetWorkerSizeId: 0
+    zoneRedundant: false
+    asyncScalingEnabled: false
+  }
+}
+// Create the Function App with isolated .NET runtime
+resource flexFunctionApp 'Microsoft.Web/sites@2024-11-01' = if (aspSKU == 'flex') {
+  name: functionAppName
+  kind: 'functionapp,linux'
+  location: location
+  // Enable managed identity for the Function App
+  identity: {
+    type: 'SystemAssigned'
+  }
+  properties: {
+    name: functionAppName
+    siteConfig: {
+      // Application settings for Function App configuration
+      appSettings: [
+        // Application Insights integration settings
+        {
+          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+          value: applicationInsight.properties.ConnectionString
+        }
+        {
+          name: 'AzureWebJobsStorage'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${functionStorage.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
+        }  
+        {
+          name: 'DEPLOYMENT_STORAGE_CONNECTION_STRING'
+          value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${functionStorage.listKeys().keys[0].value};EndpointSuffix=core.windows.net'
+        }
+      ]
+      numberOfWorkers: 1
+      acrUseManagedIdentityCreds: false
+      alwaysOn: false
+      http20Enabled: false
+      functionAppScaleLimit: 100
+      minimumElasticInstanceCount: 0
+    }
+    clientAffinityEnabled: false
+    dnsConfiguration: {}
+    outboundVnetRouting: {
+      allTraffic: false
+      applicationTraffic: false
+      contentShareTraffic: false
+      imagePullTraffic: false
+      backupRestoreTraffic: false
+    }
+    publicNetworkAccess: 'Enabled' // Disable after as we need to deploy functions to the application
+    httpsOnly: true
+    serverFarmId: '/subscriptions/${subscription().subscriptionId}/resourcegroups/${resourceGroup().name}/providers/Microsoft.Web/serverfarms/${hostingPlanName}'
+    functionAppConfig: {
+      deployment: {
+        storage: {
+          type: 'blobcontainer'
+          value: 'https://${storageAccountName}.blob.core.windows.net/${storageAccountContainerName}'
+          authentication: {
+            type: 'storageaccountconnectionstring'
+            storageAccountConnectionStringName: 'DEPLOYMENT_STORAGE_CONNECTION_STRING'
+          }
+        }
+      }
+      runtime: {
+        name: 'dotnet-isolated'
+        version: '8.0'
+      }
+      scaleAndConcurrency: {
+        maximumInstanceCount: 100
+        instanceMemoryMB: 2048
+      }
+    }
+  }
+  dependsOn: [
+    functionHostingPlanConsumption
+    functionHostingPlanPremium
+    functionStorage
+  ]
+}
+
 // Configure SCM (Source Control Manager) publishing credentials
-resource name_scm 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = {
+resource nameScm 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = if (aspSKU != 'flex') {
   parent: functionApp
   name: 'scm'
   properties: {
-    allow: true
+    allow: false
+  }
+}
+
+resource nameScmFlexApp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = if (aspSKU == 'flex') {
+  parent: flexFunctionApp
+  name: 'scm'
+  properties: {
+    allow: false
   }
 }
 
 // Configure FTP publishing credentials
-resource name_ftp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = {
+resource nameFtp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = if (aspSKU != 'flex') {
   parent: functionApp
   name: 'ftp'
   properties: {
-    allow: true
+    allow: false
   }
 }
 
-// Get existing Log Analytics Resource for Id value
-resource logAnalyticsWorkspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' existing = {  
-  name: logAnalyticsWorkspaceName
+
+resource nameFtpFlexApp 'Microsoft.Web/sites/basicPublishingCredentialsPolicies@2022-09-01' = if (aspSKU == 'flex') {
+  parent: flexFunctionApp
+  name: 'ftp'
+  properties: {
+    allow: false
+  }
 }
 
-// // Enable Diagnostic Settings to send logs to Log Analytics
-// resource functionAppDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
-//   name: 'functionAppDiagnostics'
-//   scope: functionApp
-//   properties: {
-//     workspaceId: logAnalyticsWorkspace.id
-//     logs: [
-//       {
-//         category: 'FunctionAppLogs'
-//         enabled: true
-//       }
-//       {
-//         category: 'AppServiceHTTPLogs'
-//         enabled: true
-//       }
-//       {
-//         category: 'AppServiceConsoleLogs'
-//         enabled: true
-//       }
-//       {
-//         category: 'AppServiceAuditLogs'
-//         enabled: true
-//       }
-//     ]
-//     metrics: [
-//       {
-//         category: 'AllMetrics'
-//         enabled: true
-//       }
-//     ]
-//   }
-// }
-
-
 // Output important values
-output functionAppName string = functionApp.name
-output functionAppIdentityPrincipalId string = functionApp.identity.principalId
+output functionAppName string = aspSKU == 'flex'
+  ? flexFunctionApp.name
+  : functionApp.name
+
+output functionAppIdentityPrincipalId string = aspSKU == 'flex'
+  ? flexFunctionApp.identity.principalId
+  : functionApp.identity.principalId

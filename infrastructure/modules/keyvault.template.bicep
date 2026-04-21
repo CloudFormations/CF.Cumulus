@@ -1,24 +1,17 @@
 @description('Resource group location.')
 param location string = resourceGroup().location
 
-@description('Resource name prefix as per template naming concatenated in the main file.')
-@minLength(3) // "logAnalyticsWorkspaceName" within the resource has a min length of 4. Adding this decorator constraint removes the warning.
-param namePrefix string 
+@description('Key Vault Name.')
+param keyVaultName string 
 
-@description('Resource name suffix as per template naming concatenated in the main file.')
-param nameSuffix string 
+@description('Log Analytics Workspace Name.')
+param logAnalyticsWorkspaceName string
 
 @description('Tenant Id value.')
 param tenantId string = subscription().tenantId
 
-
-var name = '${namePrefix}kv${nameSuffix}'
-
-var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
-
-
 resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' = {
-  name: name
+  name: keyVaultName
   location: location
   properties:{
     enableRbacAuthorization: true
