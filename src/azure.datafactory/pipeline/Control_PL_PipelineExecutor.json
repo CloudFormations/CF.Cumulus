@@ -391,7 +391,8 @@
 									"Importance": {
 										"value": "@activity('Get Email Parts').output.firstRow.emailImportance",
 										"type": "Expression"
-									}
+									},
+									"AlertType": "O365"
 								}
 							}
 						}
