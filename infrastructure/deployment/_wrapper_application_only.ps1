@@ -20,6 +20,7 @@ $functionAppName         = ""
 $dataFactoryName         = ""
 $sqlServerName           = ""
 $sqlDatabaseName         = ""
+$deployGovernModuleArtifacts = $false
 
 # ============================================
 # Logging Information
@@ -62,13 +63,7 @@ Write-Host "Predeployment Checks Done. $infoTime`r`n" -ForegroundColor Yellow
 # Authenticate using Azure CLI
 # ============================================
 az login --tenant $tenantId
-
-$subscriptionId = az account list `
-    --query "[?name=='${subscriptionName}'].id" `
-    --output tsv
-
-$infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
-Write-Host "Authenticated to Azure. $infoTime`r`n" -ForegroundColor Yellow
+az account set --subscription $subscriptionId
 
 # ============================================
 # Authenticate Azure PowerShell
@@ -84,22 +79,25 @@ Write-Host "Connected to Subscription. $infoTime`r`n" -ForegroundColor Yellow
 $deployStorageContainersScript = Join-Path $currentLocation "deploy_storage_containers.ps1"
 
 & $deployStorageContainersScript `
-    -SubscriptionId $subscriptionId
-    -ResourceGroupName $resourceGroupName
-    -StorageAccountName $storageAccountName
-    -Containers @("raw, cleansed, curated")
+    -SubscriptionId $subscriptionId `
+    -ResourceGroupName $resourceGroupName `
+    -StorageAccountName $storageAccountName `
+    -Containers @("raw", "cleansed", "curated")
 
 $infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
 Write-Host "Deployed Primary Data Lake Containers. $infoTime`r`n" -ForegroundColor Yellow
 
-& $deployStorageContainersScript `
-    -SubscriptionId $subscriptionId
-    -ResourceGroupName $resourceGroupName
-    -StorageAccountName $governStorageAccountName
-    -Containers @("govern")
+if($deployGovernModuleArtifacts )
+{
+    & $deployStorageContainersScript `
+        -SubscriptionId $subscriptionId `
+        -ResourceGroupName $resourceGroupName `
+        -StorageAccountName $governStorageAccountName `
+        -Containers @("govern")
 
-$infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed    
-Write-Host "Deployed Govern Data Lake Containers. $infoTime`r`n" -ForegroundColor Yellow
+    $infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed    
+    Write-Host "Deployed Govern Data Lake Containers. $infoTime`r`n" -ForegroundColor Yellow
+}
 
 # ============================================
 # Grant Key Vault Secrets Officer to User
@@ -176,21 +174,23 @@ Write-Host "Deployed Databricks Primary Artifacts. $infoTime`r`n" -ForegroundCol
 # ============================================
 # Deploy Govern Databricks Resources
 # ============================================
-$deployDatabricksResourcesScript = Join-Path $currentLocation "deploy_databricks_resources_govern.ps1"
+if($deployGovernModuleArtifacts )
+{
+    $deployDatabricksResourcesScript = Join-Path $currentLocation "deploy_databricks_resources_govern.ps1"
 
-& $deployDatabricksResourcesScript `
-    -subscriptionId $subscriptionId `
-    -resourceGroupName $resourceGroupName `
-    -keyVaultName $governKeyVaultName `
-    -keyVaultId $governKeyVaultId `
-    -keyVaultUri $governKeyVaultUri `
-    -databricksWorkspaceURL $databricksWorkspaceURL `
-    -storageAccountName $storageAccountName `
-    -governStorageAccountName $governStorageAccountName
+    & $deployDatabricksResourcesScript `
+        -subscriptionId $subscriptionId `
+        -resourceGroupName $resourceGroupName `
+        -keyVaultName $governKeyVaultName `
+        -keyVaultId $governKeyVaultId `
+        -keyVaultUri $governKeyVaultUri `
+        -databricksWorkspaceURL $databricksWorkspaceURL `
+        -storageAccountName $storageAccountName `
+        -governStorageAccountName $governStorageAccountName
 
-$infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
-Write-Host "Deployed Databricks Govern Artifacts. $infoTime`r`n" -ForegroundColor Yellow
-
+    $infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
+    Write-Host "Deployed Databricks Govern Artifacts. $infoTime`r`n" -ForegroundColor Yellow
+}
 # ============================================
 # Deploy SQL DACPACs
 # ============================================
@@ -210,6 +210,19 @@ $deploySQLDacPacsScript = Join-Path $currentLocation "deploy_sql_dacpacs.ps1"
 
 $infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
 Write-Host "Deployed SQL DACPAC. $infoTime`r`n" -ForegroundColor Yellow
+
+# ============================================
+# Grant ADF access to SQL Database
+# ============================================
+$grantADFAccessScript = Join-Path $currentLocation "grant_adf_access.ps1"
+
+& $grantADFAccessScript `
+    -dataFactoryName $dataFactoryName `
+    -sqlServerName $sqlServerName `
+    -sqlDatabaseName $sqlDatabaseName
+
+$infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
+Write-Host "Granted ADF Access to SQL Database. $infoTime`r`n" -ForegroundColor Yellow
 
 # ============================================
 # Cleanup
