@@ -18,7 +18,8 @@ param(
 # ============================================
 # Acquire Access Token for SQL Authentication
 # ============================================
-$accessToken = (Get-AzAccessToken -ResourceUrl "https://database.windows.net").Token
+$encryptedToken = (Get-AzAccessToken -ResourceUrl "https://database.windows.net" -AsSecureString).token
+$accessToken = [PSCredential]::new("token", $encryptedToken)
 $sqlServerNameFull = "$sqlServerName.database.windows.net"
 
 # ============================================
@@ -73,5 +74,5 @@ ADD MEMBER [$dataFactoryName];
 Invoke-Sqlcmd `
     -ServerInstance $sqlServerNameFull `
     -Database       $sqlDatabaseName `
-    -AccessToken    $accessToken `
+    -AccessToken    $accessToken.GetNetworkCredential().Password `
     -Query          $query

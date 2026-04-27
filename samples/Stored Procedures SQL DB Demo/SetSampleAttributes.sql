@@ -14,7 +14,7 @@ DECLARE @Attributes TABLE
 		[AttributeTargetDataType] [nvarchar](50) NULL,
 		[AttributeTargetDataFormat] [varchar](100) NULL,
 		[AttributeDescription] [nvarchar](500) NULL,
-		[PkAttribute] [bit] NOT NULL,
+		[PKAttribute] [bit] NOT NULL,
 		[PartitionByAttribute] [bit] NOT NULL,
 		[Enabled] [bit] NOT NULL
 		)
@@ -29,7 +29,7 @@ DECLARE @Attributes TABLE
 		[AttributeTargetDataType],
 		[AttributeTargetDataFormat],
 		[AttributeDescription],
-		[PkAttribute],
+		[PKAttribute],
 		[PartitionByAttribute],
 		[Enabled]
 		) 
@@ -105,7 +105,7 @@ MERGE INTO [ingest].[Attributes] AS tgt
 			tgt.[AttributeTargetDataType] = src.[AttributeTargetDataType],
 			tgt.[AttributeTargetDataFormat] = src.[AttributeTargetDataFormat],
 			tgt.[AttributeDescription] = src.[AttributeDescription],
-			tgt.[PkAttribute] = src.[PkAttribute],
+			tgt.[PKAttribute] = src.[PKAttribute],
 			tgt.[PartitionByAttribute] = src.[PartitionByAttribute],
 			tgt.[Enabled] = src.[Enabled]
 	WHEN NOT MATCHED BY TARGET THEN
@@ -117,7 +117,7 @@ MERGE INTO [ingest].[Attributes] AS tgt
 			[AttributeTargetDataType],
 			[AttributeTargetDataFormat],
 			[AttributeDescription],
-			[PkAttribute],
+			[PKAttribute],
 			[PartitionByAttribute],
 			[Enabled]
 			)
@@ -129,7 +129,7 @@ MERGE INTO [ingest].[Attributes] AS tgt
 			src.[AttributeTargetDataType],
 			src.[AttributeTargetDataFormat],
 			src.[AttributeDescription],
-			src.[PkAttribute],
+			src.[PKAttribute],
 			src.[PartitionByAttribute],
 			src.[Enabled]
 			);

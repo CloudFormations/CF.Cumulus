@@ -6,7 +6,7 @@ CREATE TABLE [ingest].[Attributes](
 	[AttributeTargetDataType] [nvarchar](50) NULL,
 	[AttributeTargetDataFormat] [varchar](500) NULL,
 	[AttributeDescription] [nvarchar](500) NULL,
-	[PkAttribute] [bit] NOT NULL,
+	[PKAttribute] [bit] NOT NULL,
 	[PartitionByAttribute] [bit] NOT NULL,
 	[Enabled] [bit] NOT NULL
 PRIMARY KEY CLUSTERED 
