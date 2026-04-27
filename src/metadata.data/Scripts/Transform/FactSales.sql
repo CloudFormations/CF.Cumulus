@@ -1,12 +1,11 @@
 ﻿--Metadata As code Transform Datasets and Attributes
 
 -- Notebooks
-EXEC [transform].[AddNotebooks] 'Managed', 'FactSales', '/Workspace/Shared/Live/files/transform/businesslogicnotebooks/FactSales', 1;
+EXEC [transform].[AddNotebooks] 'CF.Cumulus.Transform.Compute', 'Managed', 'FactSales', '/Workspace/Shared/Live/files/transform/businesslogicnotebooks/FactSales', 1;
 
 -- Datasets;
 
 EXEC [transform].[AddTransformDatasets]
-	@ComputeConnectionDisplayName = 'CF.Cumulus.Transform.Compute',
 	@CreateNotebookName = 'CreateFact',
 	@BusinessLogicName = 'FactSales',
 	@CleansedConnectionDisplayName = 'PrimaryDataLake',

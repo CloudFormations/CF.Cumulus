@@ -78,7 +78,7 @@ BEGIN
     DECLARE @CleansedColumnsTypeList NVARCHAR(MAX)
     DECLARE @CleansedColumnsFormatList NVARCHAR(MAX)
 
-    DECLARE @PkAttributesList NVARCHAR(MAX) = ''
+    DECLARE @PKAttributesList NVARCHAR(MAX) = ''
     DECLARE @PartitionByAttributesList NVARCHAR(MAX) = ''
 
     DECLARE @DateTimeFolderHierarchy NVARCHAR(1000)
@@ -105,7 +105,7 @@ BEGIN
 
     -- Get pk columns as comma separated string values for the dataset
     SELECT 
-        @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'|')
+        @PKAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'|')
     FROM 
         [ingest].[Datasets] AS ds
     INNER JOIN 
@@ -117,7 +117,7 @@ BEGIN
     AND
         ds.[Enabled] = 1
     AND 
-        att.[PkAttribute] = 1
+        att.[PKAttribute] = 1
     AND 
         att.[Enabled] = 1
     GROUP BY 
@@ -228,7 +228,7 @@ BEGIN
         @CleansedColumnsList AS 'CleansedColumnsList', 
         @CleansedColumnsTypeList AS 'CleansedColumnsTypeList',
         @CleansedColumnsFormatList AS 'CleansedColumnsFormatList',
-        @PkAttributesList AS 'CleansedPkList',
+        @PKAttributesList AS 'CleansedPkList',
         @PartitionByAttributesList AS 'CleansedPartitionFields',
         @DateTimeFolderHierarchy AS 'DateTimeFolderHierarchy',
         @FilterCondition AS 'FilterCondition'

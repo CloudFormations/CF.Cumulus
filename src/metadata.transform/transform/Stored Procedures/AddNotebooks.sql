@@ -4,7 +4,7 @@ CREATE PROCEDURE [transform].[AddNotebooks]
 	@NotebookTypeName NVARCHAR(100),
 	@NotebookName NVARCHAR(100),
 	@NotebookPath NVARCHAR(500),
-	@Enabled BIT
+	@Enabled BIT = 1
 )
 AS
 BEGIN
