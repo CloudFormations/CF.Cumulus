@@ -29,7 +29,7 @@ BEGIN
 		Enabled BIT NOT NULL
 	)
 
-	INSERT INTO @Connections(ConnectionTypeFK, ConnectiontypeDisplayName, ConnectionDisplayName, ConnectionLocation, ConnectionPort, SourceLocation, ResourceName, LinkedServiceName, Username, KeyVaultSecret, Enabled)
+	INSERT INTO @Connections(ConnectionTypeFK, ConnectionTypeDisplayName, ConnectionDisplayName, ConnectionLocation, ConnectionPort, SourceLocation, ResourceName, LinkedServiceName, Username, KeyVaultSecret, Enabled)
 	VALUES (-1, @ConnectionTypeDisplayName, @ConnectionDisplayName, @ConnectionLocation, @ConnectionPort, @SourceLocation, @ResourceName, @LinkedServiceName, @Username, @KeyVaultSecret, @Enabled)
 
 	UPDATE c

@@ -6621,7 +6621,7 @@ BEGIN
 		[AttributeTargetDataType]   NVARCHAR (50)  NULL,
 		[AttributeTargetDataFormat] VARCHAR (100)  NULL,
 		[AttributeDescription]      NVARCHAR (500) NULL,
-		[PkAttribute]               BIT            NOT NULL,
+		[PKAttribute]               BIT            NOT NULL,
 		[PartitionByAttribute]      BIT            NOT NULL,
 		[Enabled]                   BIT            NOT NULL,
 		PRIMARY KEY CLUSTERED ([AttributeId] ASC) ON [PRIMARY]
@@ -6641,7 +6641,7 @@ BEGIN
 			   FROM   [ingest].[Attributes_Migration])
 		BEGIN
 			SET IDENTITY_INSERT [ingest].[Attributes] ON;
-			INSERT INTO [ingest].[Attributes] ([AttributeId],[DatasetFK],[AttributeName],[AttributeSourceDataType],[AttributeTargetDataType],[AttributeTargetDataFormat],[AttributeDescription],[PkAttribute],[PartitionByAttribute],[Enabled])
+			INSERT INTO [ingest].[Attributes] ([AttributeId],[DatasetFK],[AttributeName],[AttributeSourceDataType],[AttributeTargetDataType],[AttributeTargetDataFormat],[AttributeDescription],[PKAttribute],[PartitionByAttribute],[Enabled])
 			SELECT  
 				[AttributeId],
 				[DatasetFK],
@@ -6650,7 +6650,7 @@ BEGIN
 				[AttributeTargetDataType],
 				[AttributeTargetDataFormat],
 				[AttributeDescription],
-				[PkAttribute],
+				[PKAttribute],
 				[PartitionByAttribute],
 				[Enabled]
 			FROM     [ingest].[Attributes_Migration]
@@ -7397,7 +7397,7 @@ BEGIN
         DECLARE @CleansedColumnsTypeList NVARCHAR(MAX)
         DECLARE @CleansedColumnsFormatList NVARCHAR(MAX)
 
-        DECLARE @PkAttributesList NVARCHAR(MAX) = ''''
+        DECLARE @PKAttributesList NVARCHAR(MAX) = ''''
         DECLARE @PartitionByAttributesList NVARCHAR(MAX) = ''''
 
         DECLARE @DateTimeFolderHierarchy NVARCHAR(1000)
@@ -7424,7 +7424,7 @@ BEGIN
 
         -- Get pk columns as comma separated string values for the dataset
         SELECT 
-            @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'','')
+            @PKAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'','')
         FROM 
             [ingest].[Datasets] AS ds
         INNER JOIN 
@@ -7436,7 +7436,7 @@ BEGIN
         AND
             ds.[Enabled] = 1
         AND 
-            att.[PkAttribute] = 1
+            att.[PKAttribute] = 1
         AND 
             att.[Enabled] = 1
         GROUP BY 
@@ -7444,7 +7444,7 @@ BEGIN
 
         -- Get pk columns as comma separated string values for the dataset
         SELECT 
-            @PkAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'','')
+            @PKAttributesList = STRING_AGG(CAST(att.AttributeName AS NVARCHAR(MAX)),'','')
         FROM 
             [ingest].[Datasets] AS ds
         INNER JOIN 
@@ -7542,7 +7542,7 @@ BEGIN
             @CleansedColumnsList AS ''CleansedColumnsList'', 
             @CleansedColumnsTypeList AS ''CleansedColumnsTypeList'',
             @CleansedColumnsFormatList AS ''CleansedColumnsFormatList'',
-            @PkAttributesList AS ''CleansedPkList'',
+            @PKAttributesList AS ''CleansedPkList'',
             @PartitionByAttributesList AS ''CleansedPartitionFields'',
             @DateTimeFolderHierarchy AS ''DateTimeFolderHierarchy''
         FROM 

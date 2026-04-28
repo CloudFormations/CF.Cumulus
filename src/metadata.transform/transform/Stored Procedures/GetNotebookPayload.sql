@@ -118,7 +118,7 @@ BEGIN
     WHERE
         ds.DatasetId = @DatasetId
     AND 
-        att.BkAttribute = 1
+        att.BKAttribute = 1
     AND 
         att.Enabled = 1
     GROUP BY 
