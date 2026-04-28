@@ -67,7 +67,20 @@ class TestSelectSqlColumnsFormatString():
         actual1 = select_sql_columns_format_string(['time'],['timestamp'], ['yyyy-MM-ddTHH:mm:ss.SSSSSSSZ'])
         expected1 = "to_timestamp(time) as time"
         assert actual1 == expected1
+    
+    def test_select_sql_columns_format_string_decimal(self):
+        actual1 = select_sql_columns_format_string(['value'],['decimal(10,2)'], [''])
+        expected1 = "cast(value as decimal(10,2)) as value"
+        actual2 = select_sql_columns_format_string(['value'],['decimal(10)'], [''])
+        expected2 = "cast(value as decimal(10)) as value"
         
+        assert actual1 == expected1
+        assert actual2 == expected2
+
+    def test_select_sql_columns_format_string_decimal2(self):
+        actual1 = select_sql_columns_format_string(['value', 'conversion_rate'],['decimal(10,2)', 'decimal(10,4)'], ['',''])
+        expected1 = "cast(value as decimal(10,2)) as value, cast(conversion_rate as decimal(10,4)) as conversion_rate"
+        assert actual1 == expected1
 
     # def test_select_sql_columns_format_string_timestamp_long_format(self):
     #     with self.assertRaises(Exception) as context:

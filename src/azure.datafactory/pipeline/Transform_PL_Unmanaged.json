@@ -19,10 +19,10 @@
 						"type": "AzureSqlSource",
 						"sqlReaderStoredProcedureName": "[transform].[GetUnmanagedNotebookPayload]",
 						"storedProcedureParameters": {
-							"DatasetId": {
+							"NotebookId": {
 								"type": "Int32",
 								"value": {
-									"value": "@pipeline().parameters.DatasetId",
+									"value": "@pipeline().parameters.NotebookId",
 									"type": "Expression"
 								}
 							}
@@ -31,7 +31,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "GetSetMetadata",
+						"referenceName": "Control_DS_GetSetMetadata",
 						"type": "DatasetReference"
 					}
 				}
@@ -136,7 +136,7 @@
 									"userProperties": [],
 									"typeProperties": {
 										"pipeline": {
-											"referenceName": "Get_Databricks_Compute_ID",
+											"referenceName": "Utils_PL_Get_Databricks_Compute_ID",
 											"type": "PipelineReference"
 										},
 										"waitOnCompletion": true,
@@ -239,7 +239,7 @@
 			}
 		],
 		"parameters": {
-			"DatasetId": {
+			"NotebookId": {
 				"type": "string"
 			}
 		},

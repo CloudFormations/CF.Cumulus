@@ -2,6 +2,8 @@ CREATE TABLE [ingest].[Datasets](
 	[DatasetId] [int] IDENTITY(1,1) NOT NULL,
 	[ConnectionFK] [int] NOT NULL,
 	[MergeComputeConnectionFK] [int] NULL,
+	[RawStorageConnectionFK] INT NOT NULL,
+	[CleansedStorageConnectionFK] INT NOT NULL,
 	[DatasetDisplayName] [nvarchar](50) NOT NULL,
 	[SourcePath] [nvarchar](100) NOT NULL,
 	[SourceName] [nvarchar](100) NOT NULL,

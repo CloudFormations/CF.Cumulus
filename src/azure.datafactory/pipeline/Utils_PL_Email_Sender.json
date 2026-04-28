@@ -1,0 +1,106 @@
+{
+	"name": "Utils_PL_Email_Sender",
+	"properties": {
+		"description": "Provide a simple abstract over the send email function with request body item exposed as pipeline parameters.",
+		"activities": [
+			{
+				"name": "Send Email",
+				"description": "Use an Azure Function to perform an SMTP client email send operation.",
+				"type": "AzureFunctionActivity",
+				"dependsOn": [
+					{
+						"activity": "Get From Username",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"functionName": "SendEmail",
+					"body": {
+						"value": "{\n\"AlertType\": \"@{pipeline().parameters.AlertType}\",\n\"FromUsername\": \"@{activity('Get From Username').output.firstRow.propertyValue}\",\n\"ToRecipients\": \"@{pipeline().parameters.Recipients}\",\n\"CcRecipients\": \"@{pipeline().parameters.CcRecipients}\",\n\"BccRecipients\": \"@{pipeline().parameters.BccRecipients}\",\n\"Subject\": \"@{pipeline().parameters.Subject}\",\n\"Message\": \"@{pipeline().parameters.Body}\",\n\"PassedImportance\": \"@{pipeline().parameters.Importance}\"\n}\n\n",
+						"type": "Expression"
+					},
+					"method": "POST"
+				},
+				"linkedServiceName": {
+					"referenceName": "Common_LS_cumulusfunctions",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Get From Username",
+				"description": "Return the from username required to send alerts from the metadata properties.",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.00:10:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[control].[GetPropertyValue]",
+						"storedProcedureParameters": {
+							"PropertyName": {
+								"type": "String",
+								"value": "AlertingFromUsername"
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "Control_DS_GetSetMetadata",
+						"type": "DatasetReference"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"Recipients": {
+				"type": "string"
+			},
+			"CcRecipients": {
+				"type": "string"
+			},
+			"BccRecipients": {
+				"type": "string"
+			},
+			"Subject": {
+				"type": "string"
+			},
+			"Body": {
+				"type": "string"
+			},
+			"Importance": {
+				"type": "string"
+			},
+			"AlertType": {
+				"type": "string",
+				"defaultValue": "O365"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Utils"
+		},
+		"annotations": [
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control",
+			"Send Alerts"
+		]
+	}
+}

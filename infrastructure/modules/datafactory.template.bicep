@@ -1,22 +1,14 @@
 @description('Resource group location.')
 param location string = resourceGroup().location
 
-@description('Resource name prefix as per template naming concatenated in the main file.')
-@minLength(3) // "logAnalyticsWorkspaceName" within the resource has a min length of 4. Adding this decorator constraint removes the warning.
-param namePrefix string 
-
-@description('Resource name suffix as per template naming concatenated in the main file.')
-param nameSuffix string 
-
 @description('Data Factory resource name.')
-param nameFactory string
+param dataFactoryName string
+
+@description('Log Analytics Workspace name.')
+param logAnalyticsWorkspaceName string
 
 @description('Option to configure Data Factory linked to GitHub.')
-param configureGitHub bool
-
-var name = '${namePrefix}${nameFactory}${nameSuffix}'
-
-var logAnalyticsWorkspaceName = '${namePrefix}log${nameSuffix}'
+param configureGitHub bool = false
 
 var repoConfig = {
   accountName: 'cfsource'
@@ -27,7 +19,7 @@ var repoConfig = {
 }
 
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
-  name: name
+  name: dataFactoryName
   location: location
   identity: {
     type: 'SystemAssigned'

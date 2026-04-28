@@ -56,16 +56,15 @@
   <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="procfwkReporting" />
-    <Folder Include="procfwkReporting\Views" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="procfwkReporting\Views\AverageStageDuration.sql" />
-    <Build Include="procfwkReporting\Views\CompleteExecutionErrorLog.sql" />
-    <Build Include="procfwkReporting\Views\CompleteExecutionLog.sql" />
-    <Build Include="procfwkReporting\Views\CurrentExecutionSummary.sql" />
-    <Build Include="procfwkReporting\Views\LastExecution.sql" />
-    <Build Include="procfwkReporting\Views\LastExecutionSummary.sql" />
-    <Build Include="procfwkReporting\Views\WorkerParallelismOverTime.sql" />
+    <Build Include="AverageStageDuration.sql" />
+    <Build Include="CompleteExecutionErrorLog.sql" />
+    <Build Include="CompleteExecutionLog.sql" />
+    <Build Include="CurrentExecutionSummary.sql" />
+    <Build Include="LastExecution.sql" />
+    <Build Include="LastExecutionSummary.sql" />
+    <Build Include="WorkerParallelismOverTime.sql" />
+    <Build Include="reporting.sql" />
   </ItemGroup>
 </Project>

@@ -31,7 +31,7 @@ Notes:
 This script dynamically populates on assumptions and known data types. Before executing, please verify the following:
 - Data Types are specified correctly, with no null values in the AttributeTargetDataType column. 
 - AttributeTargetDataFormat is correct. This mostly relates to Date and Time formats, which can pop up in a variety of ways. When dealing with RDMS sources, these are usually populated correctly, but is cautionary for other source formats, such as CSVs which rely on user input more frequently.
-- Any PkAttributes are selected correctly
+- Any PKAttributes are selected correctly
 - PartitionBy attributes are selected, as you deem fit in the Delta Table.
 - THIS SCRIPT IS DESIGNED TO SPEED UP THE METADATA INGESTION PROCESS. IT STILL REQUIRES HUMAN OBSERVATION TO ENSURE VALUES ARE CORRECTLY SPECIFIED. 
 
@@ -152,7 +152,7 @@ SELECT
     '' AS AttributeTargetDataFormat
 )
 select 'INSERT INTO ingest.Attributes 
-    ([DatasetFK], [AttributeName], [AttributeSourceDataType], [AttributeTargetDataType], [AttributeTargetDataFormat], [AttributeDescription], [PkAttribute], [PartitionByAttribute], [Enabled]) 
+    ([DatasetFK], [AttributeName], [AttributeSourceDataType], [AttributeTargetDataType], [AttributeTargetDataFormat], [AttributeDescription], [PKAttribute], [PartitionByAttribute], [Enabled]) 
     VALUES([DatasetFK],''' + cte.logicalname +''',''' + cte.attributetype + ''',''' + cte2.Attributetargetdatatype + ''',''' + cte2.Attributetargetdataformat + ''',''' + cte.description + ''',' + cte.pkattribute + ',' + cte.partitionbyattribute + ',' + cte.enabled + ')'
     
 from cte

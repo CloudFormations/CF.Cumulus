@@ -56,10 +56,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "trigger", "trigger", "{B59F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cumulus.Control", "Cumulus.Control", "{2E511592-037A-4117-8039-1ECA7F662A0E}"
 	ProjectSection(SolutionItems) = preProject
-		azure.datafactory\pipeline\01-SolutionExecutor.json = azure.datafactory\pipeline\01-SolutionExecutor.json
-		azure.datafactory\pipeline\02-BatchExecutor.json = azure.datafactory\pipeline\02-BatchExecutor.json
-		azure.datafactory\pipeline\03-StageExecutor.json = azure.datafactory\pipeline\03-StageExecutor.json
-		azure.datafactory\pipeline\04-PipelineExecutor.json = azure.datafactory\pipeline\04-PipelineExecutor.json
+		azure.datafactory\pipeline\Control_PL_BatchExecutor.json = azure.datafactory\pipeline\Control_PL_BatchExecutor.json
+		azure.datafactory\pipeline\Control_PL_PipelineExecutor.json = azure.datafactory\pipeline\Control_PL_PipelineExecutor.json
+		azure.datafactory\pipeline\Control_PL_SolutionExecutor.json = azure.datafactory\pipeline\Control_PL_SolutionExecutor.json
+		azure.datafactory\pipeline\Control_PL_StageExecutor.json = azure.datafactory\pipeline\Control_PL_StageExecutor.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cumulus.Utils", "Cumulus.Utils", "{85858FFB-41A3-46ED-B6A6-EAD44EBE1486}"

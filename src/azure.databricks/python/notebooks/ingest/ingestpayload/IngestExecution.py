@@ -61,7 +61,7 @@ pipeline_execution_datetime = pd.to_datetime(pipeline_execution_datetime, format
 
 # COMMAND ----------
 
-[table_name, load_type, load_action, load_action_text, version_number, raw_storage_name, raw_container_name, raw_secret, raw_last_load_date, raw_schema_name, raw_file_type, datetime_folder_hierarchy, cleansed_storage_name, cleansed_container_name, cleansed_secret, cleansed_last_load_date, cleansed_schema_name, pk_list, partition_list, columns_list, columns_type_list, columns_format_list, metadata_column_list, metadata_column_type_list, metadata_column_format_list, total_column_list, total_column_type_list, total_column_format_list] = get_merge_payload_variables(payload)
+[table_name,load_type,load_action,load_action_text,version_number,raw_storage_name,raw_container_name,raw_secret,raw_last_load_date,raw_connection_name,raw_file_type,raw_path,raw_name,datetime_folder_hierarchy,cleansed_storage_name,cleansed_container_name,cleansed_secret,cleansed_last_load_date,cleansed_connection_name,cleansed_path,cleansed_name,cleansed_folder,filter_condition,pk_list,partition_list,columns_list,columns_type_list,columns_format_list,metadata_column_list,metadata_column_type_list,metadata_column_format_list,total_column_list,total_column_type_list,total_column_format_list] = get_merge_payload_variables(payload)
 
 
 # COMMAND ----------
@@ -86,22 +86,30 @@ cleansed_abfss_path = set_abfss_path(cleansed_storage_name, cleansed_container_n
 # MAGIC #Get dataset from raw
 
 # COMMAND ----------
+if raw_file_type != "delta":
+    # Spark Read extended options. When switching versions of dataset, this is a required option.
+    options = {
+        'header':'True',
+        "mergeSchema": "true"
+        }
 
-# Spark Read extended options. When switching versions of dataset, this is a required option.
-options = {
-    'header':'True',
-    "mergeSchema": "true"
-    }
+    #different options for specifying, based on how we save abfss folder hierarchy.
+    file_full_path = f"{raw_abfss_path}/{raw_connection_name}/{table_name}/version={version_number}/{load_action_text}/{datetime_folder_hierarchy}/{table_name}.{raw_file_type}"
+    print(file_full_path)
 
-#different options for specifying, based on how we save abfss folder hierarchy.
-file_full_path = f"{raw_abfss_path}/{raw_schema_name}/{table_name}/version={version_number}/{load_action_text}/{datetime_folder_hierarchy}/{table_name}.{raw_file_type}"
-print(file_full_path)
-
-# assuming json,csv, parquet
-df = spark.read \
-    .options(**options) \
-    .format(raw_file_type) \
-    .load(file_full_path)
+    # assuming json,csv, parquet
+    df = spark.read \
+        .options(**options) \
+        .format(raw_file_type) \
+        .load(file_full_path)
+    
+elif raw_file_type == "delta":
+    file_full_path = f"{raw_abfss_path}/{raw_path}/{raw_name}"
+    df = spark.read.format("delta").load(file_full_path)
+    
+    # apply incremental loading filter
+    if load_action == "I":
+        df = spark.sql(f"SELECT * FROM {{df}} {filter_condition}",df=df)
 
 # display(df)
 
@@ -177,20 +185,20 @@ partition_fields_sql = create_partition_fields_sql(partition_fields=partition_li
 
 # check Delta Objects exist (import check functions)
 # check schema exists
-schema_exists = check_exists_delta_schema(schema_name=cleansed_schema_name)
+schema_exists = check_exists_delta_schema(schema_name=cleansed_folder)
 
 # create schema, if required
 if schema_exists == False:
-    create_schema(container_name=cleansed_container_name, schema_name=cleansed_schema_name)
+    create_schema(container_name=cleansed_container_name, schema_name=cleansed_folder)
 
 # COMMAND ----------
 
 # check Delta Objects exist (import check functions)
 # set Delta Table file path
-location = set_delta_table_location(schema_name=cleansed_schema_name, table_name=table_name, abfss_path=cleansed_abfss_path)
+location = set_delta_table_location(schema_name=cleansed_folder, table_name=table_name, abfss_path=cleansed_abfss_path)
 
 # check Delta table exists
-cleansed_table_path = set_table_path(schema_name =cleansed_schema_name, table_name =table_name)
+cleansed_table_path = set_table_path(schema_name =cleansed_folder, table_name =table_name)
 table_exists = check_exists_delta_table(table_path = cleansed_table_path, load_action = load_action, load_type = load_type)
 
 # Create Delta table, if required
@@ -198,11 +206,11 @@ table_created = False
 
 if table_exists == False:
     columns_string = format_columns_sql(total_column_list, total_column_type_list)
-    create_table(container_name=cleansed_container_name, schema_name=cleansed_schema_name, table_name=table_name,location=location, partition_fields_sql=partition_fields_sql, columns_string=columns_string)
+    create_table(container_name=cleansed_container_name, schema_name=cleansed_folder, table_name=table_name,location=location, partition_fields_sql=partition_fields_sql, columns_string=columns_string)
     table_created = True
     
     # get operations metrics 
-    output = get_operation_metrics(schema_name=cleansed_schema_name, table_name=table_name, output=output)
+    output = get_operation_metrics(schema_name=cleansed_folder, table_name=table_name, output=output)
 
 
 # COMMAND ----------
@@ -216,13 +224,13 @@ elif load_action.upper() == "I":
 else: 
     raise Exception("load_action not supported.")
 
-target_delta = get_target_delta_table(schema_name = cleansed_schema_name, table_name=table_name)
+target_delta = get_target_delta_table(schema_name = cleansed_connection_name, table_name=table_name)
 
-write_to_delta_executor(write_mode=write_mode, target_df=target_delta, df=df, schema_name=cleansed_schema_name, table_name=table_name, pk_fields=pk_list, columns_list=total_column_list, partition_fields=partition_list)
+write_to_delta_executor(write_mode=write_mode, target_df=target_delta, df=df, schema_name=cleansed_folder, table_name=table_name, pk_fields=pk_list, columns_list=total_column_list, partition_fields=partition_list)
 
 # COMMAND ----------
 
-output = get_operation_metrics(schema_name=cleansed_schema_name, table_name=table_name, output=output)
+output = get_operation_metrics(schema_name=cleansed_folder, table_name=table_name, output=output)
 print(output)
 
 # COMMAND ----------

@@ -28,7 +28,7 @@ Notes:
 This script dynamically populates on assumptions and known data types. Before executing, please verify the following:
 - Data Types are specified correctly, with no null values in the AttributeTargetDataType column. 
 - AttributeTargetDataFormat is correct. This mostly relates to Date and Time formats, which can pop up in a variety of ways. When dealing with RDMS sources, these are usually populated correctly, but is cautionary for other source formats, such as CSVs which rely on user input more frequently.
-- Any PkAttributes are selected correctly
+- Any PKAttributes are selected correctly
 - PartitionBy attributes are selected, as you deem fit in the Delta Table.
 - THIS SCRIPT IS DESIGNED TO SPEED UP THE METADATA INGESTION PROCESS. IT STILL REQUIRES HUMAN OBSERVATION TO ENSURE VALUES ARE CORRECTLY SPECIFIED. 
 
@@ -60,7 +60,7 @@ cte AS (
         CASE 
             WHEN pk.COLUMN_NAME IS NOT NULL THEN 1
             ELSE 0
-        END AS PkAttribute,
+        END AS PKAttribute,
         CASE 
             WHEN col.column_name LIKE '%FK' THEN 1
             ELSE 0
@@ -149,10 +149,10 @@ cte2 AS (
     FROM DUAL
     )
 SELECT 
-    'INSERT INTO ingest.Attributes ([DatasetFK],[AttributeName],[AttributeSourceDataType],[AttributeTargetDataType], [AttributeTargetDataFormat],[PkAttribute],[PartitionByAttribute],[Enabled]) VALUES (' || '''[' || TABLE_NAME || ']' || ''',''' || COLUMN_NAME || ''',''' || DATA_TYPE_FORMATTED || ''',''' ||
+    'INSERT INTO ingest.Attributes ([DatasetFK],[AttributeName],[AttributeSourceDataType],[AttributeTargetDataType], [AttributeTargetDataFormat],[PKAttribute],[PartitionByAttribute],[Enabled]) VALUES (' || '''[' || TABLE_NAME || ']' || ''',''' || COLUMN_NAME || ''',''' || DATA_TYPE_FORMATTED || ''',''' ||
     AttributeTargetDataType || ''',''' ||
     AttributeTargetDataFormat || ''',' ||
-    TO_CHAR(PkAttribute) || ',' ||
+    TO_CHAR(PKAttribute) || ',' ||
     TO_CHAR(PartitionByAttribute)  || ',' ||
     '1);' AS QueryString,
     TABLE_NAME,
@@ -161,7 +161,7 @@ SELECT
     AttributeTargetDataType,
     AttributeTargetDataFormat,
     NULL AS AttributeDescription,
-    PkAttribute,
+    PKAttribute,
     PartitionByAttribute,
     1 AS Enabled
 FROM cte 

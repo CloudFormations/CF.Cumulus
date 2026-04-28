@@ -7,7 +7,7 @@ param(
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $subscriptionID,
+    $subscriptionId,
 
     [Parameter(Mandatory=$true)]
     [ValidateNotNullOrEmpty()]
@@ -23,9 +23,10 @@ param(
 Import-Module SQLServer
 Import-Module Az.Accounts -MinimumVersion 2.2.0
 
-# Connect-AzAccount -SubscriptionId $subscriptionID
+# Connect-AzAccount -SubscriptionId $subscriptionId
 
-$accessToken = (Get-AzAccessToken -ResourceUrl https://database.windows.net).Token
+$encryptedToken = (Get-AzAccessToken -ResourceUrl "https://database.windows.net" -AsSecureString).token
+$accessToken = [PSCredential]::new("token", $encryptedToken)
 
 $instanceNameFull = "$instanceName.database.windows.net"
 
@@ -52,4 +53,7 @@ ALTER ROLE [db_cumulususer]
 ADD MEMBER [$ADFResource];
 "@
 
-Invoke-Sqlcmd -ServerInstance $instanceNameFull -Database $databaseName -AccessToken $accessToken -Query $query
+Invoke-Sqlcmd -ServerInstance $instanceNameFull `
+    -Database $databaseName `
+    -AccessToken $accessToken.GetNetworkCredential().Password `
+    -Query $query

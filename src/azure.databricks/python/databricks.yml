@@ -1,0 +1,49 @@
+# This is a Databricks asset bundle definition for CF.Cumulus.
+# The Databricks extension requires databricks.yml configuration file.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+
+bundle:
+  name: CF.Cumulus
+
+targets:
+  unit-test:
+    mode: production
+    workspace:
+      profile: dev
+      root_path: /Workspace/Shared/UnitTest/
+
+
+resources:
+  jobs:
+    run_unit_tests:
+      name: "Unit Tests - ${bundle.target}"
+      tasks:
+        - task_key: run_pytest
+          notebook_task:
+            notebook_path: ./tests/pytest_databricks.py
+            source: WORKSPACE
+      
+
+      
+      timeout_seconds: 3600
+
+# resources:
+#   jobs:
+#     deployment:
+#       name: ${bundle.name}-workflow
+#       tags:
+#         project_name: "python-unit-test"
+
+#       environments:
+#         - environment_key: default
+#           spec:
+#             client: "3"
+#             dependencies:
+#               - ../dist/*.whl
+
+
+#       tasks:
+#         - task_key: "unit-test"
+#           environment_key: default
+#           spark_python_task:
+#             python_file: "../tests/pytest_databricks.py"

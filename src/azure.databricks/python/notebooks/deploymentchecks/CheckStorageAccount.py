@@ -16,10 +16,10 @@ try:
 except Exception as e:
     print(str(e))
     if "The specified path does not exist." in str(e):
-        raise ValueError("File path within container provided does not exist. Please review the provided container path: {raw_container_path}")
+        raise ValueError(f"File path within container provided does not exist. Please review the provided container path: {raw_container_path}")
     elif "The specified filesystem does not exist." in str(e):
-        raise ValueError("Container provided does not exist. Please review the provided container path: {raw_container_path}")
+        raise ValueError(f"Container provided does not exist. Please review the provided container path: {raw_container_path}")
     elif "Failure to initialize configuration for storage account" in str(e):
-        raise ValueError("Storage account is not accessible to the Databricks Cluster or does not exist. Please review storage account specified in the provided path: {raw_container_path}")
+        raise ValueError(f"Storage account is not accessible to the Databricks Cluster or does not exist. Please review storage account specified in the provided path: {raw_container_path}")
     else:
         raise Exception(f"Unknown error encountered: {str(e)}")
