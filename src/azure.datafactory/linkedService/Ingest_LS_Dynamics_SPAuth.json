@@ -1,0 +1,37 @@
+{
+	"name": "Ingest_LS_Dynamics_SPAuth",
+	"properties": {
+		"type": "DynamicsCrm",
+		"parameters": {
+			"ServiceURI": {
+				"type": "string"
+			},
+			"ServicePrincipalId": {
+				"type": "string"
+			},
+			"ServicePrincipalKey": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"typeProperties": {
+			"deploymentType": "Online",
+			"serviceUri": "@{linkedService().ServiceURI}",
+			"authenticationType": "AADServicePrincipal",
+			"servicePrincipalId": "@{linkedService().ServicePrincipalId}",
+			"servicePrincipalCredential": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().ServicePrincipalKey",
+					"type": "Expression"
+				}
+			},
+			"servicePrincipalCredentialType": "ServicePrincipalKey"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

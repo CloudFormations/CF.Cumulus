@@ -1,0 +1,53 @@
+{
+	"name": "Ingest_LS_AzurePostgreSQL_SPAuth",
+	"properties": {
+		"parameters": {
+			"LSServicePrincipalKey": {
+				"type": "String"
+			},
+			"LSHostName": {
+				"type": "String"
+			},
+			"LSPortNumber": {
+				"type": "String"
+			},
+			"LSDatabaseName": {
+				"type": "String"
+			},
+			"LSServicePrincipalName": {
+				"type": "String"
+			},
+			"LSTenant": {
+				"type": "String"
+			},
+			"LSServicePrincipalID": {
+				"type": "String"
+			}
+		},
+		"annotations": [],
+		"type": "AzurePostgreSql",
+		"version": "2.0",
+		"typeProperties": {
+			"server": "@{linkedService().LSHostName}",
+			"port": "@{linkedService().LSPortNumber}",
+			"database": "@{linkedService().LSDatabaseName}",
+			"sslMode": 2,
+			"username": "@{linkedService().LSServicePrincipalName}",
+			"authenticationType": "ServicePrincipal",
+			"tenant": "@{linkedService().LSTenant}",
+			"servicePrincipalId": "@{linkedService().LSServicePrincipalID}",
+			"servicePrincipalCredentialType": "ServicePrincipalKey",
+			"servicePrincipalKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().LSServicePrincipalKey",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}

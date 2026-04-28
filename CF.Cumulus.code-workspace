@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"debug.internalConsoleOptions": "neverOpen",
+		"azureFunctions.showTargetFrameworkWarning": false,
+		"cSpell.words": [
+			"datalake",
+			"sqldb"
+		]
+	}
+}

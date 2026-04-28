@@ -1,0 +1,51 @@
+{
+	"name": "Ingest_DS_DataLake_Binary",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_DataLake_MIAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSStorageName": {
+					"value": "@dataset().DSStorageName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSDirectory": {
+				"type": "string"
+			},
+			"DSFileName": {
+				"type": "string"
+			},
+			"DSStorageName": {
+				"type": "string"
+			},
+			"DSContainerName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().DSFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().DSDirectory",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().DSContainerName",
+					"type": "Expression"
+				}
+			}
+		}
+	}
+}

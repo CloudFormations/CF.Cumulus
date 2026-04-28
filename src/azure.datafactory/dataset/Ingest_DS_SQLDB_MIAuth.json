@@ -1,0 +1,33 @@
+{
+	"name": "Ingest_DS_SQLDB_MIAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_SQLDB_MIAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSHostName": {
+					"value": "@dataset().DSHostname",
+					"type": "Expression"
+				},
+				"LSDatabaseName": {
+					"value": "@dataset().DSDatabaseName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSHostname": {
+				"type": "string"
+			},
+			"DSDatabaseName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": []
+	}
+}

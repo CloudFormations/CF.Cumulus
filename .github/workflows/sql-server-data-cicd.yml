@@ -1,0 +1,96 @@
+  # Job to build and publish the dacpac
+name: CF.Cumulus-Sql-Server-data-CICD
+on: [workflow_call, workflow_dispatch]
+
+jobs: 
+  build_data:
+    runs-on: windows-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - uses: actions/checkout@v2.4.2
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.1
+    - name: Build Database project
+      run: |
+        msbuild.exe src/metadata.data/metadata.data.sqlproj /p:Configuration=Release
+    - uses: actions/upload-artifact@v4
+      with: 
+        name: dataartifact
+        path: ${{ github.workspace }}/src/metadata.data/bin/Release/
+
+# Deploy dacpac job
+  deploy_dev:
+    # Set the dependency for the build job
+    needs: build_data
+    runs-on: windows-latest
+    environment: dev
+
+    steps:
+      - name: download artifact containing dacpac
+        uses: actions/download-artifact@v4
+        with:
+          name: dataartifact  # Match the uploaded artifact name
+          path: ${{ github.workspace }}/src/metadata.data/bin/Release/
+
+      - name: Verify Artifact File
+        run: ls -R ${{ github.workspace }}/src/metadata.data/bin/Release/
+
+      - name: Azure SQL Deploy
+        uses: Azure/sql-action@v2.3
+        with:
+          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+          path: ${{ github.workspace }}/src/metadata.data/bin/Release/metadata.data.dacpac
+          action: 'publish'
+          arguments: '/v:DemoConnectionLocation="${{ secrets.DEMO_CONNECTION }}" /v:DemoSourceLocation="${{ secrets.DEMO_SOURCE }}" /v:DemoResourceName="${{ secrets.DEMO_RESOURCE_NAME }}" /v:DemoLinkedService="${{ secrets.DEMO_LINKED_SERVICE }}" /v:DemoUsername="${{ secrets.DEMO_USERNAME }}" /v:DemoKVSecret="${{ secrets.DEMO_KEYVAULTSECRET }}" /v:ADFName="${{ secrets.ADFNAME }}" '
+
+# Deploy dacpac job
+  deploy_test:
+    # Set the dependency for the build job
+    needs: deploy_dev
+    runs-on: windows-latest
+    environment: test
+
+    steps:
+      - name: download artifact containing dacpac
+        uses: actions/download-artifact@v4
+        with:
+          name: dataartifact  # Match the uploaded artifact name
+          path: ${{ github.workspace }}/src/metadata.data/bin/Release/
+
+      - name: Verify Artifact File
+        run: ls -R ${{ github.workspace }}/src/metadata.data/bin/Release/
+
+      - name: Azure SQL Deploy
+        uses: Azure/sql-action@v2.3
+        with:
+          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+          path: ${{ github.workspace }}/src/metadata.data/bin/Release/metadata.data.dacpac
+          action: 'publish'
+          arguments: '/v:DemoConnectionLocation="${{ secrets.DEMO_CONNECTION }}" /v:DemoSourceLocation="${{ secrets.DEMO_SOURCE }}" /v:DemoResourceName="${{ secrets.DEMO_RESOURCE_NAME }}" /v:DemoLinkedService="${{ secrets.DEMO_LINKED_SERVICE }}" /v:DemoUsername="${{ secrets.DEMO_USERNAME }}" /v:DemoKVSecret="${{ secrets.DEMO_KEYVAULTSECRET }}" /v:ADFName="${{ secrets.ADFNAME }}" '
+
+
+# Deploy dacpac job
+  deploy_prod:
+    # Set the dependency for the build job
+    needs: deploy_test
+    runs-on: windows-latest
+    environment: prod
+
+    steps:
+      - name: download artifact containing dacpac
+        uses: actions/download-artifact@v4
+        with:
+          name: dataartifact  # Match the uploaded artifact name
+          path: ${{ github.workspace }}/src/metadata.data/bin/Release/
+
+      - name: Verify Artifact File
+        run: ls -R ${{ github.workspace }}/src/metadata.data/bin/Release/
+
+      - name: Azure SQL Deploy
+        uses: Azure/sql-action@v2.3
+        with:
+          connection-string: "${{ secrets.AZURE_SQL_CONNECTION_STRING }}"
+          path: ${{ github.workspace }}/src/metadata.data/bin/Release/metadata.data.dacpac
+          action: 'publish'
+          arguments: '/v:DemoConnectionLocation="${{ secrets.DEMO_CONNECTION }}" /v:DemoSourceLocation="${{ secrets.DEMO_SOURCE }}" /v:DemoResourceName="${{ secrets.DEMO_RESOURCE_NAME }}" /v:DemoLinkedService="${{ secrets.DEMO_LINKED_SERVICE }}" /v:DemoUsername="${{ secrets.DEMO_USERNAME }}" /v:DemoKVSecret="${{ secrets.DEMO_KEYVAULTSECRET }}" /v:ADFName="${{ secrets.ADFNAME }}" '

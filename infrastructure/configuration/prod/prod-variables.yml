@@ -1,0 +1,34 @@
+# PROD Pipeline Variables
+
+variables: 
+
+- name: AzureResourceManagerConnection # Service Principal that has the Contributor RBAC (role based access control) permission to deploy the Data Factory ARM template to the UAT resource group rg-adf-cicd-uat
+  value: Dev Connection
+
+- name: DataFactoryNameFactory
+  value: cfcdemoprodfactoryuks01
+
+- name: DataFactoryNameWorkers
+  value: cfcdemoprodworkersuks01
+
+- name: ADFResourceGroupName
+  value: cfcdemoprodrguks01
+
+- name: ADFArtifactName # Data Factory artifact name created during the datafactory.build.yml job template
+  value: ADFArtifact
+
+- name: DataFactoryTemplateParametersFilePathFactory
+  value: "$(Build.Repository.LocalPath)/infrastructure/configuration/prod/adf-prod-factory-template-parameters.json"
+
+- name: DataFactoryTemplateParametersFilePathWorkers
+  value: "$(Build.Repository.LocalPath)/infrastructure/configuration/prod/adf-prod-workers-template-parameters.json"
+
+# Shared
+- name: ResourceGroupLocation
+  value: "UK South"
+
+- name: Environment
+  value: PROD
+
+- name: DeployWorkers
+  value: "true"

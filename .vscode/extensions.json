@@ -1,0 +1,10 @@
+{
+  "recommendations": [
+    "ms-azuretools.vscode-azurefunctions",
+    "ms-vscode.csharp",
+    "ms-azuretools.vscode-bicep",
+    "databricks.databricks",
+    "ms-python.vscode-pylance",
+    "redhat.vscode-yaml"
+    ]
+}

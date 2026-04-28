@@ -1,0 +1,41 @@
+{
+	"name": "Ingest_LS_SQLDB_SQLAuth",
+	"properties": {
+		"parameters": {
+			"LSHostName": {
+				"type": "string"
+			},
+			"LSDatabaseName": {
+				"type": "string"
+			},
+			"LSUsername": {
+				"type": "string"
+			},
+			"LSPassword": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"server": "@{linkedService().LSHostName}",
+			"database": "@{linkedService().LSDatabaseName}",
+			"encrypt": "mandatory",
+			"trustServerCertificate": false,
+			"authenticationType": "SQL",
+			"userName": "@{linkedService().LSUsername}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().LSPassword",
+					"type": "Expression"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

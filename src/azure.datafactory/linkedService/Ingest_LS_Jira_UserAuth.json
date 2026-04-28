@@ -1,0 +1,37 @@
+{
+	"name": "Ingest_LS_Jira_UserAuth",
+	"properties": {
+		"type": "Jira",
+		"parameters": {
+			"LSHostName": {
+				"type": "string"
+			},
+			"LSUserName": {
+				"type": "string"
+			},
+			"LSPassword": {
+				"type": "string"
+			},
+			"LSPortNumber": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"typeProperties": {
+			"host": "@{linkedService().LSHostName}",
+			"port": "@{linkedService().LSPortNumber}",
+			"username": "@{linkedService().LSUserName}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "@{linkedService().LSPassword}"
+			},
+			"useEncryptedEndpoints": true,
+			"useHostVerification": true,
+			"usePeerVerification": true
+		}
+	}
+}

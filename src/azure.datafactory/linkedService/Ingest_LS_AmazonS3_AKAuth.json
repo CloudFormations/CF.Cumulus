@@ -1,0 +1,34 @@
+{
+	"name": "Ingest_LS_AmazonS3_AKAuth",
+	"properties": {
+		"parameters": {
+			"ServiceURL": {
+				"type": "string"
+			},
+			"SecretKeyName": {
+				"type": "string"
+			},
+			"AccessKeyId": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "AmazonS3",
+		"typeProperties": {
+			"serviceUrl": "@{linkedService().ServiceURL}",
+			"accessKeyId": "@{linkedService().AccessKeyId}",
+			"secretAccessKey": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().SecretKeyName",
+					"type": "Expression"
+				}
+			},
+			"authenticationType": "AccessKey"
+		}
+	}
+}

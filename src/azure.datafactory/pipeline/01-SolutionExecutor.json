@@ -1,0 +1,46 @@
+{
+	"name": "01-SolutionExecutor",
+	"properties": {
+		"description": "CF.Cumulus pipeline used optionally to bootstrap any wider processes in your Data Factory that then calls the processing framework.",
+		"activities": [
+			{
+				"name": "Cumulus Default Batch",
+				"description": "Call Cumulus.Control",
+				"type": "ExecutePipeline",
+				"dependsOn": [],
+				"policy": {
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "02-BatchExecutor",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"BatchName": {
+							"value": "@pipeline().parameters.BatchName",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"BatchName": {
+				"type": "string",
+				"defaultValue": "NotUsed"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Control"
+		},
+		"annotations": [
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Control",
+			"Solution Executor"
+		]
+	}
+}

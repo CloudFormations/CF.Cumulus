@@ -1,0 +1,42 @@
+{
+	"name": "Ingest_LS_Oracle_V2_SIDAuth",
+	"properties": {
+		"parameters": {
+			"LSHostname": {
+				"type": "string"
+			},
+			"LSUsername": {
+				"type": "string"
+			},
+			"LSOracleSid": {
+				"type": "string"
+			},
+			"LSPortNumber": {
+				"type": "string"
+			},
+			"LSPassword": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Oracle",
+		"version": "2.0",
+		"typeProperties": {
+			"server": "@{concat(\n    '(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=',\n    linkedService().LSHostname,\n    ')(PORT=',\n    linkedService().LSPortNumber,\n    '))(CONNECT_DATA=(SID=',\n    linkedService().LSOracleSid,')))'\n    )}",
+			"authenticationType": "Basic",
+			"username": "@{linkedService().LSUsername}",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": {
+					"value": "@linkedService().LSPassword",
+					"type": "Expression"
+				}
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/linkedservices"
+}

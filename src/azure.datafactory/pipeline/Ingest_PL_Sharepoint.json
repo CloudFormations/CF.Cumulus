@@ -1,0 +1,521 @@
+{
+	"name": "Ingest_PL_Sharepoint",
+	"properties": {
+		"activities": [
+			{
+				"name": "Sharepoint Type",
+				"type": "Switch",
+				"dependsOn": [
+					{
+						"activity": "Set Directory Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"on": {
+						"value": "@replace(activity('Get Ingest Payload').output.firstRow.LinkedServiceName,'Ingest_LS_','')",
+						"type": "Expression"
+					},
+					"cases": [
+						{
+							"value": "Sharepoint_SPNOAUTH",
+							"activities": [
+								{
+									"name": "Fetch Sharepoint Client ID",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:15:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.Username,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "Fetch Sharepoint Client Secret",
+									"type": "WebActivity",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "0.00:15:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "GET",
+										"url": {
+											"value": "@concat(activity('Get Ingest Payload').output.firstRow.KeyVaultSecret,'?api-version=7.0')",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "Fetch Sharepoint OAuth Token",
+									"type": "WebActivity",
+									"dependsOn": [
+										{
+											"activity": "Fetch Sharepoint Client ID",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										},
+										{
+											"activity": "Fetch Sharepoint Client Secret",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.00:15:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"method": "POST",
+										"headers": {
+											"Content-Type": "application/x-www-form-urlencoded"
+										},
+										"url": {
+											"value": "@concat('https://accounts.accesscontrol.windows.net/',activity('Get Ingest Payload').output.firstRow.ConnectionPort, '/tokens/OAuth/2')",
+											"type": "Expression"
+										},
+										"body": {
+											"value": "@concat('grant_type=client_credentials&client_id=',activity('Fetch Sharepoint Client ID').output.value,'@',activity('Get Ingest Payload').output.firstRow.ConnectionPort,'&client_secret=',activity('Fetch Sharepoint Client Secret').output.value,'&resource=00000003-0000-0ff1-ce00-000000000000','/',activity('Get Ingest Payload').output.firstRow.ConnectionLocation,'@',activity('Get Ingest Payload').output.firstRow.ConnectionPort)",
+											"type": "Expression"
+										},
+										"authentication": {
+											"type": "MSI",
+											"resource": "https://vault.azure.net"
+										}
+									}
+								},
+								{
+									"name": "Sharepoint OAuth Copy",
+									"type": "Copy",
+									"dependsOn": [
+										{
+											"activity": "Fetch Sharepoint OAuth Token",
+											"dependencyConditions": [
+												"Succeeded"
+											]
+										}
+									],
+									"policy": {
+										"timeout": "0.12:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": true,
+										"secureInput": false
+									},
+									"userProperties": [],
+									"typeProperties": {
+										"source": {
+											"type": "BinarySource",
+											"storeSettings": {
+												"type": "HttpReadSettings",
+												"requestMethod": "GET",
+												"additionalHeaders": {
+													"value": "@{concat('Authorization: Bearer ', activity('Fetch Sharepoint OAuth Token').output.access_token)}",
+													"type": "Expression"
+												},
+												"requestTimeout": ""
+											},
+											"formatSettings": {
+												"type": "BinaryReadSettings"
+											}
+										},
+										"sink": {
+											"type": "BinarySink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false
+									},
+									"inputs": [
+										{
+											"referenceName": "Ingest_DS_Binary_HTTP_AnonAuth",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSBaseUrl": "@concat('https://',activity('Get Ingest Payload').output.firstRow.ConnectionLocation)",
+												"DSRelativeUrl": "@concat('/sites/',activity('Get Ingest Payload').output.firstRow.SourceLocation,'/_api/web/GetFileByServerRelativeUrl(''/sites/',activity('Get Ingest Payload').output.firstRow.SourceLocation,'/',activity('Get Ingest Payload').output.firstRow.ResourceName,'/',activity('Get Ingest Payload').output.firstRow.SourceName,'.',activity('Get Ingest Payload').output.firstRow.ExtensionType,''')/$value')"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "Ingest_DS_DataLake_Binary",
+											"type": "DatasetReference",
+											"parameters": {
+												"DSDirectory": "@variables('DirectoryName')",
+												"DSFileName": {
+													"value": "@concat(activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,'.',activity('Get Ingest Payload').output.firstRow.ExtensionType)",
+													"type": "Expression"
+												},
+												"DSStorageName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageName",
+													"type": "Expression"
+												},
+												"DSContainerName": {
+													"value": "@activity('Get Ingest Payload').output.firstRow.TargetStorageContainer",
+													"type": "Expression"
+												}
+											}
+										}
+									]
+								}
+							]
+						}
+					],
+					"defaultActivities": [
+						{
+							"name": "Supported Linked Service Type",
+							"type": "Fail",
+							"dependsOn": [],
+							"userProperties": [],
+							"typeProperties": {
+								"message": {
+									"value": "@concat('The Linked Service type and authentication combination is not currently supported.')",
+									"type": "Expression"
+								},
+								"errorCode": "16"
+							}
+						}
+					]
+				}
+			},
+			{
+				"name": "Get Ingest Payload",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderStoredProcedureName": "[ingest].[GetDatasetPayload]",
+						"storedProcedureParameters": {
+							"DatasetId": {
+								"type": "Int16",
+								"value": {
+									"value": "@pipeline().parameters.DatasetId",
+									"type": "Expression"
+								}
+							}
+						},
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "GetSetMetadata",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": true
+				}
+			},
+			{
+				"name": "Set Run DateTime",
+				"type": "SetVariable",
+				"dependsOn": [],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "LocalRunDateTime",
+					"value": {
+						"value": "@if(equals(pipeline().parameters.RunDateTime,' '),string(utcnow()),pipeline().parameters.RunDateTime)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Target Path",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Run DateTime",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "TargetPath",
+					"value": {
+						"value": "@formatDateTime(variables('LocalRunDateTime'), '\\ye\\ar=yyyy/\\mon\\t\\h=MM/\\d\\a\\y=dd/\\hour=HH')",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set LoadType",
+				"description": "Set the Data Load type:\nIncremental Load = 1\nFull Load = 0",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "LoadType",
+					"value": {
+						"value": "@activity('Get Ingest Payload').output.firstRow.LoadAction",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Set Directory Path",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Set Target Path",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Set LoadType",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "DirectoryName",
+					"value": {
+						"value": "@concat(\n    activity('Get Ingest Payload').output.firstRow.ConnectionDisplayName,\n    '\\',\n    activity('Get Ingest Payload').output.firstRow.DatasetDisplayName,\n    '\\',\n    'version=',\n    activity('Get Ingest Payload').output.firstRow.VersionNumber,\n    '\\',\n    variables('LoadType'),\n    '\\',\n    variables('TargetPath')\n    )",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "Update Metadata Load Status",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "Sharepoint Type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"storedProcedureName": "[ingest].[SetIngestLoadStatus]",
+					"storedProcedureParameters": {
+						"DatasetId": {
+							"value": {
+								"value": "@pipeline().parameters.DatasetId",
+								"type": "Expression"
+							},
+							"type": "Int32"
+						},
+						"IngestStage": {
+							"value": "Raw",
+							"type": "String"
+						},
+						"LoadType": {
+							"value": {
+								"value": "@activity('Get Ingest Payload').output.firstRow.LoadType",
+								"type": "Expression"
+							},
+							"type": "String"
+						},
+						"FileLoadDateTime": {
+							"value": {
+								"value": "@variables('LocalRunDateTime')",
+								"type": "Expression"
+							},
+							"type": "DateTime"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "Common_LS_cumulusdatabase",
+					"type": "LinkedServiceReference"
+				}
+			},
+			{
+				"name": "Unpacked Datasets",
+				"type": "SetVariable",
+				"dependsOn": [
+					{
+						"activity": "Get Ingest Payload",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"variableName": "UnpackedDatasets",
+					"value": {
+						"value": "@json(activity('Get Ingest Payload').output.firstRow.SourceQuery)",
+						"type": "Expression"
+					}
+				}
+			},
+			{
+				"name": "For Each Unpacked Dataset",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "Unpacked Datasets",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Sharepoint Type",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"items": {
+						"value": "@variables('UnpackedDatasets')",
+						"type": "Expression"
+					},
+					"isSequential": false,
+					"activities": [
+						{
+							"name": "Copy Unpacked File",
+							"type": "ExecutePipeline",
+							"dependsOn": [],
+							"policy": {
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"pipeline": {
+									"referenceName": "Copy_Unpacked_File",
+									"type": "PipelineReference"
+								},
+								"waitOnCompletion": true,
+								"parameters": {
+									"DirectoryName": {
+										"value": "@variables('DirectoryName')",
+										"type": "Expression"
+									},
+									"SourceQuery": {
+										"value": "@item()",
+										"type": "Expression"
+									},
+									"IngestPayload": {
+										"value": "@string(activity('Get Ingest Payload').output.firstRow)",
+										"type": "Expression"
+									}
+								}
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"DatasetId": {
+				"type": "int"
+			},
+			"RunDateTime": {
+				"type": "string",
+				"defaultValue": " "
+			}
+		},
+		"variables": {
+			"LocalRunDateTime": {
+				"type": "String"
+			},
+			"TargetPath": {
+				"type": "String"
+			},
+			"DirectoryName": {
+				"type": "String"
+			},
+			"LoadType": {
+				"type": "String"
+			},
+			"Set LoadType": {
+				"type": "String"
+			},
+			"UnpackedDatasets": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "Cumulus.Ingest"
+		},
+		"annotations": [
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Ingest"
+		],
+		"lastPublishTime": "2025-04-11T13:21:11Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
