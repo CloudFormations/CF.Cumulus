@@ -1,0 +1,10 @@
+--Metadata As Code Transform
+
+--Notebook Types
+EXEC [transform].[AddNotebookTypes] 'Unmanaged', 1
+EXEC [transform].[AddNotebookTypes] 'Managed', 1
+EXEC [transform].[AddNotebookTypes] 'Create Dimension Table', 1
+EXEC [transform].[AddNotebookTypes] 'Create Fact Table', 1
+
+EXEC [transform].[AddNotebooks] 'CF.Cumulus.Transform.Compute', 'Create Dimension Table', 'CreateDim', '/Workspace/Shared/Live/files/transform/CreateDimensionTable', 1;
+EXEC [transform].[AddNotebooks] 'CF.Cumulus.Transform.Compute', 'Create Fact Table', 'CreateFact', '/Workspace/Shared/Live/files/transform/CreateFactTable', 1;

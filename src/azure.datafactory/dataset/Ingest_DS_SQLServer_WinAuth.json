@@ -1,0 +1,47 @@
+{
+	"name": "Ingest_DS_SQLServer_WinAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_SQLServer_WinAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSHostName": {
+					"value": "@dataset().DSHostname",
+					"type": "Expression"
+				},
+				"LSDatabaseName": {
+					"value": "@dataset().DSDatabaseName",
+					"type": "Expression"
+				},
+				"LSUsername": {
+					"value": "@dataset().DSUsername",
+					"type": "Expression"
+				},
+				"LSPassword": {
+					"value": "@dataset().DSPassword",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSHostname": {
+				"type": "string"
+			},
+			"DSDatabaseName": {
+				"type": "string"
+			},
+			"DSUsername": {
+				"type": "string"
+			},
+			"DSPassword": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}

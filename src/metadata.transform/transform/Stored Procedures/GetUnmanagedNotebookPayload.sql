@@ -1,0 +1,95 @@
+CREATE PROCEDURE [transform].[GetUnmanagedNotebookPayload]
+	(
+	@NotebookId INT
+	)
+AS
+BEGIN
+
+	-- Defensive check for results returned
+	DECLARE @ResultRowCount INT
+
+	SELECT 
+		@ResultRowCount = COUNT(*)
+	FROM 
+		[transform].[Notebooks] AS n
+	INNER JOIN 
+		[transform].[NotebookTypes] AS nt
+	ON 
+		n.NotebookTypeFK = nt.NotebookTypeId
+	INNER JOIN 
+		[common].[ComputeConnections] AS ccn
+	ON
+		n.ComputeConnectionFK = ccn.ComputeConnectionId
+	INNER JOIN
+		[common].[Connections] AS cn
+	ON 
+		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
+	INNER JOIN
+		[common].[Connections] AS cn2
+	ON 
+		cn2.ConnectionDisplayName = 'PrimarySubscription'
+	WHERE
+		n.NotebookId = @NotebookId
+	AND 
+		nt.NotebookTypeName = 'Unmanaged'
+	AND
+		n.Enabled = 1
+	AND
+		nt.Enabled = 1
+	AND
+		ccn.Enabled = 1
+
+	IF @ResultRowCount = 0
+	BEGIN
+		RAISERROR('No results returned for the provided Notebook Id.  Confirm Notebook is enabled, and related Connections and Parameters are enabled.',16,1)
+		RETURN 0;
+	END
+
+	IF @ResultRowCount > 1
+	BEGIN
+		RAISERROR('Multiple results returned for the provided Notebook Id. Confirm that only a single active Notebook is being referenced.',16,1)
+		RETURN 0;
+	END
+
+	SELECT 
+		[ccn].[ConnectionLocation] AS 'ComputeWorkspaceURL',
+        [ccn].[ConnectionDisplayName] AS 'ComputeResourceName',
+		[ccn].[ComputeLocation] AS 'ComputeClusterId',
+		[ccn].[ComputeSize],
+		[ccn].[ComputeVersion],
+		[ccn].[CountNodes],
+		[ccn].[LinkedServiceName] AS 'ComputeLinkedServiceName',
+		[ccn].[ResourceName] AS 'ComputeResourceName',
+		[cn].[SourceLocation] AS 'ResourceGroupName',
+		[cn2].[SourceLocation] AS 'SubscriptionId',
+		n.NotebookPath AS 'NotebookFullPath'
+	FROM 
+		[transform].[Notebooks] AS n
+	INNER JOIN 
+		[transform].[NotebookTypes] AS nt
+	ON 
+		n.NotebookTypeFK = nt.NotebookTypeId
+	INNER JOIN 
+		[common].[ComputeConnections] AS ccn
+	ON
+		n.ComputeConnectionFK = ccn.ComputeConnectionId
+	INNER JOIN
+		[common].[Connections] AS cn
+	ON 
+		cn.ConnectionDisplayName = 'PrimaryResourceGroup'
+	INNER JOIN
+		[common].[Connections] AS cn2
+	ON 
+		cn2.ConnectionDisplayName = 'PrimarySubscription'
+	WHERE
+		n.NotebookId = @NotebookId
+	AND 
+		nt.NotebookTypeName = 'Unmanaged'
+	AND
+		n.Enabled = 1
+	AND
+		nt.Enabled = 1
+	AND
+		ccn.Enabled = 1
+
+END

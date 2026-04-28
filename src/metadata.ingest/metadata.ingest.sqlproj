@@ -1,0 +1,88 @@
+﻿<Project Sdk="Microsoft.Build.Sql/0.1.14-preview">
+
+  <!-- =========================
+       Global Project Settings
+       ========================= -->
+  <PropertyGroup>
+    <Name>metadata.ingest</Name>
+    <AssemblyName>metadata.ingest</AssemblyName>
+    <RootNamespace>metadata.ingest</RootNamespace>
+
+    <OutputType>Database</OutputType>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>4.1</ProjectVersion>
+
+    <!-- Azure SQL -->
+    <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
+
+    <ModelCollation>1033, CI</ModelCollation>
+    <DefaultSchema>cumulus.ingest</DefaultSchema>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+
+    <DeployToDatabase>true</DeployToDatabase>
+    <IncludeCompositeObjects>true</IncludeCompositeObjects>
+    <TargetDatabaseSet>true</TargetDatabaseSet>
+    <SqlServerVerification>false</SqlServerVerification>
+
+    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
+
+    <!-- Required for CI / SDK builds -->
+    <TargetFramework>net472</TargetFramework>
+  </PropertyGroup>
+
+  <!-- =========================
+       Configuration
+       ========================= -->
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <OutputPath>bin\Debug\</OutputPath>
+    <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
+    <DefineDebug>true</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <OutputPath>bin\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- =========================
+       Project References
+       ========================= -->
+  <ItemGroup>
+    <ProjectReference Include="..\metadata.common\metadata.common.sqlproj" />
+  </ItemGroup>
+
+  <!-- =========================
+       Deployment Scripts
+       ========================= -->
+  <ItemGroup>
+    <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
+    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
+  </ItemGroup>
+
+  <!-- =========================
+       Special-case SQL files
+       ========================= -->
+
+  <ItemGroup>
+    <Build Include="ingest\Functions\GetIngestLoadAction.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Build>
+  </ItemGroup>
+
+  <!-- =========================
+       NetCore / CI Support
+       ========================= -->
+  <ItemGroup Condition="'$(NetCoreBuild)'=='true'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies"
+                      Version="1.0.0"
+                      PrivateAssets="All" />
+  </ItemGroup>
+
+</Project>

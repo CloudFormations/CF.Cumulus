@@ -1,0 +1,47 @@
+{
+	"name": "Ingest_DS_DataLake_Csv",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_DataLake_MIAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSStorageName": {
+					"value": "@dataset().DSStorageName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSFileName": {
+				"type": "string"
+			},
+			"DSDirectoryName": {
+				"type": "string"
+			},
+			"DSContainerName": {
+				"type": "string"
+			},
+			"DSStorageName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "@concat(dataset().DSFileName,'.csv')",
+				"folderPath": "@dataset().DSDirectoryName",
+				"fileSystem": "@dataset().DSContainerName"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}

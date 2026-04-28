@@ -1,0 +1,47 @@
+{
+	"name": "Ingest_DS_Salesforce_OAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_Salesforce_OAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSClientId": {
+					"value": "@dataset().DSClientId",
+					"type": "Expression"
+				},
+				"LSAPIVersion": {
+					"value": "@dataset().DSAPIVersion",
+					"type": "Expression"
+				},
+				"LSEnvironmentUrl": {
+					"value": "@dataset().DSEnvironmentUrl",
+					"type": "Expression"
+				},
+				"LSSecretName": {
+					"value": "@dataset().DSSecretName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSClientId": {
+				"type": "string"
+			},
+			"DSAPIVersion": {
+				"type": "string"
+			},
+			"DSEnvironmentUrl": {
+				"type": "string"
+			},
+			"DSSecretName": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "SalesforceV2Object",
+		"schema": []
+	}
+}

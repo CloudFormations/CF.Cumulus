@@ -1,0 +1,64 @@
+{
+	"name": "Ingest_DS_DataLake_Excel",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_DataLake_MIAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSStorageName": {
+					"value": "@dataset().DSStorageName",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSSheetName": {
+				"type": "string"
+			},
+			"DSContainerName": {
+				"type": "string"
+			},
+			"DSDirectoryName": {
+				"type": "string"
+			},
+			"DSFileName": {
+				"type": "string"
+			},
+			"DSStorageName": {
+				"type": "string"
+			},
+			"DSCellRange": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"sheetName": {
+				"value": "@dataset().DSSheetName",
+				"type": "Expression"
+			},
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().DSFileName",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().DSDirectoryName",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().DSContainerName",
+					"type": "Expression"
+				}
+			},
+			"range": "@dataset().DSCellRange",
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	}
+}

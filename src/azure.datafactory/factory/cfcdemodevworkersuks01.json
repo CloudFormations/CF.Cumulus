@@ -1,0 +1,17 @@
+{
+	"name": "cfcdemodevworkersuks01",
+	"properties": {
+		"globalParameters": {
+			"envName": {
+				"type": "String",
+				"value": "Dev"
+			}
+		}
+	},
+	"location": "uksouth",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "3aa0e71a-8eb7-4dc1-8c57-81a52eb8f1be",
+		"tenantId": "d562890e-82fc-42c7-8033-b62200df3d96"
+	}
+}

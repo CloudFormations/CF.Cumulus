@@ -1,0 +1,15 @@
+{
+	"name": "Common_LS_cumulusdatabase",
+	"properties": {
+		"description": "Connection between ADF and processing framework metadata SQLDB.",
+		"annotations": [
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Common"
+		],
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcumulusdevsqluks25.database.windows.net;Initial Catalog=cfcumulusdevsqldbuks25"
+		}
+	}
+}

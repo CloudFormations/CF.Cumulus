@@ -1,0 +1,47 @@
+{
+	"name": "Ingest_DS_SQLServer_SQLAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_SQLServer_SQLAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSHostName": {
+					"value": "@dataset().DSHostName",
+					"type": "Expression"
+				},
+				"LSDatabaseName": {
+					"value": "@dataset().DSDatabaseName",
+					"type": "Expression"
+				},
+				"LSUsername": {
+					"value": "@dataset().DSUsername",
+					"type": "Expression"
+				},
+				"LSPassword": {
+					"value": "@dataset().DSPassword",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSHostName": {
+				"type": "string"
+			},
+			"DSDatabaseName": {
+				"type": "string"
+			},
+			"DSUsername": {
+				"type": "string"
+			},
+			"DSPassword": {
+				"type": "string"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": []
+	}
+}

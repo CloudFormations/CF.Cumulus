@@ -1,0 +1,15 @@
+{
+	"name": "Common_LS_cumuluskeys",
+	"properties": {
+		"description": "Connection to Key Vault for all other ADF linked service credentials required to run the processing framework.",
+		"annotations": [
+			"Cloud Formations",
+			"CF.Cumulus",
+			"Common"
+		],
+		"type": "AzureKeyVault",
+		"typeProperties": {
+			"baseUrl": "https://cfcdemodevkvuks01.vault.azure.net/"
+		}
+	}
+}

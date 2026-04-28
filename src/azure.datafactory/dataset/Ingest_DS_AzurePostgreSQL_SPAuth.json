@@ -1,0 +1,68 @@
+{
+	"name": "Ingest_DS_AzurePostgreSQL_SPAuth",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Ingest_LS_AzurePostgreSQL_SPAuth",
+			"type": "LinkedServiceReference",
+			"parameters": {
+				"LSServicePrincipalKey": {
+					"value": "@dataset().DSServicePrincipalKey",
+					"type": "Expression"
+				},
+				"LSHostName": {
+					"value": "@dataset().DSHostName",
+					"type": "Expression"
+				},
+				"LSPortNumber": {
+					"value": "@dataset().DSPortNumber",
+					"type": "Expression"
+				},
+				"LSDatabaseName": {
+					"value": "@dataset().DSDatabaseName",
+					"type": "Expression"
+				},
+				"LSServicePrincipalName": {
+					"value": "@dataset().DSServicePrincipalName",
+					"type": "Expression"
+				},
+				"LSTenant": {
+					"value": "@dataset().DSTenant",
+					"type": "Expression"
+				},
+				"LSServicePrincipalID": {
+					"value": "@dataset().DSServicePrincipalID",
+					"type": "Expression"
+				}
+			}
+		},
+		"parameters": {
+			"DSServicePrincipalKey": {
+				"type": "String"
+			},
+			"DSHostName": {
+				"type": "String"
+			},
+			"DSPortNumber": {
+				"type": "String"
+			},
+			"DSDatabaseName": {
+				"type": "String"
+			},
+			"DSServicePrincipalName": {
+				"type": "String"
+			},
+			"DSTenant": {
+				"type": "String"
+			},
+			"DSServicePrincipalID": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Ingest"
+		},
+		"annotations": [],
+		"type": "AzurePostgreSqlTable",
+		"schema": []
+	}
+}
