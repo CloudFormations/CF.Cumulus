@@ -155,7 +155,7 @@ $clusterJSON = @"
     "azure_attributes": {
         "availability": "SPOT_WITH_FALLBACK_AZURE"
     },
-    "node_type_id": "Standard_D4ds_v5",
+    "node_type_id": "Standard_DS3_v2",
     "autotermination_minutes": 20,
     "is_single_node": true
 }
