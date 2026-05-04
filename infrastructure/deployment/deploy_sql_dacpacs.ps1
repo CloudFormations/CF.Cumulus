@@ -103,31 +103,31 @@ dotnet build "$sourceFolderPath\src\metadata.common\metadata.common.sqlproj" `
     /p:NetCoreBuild=true `
     /p:SqlServerVersion=Azure
 
-Write-Host "Building control SQL DACPAC project..." -ForegroundColor Yellow
-dotnet build "$sourceFolderPath\src\metadata.control\metadata.control.sqlproj" `
-    --configuration $configuration `
-    /p:NetCoreBuild=true `
-    /p:SqlServerVersion=Azure
+# Write-Host "Building control SQL DACPAC project..." -ForegroundColor Yellow
+# dotnet build "$sourceFolderPath\src\metadata.control\metadata.control.sqlproj" `
+#     --configuration $configuration `
+#     /p:NetCoreBuild=true `
+#     /p:SqlServerVersion=Azure
 
-Write-Host "Building ingest SQL DACPAC project..." -ForegroundColor Yellow
-dotnet build "$sourceFolderPath\src\metadata.ingest\metadata.ingest.sqlproj" `
-    --configuration $configuration `
-    /p:NetCoreBuild=true `
-    /p:SqlServerVersion=Azure
+# Write-Host "Building ingest SQL DACPAC project..." -ForegroundColor Yellow
+# dotnet build "$sourceFolderPath\src\metadata.ingest\metadata.ingest.sqlproj" `
+#     --configuration $configuration `
+#     /p:NetCoreBuild=true `
+#     /p:SqlServerVersion=Azure
 
-Write-Host "Building transform SQL DACPAC project..." -ForegroundColor Yellow
-dotnet build "$sourceFolderPath\src\metadata.transform\metadata.transform.sqlproj" `
-    --configuration $configuration `
-    /p:NetCoreBuild=true `
-    /p:SqlServerVersion=Azure
+# Write-Host "Building transform SQL DACPAC project..." -ForegroundColor Yellow
+# dotnet build "$sourceFolderPath\src\metadata.transform\metadata.transform.sqlproj" `
+#     --configuration $configuration `
+#     /p:NetCoreBuild=true `
+#     /p:SqlServerVersion=Azure
 
-if ($deployData) {
-    Write-Host "Building data SQL DACPAC project..." -ForegroundColor Yellow
-    dotnet build "$sourceFolderPath\src\metadata.data\metadata.data.sqlproj" `
-        --configuration $configuration `
-        /p:NetCoreBuild=true `
-        /p:SqlServerVersion=Azure
-}
+# if ($deployData) {
+#     Write-Host "Building data SQL DACPAC project..." -ForegroundColor Yellow
+#     dotnet build "$sourceFolderPath\src\metadata.data\metadata.data.sqlproj" `
+#         --configuration $configuration `
+#         /p:NetCoreBuild=true `
+#         /p:SqlServerVersion=Azure
+# }
 
 # ============================================
 # Publish the core set of DacPacs + PostDeployment Scripts
@@ -146,62 +146,62 @@ SqlPackage /Action:Publish `
     /v:SubscriptionID=$subscriptionId `
     /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
 
-Write-Host "Publishing the control schema objects..." -ForegroundColor Yellow
-SqlPackage /Action:Publish `
-    /SourceFile:"$sourceFolderPath\src\metadata.control\bin\Debug\metadata.control.dacpac" `
-    /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
-    /v:Environment=$environment `
-    /v:RGName=$resourceGroupName `
-    /v:SubscriptionID=$subscriptionId `
-    /v:ADFName=$dataFactoryName `
-    /v:TenantID=$tenantId `
-    /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
+# Write-Host "Publishing the control schema objects..." -ForegroundColor Yellow
+# SqlPackage /Action:Publish `
+#     /SourceFile:"$sourceFolderPath\src\metadata.control\bin\Debug\metadata.control.dacpac" `
+#     /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
+#     /v:Environment=$environment `
+#     /v:RGName=$resourceGroupName `
+#     /v:SubscriptionID=$subscriptionId `
+#     /v:ADFName=$dataFactoryName `
+#     /v:TenantID=$tenantId `
+#     /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
 
-Write-Host "Publishing the ingest schema objects..." -ForegroundColor Yellow
-SqlPackage /Action:Publish `
-    /SourceFile:"$sourceFolderPath\src\metadata.ingest\bin\Debug\metadata.ingest.dacpac" `
-    /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
-    /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
+# Write-Host "Publishing the ingest schema objects..." -ForegroundColor Yellow
+# SqlPackage /Action:Publish `
+#     /SourceFile:"$sourceFolderPath\src\metadata.ingest\bin\Debug\metadata.ingest.dacpac" `
+#     /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
+#     /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
     
-Write-Host "Publishing the transform schema objects..." -ForegroundColor Yellow
-SqlPackage /Action:Publish `
-    /SourceFile:"$sourceFolderPath\src\metadata.transform\bin\Debug\metadata.transform.dacpac" `
-    /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
-    /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
+# Write-Host "Publishing the transform schema objects..." -ForegroundColor Yellow
+# SqlPackage /Action:Publish `
+#     /SourceFile:"$sourceFolderPath\src\metadata.transform\bin\Debug\metadata.transform.dacpac" `
+#     /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
+#     /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
 
-# ============================================
-# Publish the data PostDeployment Scripts
-# ============================================
-if ($deployData) {
-    Write-Host "Publishing and populating the metadata-as-code ..." -ForegroundColor Yellow
-    SqlPackage /Action:Publish `
-        /SourceFile:"$sourceFolderPath\src\metadata.data\bin\Debug\metadata.data.dacpac" `
-        /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
-        /v:ADFName=$dataFactoryName `
-        /v:DemoConnectionLocation=$demoConnectionLocation `
-        /v:DemoKVSecret=$demoKVSecret `
-        /v:DemoLinkedService=$demoLinkedService `
-        /v:DemoResourceName=$demoResourceName `
-        /v:DemoSourceLocation=$demoSourceLocation `
-        /v:DemoUsername=$demoUsername
-}
+# # ============================================
+# # Publish the data PostDeployment Scripts
+# # ============================================
+# if ($deployData) {
+#     Write-Host "Publishing and populating the metadata-as-code ..." -ForegroundColor Yellow
+#     SqlPackage /Action:Publish `
+#         /SourceFile:"$sourceFolderPath\src\metadata.data\bin\Debug\metadata.data.dacpac" `
+#         /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
+#         /v:ADFName=$dataFactoryName `
+#         /v:DemoConnectionLocation=$demoConnectionLocation `
+#         /v:DemoKVSecret=$demoKVSecret `
+#         /v:DemoLinkedService=$demoLinkedService `
+#         /v:DemoResourceName=$demoResourceName `
+#         /v:DemoSourceLocation=$demoSourceLocation `
+#         /v:DemoUsername=$demoUsername
+# }
 
-# ============================================
-# Set Entra AD Admin to current user
-# ============================================
-Write-Host "Setting current user as Entra AD Admin..."
-$userDetails = az ad signed-in-user show --query userPrincipalName --output tsv
-$userId = az ad signed-in-user show --query id --output tsv
-az sql server ad-admin create --resource-group $resourceGroupName --server $sqlServerName --display-name $userDetails --object-id $userId
+# # ============================================
+# # Set Entra AD Admin to current user
+# # ============================================
+# Write-Host "Setting current user as Entra AD Admin..."
+# $userDetails = az ad signed-in-user show --query userPrincipalName --output tsv
+# $userId = az ad signed-in-user show --query id --output tsv
+# az sql server ad-admin create --resource-group $resourceGroupName --server $sqlServerName --display-name $userDetails --object-id $userId
 
-# ============================================
-# Provision Role assignments for ADF SPN
-# ============================================
-Write-Host "Grant Access for ADF on Metadata Database..."
-$createADFUserScript = $currentLocation + '\grant_adf_access.ps1'
-& $createADFUserScript `
-    -sqlServerName $sqlServerName `
-    -sqlDatabaseName $sqlDatabaseName `
-    -dataFactoryName $dataFactoryName
+# # ============================================
+# # Provision Role assignments for ADF SPN
+# # ============================================
+# Write-Host "Grant Access for ADF on Metadata Database..."
+# $createADFUserScript = $currentLocation + '\grant_adf_access.ps1'
+# & $createADFUserScript `
+#     -sqlServerName $sqlServerName `
+#     -sqlDatabaseName $sqlDatabaseName `
+#     -dataFactoryName $dataFactoryName
 
-Remove-Variable sqlPassword 
+# Remove-Variable sqlPassword 

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.Build.Sql/0.1.14-preview">
+﻿<Project Sdk="Microsoft.Build.Sql/2.1.0">
   <!-- =========================
        Global Project Settings
        ========================= -->
@@ -20,7 +20,7 @@
     <SqlServerVerification>false</SqlServerVerification>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <!-- Required for CI / SDK builds -->
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ProjectGuid>{00000000-0000-0000-0000-000000000000}</ProjectGuid>
   </PropertyGroup>
   <!-- =========================
