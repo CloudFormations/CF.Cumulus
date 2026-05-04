@@ -94,35 +94,35 @@ $sourceFolderPath = $currentLocation -replace '\\infrastructure\\deployment'
 # Build DacPacs
 # ============================================
 
-Write-Host "Building SQL DACPAC projects..."
+Write-Host "Building SQL DACPAC projects..." -ForegroundColor Green
 $configuration = "Debug"
 
-Write-Host "Building common SQL DACPAC project..."
+Write-Host "Building common SQL DACPAC project..." c
 dotnet build "$sourceFolderPath\src\metadata.common\metadata.common.sqlproj" `
     --configuration $configuration `
     /p:NetCoreBuild=true `
     /p:SqlServerVersion=Azure
 
-Write-Host "Building control SQL DACPAC project..."
+Write-Host "Building control SQL DACPAC project..." -ForegroundColor Yellow
 dotnet build "$sourceFolderPath\src\metadata.control\metadata.control.sqlproj" `
     --configuration $configuration `
     /p:NetCoreBuild=true `
     /p:SqlServerVersion=Azure
 
-Write-Host "Building ingest SQL DACPAC project..."
+Write-Host "Building ingest SQL DACPAC project..." -ForegroundColor Yellow
 dotnet build "$sourceFolderPath\src\metadata.ingest\metadata.ingest.sqlproj" `
     --configuration $configuration `
     /p:NetCoreBuild=true `
     /p:SqlServerVersion=Azure
 
-Write-Host "Building transform SQL DACPAC project..."
+Write-Host "Building transform SQL DACPAC project..." -ForegroundColor Yellow
 dotnet build "$sourceFolderPath\src\metadata.transform\metadata.transform.sqlproj" `
     --configuration $configuration `
     /p:NetCoreBuild=true `
     /p:SqlServerVersion=Azure
 
 if ($deployData) {
-    Write-Host "Building data SQL DACPAC project..."
+    Write-Host "Building data SQL DACPAC project..." -ForegroundColor Yellow
     dotnet build "$sourceFolderPath\src\metadata.data\metadata.data.sqlproj" `
         --configuration $configuration `
         /p:NetCoreBuild=true `
@@ -133,7 +133,7 @@ if ($deployData) {
 # Publish the core set of DacPacs + PostDeployment Scripts
 # ============================================
 
-Write-Host "Publishing the common schema objects..."
+Write-Host "Publishing the common schema objects..." -ForegroundColor Green
 SqlPackage /Action:Publish `
     /SourceFile:"$sourceFolderPath\src\metadata.common\bin\Debug\metadata.common.dacpac" `
     /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
@@ -146,7 +146,7 @@ SqlPackage /Action:Publish `
     /v:SubscriptionID=$subscriptionId `
     /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
 
-Write-Host "Publishing the control schema objects..."
+Write-Host "Publishing the control schema objects..." -ForegroundColor Yellow
 SqlPackage /Action:Publish `
     /SourceFile:"$sourceFolderPath\src\metadata.control\bin\Debug\metadata.control.dacpac" `
     /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
@@ -157,13 +157,13 @@ SqlPackage /Action:Publish `
     /v:TenantID=$tenantId `
     /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
 
-Write-Host "Publishing the ingest schema objects..."
+Write-Host "Publishing the ingest schema objects..." -ForegroundColor Yellow
 SqlPackage /Action:Publish `
     /SourceFile:"$sourceFolderPath\src\metadata.ingest\bin\Debug\metadata.ingest.dacpac" `
     /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
     /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
     
-Write-Host "Publishing the transform schema objects..."
+Write-Host "Publishing the transform schema objects..." -ForegroundColor Yellow
 SqlPackage /Action:Publish `
     /SourceFile:"$sourceFolderPath\src\metadata.transform\bin\Debug\metadata.transform.dacpac" `
     /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
@@ -173,7 +173,7 @@ SqlPackage /Action:Publish `
 # Publish the data PostDeployment Scripts
 # ============================================
 if ($deployData) {
-    Write-Host "Publishing and populating the metadata-as-code ..."
+    Write-Host "Publishing and populating the metadata-as-code ..." -ForegroundColor Yellow
     SqlPackage /Action:Publish `
         /SourceFile:"$sourceFolderPath\src\metadata.data\bin\Debug\metadata.data.dacpac" `
         /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `

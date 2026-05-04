@@ -17,14 +17,14 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $keyVaultUri,
 
-    [Parameter(Mandatory = $false)]
-    [string] $secretScopeName = "CumulusScope01",
-
     [Parameter(Mandatory = $true)]
     [string] $databricksWorkspaceURL,
 
     [Parameter(Mandatory = $true)]
     [string] $storageAccountName,
+
+    [Parameter(Mandatory = $false)]
+    [string] $secretScopeName = "CumulusScope01",
 
     [Parameter(Mandatory = $false)]
     [string] $clusterName = "General Purpose Cluster"
