@@ -72,7 +72,7 @@ var databricksManagedResourceGroupName = '${namePrefix}mrg${nameSuffix}'
 var keyVaultName = '${namePrefix}kv${nameSuffix}'
 
 var functionStorageName = '${namePrefix}${functionStorageNameShort}${nameSuffix}'
-var functionStorageContainerName = 'app-package-${functionStorageName}-bb6a' //Function app storage name prefix
+var functionStorageContainerName = 'app-package-${functionStorageName}' //Function app storage name prefix
 var functionAppName = '${namePrefix}func${nameSuffix}'
 var hostingPlanName = '${namePrefix}asp${nameSuffix}'
 
@@ -141,8 +141,8 @@ module storageAccountDeploy './modules/storage.template.bicep' = {
   scope: rg
   params: {
     envName: envName
-    isHnsEnabled: false
-    isSftpEnabled: false
+    isHnsEnabled: true
+    isSftpEnabled: true
     storageAccountName: storageAccountName
     keyVaultName: keyVaultName
     storageKind: 'StorageV2'

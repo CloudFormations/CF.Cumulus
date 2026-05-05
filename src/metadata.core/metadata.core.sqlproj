@@ -1,5 +1,4 @@
-﻿<Project Sdk="Microsoft.Build.Sql/0.1.14-preview">
-
+﻿<Project Sdk="Microsoft.Build.Sql/2.1.0">
   <!-- =========================
        Global Project Settings
        ========================= -->
@@ -7,29 +6,23 @@
     <Name>metadata.core</Name>
     <AssemblyName>metadata.core</AssemblyName>
     <RootNamespace>metadata.core</RootNamespace>
-
     <OutputType>Database</OutputType>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-
     <!-- Azure SQL -->
     <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
-
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
-
     <DeployToDatabase>true</DeployToDatabase>
     <IncludeCompositeObjects>true</IncludeCompositeObjects>
     <TargetDatabaseSet>true</TargetDatabaseSet>
     <SqlServerVerification>false</SqlServerVerification>
     <IncludeReferencedProjects>true</IncludeReferencedProjects>
-
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
-
     <!-- Required for CI / SDK builds -->
-    <TargetFramework>net472</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <ProjectGuid>{00000000-0000-0000-0000-000000000000}</ProjectGuid>
   </PropertyGroup>
-
   <!-- =========================
        Configuration
        ========================= -->
@@ -41,7 +34,6 @@
     <DefineTrace>true</DefineTrace>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <OutputPath>bin\Release\</OutputPath>
     <Optimize>true</Optimize>
@@ -50,7 +42,6 @@
     <DefineTrace>true</DefineTrace>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
-
   <!-- =========================
        Project References
        ========================= -->
@@ -60,36 +51,30 @@
     <ProjectReference Include="..\metadata.ingest\metadata.ingest.sqlproj" />
     <ProjectReference Include="..\metadata.transform\metadata.transform.sqlproj" />
   </ItemGroup>
-
   <!-- =========================
        Deployment Scripts
        ========================= -->
   <ItemGroup>
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
-
   <!-- =========================
        SQLCMD Variables
        ========================= -->
   <ItemGroup>
-    <SqlCmdVariable Include="DLSName"           Value="$(SqlCmdVar__1)" />
-    <SqlCmdVariable Include="KeyVaultName"      Value="$(SqlCmdVar__4)" />
-    <SqlCmdVariable Include="RGName"            Value="$(SqlCmdVar__5)" />
-    <SqlCmdVariable Include="SubscriptionID"    Value="$(SqlCmdVar__6)" />
-    <SqlCmdVariable Include="DatabricksHost"    Value="$(SqlCmdVar__13)" />
-    <SqlCmdVariable Include="DatabricksWSName"  Value="$(SqlCmdVar__14)" />
-    <SqlCmdVariable Include="Environment"       Value="$(SqlCmdVar__15)" />
-    <SqlCmdVariable Include="TenantID"          Value="$(SqlCmdVar__16)" />
-    <SqlCmdVariable Include="ADFName"           Value="$(SqlCmdVar__17)" />
+    <SqlCmdVariable Include="DLSName" Value="$(SqlCmdVar__1)" />
+    <SqlCmdVariable Include="KeyVaultName" Value="$(SqlCmdVar__4)" />
+    <SqlCmdVariable Include="RGName" Value="$(SqlCmdVar__5)" />
+    <SqlCmdVariable Include="SubscriptionID" Value="$(SqlCmdVar__6)" />
+    <SqlCmdVariable Include="DatabricksHost" Value="$(SqlCmdVar__13)" />
+    <SqlCmdVariable Include="DatabricksWSName" Value="$(SqlCmdVar__14)" />
+    <SqlCmdVariable Include="Environment" Value="$(SqlCmdVar__15)" />
+    <SqlCmdVariable Include="TenantID" Value="$(SqlCmdVar__16)" />
+    <SqlCmdVariable Include="ADFName" Value="$(SqlCmdVar__17)" />
   </ItemGroup>
-
   <!-- =========================
        NetCore / CI Support
        ========================= -->
   <ItemGroup Condition="'$(NetCoreBuild)'=='true'">
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies"
-                      Version="1.0.0"
-                      PrivateAssets="All" />
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
-
 </Project>

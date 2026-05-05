@@ -62,4 +62,4 @@ $functionAppMasterKey = $functionAppKeys.masterKey
 az keyvault secret set `
     --vault-name $keyVaultName `
     --name "cumulusfunctionsKey" `
-    --value "'$functionAppMasterKey'"
+    --value $functionAppMasterKey

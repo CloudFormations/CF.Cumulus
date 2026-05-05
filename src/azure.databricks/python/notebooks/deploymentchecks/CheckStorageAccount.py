@@ -2,7 +2,9 @@
 
 # COMMAND ----------
 
-raw_container_path = "abfss://raw@mystorageaccount.dfs.core.windows.net/"
+dbutils.widgets.text("storage_account_name", "mystorageaccount")
+storage_account_name = dbutils.widgets.get("storage_account_name")
+raw_container_path = f"abfss://raw@{storage_account_name}.dfs.core.windows.net/"
 
 # COMMAND ----------
 try:
