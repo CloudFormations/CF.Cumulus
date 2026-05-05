@@ -141,8 +141,8 @@ module storageAccountDeploy './modules/storage.template.bicep' = {
   scope: rg
   params: {
     envName: envName
-    isHnsEnabled: false
-    isSftpEnabled: false
+    isHnsEnabled: true
+    isSftpEnabled: true
     storageAccountName: storageAccountName
     keyVaultName: keyVaultName
     storageKind: 'StorageV2'

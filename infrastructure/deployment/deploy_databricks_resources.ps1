@@ -27,7 +27,7 @@ param(
     [string] $secretScopeName = "CumulusScope01",
 
     [Parameter(Mandatory = $false)]
-    [string] $clusterName = "General Purpose Cluster"
+    [string] $clusterName = "CF.Cumulus.Ingest.Compute"
 )
 
 # ============================================
