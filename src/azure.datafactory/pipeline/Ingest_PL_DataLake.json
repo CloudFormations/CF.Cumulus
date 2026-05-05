@@ -138,7 +138,7 @@
 						"partitionOption": "None"
 					},
 					"dataset": {
-						"referenceName": "GetSetMetadata",
+						"referenceName": "Control_DS_GetSetMetadata",
 						"type": "DatasetReference"
 					},
 					"firstRowOnly": true
@@ -353,7 +353,7 @@
 							"userProperties": [],
 							"typeProperties": {
 								"pipeline": {
-									"referenceName": "Copy_Unpacked_File",
+									"referenceName": "Utils_PL_Copy_Unpacked_File",
 									"type": "PipelineReference"
 								},
 								"waitOnCompletion": true,

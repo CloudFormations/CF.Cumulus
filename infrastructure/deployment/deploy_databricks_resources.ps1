@@ -27,7 +27,10 @@ param(
     [string] $secretScopeName = "CumulusScope01",
 
     [Parameter(Mandatory = $false)]
-    [string] $clusterName = "CF.Cumulus.Ingest.Compute"
+    [string] $clusterName = "CF.Cumulus.Ingest.Compute",
+
+    [Parameter(Mandatory = $false)]
+    [string] $nodeTypeId = "Standard_D4s_v3"
 )
 
 # ============================================
@@ -155,7 +158,7 @@ $clusterJSON = @"
     "azure_attributes": {
         "availability": "SPOT_WITH_FALLBACK_AZURE"
     },
-    "node_type_id": "Standard_DS3_v2",
+    "node_type_id": "$nodeTypeId",
     "autotermination_minutes": 20,
     "is_single_node": true
 }

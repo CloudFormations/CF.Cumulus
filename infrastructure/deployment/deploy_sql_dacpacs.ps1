@@ -92,64 +92,73 @@ $sourceFolderPath = $currentLocation -replace '\\infrastructure\\deployment'
 
 # ============================================
 # Build DacPacs
+# control/ingest/transform all reference common, so common builds first,
+# then the three schema projects build in parallel.
 # ============================================
 
-Write-Host "Building SQL DACPAC projects..." -ForegroundColor Green
 $configuration = "Debug"
+$connStr       = "Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+$reportDir     = "$sourceFolderPath\src\metadata.core"
 
-Write-Host "Building common SQL DACPAC project..." c
+Write-Host "`nBuilding common (required first)..." -ForegroundColor Green
 dotnet build "$sourceFolderPath\src\metadata.common\metadata.common.sqlproj" `
     --configuration $configuration `
     /p:NetCoreBuild=true `
     /p:SqlServerVersion=Azure
 
-Write-Host "Building control SQL DACPAC project..." -ForegroundColor Yellow
-dotnet build "$sourceFolderPath\src\metadata.control\metadata.control.sqlproj" `
-    --configuration $configuration `
-    /p:NetCoreBuild=true `
-    /p:SqlServerVersion=Azure
-
-Write-Host "Building ingest SQL DACPAC project..." -ForegroundColor Yellow
-dotnet build "$sourceFolderPath\src\metadata.ingest\metadata.ingest.sqlproj" `
-    --configuration $configuration `
-    /p:NetCoreBuild=true `
-    /p:SqlServerVersion=Azure
-
-Write-Host "Building transform SQL DACPAC project..." -ForegroundColor Yellow
-dotnet build "$sourceFolderPath\src\metadata.transform\metadata.transform.sqlproj" `
-    --configuration $configuration `
-    /p:NetCoreBuild=true `
-    /p:SqlServerVersion=Azure
+Write-Host "Building control / ingest / transform in parallel..." -ForegroundColor Yellow
+$buildJobs = @(
+    Start-Job -Name "build-control" -ScriptBlock {
+        dotnet build $using:sourceFolderPath\src\metadata.control\metadata.control.sqlproj `
+            --configuration $using:configuration /p:NetCoreBuild=true /p:SqlServerVersion=Azure
+    }
+    Start-Job -Name "build-ingest" -ScriptBlock {
+        dotnet build $using:sourceFolderPath\src\metadata.ingest\metadata.ingest.sqlproj `
+            --configuration $using:configuration /p:NetCoreBuild=true /p:SqlServerVersion=Azure
+    }
+    Start-Job -Name "build-transform" -ScriptBlock {
+        dotnet build $using:sourceFolderPath\src\metadata.transform\metadata.transform.sqlproj `
+            --configuration $using:configuration /p:NetCoreBuild=true /p:SqlServerVersion=Azure
+    }
+)
 
 if ($deployData) {
-    Write-Host "Building data SQL DACPAC project..." -ForegroundColor Yellow
-    dotnet build "$sourceFolderPath\src\metadata.data\metadata.data.sqlproj" `
-        --configuration $configuration `
-        /p:NetCoreBuild=true `
-        /p:SqlServerVersion=Azure
+    $buildJobs += Start-Job -Name "build-data" -ScriptBlock {
+        dotnet build $using:sourceFolderPath\src\metadata.data\metadata.data.sqlproj `
+            --configuration $using:configuration /p:NetCoreBuild=true /p:SqlServerVersion=Azure
+    }
 }
+
+$buildJobs | Wait-Job | Receive-Job
+$buildJobs | Remove-Job
 
 # ============================================
 # Publish the core set of DacPacs + PostDeployment Scripts
+# common must publish before the schema-specific projects (they reference
+# its objects at runtime). control / ingest / transform target different
+# schemas and have no cross-dependencies, so they publish in parallel.
+# /p:ScriptDatabaseOptions=false skips the DB-level options round-trip,
+# which is the single biggest per-publish time saving.
 # ============================================
 
-Write-Host "Publishing the common schema objects..." -ForegroundColor Green
+Write-Host "`nPublishing common schema objects (required first)..." -ForegroundColor Green
 SqlPackage /Action:Publish `
-    /SourceFile:"$sourceFolderPath\src\metadata.common\bin\Debug\metadata.common.dacpac" `
-    /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
+    "/SourceFile:$sourceFolderPath\src\metadata.common\bin\Debug\metadata.common.dacpac" `
+    "/TargetConnectionString:$connStr" `
     /v:DatabricksWSName=$databricksWorkspaceName `
-    /v:DatabricksHost="https://$databricksWorkspaceURL" `
+    "/v:DatabricksHost=https://$databricksWorkspaceURL" `
     /v:DLSName=$storageAccountName `
     /v:Environment=$environment `
     /v:KeyVaultName=$keyVaultName `
     /v:RGName=$resourceGroupName `
     /v:SubscriptionID=$subscriptionId `
-    /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
+    /p:ScriptDatabaseOptions=false `
+    "/DeployReportPath:$reportDir\deploy-report-common.xml"
 
-Write-Host "Publishing the control schema objects..." -ForegroundColor Yellow
+Write-Host "Publishing the control schema objects..."
 SqlPackage /Action:Publish `
-    /SourceFile:"$sourceFolderPath\src\metadata.control\bin\Debug\metadata.control.dacpac" `
-    /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
+    "/SourceFile:$sourceFolderPath\src\metadata.control\bin\Debug\metadata.control.dacpac" `
+    "/TargetConnectionString:$connStr" `
     /v:Environment=$environment `
     /v:RGName=$resourceGroupName `
     /v:SubscriptionID=$subscriptionId `
@@ -157,17 +166,33 @@ SqlPackage /Action:Publish `
     /v:TenantID=$tenantId `
     /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
 
-Write-Host "Publishing the ingest schema objects..." -ForegroundColor Yellow
-SqlPackage /Action:Publish `
-    /SourceFile:"$sourceFolderPath\src\metadata.ingest\bin\Debug\metadata.ingest.dacpac" `
-    /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
-    /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
-    
-Write-Host "Publishing the transform schema objects..." -ForegroundColor Yellow
-SqlPackage /Action:Publish `
-    /SourceFile:"$sourceFolderPath\src\metadata.transform\bin\Debug\metadata.transform.dacpac" `
-    /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
-    /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
+
+Write-Host "Publishing ingest / transform in parallel..." -ForegroundColor Yellow
+$publishJobs = @(
+    Start-Job -Name "publish-ingest" -ScriptBlock {
+        param($conn, $src, $report)
+        & SqlPackage /Action:Publish `
+            "/SourceFile:$src\metadata.ingest\bin\Debug\metadata.ingest.dacpac" `
+            "/TargetConnectionString:$conn" `
+            /p:ScriptDatabaseOptions=false `
+            "/DeployReportPath:$report\deploy-report-ingest.xml"
+    } -ArgumentList $connStr, "$sourceFolderPath\src", $reportDir
+
+    Start-Job -Name "publish-transform" -ScriptBlock {
+        param($conn, $src, $report)
+        & SqlPackage /Action:Publish `
+            "/SourceFile:$src\metadata.transform\bin\Debug\metadata.transform.dacpac" `
+            "/TargetConnectionString:$conn" `
+            /p:ScriptDatabaseOptions=false `
+            "/DeployReportPath:$report\deploy-report-transform.xml"
+    } -ArgumentList $connStr, "$sourceFolderPath\src", $reportDir
+)
+
+$publishJobs | Wait-Job | Receive-Job
+if ($publishJobs | Where-Object { $_.State -eq "Failed" }) {
+    throw "One or more schema publishes failed. Check output above."
+}
+$publishJobs | Remove-Job
 
 # ============================================
 # Publish the data PostDeployment Scripts
@@ -175,15 +200,16 @@ SqlPackage /Action:Publish `
 if ($deployData) {
     Write-Host "Publishing and populating the metadata-as-code ..." -ForegroundColor Yellow
     SqlPackage /Action:Publish `
-        /SourceFile:"$sourceFolderPath\src\metadata.data\bin\Debug\metadata.data.dacpac" `
-        /TargetConnectionString:"Server=tcp:$sqlServerName.database.windows.net,1433;Initial Catalog=$sqlDatabaseName;Persist Security Info=False;User ID=$sqlLogin;Password=$sqlPassword;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;" `
+        "/SourceFile:$sourceFolderPath\src\metadata.data\bin\Debug\metadata.data.dacpac" `
+        "/TargetConnectionString:$connStr" `
         /v:ADFName=$dataFactoryName `
         /v:DemoConnectionLocation=$demoConnectionLocation `
         /v:DemoKVSecret=$demoKVSecret `
         /v:DemoLinkedService=$demoLinkedService `
         /v:DemoResourceName=$demoResourceName `
         /v:DemoSourceLocation=$demoSourceLocation `
-        /v:DemoUsername=$demoUsername
+        /v:DemoUsername=$demoUsername `
+        /p:ScriptDatabaseOptions=false
 }
 
 # ============================================

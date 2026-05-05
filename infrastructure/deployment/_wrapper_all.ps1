@@ -177,7 +177,7 @@ $deploySQLDacPacsScript = Join-Path $currentLocation "deploy_sql_dacpacs.ps1"
     -dataFactoryName $dataFactoryName
 
 # ============================================
-# Final Timer
+# Final Deployment Timer
 # ============================================
 $processTimerEnd = $processTimerStart.Elapsed
 $elapsedTime = "{0:00}:{1:00}:{2:00}.{3:00}" -f `
@@ -187,6 +187,23 @@ $elapsedTime = "{0:00}:{1:00}:{2:00}.{3:00}" -f `
     ($processTimerEnd.Milliseconds / 10)
 
 Write-Host "Deployment Complete! Elapsed Time $elapsedTime`r`n"
+
+
+# ============================================
+# Post Deployment Checks and Report
+# ============================================
+$checkDeployment = Join-Path $currentLocation "check_deployment.ps1"
+
+& $checkDeployment `
+    -subscriptionId $subscriptionId `
+    -resourceGroupName $resourceGroupName `
+    -functionAppName $functionAppName `
+    -dataFactoryName $dataFactoryName `
+    -databricksWorkspaceName $databricksWorkspaceName `
+    -keyVaultNames @($keyVaultName) `
+    -storageAccountNames @($storageAccountName) `
+    -sqlServerName $sqlServerName `
+    -sqlDatabaseName $sqlDatabaseName
 
 # ============================================
 # Cleanup - Clear environment variables

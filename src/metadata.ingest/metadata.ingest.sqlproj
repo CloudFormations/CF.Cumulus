@@ -56,14 +56,6 @@
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
   <!-- =========================
-       Special-case SQL files
-       ========================= -->
-  <ItemGroup>
-    <Build Include="ingest\Functions\GetIngestLoadAction.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Build>
-  </ItemGroup>
-  <!-- =========================
        NetCore / CI Support
        ========================= -->
   <ItemGroup Condition="'$(NetCoreBuild)'=='true'">

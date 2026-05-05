@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure.datafactory", "azure.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "dataset", "dataset", "{7047C075-A03D-4F74-824B-3A541E686765}"
 	ProjectSection(SolutionItems) = preProject
-		azure.datafactory\dataset\GetSetMetadata.json = azure.datafactory\dataset\GetSetMetadata.json
+		azure.datafactory\dataset\Control_DS_GetSetMetadata.json = azure.datafactory\dataset\Control_DS_GetSetMetadata.json
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "factory", "factory", "{21EB09F3-646D-4DBA-A33D-5D83D83C178D}"

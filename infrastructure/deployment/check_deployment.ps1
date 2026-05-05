@@ -39,7 +39,10 @@ param(
     [string] $clusterName = "CF.Cumulus.Ingest.Compute",
 
     [Parameter(Mandatory = $false)]
-    [string] $secretScopeName = "CumulusScope01"
+    [string] $secretScopeName = "CumulusScope01",
+
+    [Parameter(Mandatory = $false)]
+    [boolean] $generateReport = $true
 )
 
 # ============================================
@@ -195,6 +198,7 @@ foreach ($saScope in $storageScopes) {
             -Role           "Storage Blob Data Contributor" `
             -Scope          $saScope `
             -SubscriptionId $subscriptionId)) `
+        -Detail   "Optional: Databricks accesses storage via cluster Spark config (secret scope key) rather than MI role assignment" `
         -WarnOnly
 }
 
@@ -360,13 +364,15 @@ if ($null -ne $databricksToken) {
     $script:dbHeaders = @{ Authorization = "Bearer $databricksToken" }
     $notebookRoot     = "/Workspace/Shared/Live/files/deploymentchecks"
     $clusterId        = $null
+    $clusterState     = $null
 
-    # Check 1: Cluster exists
+    # Check 1: Cluster exists (reports current state in detail)
     try {
-        $clusterList   = Invoke-RestMethod -Uri "$databricksHost/api/2.0/clusters/list" `
+        $clusterList    = Invoke-RestMethod -Uri "$databricksHost/api/2.0/clusters/list" `
             -Headers $script:dbHeaders -Method Get -ErrorAction Stop
         $matchedCluster = $clusterList.clusters | Where-Object { $_.cluster_name -eq $clusterName }
         $clusterId      = $matchedCluster.cluster_id
+        $clusterState   = $matchedCluster.state
 
         Add-CheckResult `
             -Name   "Databricks cluster '$clusterName' exists" `
@@ -396,7 +402,56 @@ if ($null -ne $databricksToken) {
             -Detail $_.Exception.Message
     }
 
+    # Ensure cluster is RUNNING before notebook checks (checks 3 & 4)
+    $clusterReady = $false
     if ($null -ne $clusterId) {
+        if ($clusterState -eq "RUNNING") {
+            $clusterReady = $true
+        }
+        elseif ($clusterState -in @("TERMINATED", "PENDING", "RESTARTING", "RESIZING")) {
+
+            if ($clusterState -eq "TERMINATED") {
+                Write-Host "  Cluster '$clusterName' is TERMINATED — starting it for notebook checks..." -ForegroundColor Yellow
+                try {
+                    Invoke-RestMethod -Uri "$databricksHost/api/2.0/clusters/start" `
+                        -Headers      $script:dbHeaders `
+                        -Method       Post `
+                        -Body         (@{ cluster_id = $clusterId } | ConvertTo-Json) `
+                        -ContentType  "application/json" `
+                        -ErrorAction  Stop | Out-Null
+                }
+                catch {
+                    Write-Host "  WARNING: Could not start cluster — $($_.Exception.Message)" -ForegroundColor Yellow
+                }
+            }
+            else {
+                Write-Host "  Cluster '$clusterName' is $clusterState — waiting for it to be RUNNING..." -ForegroundColor Yellow
+            }
+
+            Write-Host "  NOTE: Notebook checks 3 & 4 will run once the cluster is RUNNING. Waiting up to 10 minutes..." -ForegroundColor Yellow
+            $clusterDeadline = (Get-Date).AddMinutes(10)
+            do {
+                Start-Sleep -Seconds 30
+                $clusterInfo  = Invoke-RestMethod -Uri "$databricksHost/api/2.0/clusters/get?cluster_id=$clusterId" `
+                    -Headers $script:dbHeaders -Method Get
+                $clusterState = $clusterInfo.state
+                Write-Host "    ... cluster state: $clusterState" -ForegroundColor Gray
+            } while ($clusterState -ne "RUNNING" -and (Get-Date) -lt $clusterDeadline)
+
+            $clusterReady = ($clusterState -eq "RUNNING")
+            if (-not $clusterReady) {
+                Write-Host "  WARNING: Cluster did not reach RUNNING within 10 minutes — skipping notebook checks." -ForegroundColor Yellow
+            }
+        }
+        else {
+            Write-Host "  WARNING: Cluster '$clusterName' is in state '$clusterState' — skipping notebook checks." -ForegroundColor Yellow
+        }
+    }
+    else {
+        Write-Host "  Skipping notebook checks — cluster '$clusterName' not found." -ForegroundColor Yellow
+    }
+
+    if ($clusterReady) {
 
         # Check 3: CheckSecretScope notebook
         try {
@@ -435,9 +490,6 @@ if ($null -ne $databricksToken) {
                     -Detail $_.Exception.Message
             }
         }
-    }
-    else {
-        Write-Host "  Skipping notebook checks — cluster '$clusterName' not found." -ForegroundColor Yellow
     }
 }
 
@@ -535,6 +587,49 @@ if (-not $allPassed) {
 }
 
 Write-Host "============================================`n" -ForegroundColor $colour
+
+# ============================================
+# Markdown Report
+# ============================================
+if ($generateReport) {
+    $runTime     = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+    $overallText = if ($allPassed) { "PASSED" } else { "FAILED" }
+    $warnSuffix  = if ($warnCount -gt 0) { " · $warnCount warning$(if ($warnCount -ne 1) { 's' })" } else { "" }
+    $failSuffix  = if ($failCount -gt 0) { " · $failCount failure$(if ($failCount -ne 1) { 's' })" } else { "" }
+
+    $md = [System.Text.StringBuilder]::new()
+    [void]$md.AppendLine("# Deployment Check Report")
+    [void]$md.AppendLine("")
+    [void]$md.AppendLine("| | |")
+    [void]$md.AppendLine("|---|---|")
+    [void]$md.AppendLine("| **Run** | $runTime |")
+    [void]$md.AppendLine("| **Result** | $overallText |")
+    [void]$md.AppendLine("| **Summary** | $passCount / $total passed$warnSuffix$failSuffix |")
+    [void]$md.AppendLine("")
+    [void]$md.AppendLine("## Checks")
+    [void]$md.AppendLine("")
+    [void]$md.AppendLine("| Status | Check | Detail |")
+    [void]$md.AppendLine("|--------|-------|--------|")
+
+    foreach ($r in $checkResults) {
+        $icon   = if ($r.Passed) { "✅ PASS" } elseif ($r.WarnOnly) { "⚠️ WARN" } else { "❌ FAIL" }
+        $detail = if ($r.Detail) { $r.Detail } else { "" }
+        [void]$md.AppendLine("| $icon | $($r.Name) | $detail |")
+    }
+
+    if (-not $allPassed) {
+        [void]$md.AppendLine("")
+        [void]$md.AppendLine("## Failures")
+        [void]$md.AppendLine("")
+        $checkResults | Where-Object { -not $_.Passed -and -not $_.WarnOnly } | ForEach-Object {
+            [void]$md.AppendLine("- ❌ **$($_.Name)**$(if ($_.Detail) { ": $($_.Detail)" })")
+        }
+    }
+
+    $reportPath = Join-Path $PSScriptRoot "deployment-check-report.md"
+    $md.ToString() | Out-File -FilePath $reportPath -Encoding utf8 -Force
+    Write-Host "  Report written to: $reportPath" -ForegroundColor Cyan
+}
 
 if (-not $allPassed) {
     throw "Deployment check failed: $failCount of $total checks did not pass."
