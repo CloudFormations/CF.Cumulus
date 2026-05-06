@@ -1,8 +1,10 @@
 CREATE TABLE [transform].[Datasets](
 	[DatasetId] [int] IDENTITY(1,1) NOT NULL,
-	[ComputeConnectionFK] [int] NOT NULL,
 	[CreateNotebookFK] [int] NULL,
 	[BusinessLogicNotebookFK] [int] NULL,
+	[CleansedStorageConnectionFK] [int] NULL,	
+	[CuratedStorageConnectionFK] [int] NULL,
+	[DomainName] [nvarchar](100) NOT NULL,
 	[SchemaName] [nvarchar](100) NOT NULL,
 	[DatasetName] [nvarchar](100) NOT NULL,
 	[VersionNumber] [int] NOT NULL,

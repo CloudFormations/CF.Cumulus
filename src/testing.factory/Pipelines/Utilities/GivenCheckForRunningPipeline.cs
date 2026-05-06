@@ -16,9 +16,9 @@ namespace framework.testing.Pipelines.Utilities
             _helper = new UtilitiesHelper()
                 .WithBasicMetadata()
                 .WithTenantAndSubscriptionIds()
-                .WithParameter("PipelineName", "Check For Running Pipeline");
+                .WithParameter("PipelineName", "Utils_PL_Check_For_Running_Pipeline");
 
-            await _helper.RunPipeline("Check For Running Pipeline");
+            await _helper.RunPipeline("Utils_PL_Check_For_Running_Pipeline");
         }
 
         [Test]

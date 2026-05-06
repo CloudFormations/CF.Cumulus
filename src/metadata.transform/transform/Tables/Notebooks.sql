@@ -1,6 +1,7 @@
 CREATE TABLE [transform].[Notebooks](
 	[NotebookId] [int] IDENTITY(1,1) NOT NULL,
 	[NotebookTypeFK] [int] NOT NULL,
+	[ComputeConnectionFK] [int] NOT NULL,
 	[NotebookName] [nvarchar](100) NOT NULL,
 	[NotebookPath] [nvarchar](500) NOT NULL,
 	[Enabled] [bit] NOT NULL

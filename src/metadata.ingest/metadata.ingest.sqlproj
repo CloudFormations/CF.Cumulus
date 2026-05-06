@@ -1,99 +1,64 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project Sdk="Microsoft.Build.Sql/2.1.0">
+  <!-- =========================
+       Global Project Settings
+       ========================= -->
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <Name>metadata.ingest</Name>
+    <AssemblyName>metadata.ingest</AssemblyName>
+    <RootNamespace>metadata.ingest</RootNamespace>
+    <OutputType>Database</OutputType>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectVersion>4.1</ProjectVersion>
-    <ProjectGuid>{882d4321-8587-45d2-8db3-a88efb3fcb7a}</ProjectGuid>
+    <!-- Azure SQL -->
     <DSP>Microsoft.Data.Tools.Schema.Sql.SqlAzureV12DatabaseSchemaProvider</DSP>
-    <OutputType>Database</OutputType>
-    <RootPath>
-    </RootPath>
-    <RootNamespace>metadata.ingest</RootNamespace>
-    <AssemblyName>metadata.ingest</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
-    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
-    <DeployToDatabase>True</DeployToDatabase>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
-    <TargetLanguage>CS</TargetLanguage>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <SqlServerVerification>False</SqlServerVerification>
-    <IncludeCompositeObjects>True</IncludeCompositeObjects>
-    <TargetDatabaseSet>True</TargetDatabaseSet>
     <DefaultSchema>cumulus.ingest</DefaultSchema>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\Release\</OutputPath>
+    <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
+    <DeployToDatabase>true</DeployToDatabase>
+    <IncludeCompositeObjects>true</IncludeCompositeObjects>
+    <TargetDatabaseSet>true</TargetDatabaseSet>
+    <SqlServerVerification>false</SqlServerVerification>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
-    <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineDebug>false</DefineDebug>
-    <DefineTrace>true</DefineTrace>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <!-- Required for CI / SDK builds -->
+    <TargetFramework>net8.0</TargetFramework>
+    <ProjectGuid>{00000000-0000-0000-0000-000000000000}</ProjectGuid>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <!-- =========================
+       Configuration
+       ========================= -->
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
     <OutputPath>bin\Debug\</OutputPath>
-    <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
     <Optimize>false</Optimize>
+    <DebugType>full</DebugType>
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
-  <PropertyGroup>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
-    <!-- Default to the v11.0 targets path if the targets file for the current VS version is not found -->
-    <SSDTExists Condition="Exists('$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets')">True</SSDTExists>
-    <VisualStudioVersion Condition="'$(SSDTExists)' == ''">11.0</VisualStudioVersion>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <OutputPath>bin\Release\</OutputPath>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <DefineDebug>false</DefineDebug>
+    <DefineTrace>true</DefineTrace>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
-  <Import Condition="'$(SQLDBExtensionsRefPath)' != ''" Project="$(SQLDBExtensionsRefPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
-  <Import Condition="'$(SQLDBExtensionsRefPath)' == ''" Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
+  <!-- =========================
+       Project References
+       ========================= -->
   <ItemGroup>
-    <Folder Include="Properties" />
-    <Folder Include="Security" />
-    <Folder Include="ingest" />
-    <Folder Include="ingest\Tables" />
-    <Folder Include="ingest\Views" />
-    <Folder Include="ingest\Stored Procedures" />
-    <Folder Include="Scripts" />
-    <Folder Include="ingest\Functions" />
-    <Folder Include="Synonyms" />
+    <ProjectReference Include="..\metadata.common\metadata.common.sqlproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Build Include="ingest\Tables\Attributes.sql" />
-    <Build Include="ingest\Tables\Datasets.sql" />
-    <Build Include="ingest\Stored Procedures\GetDatasetPayload.sql" />
-    <Build Include="ingest\Stored Procedures\GetMergePayload.sql" />
-    <Build Include="ingest\Stored Procedures\SetIngestLoadStatus.sql" />
-    <Build Include="ingest\Stored Procedures\AddDatasets.sql" />
-    <Build Include="ingest\Stored Procedures\AddAttributes.sql" />
-    <Build Include="ingest\Functions\GetIngestLoadAction.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Build>
-    <Build Include="Scripts\DynamicsGetAttributeMetadata.sql" />
-    <Build Include="Scripts\OracleGetAttributeMetadata.sql" />
-    <Build Include="Scripts\SqlGetAttributeMetadata.sql" />
-    <Build Include="Security\db_cumulususer.sql" />
-    <Build Include="Security\ingest.sql" />
-    <Build Include="ingest\Stored Procedures\AddIngestPayloadPipelineDependencies.sql" />
-    <Build Include="Synonyms\ComputeConnections.sql" />
-    <Build Include="Synonyms\Connections.sql" />
-    <Build Include="Synonyms\ConnectionTypes.sql" />
-    <Build Include="ingest\Stored Procedures\GetLatestRefreshToken.sql" />
-    <Build Include="ingest\Tables\APITokens.sql" />
-    <Build Include="ingest\Stored Procedures\SetLatestRefreshToken.sql" />
-  </ItemGroup>
-  <ItemGroup>
-    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
-  </ItemGroup>
+  <!-- =========================
+       Deployment Scripts
+       ========================= -->
   <ItemGroup>
     <PreDeploy Include="Scripts\Script.PreDeployment.sql" />
+    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
+  </ItemGroup>
+  <!-- =========================
+       NetCore / CI Support
+       ========================= -->
+  <ItemGroup Condition="'$(NetCoreBuild)'=='true'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>

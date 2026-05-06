@@ -12,6 +12,7 @@ Post-Deployment Script Template
 --load default metadata
 :r .\DefaultProperties.sql
 :r .\MetadataAsCodeControl.sql
+:r .\BatchDaily.sql
 --:r .\Metadata\Orchestrators.sql
 --:r .\Metadata\Stages.sql
 --:r .\Metadata\Pipelines.sql

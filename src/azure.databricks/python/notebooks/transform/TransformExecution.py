@@ -26,15 +26,27 @@ from utils.CheckPayloadFunctions import *
 
 dbutils.widgets.text("Notebook Payload","")
 dbutils.widgets.text("Pipeline Run Id","")
+dbutils.widgets.text("Pipeline Run DateTime","")
 
 # COMMAND ----------
 
 import json
-payload = json.loads(dbutils.widgets.get("Notebook Payload"))
+from pyspark.sql.functions import *
+import pandas as pd
 
 # COMMAND ----------
 
-cleansed_secret, cleansed_storage_name, cleansed_container_name, curated_secret, curated_storage_name, curated_container_name, curated_schema_name, curated_dataset_name, columns_list, column_type_list, bk_list, partition_list, surrogate_key, load_type, business_logic_notebook_path = get_transform_payload_variables(payload)
+payload = json.loads(dbutils.widgets.get("Notebook Payload"))
+pipeline_run_id = dbutils.widgets.get("Pipeline Run Id")
+pipeline_execution_datetime_string = dbutils.widgets.get("Pipeline Run DateTime")
+
+# COMMAND ----------
+
+pipeline_execution_datetime = pd.to_datetime(pipeline_execution_datetime_string, format='%Y-%m-%dT%H:%M:%S.%fZ')
+
+# COMMAND ----------
+
+cleansed_secret, cleansed_storage_name, cleansed_container_name, curated_secret, curated_storage_name, curated_container_name, curated_domain_name, curated_schema_name, curated_dataset_name, columns_list, column_type_list, bk_list, partition_list, surrogate_key, load_type, business_logic_notebook_path = get_transform_payload_variables(payload)
 
 # COMMAND ----------
 
@@ -42,7 +54,7 @@ print("Setting cleansed ABFSS config...")
 set_abfss_spark_config(cleansed_secret, cleansed_storage_name)
 
 print("Setting curated ABFSS config...")
-set_abfss_spark_config(cleansed_secret, curated_storage_name)
+set_abfss_spark_config(curated_secret, curated_storage_name)
 
 # COMMAND ----------
 
@@ -51,6 +63,10 @@ cleansed_abfss_path = set_abfss_path(cleansed_storage_name, cleansed_container_n
 
 print("Setting curated ABFSS path...")
 curated_abfss_path = set_abfss_path(curated_storage_name, curated_container_name)
+
+# COMMAND ----------
+
+curated_abfss_path = f"{curated_abfss_path}/{curated_domain_name}/"
 
 # COMMAND ----------
 
@@ -64,7 +80,11 @@ str_sql = dbutils.notebook.run(business_logic_notebook_path, 60 ,{})
 # COMMAND ----------
 
 source_df = spark.sql(str_sql)
-# display(source_df)
+
+# COMMAND ----------
+
+source_df = source_df.withColumn('PipelineExecutionDateTime', to_timestamp(lit(pipeline_execution_datetime)))
+source_df = source_df.withColumn('PipelineRunId', lit(pipeline_run_id))
 
 # COMMAND ----------
 

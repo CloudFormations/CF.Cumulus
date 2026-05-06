@@ -2,6 +2,7 @@
 	"name": "Ingest_LS_Jira_UserAuth",
 	"properties": {
 		"type": "Jira",
+        "version": "2.0",
 		"parameters": {
 			"LSHostName": {
 				"type": "string"
