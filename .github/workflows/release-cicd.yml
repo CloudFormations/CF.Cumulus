@@ -1,0 +1,42 @@
+name: Sync source community → target pre-release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source repo (community)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: community
+          persist-credentials: false
+
+      - name: Add target repo as remote
+        run: |
+          git remote add target https://x-access-token:${{ secrets.TARGET_REPO_TOKEN }}@github.com/CloudFormations/CF.Cumulus.git
+
+      - name: Fetch target repo
+        run: |
+          git fetch target
+
+      - name: Checkout or create pre-release
+        run: |
+          if git show-ref --verify --quiet refs/remotes/target/pre-release; then
+            git checkout -B pre-release target/pre-release
+          else
+            git checkout -b pre-release
+          fi
+
+      - name: Merge source community into pre-release
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git merge origin/community --allow-unrelated-histories -X theirs -m "Merge source repo code into community into pre-release"
+
+      - name: Push pre-release
+        run: |
+          git push target pre-release

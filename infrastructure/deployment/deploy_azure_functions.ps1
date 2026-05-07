@@ -48,10 +48,10 @@ Compress-Archive -Path $sourcePath -DestinationPath ./funcapp.zip -Update
 # ============================================
 # Deploy ZIP package to Azure Function App
 # ============================================
-az functionapp deployment source config-zip `
-    --resource-group $resourceGroupName `
-    --name $functionAppName `
-    --src ./funcapp.zip
+# az functionapp deployment source config-zip `
+#     --resource-group $resourceGroupName `
+#     --name $functionAppName `
+#     --src ./funcapp.zip
 
 # ============================================
 # Store Function App Master Key in Key Vault
@@ -62,4 +62,4 @@ $functionAppMasterKey = $functionAppKeys.masterKey
 az keyvault secret set `
     --vault-name $keyVaultName `
     --name "cumulusfunctionsKey" `
-    --value "'$functionAppMasterKey'"
+    --value $functionAppMasterKey

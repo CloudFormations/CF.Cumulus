@@ -23,12 +23,17 @@ BEGIN
 		END;
 
 	SELECT DISTINCT 
-		[StageId] 
+		ce.[StageId]
+		, s.[ExecutionOrderId]
 	FROM 
-		[control].[CurrentExecution]
+		[control].[CurrentExecution] ce
+	INNER JOIN 
+		[control].[Stages] s
+	ON 
+		ce.StageId = s.StageId
 	WHERE
 		[LocalExecutionId] = @ExecutionId
 		AND ISNULL([PipelineStatus],'') <> 'Success'
 	ORDER BY 
-		[StageId] ASC
+		s.[ExecutionOrderId] ASC
 END;

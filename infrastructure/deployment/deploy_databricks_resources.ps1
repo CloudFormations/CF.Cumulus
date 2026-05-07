@@ -17,9 +17,6 @@ param(
     [Parameter(Mandatory = $true)]
     [string] $keyVaultUri,
 
-    [Parameter(Mandatory = $false)]
-    [string] $secretScopeName = "CumulusScope01",
-
     [Parameter(Mandatory = $true)]
     [string] $databricksWorkspaceURL,
 
@@ -27,7 +24,13 @@ param(
     [string] $storageAccountName,
 
     [Parameter(Mandatory = $false)]
-    [string] $clusterName = "General Purpose Cluster"
+    [string] $secretScopeName = "CumulusScope01",
+
+    [Parameter(Mandatory = $false)]
+    [string] $clusterName = "CF.Cumulus.Ingest.Compute",
+
+    [Parameter(Mandatory = $false)]
+    [string] $nodeTypeId = "Standard_D4s_v3"
 )
 
 # ============================================
@@ -148,21 +151,16 @@ $sparkConfig = @"
 $clusterJSON = @"
 {
     "cluster_name": "$clusterName",
-    "spark_version": "15.4.x-scala2.12",
+    "spark_version": "17.3.x-scala2.13",
+    "kind": "CLASSIC_PREVIEW",
+    "runtime_engine": "STANDARD",
     "spark_conf": $sparkConfig,
     "azure_attributes": {
         "availability": "SPOT_WITH_FALLBACK_AZURE"
     },
-    "node_type_id": "Standard_D4ds_v5",
+    "node_type_id": "$nodeTypeId",
     "autotermination_minutes": 20,
-    "data_security_mode": "DATA_SECURITY_MODE_AUTO",
-    "runtime_engine": "STANDARD",
-    "kind": "CLASSIC_PREVIEW",
-    "is_single_node": false,
-    "autoscale": {
-        "min_workers": 1,
-        "max_workers": 4
-    }
+    "is_single_node": true
 }
 "@
 
