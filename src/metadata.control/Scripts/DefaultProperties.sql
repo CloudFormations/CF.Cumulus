@@ -24,6 +24,11 @@
 		@Description = N'Do you want the framework to handle pipeline email alerts via the database metadata? 1 = Yes, 0 = No.';
 
 	EXEC [control].[AddProperty]
+		@PropertyName = N'AlertingFromUsername',
+		@PropertyValue = N'xxxx@yourdomain.com',
+		@Description = N'A valid user that email alerts will have set as the from address on your tenant that the underlying credential can send alerts on behalf of.';
+
+	EXEC [control].[AddProperty]
 		@PropertyName = N'EmailAlertBodyTemplate',
 		@PropertyValue = 
 		N'<hr/><strong>Pipeline Name: </strong>##PipelineName###<br/>

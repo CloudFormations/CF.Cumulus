@@ -3,8 +3,8 @@
 # COMMAND ----------
 
 # Set-up Secret Scope Name
-# Default Value
-scope_name = "CumulusScope01"
+dbutils.widgets.text("scope_name", "CumulusScope01")
+scope_name = dbutils.widgets.get("scope_name")
 
 # COMMAND ----------
 

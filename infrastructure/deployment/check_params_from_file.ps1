@@ -29,4 +29,4 @@ $params = foreach ($line in $lines) {
 # ============================================
 # Output in table format
 # ============================================
-$params | Format-Table -AutoSize
+Write-Output $params | Format-Table -AutoSize

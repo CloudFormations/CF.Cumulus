@@ -1,9 +1,18 @@
 # Read Me - Cloud Formations CF.Cumulus Community Edition
 
+[![GitHub Release](https://img.shields.io/github/v/release/CloudFormations/CF.Cumulus?label=release)](https://github.com/CloudFormations/CF.Cumulus/releases)
+[![GitHub Stars](https://img.shields.io/github/stars/CloudFormations/CF.Cumulus?style=flat)](https://github.com/CloudFormations/CF.Cumulus/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/CloudFormations/CF.Cumulus?style=flat)](https://github.com/CloudFormations/CF.Cumulus/network/members)
+[![GitHub Last Commit](https://img.shields.io/github/last-commit/CloudFormations/CF.Cumulus)](https://github.com/CloudFormations/CF.Cumulus/commits/main)
+
+<!--[![GitHub License](https://img.shields.io/github/license/CloudFormations/CF.Cumulus)](https://github.com/CloudFormations/CF.Cumulus/blob/main/LICENSE)
+[![GitHub Issues](https://img.shields.io/github/issues/CloudFormations/CF.Cumulus)](https://github.com/CloudFormations/CF.Cumulus/issues)
+[![GitHub Contributors](https://img.shields.io/github/contributors/CloudFormations/CF.Cumulus)](https://github.com/CloudFormations/CF.Cumulus/graphs/contributors) -->
+
 [ ![](https://static.wixstatic.com/media/fb2e49_ee1fa91f1ad049d2a4b151f3d8caeb9e~mv2.png) ](https://static.wixstatic.com/media/fb2e49_ee1fa91f1ad049d2a4b151f3d8caeb9e~mv2.png)
 
 CF.Cumulus is an Open-Source Metadata-driven Lakehouse Accelerator designed for Data Teams to quickly deploy and use a Lakehouse in Azure. Key features include:
-* Deployment of a Lakehouse to Azure within minutes.
+* Deployment of a Lakehouse to Azure within minutes. 
 * Pre-built connectors to minimise development overhead of ingesting data from variety of data sources.
 * Easy-to-use Metadata configuration tables simplifying the onboarding of new data sources to your data lake.
 * Robust Data Orchestration Pipelines. 

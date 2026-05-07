@@ -41,14 +41,6 @@ namespace cloudformations.cumulus.helpers
             if (!CheckGuid(SubscriptionId)) ReportInvalidBody(logger, "Expected Subscription Id to be a GUID.");
         }
 
-        private bool CheckUri(string uriValue)
-        {
-            bool result = Uri.TryCreate(uriValue, UriKind.Absolute, out var uriResult)
-                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
-
-            return result;
-        }
-
         public bool CheckGuid(string idValue)
         {
             bool result = Guid.TryParse(idValue, out _);

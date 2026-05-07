@@ -43,7 +43,7 @@ payload = json.loads(dbutils.widgets.get("Notebook Payload"))
 
 # COMMAND ----------
 
-cleansed_secret, cleansed_storage_name, cleansed_container_name, curated_secret, curated_storage_name, curated_container_name, curated_schema_name, curated_dataset_name, columns_list, column_type_list, bk_list, partition_list, surrogate_key, load_type, business_logic_notebook_path = get_transform_payload_variables(payload)
+cleansed_secret, cleansed_storage_name, cleansed_container_name, curated_secret, curated_storage_name, curated_container_name, curated_domain_name, curated_schema_name, curated_dataset_name, columns_list, column_type_list, bk_list, partition_list, surrogate_key, load_type, business_logic_notebook_path = get_transform_payload_variables(payload)
 
 
 # COMMAND ----------
@@ -66,6 +66,10 @@ cleansed_abfss_path = set_abfss_path(cleansed_storage_name, cleansed_container_n
 
 print("Setting curated ABFSS path...")
 curated_abfss_path = set_abfss_path(curated_storage_name, curated_container_name)
+
+# COMMAND ----------
+
+curated_abfss_path = f"{curated_abfss_path}/{curated_domain_name}/"
 
 # COMMAND ----------
 

@@ -7,6 +7,7 @@ def get_transform_payload_variables(payload: dict()) -> list():
     curated_storage_name = payload["CuratedStorageName"] 
     curated_container_name = payload["CuratedContainerName"] 
 
+    curated_domain_name = payload["DomainName"]
     curated_schema_name = payload["SchemaName"]
     curated_dataset_name = payload["DatasetName"]
     columns_list = payload["ColumnsList"].split("|")
@@ -21,6 +22,6 @@ def get_transform_payload_variables(payload: dict()) -> list():
 
     business_logic_notebook_path = payload["BusinessLogicNotebookPath"]
 
-    output = [cleansed_secret, cleansed_storage_name, cleansed_container_name, curated_secret, curated_storage_name, curated_container_name, curated_schema_name, curated_dataset_name, columns_list, column_type_list, bk_list, partition_list, surrogate_key, load_type, business_logic_notebook_path]
+    output = [cleansed_secret, cleansed_storage_name, cleansed_container_name, curated_secret, curated_storage_name, curated_container_name, curated_domain_name, curated_schema_name, curated_dataset_name, columns_list, column_type_list, bk_list, partition_list, surrogate_key, load_type, business_logic_notebook_path]
 
     return output

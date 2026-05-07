@@ -15,7 +15,7 @@ BEGIN
     INNER JOIN [common].[Connections] cn1
         ON ds.[ConnectionFK] = cn1.[ConnectionId]
     INNER JOIN [common].[Connections] cn2
-        ON ds.[RawStorageConnectionFK] = cn2.ConnectionId
+        ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] IN ('raw','bronze')
     INNER JOIN [common].[Connections] cn3
         ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
     WHERE
@@ -251,6 +251,18 @@ BEGIN
     SET @SourceQuery += '</entity></fetch>'
     END
 
+    ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType = 'Azure Data Lake Gen2'
+    BEGIN
+        SELECT 
+            @SourceQuery = ds.LoadClause
+        FROM 
+            [ingest].[Datasets] AS ds
+        WHERE
+            ds.DatasetId = @DatasetId
+        AND 
+            ds.[Enabled] = 1
+    END
+        
     ELSE IF @SourceLanguageType = 'NA' AND @ConnectionType <> 'REST API'
     BEGIN
         SELECT 
@@ -357,9 +369,9 @@ BEGIN
         RETURN 0;
     END
 
-    ELSE IF (@LoadType = 'I') AND (@ConnectionType = 'Amazon S3')
+    ELSE IF (@LoadType = 'I') AND (@ConnectionType = 'Azure Data Lake Gen2')
     BEGIN
-        RAISERROR('The Amazon S3 Connection type does not support incremental loading. Please change the load type in ingest.Datasets.',16,1)
+        RAISERROR('The Azure Data Lake Gen2 Connection type does not support incremental loading. Please change the load type in ingest.Datasets.',16,1)
         RETURN 0;
     END
 
@@ -414,7 +426,7 @@ BEGIN
     INNER JOIN [common].[Connections] cn1
     ON ds.[ConnectionFK] = cn1.[ConnectionId]
     INNER JOIN [common].[Connections] cn2
-    ON ds.[RawStorageConnectionFK] = cn2.ConnectionId
+    ON cn2.[ConnectionDisplayName] = 'PrimaryDataLake' AND cn2.[SourceLocation] IN ('raw','bronze')
     INNER JOIN [common].[Connections] cn3
     ON cn3.[ConnectionDisplayName] = 'PrimaryKeyVault'
     WHERE
