@@ -12,7 +12,10 @@ param(
     [string] $functionAppName,
     
     [Parameter(Mandatory = $true)]
-    [string] $keyVaultName
+    [string] $keyVaultName,
+
+    [Parameter(Mandatory = $false)]
+    [string] $secretName = $functionAppName + '-key'
 )
 
 # ============================================
@@ -61,5 +64,5 @@ $functionAppMasterKey = $functionAppKeys.masterKey
 
 az keyvault secret set `
     --vault-name $keyVaultName `
-    --name "cumulusfunctionsKey" `
+    --name $secretName `
     --value $functionAppMasterKey

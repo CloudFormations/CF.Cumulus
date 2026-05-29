@@ -19,8 +19,6 @@ CF.Cumulus is an Open-Source Metadata-driven Lakehouse Accelerator designed for 
 
 ## Release Details
 ### Latest Release Notes
-V25.1.1.0
-
 https://github.com/CloudFormations/CF.Cumulus/releases
 
 ## Choosing the Right Product Edition For You
@@ -120,12 +118,17 @@ param uniqueIdentifier = '01' // Identifier to ensure unique naming
 param myIPAddress = '1.1.1.1' // For SQL Server Firewall rule
 ```
 5. Save the file!
-6. Open the infrastructure/deployment/deploy_wrapper.ps1 file to view the PowerShell executor module. Review the parameters listed here and get these from your Azure tenant.
+6. Open the infrastructure/deployment/_wrapper_all.ps1 file to view the PowerShell executor module. Review the parameters listed here and get these from your Azure tenant.
 7. For ease of use, and confidence you've recorded the right values, input them in to the following PowerShell command:
 ```
-. 'C:\Users\MyUser\Repos\CF.Cumulus\infrastructure\deployment\deploy_wrapper.ps1' -tenantId 'My Tenant GUID' -subscriptionName 'My Subscription Name' -location 'uksouth'
+. 'C:\Users\MyUser\Repos\CF.Cumulus\infrastructure\deployment\_wrapper_all.ps1' `
+    -tenantId 'My-Tenant-GUID' `
+    -subscriptionName 'CF Internal' `
+    -location 'uksouth' `
+    -templateFile 'infrastructure/manual/main.bicep' `
+    -parametersFile 'infrastructure/manual/configuration/_installation/main.bicepparam'
 ```
-> Note: The deploy_wrapper.ps1 PowerShell script allows you to input these parameters at execution time, but it is also easy to specify them as part of a declarative statement, as above. This allows users to verify the command, path of file and parameters before executing.
+> Note: The _wrapper_all.ps1 PowerShell script allows you to input these parameters at execution time, but it is also easy to specify them as part of a declarative statement, as above. This allows users to verify the command, path of file and parameters before executing.
 
 8. Copy and Paste your command into a PowerShell terminal (such as the integrated terminal in VSCode) and execute.
-9. Follow the process on screen and in 5-10 minutes you will have a deployment of Cumulus ready to explore.
+9. Follow the process on screen and in 10-20 minutes you will have a deployment of Cumulus ready to explore.

@@ -162,6 +162,7 @@ BEGIN
     END
 
 	SELECT 
+        [ccn].[ConnectionDisplayName] AS 'ComputeName',
         [ccn].[ConnectionLocation] AS 'ComputeWorkspaceURL',
         [ccn].[ComputeLocation] AS 'ComputeClusterId',
         [ccn].[ComputeSize] AS 'ComputeSize',

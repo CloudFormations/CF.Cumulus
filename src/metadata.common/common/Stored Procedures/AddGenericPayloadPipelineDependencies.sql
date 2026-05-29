@@ -15,10 +15,7 @@ IF @StageName in ('Raw', 'Cleansed')
 BEGIN
     SELECT @DatasetCount = COUNT(*)
     FROM [ingest].[Datasets] AS ds
-    INNER JOIN [common].[Connections] AS cs
-    ON ds.ConnectionFK = cs.ConnectionId
     WHERE ds.Enabled = 1
-    AND cs.Enabled = 1
     AND ds.DatasetDisplayName = @DatasetDisplayName
 
     SELECT 
@@ -32,10 +29,7 @@ ELSE IF @StageName in ('Dimension', 'Fact')
 BEGIN
     SELECT @DatasetCount = COUNT(*)
     FROM [transform].[Datasets] AS ds
-    INNER JOIN [common].[ComputeConnections] AS ccs
-    ON ds.ComputeConnectionFK = ccs.ComputeConnectionId
     WHERE ds.Enabled = 1
-    AND ccs.Enabled = 1
     AND ds.DatasetName = @DatasetDisplayName
 
     SELECT 
@@ -69,10 +63,7 @@ IF @DependantStageName in ('Raw', 'Cleansed')
 BEGIN
     SELECT @DependantDatasetCount = COUNT(*)
     FROM [ingest].[Datasets] AS ds
-    INNER JOIN [common].[Connections] AS cs
-    ON ds.ConnectionFK = cs.ConnectionId
     WHERE ds.Enabled = 1
-    AND cs.Enabled = 1
     AND ds.DatasetDisplayName = @DependantDatasetDisplayName
 
     SELECT 
@@ -86,10 +77,7 @@ ELSE IF @DependantStageName in ('Dimension', 'Fact')
 BEGIN
     SELECT @DependantDatasetCount = COUNT(*)
     FROM [transform].[Datasets] AS ds
-    INNER JOIN [common].[ComputeConnections] AS ccs
-    ON ds.ComputeConnectionFK = ccs.ComputeConnectionId
     WHERE ds.Enabled = 1
-    AND ccs.Enabled = 1
     AND ds.DatasetName = @DependantDatasetDisplayName
 
     SELECT 

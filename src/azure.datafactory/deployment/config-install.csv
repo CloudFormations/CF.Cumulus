@@ -1,4 +1,6 @@
 type,name,path,value
-linkedService,Common_LS_cumulusdatabase,typeProperties.connectionString,"Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=$Env:SQLSERVER.database.windows.net;Initial Catalog=$Env:SQLDATABASE"
-linkedService,Common_LS_cumulusfunctions,typeProperties.functionAppUrl, "https://$Env:FUNCTIONAPP.azurewebsites.net"
-linkedService,Common_LS_cumuluskeys,typeProperties.baseUrl, "https://$Env:KEYVAULT.vault.azure.net/"
+linkedService,Common_LS_cumulusdatabase,typeProperties.connectionString,"Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=$Env:SQLSERVER.database.windows.net;Initial Catalog=$Env:SQLDATABASE;User ID=cumulus_adf_user"
+linkedService,Common_LS_cumulusdatabase,typeProperties.password.secretName,"$Env:SQLSERVER-adfpassword"
+linkedService,Common_LS_cumulusfunctions,typeProperties.functionAppUrl,"https://$Env:FUNCTIONAPP.azurewebsites.net"
+linkedService,Common_LS_cumulusfunctions,typeProperties.functionKey.secretName,"$Env:FUNCTIONAPP-key"
+linkedService,Common_LS_cumuluskeys,typeProperties.baseUrl,"https://$Env:KEYVAULT.vault.azure.net/"
