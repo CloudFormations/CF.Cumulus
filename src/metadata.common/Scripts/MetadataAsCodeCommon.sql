@@ -10,5 +10,5 @@ EXEC [common].[AddConnections] 'Azure Subscription', 'PrimarySubscription', 'NA'
 
 --ComputeConnections
 EXEC [common].[AddComputeConnections] 'Azure Databricks', 'CF.Cumulus.Ingest.Compute', '$(DatabricksHost)', '', 'Standard_D4ds_v5', '17.3.x-scala2.13', 1, '$(DatabricksWSName)', 'Common_LS_Databricks_Cluster_MIAuth', '$(Environment)', 1;
-EXEC [common].[AddComputeConnections] 'Azure Databricks', 'CF.Cumulus.Transform.Compute', '$(DatabricksHost)', '', 'Standard_E8_v3', '17.3.x-scala2.13', 2, '$(DatabricksWSName)', 'Common_LS_Databricks_Cluster_MIAuth', '$(Environment)', 1;
+EXEC [common].[AddComputeConnections] 'Azure Databricks', 'CF.Cumulus.Transform.Compute', '$(DatabricksHost)', '', 'Standard_D4ds_v5', '17.3.x-scala2.13', 4, '$(DatabricksWSName)', 'Common_LS_Databricks_Cluster_MIAuth', '$(Environment)', 1;
 EXEC [common].[AddComputeConnections] 'Azure Databricks', 'CF.Cumulus.Job.Compute', '$(DatabricksHost)', '', 'Standard_D4ds_v5', '17.3.x-scala2.13', 2, '$(DatabricksWSName)', 'Common_LS_Databricks_JobCluster_MIAuth', '$(Environment)', 1;

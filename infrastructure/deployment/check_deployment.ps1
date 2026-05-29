@@ -3,6 +3,9 @@
 # ============================================
 param(
     [Parameter(Mandatory = $true)]
+    [string] $tenantId,
+
+    [Parameter(Mandatory = $true)]
     [string] $subscriptionId,
 
     [Parameter(Mandatory = $true)]
@@ -42,8 +45,62 @@ param(
     [string] $secretScopeName = "CumulusScope01",
 
     [Parameter(Mandatory = $false)]
-    [boolean] $generateReport = $true
+    [boolean] $generateReport = $true,
+
+    [Parameter(Mandatory = $false)]
+    [string] $reportName = "deployment-check-report.md",
+
+    [Parameter(Mandatory = $false)]
+    [string] $secretName = $functionAppName + '-key',
+
+    [Parameter(Mandatory = $false)]
+    [string] $timingCsvPath = "",
+
+    [Parameter(Mandatory = $false)]
+    [boolean] $independentExecution = $false
+    
 )
+
+# ============================================
+# Write Inputs
+# ============================================
+$inputTable = [ordered]@{
+    tenantId                = $tenantId
+    subscriptionId          = $subscriptionId
+    resourceGroupName       = $resourceGroupName
+    functionAppName         = $functionAppName
+    dataFactoryName         = $dataFactoryName
+    databricksWorkspaceName = $databricksWorkspaceName
+    keyVaultNames           = $keyVaultNames -join ', '
+    storageAccountNames     = $storageAccountNames -join ', '
+    sqlServerName           = $sqlServerName
+    sqlDatabaseName         = $sqlDatabaseName
+    orchestratorType        = $orchestratorType
+    pipelineName            = $pipelineName
+    clusterName             = $clusterName
+    secretScopeName         = $secretScopeName
+    generateReport          = $generateReport
+    reportName              = $reportName
+    secretName              = $secretName
+    timingCsvPath           = $timingCsvPath
+    independentExecution    = $independentExecution
+}
+
+$colWidth = ($inputTable.Keys | Measure-Object -Maximum -Property Length).Maximum
+Write-Host ""
+Write-Host ("  {0,-$colWidth}  {1}" -f "Parameter", "Value") -ForegroundColor Cyan
+Write-Host ("  {0}" -f ("-" * 80)) -ForegroundColor Cyan
+foreach ($entry in $inputTable.GetEnumerator()) {
+    Write-Host ("  {0,-$colWidth}  {1}" -f $entry.Key, $entry.Value)
+}
+Write-Host ""
+
+# ============================================
+# Login if run independently
+# ============================================
+if ($independentExecution) {
+    az login --tenant $tenantId
+}
 
 # ============================================
 # Result Tracking
@@ -64,6 +121,24 @@ function Add-CheckResult {
     if ($Detail) {
         Write-Host "         $Detail" -ForegroundColor $(if ($Passed) { "Gray" } else { "Yellow" })
     }
+}
+
+# ============================================
+# Helper: Get-PrincipalId
+# ============================================
+function Get-PrincipalId {
+    param($identity)
+    if (-not $identity) { return $null }
+    # System-assigned (or combined) — principalId is on the identity object directly
+    if ($identity.type -like '*SystemAssigned*' -and $identity.principalId) {
+        return $identity.principalId
+    }
+    # User-assigned only — principalId is nested under the UAMI resource ID key
+    if ($identity.type -like '*UserAssigned*' -and $identity.userAssignedIdentities) {
+        $firstKey = $identity.userAssignedIdentities.PSObject.Properties.Name | Select-Object -First 1
+        if ($firstKey) { return $identity.userAssignedIdentities.$firstKey.principalId }
+    }
+    return $null
 }
 
 # ============================================
@@ -111,7 +186,7 @@ $databricksResource = az resource show `
 
 $functionAppMIId = $functionAppResource.identity.principalId
 $adfMIId         = $dataFactoryResource.identity.principalId
-$databricksMIId  = $databricksResource.identity.principalId
+$databricksMIId  = Get-PrincipalId $databricksResource.identity
 
 if (-not $databricksMIId) {
     Write-Host "  Databricks workspace has no system-assigned MI — falling back to AzureDatabricks service principal." -ForegroundColor Yellow
@@ -226,6 +301,18 @@ foreach ($kvScope in $keyVaultScopes) {
             -SubscriptionId $subscriptionId))
 }
 
+# Data Factory MI -> Databricks workspace: Contributor
+# Required so the ADF system-assigned MSI is accepted as a workspace admin by the
+# Databricks REST API (Premium SKU treats ARM Contributor as workspace-level admin),
+# enabling Web Activities that use MSI auth (e.g. Utils_PL_Get_Databricks_Compute_ID).
+Add-CheckResult `
+    -Name   "Data Factory MI -> Databricks '$databricksWorkspaceName': Contributor" `
+    -Passed ($null -ne $adfMIId -and $null -ne $databricksResource -and (Test-RoleAssignment `
+        -PrincipalId    $adfMIId `
+        -Role           "Contributor" `
+        -Scope          $databricksResource.id `
+        -SubscriptionId $subscriptionId))
+
 # ============================================
 # SQL db_cumulususer Check (Data Factory MI)
 # ============================================
@@ -306,6 +393,66 @@ WHERE dp.name = '$dataFactoryName'
             -Name   "Data Factory MI -> SQL '$sqlDatabaseName': db_cumulususer member" `
             -Passed $false `
             -Detail $_.Exception.Message
+    }
+}
+
+# ============================================
+# Function App Key Vault + PipelineValidate Check
+# ============================================
+Write-Host "`n============================================" -ForegroundColor Cyan
+Write-Host "  Checking Function App via Key Vault Key   " -ForegroundColor Cyan
+Write-Host "============================================`n" -ForegroundColor Cyan
+
+$functionKey = $null
+
+try {
+    $secret      = az keyvault secret show `
+        --vault-name $keyVaultNames[0] `
+        --name       $secretName 2>$null | ConvertFrom-Json
+    $functionKey = $secret.value.Trim("'")
+
+    Add-CheckResult `
+        -Name   "Key Vault secret '$secretName' accessible" `
+        -Passed (-not [string]::IsNullOrEmpty($functionKey))
+}
+catch {
+    Add-CheckResult `
+        -Name   "Key Vault secret '$secretName' accessible" `
+        -Passed $false `
+        -Detail $_.Exception.Message
+}
+
+if (-not [string]::IsNullOrEmpty($functionKey)) {
+
+    $validateUrl = "https://$functionAppName.azurewebsites.net/api/PipelineValidate?code=$functionKey"
+    $requestBody = @{
+        subscriptionId    = $subscriptionId
+        resourceGroupName = $resourceGroupName
+        orchestratorName  = $dataFactoryName
+        orchestratorType  = $orchestratorType
+        pipelineName      = $pipelineName
+    } | ConvertTo-Json
+
+    try {
+        $response = Invoke-RestMethod `
+            -Uri         $validateUrl `
+            -Method      Get `
+            -Body        $requestBody `
+            -ContentType "application/json" `
+            -ErrorAction Stop
+
+        Add-CheckResult `
+            -Name   "PipelineValidate '$pipelineName' via Function App" `
+            -Passed $true `
+            -Detail ($response | ConvertTo-Json -Compress -Depth 3)
+    }
+    catch {
+        $statusCode = $_.Exception.Response.StatusCode.value__
+        $passed     = ($null -ne $statusCode -and [int]$statusCode -lt 500)
+        Add-CheckResult `
+            -Name   "PipelineValidate '$pipelineName' via Function App" `
+            -Passed $passed `
+            -Detail "HTTP $statusCode — $($_.Exception.Message)"
     }
 }
 
@@ -494,67 +641,6 @@ if ($null -ne $databricksToken) {
 }
 
 # ============================================
-# Function App Key Vault + PipelineValidate Check
-# ============================================
-Write-Host "`n============================================" -ForegroundColor Cyan
-Write-Host "  Checking Function App via Key Vault Key   " -ForegroundColor Cyan
-Write-Host "============================================`n" -ForegroundColor Cyan
-
-$secretName  = "cumulusfunctionsKey"
-$functionKey = $null
-
-try {
-    $secret      = az keyvault secret show `
-        --vault-name $keyVaultNames[0] `
-        --name       $secretName 2>$null | ConvertFrom-Json
-    $functionKey = $secret.value.Trim("'")
-
-    Add-CheckResult `
-        -Name   "Key Vault secret '$secretName' accessible" `
-        -Passed (-not [string]::IsNullOrEmpty($functionKey))
-}
-catch {
-    Add-CheckResult `
-        -Name   "Key Vault secret '$secretName' accessible" `
-        -Passed $false `
-        -Detail $_.Exception.Message
-}
-
-if (-not [string]::IsNullOrEmpty($functionKey)) {
-
-    $validateUrl = "https://$functionAppName.azurewebsites.net/api/PipelineValidate?code=$functionKey"
-    $requestBody = @{
-        subscriptionId    = $subscriptionId
-        resourceGroupName = $resourceGroupName
-        orchestratorName  = $dataFactoryName
-        orchestratorType  = $orchestratorType
-        pipelineName      = $pipelineName
-    } | ConvertTo-Json
-
-    try {
-        $response = Invoke-RestMethod `
-            -Uri         $validateUrl `
-            -Method      Get `
-            -Body        $requestBody `
-            -ContentType "application/json" `
-            -ErrorAction Stop
-
-        Add-CheckResult `
-            -Name   "PipelineValidate '$pipelineName' via Function App" `
-            -Passed $true `
-            -Detail ($response | ConvertTo-Json -Compress -Depth 3)
-    }
-    catch {
-        $statusCode = $_.Exception.Response.StatusCode.value__
-        $passed     = ($null -ne $statusCode -and [int]$statusCode -lt 500)
-        Add-CheckResult `
-            -Name   "PipelineValidate '$pipelineName' via Function App" `
-            -Passed $passed `
-            -Detail "HTTP $statusCode — $($_.Exception.Message)"
-    }
-}
-
-# ============================================
 # Summary Report
 # ============================================
 $total      = $checkResults.Count
@@ -617,16 +703,19 @@ if ($generateReport) {
         [void]$md.AppendLine("| $icon | $($r.Name) | $detail |")
     }
 
-    if (-not $allPassed) {
+    if (-not [string]::IsNullOrEmpty($timingCsvPath) -and (Test-Path $timingCsvPath)) {
+        $timingRows = Import-Csv -Path $timingCsvPath
         [void]$md.AppendLine("")
-        [void]$md.AppendLine("## Failures")
+        [void]$md.AppendLine("## Deployment Timing")
         [void]$md.AppendLine("")
-        $checkResults | Where-Object { -not $_.Passed -and -not $_.WarnOnly } | ForEach-Object {
-            [void]$md.AppendLine("- ❌ **$($_.Name)**$(if ($_.Detail) { ": $($_.Detail)" })")
+        [void]$md.AppendLine("| Module | Start | End | Duration |")
+        [void]$md.AppendLine("|--------|-------|-----|----------|")
+        foreach ($row in $timingRows) {
+            [void]$md.AppendLine("| $($row.Module) | $($row.StartTime) | $($row.EndTime) | $($row.Duration) |")
         }
     }
 
-    $reportPath = Join-Path $PSScriptRoot "deployment-check-report.md"
+    $reportPath = Join-Path $PSScriptRoot $reportName
     $md.ToString() | Out-File -FilePath $reportPath -Encoding utf8 -Force
     Write-Host "  Report written to: $reportPath" -ForegroundColor Cyan
 }

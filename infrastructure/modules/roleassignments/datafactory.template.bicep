@@ -2,25 +2,23 @@
 param location string = resourceGroup().location
 
 @description('Function App Name.')
-param functionAppName string
+param functionAppName string = 'cfmaydevfuncuks16'
 
 @description('Key Vault name.')
-param keyVaultName string
+param keyVaultName string = 'cfmaydevkvuks16'
 
 @description('Data Factory resource name.')
-param dataFactoryName string
+param dataFactoryName string = 'cfmaydevadfuks16'
 
 @description('Databricks Workspace name.')
-param databricksWorkspaceName string
+param databricksWorkspaceName string = 'cfmaydevdbwuks16'
 
 @description('SQL Server Logical Instance name.')
-param sqlServerName string
+param sqlServerName string = 'cfmaydevsqluks16'
 
 @description('Storage Account Name.')
-param storageAccountName string 
+param storageAccountName string = 'cfmaydevdlsuks16' 
 
-@description('Unique timestamp for RBAC deployments to prevent duplication conflicts.')
-param timestamp string = utcNow('yy-MM-dd-HHmm')
 
 // Reference to existing Data Factory resource
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
@@ -35,6 +33,7 @@ resource dataFactoryRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '673868aa-7521-48a0-acc6-0f60742d39f5') // Data Factory Contributor role
     principalId: dataFactory.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -50,6 +49,7 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '4633458b-17de-408a-b874-0445c86b69e6') // Key Vault Secrets User role
     principalId: dataFactory.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -65,6 +65,7 @@ resource sqlRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' 
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7') // Reader role
     principalId: dataFactory.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -78,8 +79,9 @@ resource databricksRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-
   name: guid(dataFactory.id, databricks.id, 'Contributor')
   scope: databricks
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c') // Reader role
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c') // Contributor role
     principalId: dataFactory.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -93,8 +95,9 @@ resource functionAppRoleAssignment 'Microsoft.Authorization/roleAssignments@2022
   name: guid(dataFactory.id, functionApp.id, 'Contributor')
   scope: functionApp
   properties: {
-    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c') // Reader role
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'b24988ac-6180-42a0-ab88-20f7382dd24c') // Contributor role
     principalId: dataFactory.identity.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 

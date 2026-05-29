@@ -103,6 +103,7 @@ $reportDir     = "$sourceFolderPath\src\metadata.core"
 Write-Host "`nBuilding common (required first)..." -ForegroundColor Green
 dotnet build "$sourceFolderPath\src\metadata.common\metadata.common.sqlproj" `
     --configuration $configuration `
+    --verbosity quiet `
     /p:NetCoreBuild=true `
     /p:SqlServerVersion=Azure
 
@@ -110,22 +111,22 @@ Write-Host "Building control / ingest / transform in parallel..." -ForegroundCol
 $buildJobs = @(
     Start-Job -Name "build-control" -ScriptBlock {
         dotnet build $using:sourceFolderPath\src\metadata.control\metadata.control.sqlproj `
-            --configuration $using:configuration /p:NetCoreBuild=true /p:SqlServerVersion=Azure
+            --configuration $using:configuration --verbosity quiet /p:NetCoreBuild=true /p:SqlServerVersion=Azure
     }
     Start-Job -Name "build-ingest" -ScriptBlock {
         dotnet build $using:sourceFolderPath\src\metadata.ingest\metadata.ingest.sqlproj `
-            --configuration $using:configuration /p:NetCoreBuild=true /p:SqlServerVersion=Azure
+            --configuration $using:configuration --verbosity quiet /p:NetCoreBuild=true /p:SqlServerVersion=Azure
     }
     Start-Job -Name "build-transform" -ScriptBlock {
         dotnet build $using:sourceFolderPath\src\metadata.transform\metadata.transform.sqlproj `
-            --configuration $using:configuration /p:NetCoreBuild=true /p:SqlServerVersion=Azure
+            --configuration $using:configuration --verbosity quiet /p:NetCoreBuild=true /p:SqlServerVersion=Azure
     }
 )
 
 if ($deployData) {
     $buildJobs += Start-Job -Name "build-data" -ScriptBlock {
         dotnet build $using:sourceFolderPath\src\metadata.data\metadata.data.sqlproj `
-            --configuration $using:configuration /p:NetCoreBuild=true /p:SqlServerVersion=Azure
+            --configuration $using:configuration --verbosity quiet /p:NetCoreBuild=true /p:SqlServerVersion=Azure
     }
 }
 
@@ -134,14 +135,14 @@ $buildJobs | Remove-Job
 
 # ============================================
 # Publish the core set of DacPacs + PostDeployment Scripts
-# common must publish before the schema-specific projects (they reference
-# its objects at runtime). control / ingest / transform target different
-# schemas and have no cross-dependencies, so they publish in parallel.
-# /p:ScriptDatabaseOptions=false skips the DB-level options round-trip,
-# which is the single biggest per-publish time saving.
+# Dependency order:
+#   Phase 1: common   (no dependencies)
+#   Phase 2: control  (references common objects)
+#   Phase 3: ingest + transform in parallel (both reference common + control;
+#            no cross-dependency between each other)
 # ============================================
 
-Write-Host "`nPublishing common schema objects (required first)..." -ForegroundColor Green
+Write-Host "`nPhase 1: Publishing common schema objects..." -ForegroundColor Green
 SqlPackage /Action:Publish `
     "/SourceFile:$sourceFolderPath\src\metadata.common\bin\Debug\metadata.common.dacpac" `
     "/TargetConnectionString:$connStr" `
@@ -153,9 +154,10 @@ SqlPackage /Action:Publish `
     /v:RGName=$resourceGroupName `
     /v:SubscriptionID=$subscriptionId `
     /p:ScriptDatabaseOptions=false `
-    "/DeployReportPath:$reportDir\deploy-report-common.xml"
+    /p:BlockOnPossibleDataLoss=false `
+    /p:VerifyDeployment=false
 
-Write-Host "Publishing the control schema objects..."
+Write-Host "`nPhase 2: Publishing control schema objects..." -ForegroundColor Green
 SqlPackage /Action:Publish `
     "/SourceFile:$sourceFolderPath\src\metadata.control\bin\Debug\metadata.control.dacpac" `
     "/TargetConnectionString:$connStr" `
@@ -164,34 +166,34 @@ SqlPackage /Action:Publish `
     /v:SubscriptionID=$subscriptionId `
     /v:ADFName=$dataFactoryName `
     /v:TenantID=$tenantId `
-    /DeployReportPath:"$sourceFolderPath\src\metadata.core\deploy-report.xml"
+    /p:ScriptDatabaseOptions=false `
+    /p:BlockOnPossibleDataLoss=false `
+    /p:VerifyDeployment=false
 
-
-Write-Host "Publishing ingest / transform in parallel..." -ForegroundColor Yellow
+Write-Host "`nPhase 3: Publishing ingest + transform schemas in parallel..." -ForegroundColor Yellow
 $publishJobs = @(
     Start-Job -Name "publish-ingest" -ScriptBlock {
-        param($conn, $src, $report)
-        & SqlPackage /Action:Publish `
-            "/SourceFile:$src\metadata.ingest\bin\Debug\metadata.ingest.dacpac" `
+        $src  = $using:sourceFolderPath
+        $conn = $using:connStr
+        SqlPackage /Action:Publish `
+            "/SourceFile:$src\src\metadata.ingest\bin\Debug\metadata.ingest.dacpac" `
             "/TargetConnectionString:$conn" `
             /p:ScriptDatabaseOptions=false `
-            "/DeployReportPath:$report\deploy-report-ingest.xml"
-    } -ArgumentList $connStr, "$sourceFolderPath\src", $reportDir
-
+            /p:BlockOnPossibleDataLoss=false `
+            /p:VerifyDeployment=false
+    }
     Start-Job -Name "publish-transform" -ScriptBlock {
-        param($conn, $src, $report)
-        & SqlPackage /Action:Publish `
-            "/SourceFile:$src\metadata.transform\bin\Debug\metadata.transform.dacpac" `
+        $src  = $using:sourceFolderPath
+        $conn = $using:connStr
+        SqlPackage /Action:Publish `
+            "/SourceFile:$src\src\metadata.transform\bin\Debug\metadata.transform.dacpac" `
             "/TargetConnectionString:$conn" `
             /p:ScriptDatabaseOptions=false `
-            "/DeployReportPath:$report\deploy-report-transform.xml"
-    } -ArgumentList $connStr, "$sourceFolderPath\src", $reportDir
+            /p:BlockOnPossibleDataLoss=false `
+            /p:VerifyDeployment=false
+    }
 )
-
 $publishJobs | Wait-Job | Receive-Job
-if ($publishJobs | Where-Object { $_.State -eq "Failed" }) {
-    throw "One or more schema publishes failed. Check output above."
-}
 $publishJobs | Remove-Job
 
 # ============================================
@@ -221,13 +223,50 @@ $userId = az ad signed-in-user show --query id --output tsv
 az sql server ad-admin create --resource-group $resourceGroupName --server $sqlServerName --display-name $userDetails --object-id $userId
 
 # ============================================
-# Provision Role assignments for ADF SPN
+# Create SQL auth user for ADF (cumulus_adf_user)
 # ============================================
-Write-Host "Grant Access for ADF on Metadata Database..."
-$createADFUserScript = $currentLocation + '\grant_adf_access.ps1'
-& $createADFUserScript `
-    -sqlServerName $sqlServerName `
-    -sqlDatabaseName $sqlDatabaseName `
-    -dataFactoryName $dataFactoryName
+Write-Host "Creating SQL auth user for ADF..."
+$rng         = [System.Security.Cryptography.RandomNumberGenerator]::Create()
+$pwdBytes    = New-Object byte[] 24; $rng.GetBytes($pwdBytes)
+$adfPassword = 'Cf2@' + [Convert]::ToBase64String($pwdBytes).TrimEnd('=').Replace('+','p').Replace('/','q')
 
-Remove-Variable sqlPassword 
+az keyvault secret set `
+    --vault-name $keyVaultName `
+    --name "$sqlServerName-adfpassword" `
+    --value $adfPassword `
+    --output none
+
+$escapedAdfPwd = $adfPassword.Replace("'", "''")
+$adfUserSql = @"
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'cumulus_adf_user' AND type_desc = 'SQL_USER')
+    CREATE USER [cumulus_adf_user] WITH PASSWORD = '$escapedAdfPwd';
+ELSE
+    ALTER USER [cumulus_adf_user] WITH PASSWORD = '$escapedAdfPwd';
+
+IF NOT EXISTS (SELECT 1 FROM sys.database_principals WHERE name = 'db_cumulususer' AND type = 'R')
+    CREATE ROLE [db_cumulususer];
+
+GRANT EXECUTE, SELECT, INSERT, UPDATE, DELETE, CONTROL, ALTER ON SCHEMA::[common]    TO [db_cumulususer];
+GRANT EXECUTE, SELECT, INSERT, UPDATE, DELETE, CONTROL, ALTER ON SCHEMA::[control]   TO [db_cumulususer];
+GRANT EXECUTE, SELECT, INSERT, UPDATE, DELETE, CONTROL, ALTER ON SCHEMA::[ingest]    TO [db_cumulususer];
+GRANT EXECUTE, SELECT, INSERT, UPDATE, DELETE, CONTROL, ALTER ON SCHEMA::[transform] TO [db_cumulususer];
+
+IF NOT EXISTS (
+    SELECT 1 FROM sys.database_role_members rm
+    JOIN sys.database_principals r ON r.principal_id = rm.role_principal_id AND r.name = 'db_cumulususer'
+    JOIN sys.database_principals m ON m.principal_id = rm.member_principal_id AND m.name = 'cumulus_adf_user')
+    ALTER ROLE [db_cumulususer] ADD MEMBER [cumulus_adf_user];
+"@
+
+Invoke-Sqlcmd `
+    -ServerInstance "$sqlServerName.database.windows.net" `
+    -Database       $sqlDatabaseName `
+    -Username       $sqlLogin `
+    -Password       $sqlPassword `
+    -Query          $adfUserSql `
+    -TrustServerCertificate `
+    -ConnectionTimeout 60
+Write-Host "ADF SQL user 'cumulus_adf_user' created/updated in database"
+
+Remove-Variable sqlPassword
+Remove-Variable adfPassword

@@ -1,28 +1,60 @@
-This license is based on the MIT License but includes additional restrictions on 
-redistribution and resale.
+CF.Cumulus Source-Available License v1
 
-Copyright (c) 2025, CF.Cumulus™, Cloud Formations™, Cloud Formations Ltd (cloudformations.org)
+Copyright (c) 2025-2026, Cloud Formations Ltd (cloudformations.org).
+CF.Cumulus(TM) and Cloud Formations(TM) are trademarks of Cloud Formations Ltd.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+1. Scope.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+   This licence covers the source code contained in this repository (the
+   "Community Edition"). Additional CF.Cumulus components, framework
+   modules, portal functionality, and support entitlements not contained
+   in this repository are proprietary and licensed separately under
+   commercial terms.
 
-The software may not be sold, sublicensed, or distributed as part of any product 
-or service unless as part of a larger application with substantial added value.
+2. Grant.
 
-Substantial added value is defined as significant new functionality, features, 
-or integrations beyond the original scope of the Software.
+   Subject to the conditions below, Cloud Formations Ltd grants you a
+   worldwide, royalty-free, non-exclusive licence to use, copy, modify,
+   and internally deploy the Community Edition (the "Software"),
+   including for commercial purposes within your own organisation or on
+   behalf of a single customer for whom you are performing engagement
+   work.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+3. Restrictions.
+
+   You may not:
+
+   (a) sell, rent, sublicense, host as a service, or otherwise
+       commercialise the Software, whether on its own or substantially
+       unmodified, as a product or service offered to third parties; or
+
+   (b) redistribute the Software except as an integrated component of a
+       larger application that provides substantial added value, where
+       "substantial added value" means significant new functionality,
+       features, or integrations that materially extend the Software
+       beyond its original scope. Mere repackaging, rebranding,
+       configuration, or hosting does not constitute substantial added
+       value.
+
+4. Attribution.
+
+   Any permitted redistribution must retain this licence notice in full,
+   together with the copyright and trademark notices above.
+
+5. Trademarks.
+
+   This licence does not grant permission to use the trade names,
+   trademarks, service marks, or product names of Cloud Formations Ltd,
+   except as required for reasonable and customary use in describing the
+   origin of the Software.
+
+6. Warranty disclaimer.
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.

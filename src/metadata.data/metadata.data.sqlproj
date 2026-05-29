@@ -48,33 +48,6 @@
     <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
   </ItemGroup>
   <!-- =========================
-       Non-model / Utility Files
-       ========================= -->
-  <ItemGroup>
-    <None Include="metadata.data.publish.xml" />
-    <None Include="Scripts\ConnectionsMetadataAsCode.sql" />
-    <None Include="Scripts\Control\ControlPipelineMetadataAsCode.sql" />
-    <None Include="Scripts\ControlWaitPipelineMetadataAsCode.sql" />
-    <None Include="Scripts\Ingest\Product.sql" />
-    <None Include="Scripts\Ingest\SalesOrderDetail.sql" />
-    <None Include="Scripts\Ingest\SalesOrderHeader.sql" />
-    <None Include="Scripts\Transform\DimDate.sql" />
-    <None Include="Scripts\Transform\DimProducts.sql" />
-    <None Include="Scripts\Transform\FactSales.sql" />
-  </ItemGroup>
-  <!-- =========================
-       SQLCMD Variables
-       ========================= -->
-  <ItemGroup>
-    <SqlCmdVariable Include="DemoConnectionLocation" Value="$(SqlCmdVar__1)" />
-    <SqlCmdVariable Include="DemoSourceLocation" Value="$(SqlCmdVar__2)" />
-    <SqlCmdVariable Include="DemoResourceName" Value="$(SqlCmdVar__3)" />
-    <SqlCmdVariable Include="DemoLinkedService" Value="$(SqlCmdVar__4)" />
-    <SqlCmdVariable Include="DemoUsername" Value="$(SqlCmdVar__5)" />
-    <SqlCmdVariable Include="DemoKVSecret" Value="$(SqlCmdVar__6)" />
-    <SqlCmdVariable Include="ADFName" Value="$(SqlCmdVar__7)" />
-  </ItemGroup>
-  <!-- =========================
        Project References
        ========================= -->
   <ItemGroup>
@@ -89,28 +62,5 @@
   <ItemGroup Condition="'$(NetCoreBuild)'=='true'">
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
-  <!-- =========================
-       Auto-include helpers
-       ========================= -->
-  <!-- Generate Scripts\Ingest\_AutoInclude.sql -->
-  <Target Name="GenerateIngestScripts" BeforeTargets="BeforeBuild">
-    <ItemGroup>
-      <IngestScripts Include="Scripts\Ingest\*.sql" Exclude="Scripts\Ingest\_AutoInclude.sql" />
-    </ItemGroup>
-    <WriteLinesToFile File="Scripts\Ingest\_AutoInclude.sql" Lines="@(IngestScripts->':r .\%(RecursiveDir)%(Filename)%(Extension)')" Overwrite="true" />
-  </Target>
-  <!-- Generate Scripts\Transform\_AutoInclude.sql -->
-  <Target Name="GenerateTransformScripts" BeforeTargets="BeforeBuild">
-    <ItemGroup>
-      <TransformScripts Include="Scripts\Transform\*.sql" Exclude="Scripts\Transform\_AutoInclude.sql" />
-    </ItemGroup>
-    <WriteLinesToFile File="Scripts\Transform\_AutoInclude.sql" Lines="@(TransformScripts->':r .\%(RecursiveDir)%(Filename)%(Extension)')" Overwrite="true" />
-  </Target>
-  <!-- Generate Scripts\Control\_AutoInclude.sql -->
-  <Target Name="GenerateControlScripts" BeforeTargets="BeforeBuild">
-    <ItemGroup>
-      <ControlScripts Include="Scripts\Control\*.sql" Exclude="Scripts\Control\_AutoInclude.sql" />
-    </ItemGroup>
-    <WriteLinesToFile File="Scripts\Control\_AutoInclude.sql" Lines="@(ControlScripts->':r .\%(RecursiveDir)%(Filename)%(Extension)')" Overwrite="true" />
-  </Target>
+  
 </Project>
