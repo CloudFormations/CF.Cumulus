@@ -9,7 +9,15 @@
 		],
 		"type": "AzureSqlDatabase",
 		"typeProperties": {
-			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcumulusdevsqluks25.database.windows.net;Initial Catalog=cfcumulusdevsqldbuks25"
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=cfcumulusdevsqluks25.database.windows.net;Initial Catalog=cfcumulusdevsqldbuks25;User ID=cumulus_adf_user",
+			"password": {
+				"type": "AzureKeyVaultSecret",
+				"store": {
+					"referenceName": "Common_LS_cumuluskeys",
+					"type": "LinkedServiceReference"
+				},
+				"secretName": "placeholder-adfpassword"
+			}
 		}
 	}
 }

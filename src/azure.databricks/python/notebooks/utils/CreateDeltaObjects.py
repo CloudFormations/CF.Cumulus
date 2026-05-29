@@ -7,7 +7,7 @@ from databricks.sdk.runtime import spark
 # Variations of required the create statements required to create schema and table objects for different environments.
 def create_generic_schema_sql(schema_name: str) -> str:
     create_sql = f"""
-    CREATE SCHEMA {schema_name}
+    CREATE SCHEMA IF NOT EXISTS {schema_name}
     """
     return create_sql
 

@@ -1,6 +1,9 @@
 # ============================================
 # Target Resources
 # ============================================
+<#
+#For manual, inline execution.
+
 $tenantId                = ""
 $subscriptionName        = ""
 $subscriptionId          = ""
@@ -21,6 +24,30 @@ $dataFactoryName         = ""
 $sqlServerName           = ""
 $sqlDatabaseName         = ""
 $deployGovernModuleArtifacts = $false
+#>
+
+param(
+    [string]$tenantId = "",
+    [string]$subscriptionName = "",
+    [string]$subscriptionId = "",
+    [string]$location = "",
+    [string]$resourceGroupName = "",
+    [string]$keyVaultName = "",
+    [string]$keyVaultId = "",
+    [string]$keyVaultUri = "",
+    [string]$governKeyVaultName = "",
+    [string]$governKeyVaultId = "",
+    [string]$governKeyVaultUri = "",
+    [string]$databricksWorkspaceName = "",
+    [string]$databricksWorkspaceURL = "",
+    [string]$storageAccountName = "",
+    [string]$governStorageAccountName = "",
+    [string]$functionAppName = "",
+    [string]$dataFactoryName = "",
+    [string]$sqlServerName = "",
+    [string]$sqlDatabaseName = "",
+    [bool]$deployGovernModuleArtifacts = $false
+)
 
 # ============================================
 # Logging Information
@@ -46,6 +73,7 @@ Write-Host "Starting Deployment. $infoTime`r`n" -ForegroundColor Yellow
 # Determine script location
 # ============================================
 $currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
+#$currentLocation = $PSScriptRoot
 
 $infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
 Write-Host "Current Path Set. $infoTime`r`n" -ForegroundColor Yellow
@@ -62,13 +90,35 @@ Write-Host "Predeployment Checks Done. $infoTime`r`n" -ForegroundColor Yellow
 # ============================================
 # Authenticate using Azure CLI
 # ============================================
-az login --tenant $tenantId
-az account set --subscription $subscriptionId
+if ($tenantId) {
+    az login --tenant $tenantId
+} else {
+    Write-Host "tenantId not provided. Skipping explicit az login. Assuming Azure DevOps service connection or agent identity is already authenticated."
+}
+
+if ($subscriptionId) {
+    az account set --subscription $subscriptionId
+}
 
 # ============================================
 # Authenticate Azure PowerShell
 # ============================================
-Connect-AzAccount -SubscriptionId $subscriptionId
+$azContext = $null
+try {
+    $azContext = Get-AzContext -ErrorAction Stop
+} catch {
+    Write-Host "Az PowerShell context not available yet. Attempting Connect-AzAccount..." -ForegroundColor Yellow
+}
+
+if (-not $azContext) {
+    try {
+        Connect-AzAccount -SubscriptionId $subscriptionId -ErrorAction Stop
+    } catch {
+        Write-Host "Connect-AzAccount was skipped or failed: $($_.Exception.Message)" -ForegroundColor Yellow
+    }
+} else {
+    Write-Host "Azure PowerShell context already established." -ForegroundColor Yellow
+}
 
 $infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
 Write-Host "Connected to Subscription. $infoTime`r`n" -ForegroundColor Yellow
@@ -210,19 +260,6 @@ $deploySQLDacPacsScript = Join-Path $currentLocation "deploy_sql_dacpacs.ps1"
 
 $infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
 Write-Host "Deployed SQL DACPAC. $infoTime`r`n" -ForegroundColor Yellow
-
-# ============================================
-# Grant ADF access to SQL Database
-# ============================================
-$grantADFAccessScript = Join-Path $currentLocation "grant_adf_access.ps1"
-
-& $grantADFAccessScript `
-    -dataFactoryName $dataFactoryName `
-    -sqlServerName $sqlServerName `
-    -sqlDatabaseName $sqlDatabaseName
-
-$infoTime = ParseTimeValue -processTimerInterim $processTimerStart.Elapsed
-Write-Host "Granted ADF Access to SQL Database. $infoTime`r`n" -ForegroundColor Yellow
 
 # ============================================
 # Cleanup
