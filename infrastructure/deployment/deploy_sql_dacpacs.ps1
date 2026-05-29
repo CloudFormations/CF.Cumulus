@@ -87,8 +87,8 @@ $sqlPassword = az keyvault secret show `
     --query value `
     --output tsv
 
-$currentLocation = Split-Path -Path $MyInvocation.MyCommand.Path -Parent
-$sourceFolderPath = $currentLocation -replace '\\infrastructure\\deployment'
+    [Parameter(Mandatory=$false)]
+    [boolean] $demoSourceLocation,
 
 # ============================================
 # Build DacPacs

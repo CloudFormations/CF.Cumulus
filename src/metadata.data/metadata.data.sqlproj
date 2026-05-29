@@ -45,7 +45,13 @@
        Deployment Scripts
        ========================= -->
   <ItemGroup>
-    <PostDeploy Include="Scripts\Script.PostDeployment.sql" />
+    <SqlCmdVariable Include="DemoConnectionLocation" Value="$(SqlCmdVar__1)" />
+    <SqlCmdVariable Include="DemoSourceLocation" Value="$(SqlCmdVar__2)" />
+    <SqlCmdVariable Include="DemoResourceName" Value="$(SqlCmdVar__3)" />
+    <SqlCmdVariable Include="DemoLinkedService" Value="$(SqlCmdVar__4)" />
+    <SqlCmdVariable Include="DemoUsername" Value="$(SqlCmdVar__5)" />
+    <SqlCmdVariable Include="DemoKVSecret" Value="$(SqlCmdVar__6)" />
+    <SqlCmdVariable Include="ADFName" Value="$(SqlCmdVar__7)" />
   </ItemGroup>
   <!-- =========================
        Project References

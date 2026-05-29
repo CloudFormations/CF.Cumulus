@@ -69,6 +69,10 @@ curated_abfss_path = set_abfss_path(curated_storage_name, curated_container_name
 
 # COMMAND ----------
 
+curated_abfss_path = f"{curated_abfss_path}/{curated_domain_name}/"
+
+# COMMAND ----------
+
 # MAGIC %md
 # MAGIC # Check: Payload Validity
 
