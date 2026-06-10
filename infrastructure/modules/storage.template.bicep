@@ -32,6 +32,8 @@ param isSftpEnabled bool
 @allowed(['Hot', 'Cold'])
 param accessTier string = 'Hot'
 
+@description('Redundancy option for the storage account')
+param redundancy string = 'Standard_LRS'
 
 
 // Create storage account resource
@@ -44,7 +46,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   // - isSftpEnabled
   kind: storageKind
   sku: {
-    name: 'Standard_GRS'
+    name: redundancy
   }
   properties: {
     isHnsEnabled: storageKind == 'StorageV2' ? isHnsEnabled : false
